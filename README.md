@@ -1,4 +1,4 @@
-# workflow_for_claude_code
+# Consilium
 
 Personal Claude Code customizations: slash commands, subagents, skills, and
 audit templates that follow you across machines.
@@ -6,7 +6,7 @@ audit templates that follow you across machines.
 ## Layout
 
 ```
-workflow_for_claude_code/
+consilium/
 ├── commands/             # custom slash commands     (--> ~/.claude/commands/)
 │   ├── audit.md          #   /audit — single-pass scientific-project audit
 │   └── release.md        #   /release — versioned-release workflow
@@ -33,8 +33,8 @@ workflow_for_claude_code/
 ## Install on a new machine
 
 ```bash
-git clone git@github.com:dunyuliu/workflow_for_claude_code.git ~/workflow_for_claude_code
-bash ~/workflow_for_claude_code/scripts/install.sh
+git clone git@github.com:dunyuliu/consilium.git ~/consilium
+bash ~/consilium/scripts/install.sh
 ```
 
 `install.sh` creates symlinks from `~/.claude/{commands,agents,skills}/<name>` to
