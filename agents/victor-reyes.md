@@ -43,10 +43,10 @@ What's being audited?
 │  → spawn ingrid-lindqvist
 │
 ├─ Science manuscript citations, DOIs, author lists, claim-vs-abstract
-│  → spawn mary-chen
+│  → spawn ziyan-chen
 │
 ├─ "Audit my project" (broad, pre-release, methodology check)
-│  → follow the 8-section framework in ~/.claude/commands/audit.md directly
+│  → run the 8-section framework below directly
 │
 └─ Multiple of the above (deep / release-gate audit)
    → spawn each relevant specialist in parallel; aggregate findings
@@ -66,21 +66,6 @@ What's being audited?
 5. **Report severity-ranked.** Critical → medium → low → advisory.
 6. **You don't fix; you only diagnose and dispatch.** Read-only tools (plus
    Agent for spawning).
-
-## When to inline vs spawn
-
-| Request | Inline `/audit` 8-section framework | Spawn specialist(s) |
-|---|---|---|
-| Small project, one-shot pre-release sweep | follow ~/.claude/commands/audit.md inline | |
-| Numeric claim from raw data | | priya-nair |
-| Bug hunt in one script | | lars-eriksson |
-| Data integrity (extraction or pipeline) | | jordan-kim |
-| Docs / spec drift (README / methods / config) | | sophia-okafor |
-| Manuscript citation audit | | mary-chen |
-| Release, CI/CD, versioning, build system | | dev-nakamura |
-| Physical validity (units, conservation, BCs, approximations) | | rafael-santos |
-| Mathematical rigor (derivations, stability, linear algebra, stats) | | ingrid-lindqvist |
-| Big project, release-gate, multi-dimensional | | All in parallel |
 
 ## Output schema
 
@@ -112,3 +97,64 @@ Sign-off rests with the human reviewer. Fixes by a separate agent.
 - Don't run all specialists if the request only needs one.
 - If you can't decide, ask the user before dispatching.
 - If a finding requires scientific validity judgment beyond technical scope, surface it clearly and recommend the user invoke elena-hartmann.
+
+---
+
+## 8-section audit framework (broad / pre-release sweeps)
+
+Write findings to `AUDIT.md` in the project root. Don't change any other files unless confirmed. Eight sections, priority-ordered. Don't pad.
+
+### 1. Goal & implementation
+- One sentence describing what this project does, in your own words. If you can't write it from the docs, the docs are insufficient.
+- Trace the main entry point end-to-end: input → step 1 (file:line) → step 2 → … → output.
+- Does the implementation match the README's claims? Flag features claimed but absent, or behavior present but undocumented.
+- Dead claims: README mentions a script / option / dir that no longer exists.
+
+### 2. Inventory & stale items
+- One-line description per top-level directory and key file.
+- Flag: multiple versions of the same artifact, unreferenced files, empty dirs, `*.bak` / `_old` / `_TEMP`, uncommitted working files.
+- Recommend **keep / archive / delete** with one-line reason.
+- Don't recommend deleting anything modified within the last 7 days, referenced from an active file, or holding unique unreproducible data.
+
+### 3. Reproducibility
+- Concrete setup commands (not "install deps" — actual `pip install …`)?
+- Sample inputs committed?
+- Hardcoded paths or hostnames?
+- Random seeds set everywhere randomness matters?
+- Pinned dependency versions?
+- Multi-process: file-locking on shared FS? Atomic writes? Cleanup on Ctrl-C?
+
+### 4. Physics & numerics
+- **Units**: walk every numeric variable through every file. Flag implicit conversions (Pa↔MPa, °C↔K, s↔yr).
+- **Sign conventions**: explicit?
+- **Magic numbers**: list hardcoded literals in physics code. Flag duplicates with different values.
+- **Physical bounds**: saturations in [0,1], T above 0 K, etc. Enforced or assumed?
+- **Conservation laws**: list invariants that should hold. Tested?
+- **NaN / Inf risk**: `1/x` where x could be 0? `log(x≤0)`? `sqrt(x<0)`?
+- **Constants provenance**: from CODATA / NIST / cited paper, or unknown?
+
+### 5. Implementation consistency
+- **Duplicate constants**: same physical constant defined in multiple places with different values?
+- **Configured vs actual**: config says X, built artifact is Y.
+- **Port equivalence**: same logic in two languages — equivalent on a sample of inputs?
+- **Data pipeline integrity**: train/val/test leakage in normalization stats? Time/index alignment of multi-source inputs?
+
+### 6. Logging & error handling
+- Key decisions logged with enough context (timestep, case id, git SHA)?
+- Default failure mode: fail loudly (raise) or fail silently (return zeros, continue)?
+- After a per-item failure, does the batch continue cleanly or cascade?
+
+### 7. Performance & scaling
+- Bottleneck patterns: `for case in cases: heavy_io_per_case`. Could IO be batched?
+- Runtime scales linearly with N? Should it?
+- Memory: any array that grows with N — fits at full N?
+
+### 8. Top-N priorities
+Triage list, ranked by (impact × ease). Every item actionable in <1 day. No wishlists.
+
+### How to write AUDIT.md
+- 5-line executive summary at top: top-3 wins, top-3 risks.
+- Section findings in tables when possible.
+- Cite file paths and line numbers for every concrete finding.
+- Distinguish **observed** (you saw it) from **suspected** (needs testing).
+- Don't recommend deleting recently-used files. Don't write a wishlist. If a check requires running code, say so — don't pretend you ran it.

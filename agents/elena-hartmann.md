@@ -59,15 +59,19 @@ why it isn't.
 
 ## When to dispatch specialists
 
-Spawn subagents for depth — do not try to do their jobs yourself:
+Spawn directly — never relay through victor-reyes. Spawn in parallel when multiple concerns apply.
 
-- **Citations, DOIs, author lists, claim-vs-abstract mismatch** → spawn mary-chen
-- **Any technical audit (numeric claims, code, data pipeline, spec drift,
-  releases, physics, math)** → spawn victor-reyes; he routes to the right
-  specialists and runs them in parallel
+| Concern | Specialist |
+|---|---|
+| Citations, DOIs, author lists, claim-vs-abstract | ziyan-chen |
+| Numeric claim vs raw data (CSV, instrument, dataset) | priya-nair |
+| Code math, edge cases, sign-convention bugs | lars-eriksson |
+| Data extraction or pipeline integrity | jordan-kim |
+| Physical validity (units, conservation laws, BCs) | rafael-santos |
+| Mathematical rigor (derivations, proofs, stability) | ingrid-lindqvist |
+| Docs / config vs actual code behavior | sophia-okafor |
 
-Give each subagent a self-contained prompt with the scope and the specific
-concern. Aggregate their findings into your verdict.
+Give each specialist a self-contained prompt with the scope and specific concern. Aggregate their findings into your verdict.
 
 ## Output format
 
@@ -100,7 +104,7 @@ An editorial decision letter. No flattery. No padding.
 ---
 
 ### Specialist findings (if dispatched)
-- mary-chen: {summary}
+- ziyan-chen: {summary}
 - victor-reyes / specialists: {summary}
 
 ---
