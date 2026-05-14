@@ -7,26 +7,20 @@ audit templates that follow you across machines.
 
 ```
 consilium/
-├── commands/             # custom slash commands     (--> ~/.claude/commands/)
-│   ├── audit.md          #   /audit — single-pass scientific-project audit
-│   └── release.md        #   /release — versioned-release workflow
-├── agents/                            # specialist subagents  (--> ~/.claude/agents/)
-│   ├── elena-hartmann.md              #   Editor in Chief — final scientific authority
-│   ├── victor-reyes.md                #   audit orchestrator — routes to specialists
-│   ├── mary-chen.md                   #   senior editor — citations, DOIs, manuscripts
-│   ├── priya-nair.md                  #   quantitative claims vs raw anchor data
-│   ├── lars-eriksson.md               #   code math bugs, edge cases, sign conventions
-│   ├── jordan-kim.md                  #   data integrity — extraction + pipeline
-│   └── sophia-okafor.md               #   spec drift — docs vs code
-├── skills/                            # custom skills         (--> ~/.claude/skills/)
-│                                      #   (empty — drop new skills/<name>/SKILL.md here)
-├── templates/
-│   └── PROJECT_RULES.md               # per-project rulebook for /release
-├── examples/                          # real audit reports — copy/paste templates
-├── evals/                             # regression-test cases for the prompts
-│                                      #   (skeleton only — see evals/README.md)
+├── commands/          # custom slash commands  (--> ~/.claude/commands/)
+│   ├── audit.md       #   /audit — single-pass scientific-project audit
+│   └── release.md     #   /release — versioned-release workflow
+├── agents/            # specialist subagents   (--> ~/.claude/agents/)
+│   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
+│   ├── victor-reyes.md     #   audit orchestrator — routes to specialists
+│   ├── mary-chen.md        #   senior editor — citations, DOIs, manuscripts
+│   ├── priya-nair.md       #   quantitative claims vs raw anchor data
+│   ├── lars-eriksson.md    #   code math bugs, edge cases, sign conventions
+│   ├── jordan-kim.md       #   data integrity — extraction + pipeline
+│   ├── sophia-okafor.md    #   spec drift — docs vs code
+│   └── dev-nakamura.md     #   releases, CI/CD, versioning, build pipelines
 ├── scripts/
-│   └── install.sh                     # symlink everything into ~/.claude
+│   └── install.sh     # symlink everything into ~/.claude
 └── README.md
 ```
 
@@ -75,8 +69,11 @@ Need to audit a codebase or analysis?
 └─ Big project, release-gate, multi-dimensional audit
    → victor-reyes — spawns relevant specialists in parallel
 
-Need to release?
-└─ /release [patch|minor|major]
+Need to release or fix CI?
+├─ Cut a release, audit changelog, check version consistency
+│  → dev-nakamura (or /release for the automated workflow)
+└─ CI pipeline failing, build system broken, deployment issue
+   → dev-nakamura
 ```
 
 ## The team
@@ -90,6 +87,7 @@ Need to release?
 | `lars-eriksson` | Lars Eriksson, Senior Engineer | Code auditor. Finds math errors, edge cases, sign-convention bugs, and silent-failure modes at file:line. Read-only. |
 | `jordan-kim` | Jordan Kim, Data Engineer | Data integrity. Covers both extraction quality (raw source → anchor) and end-to-end pipeline tracing (drops, duplication, time-alignment, reproducibility). |
 | `sophia-okafor` | Sophia Okafor, Tech Writer/Engineer | Spec drift. Compares docs, methods sections, and configs to actual code behavior; flags every divergence. |
+| `dev-nakamura` | Dev Nakamura, Release Engineer | Software releases, CI/CD, versioning, changelog accuracy, build reproducibility, deployment pipelines. |
 
 ## How it works (design philosophy)
 

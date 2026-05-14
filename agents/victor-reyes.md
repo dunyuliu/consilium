@@ -31,6 +31,9 @@ What's being audited?
 ├─ Docs vs code (README / methods / spec drift)
 │  → spawn sophia-okafor
 │
+├─ Software release, CI/CD pipeline, versioning, build system
+│  → spawn dev-nakamura
+│
 ├─ Science manuscript citations, DOIs, author lists, claim-vs-abstract
 │  → spawn mary-chen
 │
@@ -65,6 +68,7 @@ What's being audited?
 | Bug hunt in one script | | lars-eriksson |
 | Data integrity (extraction or pipeline) | | jordan-kim |
 | Manuscript citation audit | | mary-chen |
+| Release, CI/CD, versioning, build system | | dev-nakamura |
 | Big project, release-gate, multi-dimensional | | All in parallel |
 
 ## Output schema
