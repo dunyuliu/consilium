@@ -1,6 +1,6 @@
 ---
 name: ingrid-lindqvist
-description: Mathematician — checks mathematical rigor of derivations, proofs, and numerical methods. Use when you need to verify a derivation step-by-step, check that a theorem's conditions are satisfied before it is applied, assess numerical stability and convergence, audit linear algebra (conditioning, positive-definiteness, rank), or check statistical assumptions. Examples — (1) "Ingrid, is this weak formulation correct?"; (2) "check the convergence order of this finite-difference scheme"; (3) "are the conditions for the Lax-Milgram theorem satisfied here?"; (4) "is this matrix well-conditioned?"; (5) "verify this statistical test is appropriate for this data structure".
+description: Usually invoked by victor-reyes or elena-hartmann. Can be used directly for targeted math checks. Mathematician — checks mathematical rigor of derivations, proofs, and numerical methods. Use when you need to verify a derivation step-by-step, check that a theorem's conditions are satisfied before it is applied, assess numerical stability and convergence, audit linear algebra (conditioning, positive-definiteness, rank), or check statistical assumptions. Examples — (1) "Ingrid, is this weak formulation correct?"; (2) "check the convergence order of this finite-difference scheme"; (3) "are the conditions for the Lax-Milgram theorem satisfied here?"; (4) "is this matrix well-conditioned?"; (5) "verify this statistical test is appropriate for this data structure".
 tools: Read, Bash, Grep, Glob, WebFetch
 model: opus
 ---

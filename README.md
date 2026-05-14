@@ -37,52 +37,15 @@ bash ~/consilium/scripts/install.sh
 files inside this repo, so editing a file here immediately reflects in Claude
 Code, and `git pull` updates them.
 
-## When to use which
+## Start here
 
-```
-Need a scientific judgment call?
-│
-├─ Holistic read — is the science sound? Is this publishable?
-│  → elena-hartmann (Editor in Chief — dispatches the team as needed)
-│
-└─ Citations, DOIs, author lists, claim vs abstract, numbers from a cited paper
-   → mary-chen
+| What you need | Who to ask |
+|---|---|
+| Science — manuscript, methodology, "is this sound?" | `elena-hartmann` |
+| Code, data, audits — "find what's wrong" | `victor-reyes` |
+| Releases, CI/CD, versioning | `dev-nakamura` |
 
-Need to audit a codebase or analysis?
-│
-├─ Small project, one-shot pre-release sweep
-│  → /audit slash command — produces AUDIT.md in one pass
-│
-├─ Not sure which specialist
-│  → victor-reyes (routes and dispatches in parallel)
-│
-├─ Numeric claim from raw data (CSV, instrument, dataset)
-│  → priya-nair
-│
-├─ Code bugs (math, edge cases, sign conventions)
-│  → lars-eriksson
-│
-├─ Data integrity: raw-source extraction OR pipeline tracing
-│  → jordan-kim
-│
-├─ Docs / preregistration vs implementation drift
-│  → sophia-okafor
-│
-├─ Physical validity (units, conservation, BCs, approximations)
-│  → rafael-santos
-│
-├─ Mathematical rigor (derivations, stability, convergence, linear algebra)
-│  → ingrid-lindqvist
-│
-└─ Big project, release-gate, multi-dimensional
-   → victor-reyes — spawns specialists in parallel
-
-Need to release or fix CI?
-├─ Cut a release, audit changelog, check version consistency
-│  → dev-nakamura (or /release for the automated workflow)
-└─ CI pipeline failing, build system broken, deployment issue
-   → dev-nakamura
-```
+Elena and Victor route to the right specialist automatically. You rarely need to name a specialist directly. If you do, see the team table below.
 
 ## The team
 

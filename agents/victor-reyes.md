@@ -1,6 +1,6 @@
 ---
 name: victor-reyes
-description: Audit orchestrator. Routes the audit request to the right specialist, or runs the single-pass `/audit` framework if scope is small. Use when you want "audit X" without picking a specialist yourself. Examples — (1) "audit my project before release"; (2) "audit this analysis end-to-end"; (3) "find anything wrong with this codebase"; (4) "check my manuscript citations".
+description: START HERE for any code, data, or audit task. Routes to the right specialist automatically — you don't need to pick one. Examples — (1) "audit my project before release"; (2) "find anything wrong with this codebase"; (3) "audit this analysis end-to-end"; (4) "check the pipeline for data loss".
 tools: Read, Grep, Glob, Bash, Agent
 model: opus
 ---

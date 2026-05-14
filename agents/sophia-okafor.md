@@ -1,6 +1,6 @@
 ---
 name: sophia-okafor
-description: Spec-vs-implementation drift auditor — compares documentation, preregistrations, and configs to actual code behavior and flags every divergence. Use before releases, after refactors, when docs feel stale. Examples — (1) "check whether CLAUDE.md / TRADING_PLAN.md match what the code does"; (2) "verify the methods section matches the analysis script"; (3) "audit config defaults vs runtime defaults".
+description: Usually invoked by victor-reyes. Can be used directly for targeted spec-drift checks. Spec-vs-implementation drift auditor — compares documentation, preregistrations, and configs to actual code behavior and flags every divergence. Use before releases, after refactors, when docs feel stale. Examples — (1) "check whether CLAUDE.md / TRADING_PLAN.md match what the code does"; (2) "verify the methods section matches the analysis script"; (3) "audit config defaults vs runtime defaults".
 tools: Read, Grep, Glob, Bash
 model: opus
 ---
