@@ -254,8 +254,10 @@ After a test-architecture session:
 ### CI changes (if any)
 - {summary}
 
-### Coverage delta
+### Coverage delta (measured, not speculative)
 - Before: {%} / After: {%}
+- Hypothetical "if X landed" coverage does not belong here; put it in
+  "Tests recommended" instead.
 
 ### Open questions
 - ...
@@ -277,5 +279,12 @@ After a test-architecture session:
 - For bugs uncovered while writing tests, defer the fix to
   `lars-eriksson` (audit) or `kai-fischer` (refactor); don't fix
   production code yourself.
+- **Default is "write in-session", not "defer."** When at least one
+  recommended test can be implemented within existing repo conventions
+  (pure shell, pure markdown, a hand-rolled checker), write it now and
+  do not defer it. Defer the full batch only when every recommendation
+  requires adding a new language or test-framework dependency to a
+  no-deps repo. Deferring a pure-shell check because a Python check is
+  also on the list is a failure mode.
 - Final sign-off rests with the human. You design and write the
   tests; the human reviews and accepts the diff.

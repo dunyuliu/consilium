@@ -405,6 +405,10 @@ consilium/
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
 │   └── cases/              # one directory per planted-bug case
+├── tests/             # structural-invariant checks for consilium itself
+│   └── check.sh            # pure-bash; runs in CI on every push/PR
+├── .github/workflows/
+│   └── check.yml      # CI runner for tests/check.sh
 ├── scripts/
 │   └── install.sh     # symlink everything into ~/.claude
 └── README.md
@@ -449,19 +453,39 @@ Current coverage: `lars-001` (look-ahead window), `sophia-001` (units
 drift). The repo that ships a test architect does not yet adequately
 dogfood its own evals — see roadmap.
 
+## Tests
+
+Structural invariants of consilium itself — agent frontmatter
+validity, command-to-agent cross-references, README/filesystem sync,
+and stale-reference detection — are checked by:
+
+```bash
+bash tests/check.sh
+```
+
+Pure bash, no dependencies. The same checks run on every push and
+pull request via `.github/workflows/check.yml`. Failures exit
+non-zero and the CI run goes red.
+
+Add new structural checks to `tests/check.sh` when they cost less
+than the rule they enforce. `iris-vermeulen`'s default applies here
+too: write in-session, defer only when a new dependency is genuinely
+required.
+
 ---
 
 ## Roadmap
 
 - Expand `evals/` coverage across every specialist.
 - Automated eval harness (`evals/run.py`).
-- Structural-invariant tests for consilium itself (frontmatter
-  validity, agent cross-references, README/filesystem sync,
-  `install.sh` idempotency).
+- `install.sh` idempotency / `--force` behaviour tests (the structural
+  invariants are now covered by `tests/check.sh`; the script itself
+  isn't).
 - Statistics specialist for p-hacking, multiple comparisons, study
   design.
 - Security/privacy agent for credential leaks, PII, supply-chain risk.
-- GitHub-Action wiring so audits run automatically on PRs.
+- GitHub-Action wiring so `/audit` runs automatically on PRs to
+  user projects (the structural-invariant CI is already wired).
 
 ---
 
