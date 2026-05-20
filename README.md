@@ -19,7 +19,8 @@ consilium/
 │   ├── refactor.md         #   /refactor         — simplify code (applies edits)
 │   ├── release.md          #   /release          — versioned-release workflow
 │   ├── review.md           #   /review           — full editorial decision
-│   └── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
+│   ├── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
+│   └── eval-deployment.md  #   /eval-deployment  — grade a real agent run
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
@@ -34,7 +35,8 @@ consilium/
 │   ├── ingrid-lindqvist.md #   mathematical rigor — derivations, stability, proofs
 │   ├── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
-│   └── anya-petrov.md      #   publication staging — GitHub + Zenodo
+│   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
+│   └── nadia-hadid.md      #   onsite eval PM — grades real deployments
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
 │   └── cases/              # one directory per planted-bug case
@@ -105,6 +107,7 @@ versus one-shot publication staging.
 | Member | Role |
 |---|---|
 | `kai-fischer` | Refactoring engineer. Simplifies, dedupes, improves naming. Applies edits. Use after a `lars-eriksson` audit, not before. |
+| `nadia-hadid` | Onsite evaluation PM. Reviews a real deployment of any agent or team against its own contract and the user's task, diagnoses root causes, and recommends prompt edits or new eval fixtures. Closes the loop between the agents and the wild. |
 
 ## Start here
 
@@ -115,6 +118,7 @@ versus one-shot publication staging.
 | Refactor working code | `kai-fischer` (or `/refactor`) |
 | Cut a release / fix CI / keep the project shippable | `haruto-nakamura` (or `/release`) |
 | Stage for public release — GitHub + Zenodo | `anya-petrov` (or `/stage-publish`) |
+| Grade what an agent just produced — improve next time | `nadia-hadid` (or `/eval-deployment`) |
 
 You rarely need to name a specialist directly. The front-door agent routes.
 
@@ -126,7 +130,7 @@ runs on sonnet; pattern-match-heavy auditing runs on haiku.
 
 | Model | Agents |
 |---|---|
-| opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi` |
+| opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
 | sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `haruto-nakamura`, `anya-petrov` |
 | haiku | `lars-eriksson`, `sophia-okafor` |
 
@@ -159,6 +163,7 @@ runs on sonnet; pattern-match-heavy auditing runs on haiku.
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
+| `/eval-deployment` | `nadia-hadid` | Grade a real agent run against its contract, diagnose misses, recommend prompt or fixture edits. |
 
 ## Adding a new agent
 
