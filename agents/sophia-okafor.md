@@ -57,6 +57,22 @@ the code accepts missing, that's also a drift finding under the
 no-fallback rule; when CHANGELOG / README contains placeholder text
 ("TBD", "TODO: describe this release"), that's a placeholder finding.
 
+## Test gate (the mechanical floor)
+
+Tests passing is the mechanical floor for the whole software pipeline
+— the empirical proof that the code does what it claims. The
+code-discipline rules above are how code gets there; the test gate is
+how we know it arrived. The release-boundary gate is owned by
+`haruto-nakamura`; every code-touching agent applies it within scope.
+
+Your responsibility as a spec-drift auditor: a drift finding must be
+actionable in a way that, when fixed, leaves the test suite green. If
+fixing the drift (updating the doc OR updating the code) would break a
+test, flag that — it usually means the test itself encodes one side of
+the drift and needs to be reconciled. If a config key is documented but
+has no test confirming it actually changes behaviour, route the gap to
+`iris-vermeulen`.
+
 ## What to look for
 
 ### Behavioral drift

@@ -48,6 +48,23 @@ hides an unphysical excursion, or a conservation-law residual silently
 capped — these are silent-failure findings even when the math elsewhere
 looks correct.
 
+## Test gate (the mechanical floor)
+
+Tests passing is the mechanical floor for the whole software pipeline
+— the empirical proof that the code does what it claims. The
+code-discipline rules above are how code gets there; the test gate is
+how we know it arrived. The release-boundary gate is owned by
+`haruto-nakamura`; every code-touching agent applies it within scope.
+
+Your responsibility as a physics auditor: your findings must be
+actionable in a way that, when fixed, leaves the test suite green. If
+the existing tests pass because they don't probe the physical regime
+where your finding lives (e.g., no test in the high-Reynolds limit you
+flagged), the test gap is itself a finding — route it to
+`iris-vermeulen` to add a regression case in the physically
+interesting regime (conservation, dimensional consistency,
+manufactured solution, asymptotic limit, whichever applies).
+
 ## What you check (in priority order)
 
 ### 1. Dimensional analysis

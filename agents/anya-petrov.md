@@ -132,9 +132,13 @@ treat each as a blocker until cleared.
   expected output. Any deviation is a finding.
 - **Test suite must pass.** Run the full test suite in the fresh clone.
   A package that ships with failing tests, or with skipped tests that
-  have no inline justification, is not publication-ready. The release
-  gate is owned by `haruto-nakamura`; you inherit it for any
-  publication you stage.
+  have no inline justification, is not publication-ready. Tests-pass
+  is the universal mechanical floor; `haruto-nakamura` enforces it at
+  the release boundary, `iris-vermeulen` designs the pyramid that
+  makes the floor real. If you find the suite thin (no end-to-end
+  reproduction test, no physical-behaviour coverage for scientific
+  code), route the gap to `iris-vermeulen` rather than letting the
+  publication go out on weak ground.
 - **Zenodo bundle integrity.** Re-download the Zenodo archive, verify
   checksums, open the README in a markdown viewer.
 - **Citation round-trip.** Copy the citation from CITATION.cff into a

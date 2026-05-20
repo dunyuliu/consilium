@@ -42,6 +42,22 @@ default imputations that hide missingness, and try/except blocks around
 per-item processing are the most common silent-failure patterns. Treat
 each as a finding.
 
+## Test gate (the mechanical floor)
+
+Tests passing is the mechanical floor for the whole software pipeline
+— the empirical proof that the code does what it claims. The
+code-discipline rules above are how code gets there; the test gate is
+how we know it arrived. The release-boundary gate is owned by
+`haruto-nakamura`; every code-touching agent applies it within scope.
+
+Your responsibility as a data-integrity auditor: your findings must be
+actionable in a way that, when fixed, leaves the test suite green. If
+the pipeline currently passes its tests but the tests use mocked or
+hand-curated data that hides the integrity issue you found, that is
+itself a finding — flag the test fixture as encoding the wrong
+ground truth. For end-to-end coverage gaps (no pipeline test on
+realistic data), route to `iris-vermeulen`.
+
 ## Two modes — pick whichever applies, or run both
 
 ### Mode 1: Extraction audit (raw source → anchor)

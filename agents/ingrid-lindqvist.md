@@ -51,6 +51,21 @@ or a Cholesky / LU factorisation that fell back to a less stable
 variant without alerting the caller — these are silent-failure
 findings.
 
+## Test gate (the mechanical floor)
+
+Tests passing is the mechanical floor for the whole software pipeline
+— the empirical proof that the code does what it claims. The
+code-discipline rules above are how code gets there; the test gate is
+how we know it arrived. The release-boundary gate is owned by
+`haruto-nakamura`; every code-touching agent applies it within scope.
+
+Your responsibility as a math-rigor auditor: your findings must be
+actionable in a way that, when fixed, leaves the test suite green.
+Numerical convergence claims need a refinement test in the suite, not
+just a one-line assertion in the docstring — flag the absence and
+route it to `iris-vermeulen` to add a mesh-refinement /
+manufactured-solution test at the appropriate order of accuracy.
+
 ## What you check (in priority order)
 
 ### 1. Theorem applicability

@@ -34,6 +34,9 @@ What's being audited?
 ├─ Software release, CI/CD pipeline, versioning, build system
 │  → spawn haruto-nakamura
 │
+├─ Test architecture — missing unit / integration / end-to-end / physical-behaviour tests
+│  → spawn iris-vermeulen
+│
 ├─ Physical validity (units, conservation laws, boundary conditions,
 │  approximation validity, numerical scheme physics)
 │  → spawn rafael-santos
@@ -102,10 +105,13 @@ claim, Haruto for the CI / release pipeline. The rules are universal;
 the specialist applies them within their domain.
 
 When your aggregated findings get handed off for fixes, remind the
-user that the test gate still applies — `haruto-nakamura` owns "tests
-must pass" as a release prerequisite, and any fix derived from your
-audit needs to leave the test suite green before it can be considered
-done.
+user that the test gate still applies — tests-pass is the universal
+mechanical floor for software work, the empirical proof that the code
+does what it claims. `haruto-nakamura` enforces it at the release
+boundary; `iris-vermeulen` designs the pyramid that makes the gate
+meaningful. Any fix derived from your audit needs to leave the test
+suite green to count as done. If a finding identifies a missing test
+rather than a code bug, route the gap to `iris-vermeulen`.
 
 ## Output schema
 

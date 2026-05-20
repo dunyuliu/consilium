@@ -20,7 +20,8 @@ consilium/
 │   ├── release.md          #   /release          — versioned-release workflow
 │   ├── review.md           #   /review           — full editorial decision
 │   ├── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
-│   └── eval-deployment.md  #   /eval-deployment  — grade a real agent run
+│   ├── eval-deployment.md  #   /eval-deployment  — grade a real agent run
+│   └── test-design.md      #   /test-design      — design + write the test pyramid
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
@@ -34,6 +35,7 @@ consilium/
 │   ├── rafael-santos.md    #   physical validity — units, conservation, BCs
 │   ├── ingrid-lindqvist.md #   mathematical rigor — derivations, stability, proofs
 │   ├── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
+│   ├── iris-vermeulen.md   #   test architect — designs + writes the pyramid
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
 │   └── nadia-hadid.md      #   onsite eval PM — grades real deployments
@@ -56,11 +58,11 @@ bash ~/consilium/scripts/install.sh
 files inside this repo, so editing a file here immediately reflects in Claude
 Code, and `git pull` updates them.
 
-## Three teams
+## Three teams + a quality bench
 
-Consilium organises around three editorial-style teams plus one solo
-refactorer. Each team has a single front door so you never have to remember
-the specialist roster.
+Consilium organises around three editorial-style teams plus a small quality
+bench of standalone engineers. Each team has a single front door so you
+never have to remember the specialist roster.
 
 ### Editorial — under `elena-hartmann`
 
@@ -102,11 +104,16 @@ versus one-shot publication staging.
 | `haruto-nakamura` | Release & maintenance engineer. Cuts versioned releases, keeps CI green, audits build reproducibility, manages dependency hygiene. |
 | `anya-petrov` | Publication-staging engineer. Prepares a project for GitHub public release and a Zenodo data deposit — scrub, reproducibility floor, CITATION.cff, DOI. |
 
-### Standalone
+### Quality bench
+
+Three standalone engineers who keep the work and the team itself honest.
+Each applies edits within a tightly-scoped surface (refactors, tests,
+fixtures); none touch production code outside that surface.
 
 | Member | Role |
 |---|---|
-| `kai-fischer` | Refactoring engineer. Simplifies, dedupes, improves naming. Applies edits. Use after a `lars-eriksson` audit, not before. |
+| `kai-fischer` | Refactoring engineer. Simplifies, dedupes, improves naming. Applies edits to production code. Use after a `lars-eriksson` audit, not before. |
+| `iris-vermeulen` | Test architect. Designs and writes the test pyramid — unit, integration, end-to-end, and physical-behaviour tests. Applies edits to test files, fixtures, and CI config only. The mechanical floor that the release gate enforces. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews a real deployment of any agent or team against its own contract and the user's task, diagnoses root causes, and recommends prompt edits or new eval fixtures. Closes the loop between the agents and the wild. |
 
 ## Start here
@@ -116,6 +123,7 @@ versus one-shot publication staging.
 | Science — manuscript, methodology, "is this sound?" | `elena-hartmann` (or `/review`) |
 | Code, data, audits — "find what's wrong" | `victor-reyes` (or `/audit`) |
 | Refactor working code | `kai-fischer` (or `/refactor`) |
+| Design / write tests for a project | `iris-vermeulen` (or `/test-design`) |
 | Cut a release / fix CI / keep the project shippable | `haruto-nakamura` (or `/release`) |
 | Stage for public release — GitHub + Zenodo | `anya-petrov` (or `/stage-publish`) |
 | Grade what an agent just produced — improve next time | `nadia-hadid` (or `/eval-deployment`) |
@@ -131,7 +139,7 @@ runs on sonnet; pattern-match-heavy auditing runs on haiku.
 | Model | Agents |
 |---|---|
 | opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `haruto-nakamura`, `anya-petrov` |
+| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `haruto-nakamura`, `anya-petrov` |
 | haiku | `lars-eriksson`, `sophia-okafor` |
 
 ## How it works
@@ -139,12 +147,21 @@ runs on sonnet; pattern-match-heavy auditing runs on haiku.
 - **Independence.** Each subagent runs in its own context and doesn't see
   your prior conversation. This forces re-derivation from raw sources.
 - **Read-only specialists.** Auditors and reviewers verify; they don't fix.
-  Apply fixes, then re-run to confirm. `kai-fischer` and `anya-petrov` are
-  the exceptions — they apply edits within their scope.
+  Apply fixes, then re-run to confirm. `kai-fischer`, `iris-vermeulen`,
+  and `anya-petrov` are the exceptions — each applies edits within a
+  tightly-scoped surface (refactor, tests/CI, publication staging).
 - **Clear boundaries.** Each agent states what falls outside their scope
   and who to hand off to.
 - **One routing table.** Victor owns the technical routing; Elena delegates
   technical work to him rather than maintaining a parallel table.
+- **Code discipline rules are universal.** No fallback, no placeholder,
+  hard failure, no silent failure — every code-touching agent applies
+  these as findings on code they review and as constraints on code they
+  write.
+- **Tests-pass is the mechanical floor.** The empirical proof that the
+  code does what it claims. `iris-vermeulen` designs the pyramid;
+  `haruto-nakamura` enforces the gate at the release boundary;
+  everyone else respects it.
 - **Final sign-off rests with the human.**
 
 ## Commands (slash)
@@ -160,6 +177,7 @@ runs on sonnet; pattern-match-heavy auditing runs on haiku.
 | `/audit-physics` | `rafael-santos` | Physical validity — units, conservation, BCs. |
 | `/audit-spec` | `sophia-okafor` | Spec drift — docs / config vs code. |
 | `/refactor` | `kai-fischer` | Simplify, dedupe, improve naming. Applies edits. |
+| `/test-design` | `iris-vermeulen` | Design and write the test pyramid — unit, integration, end-to-end, and physical-behaviour tests. Applies edits to test files only. |
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |

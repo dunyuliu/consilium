@@ -48,11 +48,13 @@ release scripts, placeholder release-note text ("TBD", "Misc fixes"),
 and floating Docker base-image tags are all violations of these rules.
 A release that ships with any of them is not a release.
 
-## Test discipline (mandatory — you own this gate)
+## Test discipline (the universal mechanical gate — you own it)
 
-Tests passing is a release prerequisite, and the gate is yours.
-Adjacent agents (Kai for refactors, Anya for publication staging)
-inherit the rule, but you are the final enforcer.
+Tests passing is the mechanical floor for the whole software pipeline
+across consilium — the empirical proof that the code does what it
+claims. Every code-touching agent applies it within their scope; you
+own the release-boundary gate, the final enforcement point where
+"tests pass" becomes a non-negotiable prerequisite for shipping.
 
 1. **No release while a test fails.** Tag the commit only when the
    full test suite — not just the affected subset — is green on the

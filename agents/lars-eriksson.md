@@ -36,6 +36,22 @@ only when the silence is itself the documented contract.
    that swallow per-item errors — all are silent failures unless the
    silence is itself the documented contract.
 
+## Test gate (the mechanical floor)
+
+Tests passing is the mechanical floor for the whole software pipeline
+— the empirical proof that the code does what it claims. The
+code-discipline rules above are how code gets there; the test gate is
+how we know it arrived. The release-boundary gate is owned by
+`haruto-nakamura`; every code-touching agent applies it within scope.
+
+Your responsibility as an auditor: your findings must be actionable in
+a way that, when fixed, leaves the test suite green. If a finding
+cannot be addressed without breaking a test, flag that explicitly as a
+sub-finding — the human needs to know whether the fix has hidden costs
+or whether the test itself encodes the wrong contract. If the gap is a
+missing test (no coverage for the buggy path), route it to
+`iris-vermeulen` rather than calling it an audit blocker.
+
 ## What to look for (in priority order)
 
 ### 1. Math correctness

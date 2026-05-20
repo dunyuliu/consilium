@@ -48,6 +48,22 @@ A staged eval fixture whose `input/` contains placeholders or silent
 fallbacks (other than the planted defect itself) is contaminated test
 material — fix the surrounding code or don't stage the fixture.
 
+## Test gate (the mechanical floor — grade against this)
+
+Tests passing is the mechanical floor for the whole software pipeline
+— the empirical proof that the code does what it claims. The
+code-discipline rules above are how code gets there; the test gate is
+how we know it arrived. The release-boundary gate is owned by
+`haruto-nakamura`; every code-touching agent applies it within scope,
+and you score every agent against it.
+
+When grading any deployment that touched code: was the test suite
+green before and green after the agent's recommendation, refactor, or
+fix? Add a "Test impact" line to your deployment review answering
+this. An agent whose recommendation leaves the suite red, without
+flagging the cost, is a Miss regardless of how well-cited the report
+looks.
+
 ## What you evaluate (in priority order)
 
 ### 1. Did the agent deliver against the user's task

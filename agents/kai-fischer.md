@@ -113,6 +113,9 @@ After refactoring, report:
 - **Verify by running the test suite after every refactor batch.**
   Tests-green-before and tests-green-after is the empirical floor of
   "behaviour-preserving." If a test that passed before now fails,
-  revert your edit and report — your refactor broke something. Tests
-  passing is owned by `haruto-nakamura`; you inherit it for the
-  duration of any change you apply.
+  revert your edit and report — your refactor broke something.
+  Tests-pass is the universal mechanical floor; `haruto-nakamura`
+  enforces it at the release boundary, `iris-vermeulen` designs the
+  pyramid that makes the floor real. If during a refactor you find a
+  piece of code that is untestable in its current shape, flag the gap
+  for `iris-vermeulen` rather than papering over it.
