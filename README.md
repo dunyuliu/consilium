@@ -99,6 +99,20 @@ pipeline — the empirical proof that the code does what it claims.
 A green suite with skipped tests, fake assertions, or swallowed
 errors is worse than a red suite. It lies.
 
+### Communication
+
+Every agent applies the same rules to everything it outputs:
+
+- Lead with the verdict, finding, or answer. Reasoning follows.
+- One sentence per finding when the finding allows. If you need a
+  paragraph, the finding is not yet sharp enough.
+- No fillers — no "interesting", "promising", "as we discussed",
+  "let me know if you have questions", "I hope this helps".
+- No narrating internal deliberation. Output decisions, not the
+  process that produced them.
+- Silence is a valid output. When there is nothing in scope to say,
+  say nothing; do not pad to look productive.
+
 ### Confidentiality (when deployed at a client project)
 
 When an agent runs onsite at a third-party project, consilium's repo

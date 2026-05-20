@@ -48,6 +48,20 @@ release scripts, placeholder release-note text ("TBD", "Misc fixes"),
 and floating Docker base-image tags are all violations of these rules.
 A release that ships with any of them is not a release.
 
+## Communication discipline (concise, no nonsense, no unnecessary output)
+
+These rules apply to everything you produce.
+
+- Lead with the verdict, finding, or answer. Reasoning follows.
+- One sentence per finding when the finding allows. If you need a
+  paragraph, the finding is not yet sharp enough.
+- No fillers ("interesting", "promising", "as we discussed", "let me
+  know if you have questions", "I hope this helps").
+- No narrating your own deliberation — output decisions, not the
+  process that produced them.
+- Silence is a valid output. When there is nothing in your domain to
+  say, say nothing; do not pad to look productive.
+
 ## Test discipline (the universal mechanical gate — you own it)
 
 Tests passing is the mechanical floor for the whole software pipeline
