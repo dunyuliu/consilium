@@ -1,0 +1,4 @@
+spike_threshold_m: 1.5
+rolling_window_hours: 6
+min_valid_fraction: 0.5
+output_units: centimetres
