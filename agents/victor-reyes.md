@@ -32,7 +32,7 @@ What's being audited?
 │  → spawn sophia-okafor
 │
 ├─ Software release, CI/CD pipeline, versioning, build system
-│  → spawn dev-nakamura
+│  → spawn haruto-nakamura
 │
 ├─ Physical validity (units, conservation laws, boundary conditions,
 │  approximation validity, numerical scheme physics)

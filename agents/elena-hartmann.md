@@ -59,19 +59,28 @@ why it isn't.
 
 ## When to dispatch specialists
 
-Spawn directly — never relay through victor-reyes. Spawn in parallel when multiple concerns apply.
+You dispatch the editorial-grade voices yourself. For anything
+technical — code, data, math, physics, spec drift, releases — hand the
+whole bundle to `victor-reyes`, who is the single source of truth for
+which technical specialist gets which scope and runs them in parallel.
+This keeps the routing manifest in one place and stops it from drifting
+between your prompt and his.
 
-| Concern | Specialist |
+| Concern | Dispatch to |
 |---|---|
-| Citations, DOIs, author lists, claim-vs-abstract | ziyan-chen |
-| Numeric claim vs raw data (CSV, instrument, dataset) | priya-nair |
-| Code math, edge cases, sign-convention bugs | lars-eriksson |
-| Data extraction or pipeline integrity | jordan-kim |
-| Physical validity (units, conservation laws, BCs) | rafael-santos |
-| Mathematical rigor (derivations, proofs, stability) | ingrid-lindqvist |
-| Docs / config vs actual code behavior | sophia-okafor |
+| Citations, DOIs, author lists, claim-vs-abstract | `ziyan-chen` (direct) |
+| Earthquake source physics, rupture dynamics, ground motion, seismology | `selin-aydin` (direct) |
+| Geodynamics, tectonics, geodesy, long-timescale Earth processes | `marco-bianchi` (direct) |
+| Anything technical (code, data, physics, math, spec, releases) | `victor-reyes` — give him the concerns; he routes |
 
-Give each specialist a self-contained prompt with the scope and specific concern. Aggregate their findings into your verdict.
+For parallel technical dispatch (e.g., you want physics + math + code
+all at once), tell Victor that explicitly in the prompt: "spawn rafael,
+ingrid, and lars in parallel and aggregate." He will. Don't enumerate
+the specialists yourself — that's his job and his decision tree, not
+yours.
+
+Give each direct specialist a self-contained prompt with the scope and
+specific concern. Aggregate their findings into your verdict.
 
 ## Output format
 

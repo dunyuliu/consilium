@@ -18,19 +18,23 @@ consilium/
 │   ├── audit-spec.md       #   /audit-spec       — docs vs code drift
 │   ├── refactor.md         #   /refactor         — simplify code (applies edits)
 │   ├── release.md          #   /release          — versioned-release workflow
-│   └── review.md           #   /review           — full editorial decision
+│   ├── review.md           #   /review           — full editorial decision
+│   └── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
-│   ├── victor-reyes.md     #   audit orchestrator — routes to specialists
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
+│   ├── selin-aydin.md      #   seismology / earthquake-rupture reviewer
+│   ├── marco-bianchi.md    #   geodynamics / long-timescale reviewer
+│   ├── victor-reyes.md     #   audit orchestrator — routes technical work
 │   ├── priya-nair.md       #   quantitative claims vs raw anchor data
 │   ├── lars-eriksson.md    #   code math bugs, edge cases, sign conventions
 │   ├── jordan-kim.md       #   data integrity — extraction + pipeline
 │   ├── sophia-okafor.md    #   spec drift — docs vs code
-│   ├── dev-nakamura.md     #   releases, CI/CD, versioning, build pipelines
 │   ├── rafael-santos.md    #   physical validity — units, conservation, BCs
 │   ├── ingrid-lindqvist.md #   mathematical rigor — derivations, stability, proofs
-│   └── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
+│   ├── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
+│   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
+│   └── anya-petrov.md      #   publication staging — GitHub + Zenodo
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
 │   └── cases/              # one directory per planted-bug case
@@ -50,60 +54,111 @@ bash ~/consilium/scripts/install.sh
 files inside this repo, so editing a file here immediately reflects in Claude
 Code, and `git pull` updates them.
 
+## Three teams
+
+Consilium organises around three editorial-style teams plus one solo
+refactorer. Each team has a single front door so you never have to remember
+the specialist roster.
+
+### Editorial — under `elena-hartmann`
+
+Scientific judgment on a manuscript, analysis, or claim. Elena gives the
+verdict and dispatches the deep-domain critical reviewers directly. For any
+technical work (code, data, physics, math, spec drift), she hands the whole
+bundle to `victor-reyes` rather than re-implementing his routing table.
+
+| Member | Role |
+|---|---|
+| `elena-hartmann` | Editor in Chief. Holistic verdict. The buck stops here. |
+| `ziyan-chen` | Citations, DOIs, author lists, claim-vs-abstract. |
+| `selin-aydin` | Critical reviewer — seismology, earthquake-rupture physics, ground motion. |
+| `marco-bianchi` | Critical reviewer — geodynamics, geodesy, long-timescale Earth physics. |
+
+### Audit — under `victor-reyes`
+
+Technical depth on what's actually in the repo: bugs, drift, integrity,
+correctness. Victor diagnoses scope and spawns the right specialist(s) in
+parallel.
+
+| Member | Role |
+|---|---|
+| `victor-reyes` | Audit orchestrator. Routes technical work, runs specialists in parallel, aggregates findings. |
+| `lars-eriksson` | Code auditor — math errors, edge cases, sign conventions, silent failures. |
+| `priya-nair` | Numeric-claim verifier — re-derives from raw anchor data. |
+| `jordan-kim` | Data integrity — extraction quality and end-to-end pipeline tracing. |
+| `sophia-okafor` | Spec drift — docs / methods / config vs actual code. |
+| `rafael-santos` | Physical validity — units, conservation, boundary conditions. |
+| `ingrid-lindqvist` | Mathematical rigor — derivations, stability, theorem applicability. |
+
+### Release & publication
+
+Two engineers for two different shipping problems: ongoing version releases
+versus one-shot publication staging.
+
+| Member | Role |
+|---|---|
+| `haruto-nakamura` | Release & maintenance engineer. Cuts versioned releases, keeps CI green, audits build reproducibility, manages dependency hygiene. |
+| `anya-petrov` | Publication-staging engineer. Prepares a project for GitHub public release and a Zenodo data deposit — scrub, reproducibility floor, CITATION.cff, DOI. |
+
+### Standalone
+
+| Member | Role |
+|---|---|
+| `kai-fischer` | Refactoring engineer. Simplifies, dedupes, improves naming. Applies edits. Use after a `lars-eriksson` audit, not before. |
+
 ## Start here
 
-| What you need | Who to ask |
+| What you need | Front door |
 |---|---|
 | Science — manuscript, methodology, "is this sound?" | `elena-hartmann` (or `/review`) |
 | Code, data, audits — "find what's wrong" | `victor-reyes` (or `/audit`) |
 | Refactor working code | `kai-fischer` (or `/refactor`) |
-| Releases, CI/CD, versioning | `dev-nakamura` (or `/release`) |
+| Cut a release / fix CI / keep the project shippable | `haruto-nakamura` (or `/release`) |
+| Stage for public release — GitHub + Zenodo | `anya-petrov` (or `/stage-publish`) |
 
-Elena and Victor route to the right specialist automatically. You rarely need to name a specialist directly. If you do, see the team table below.
+You rarely need to name a specialist directly. The front-door agent routes.
 
-## The team
+## Models
 
-| Agent | Persona | Model | Role |
-|---|---|---|---|
-| `elena-hartmann` | Prof. Elena Hartmann, EIC | opus | Final scientific authority. Holistic verdict on manuscripts and analyses. Dispatches the full team when needed. |
-| `victor-reyes` | Victor Reyes, Chief of Staff | opus | Audit orchestrator. Routes technical work to the right specialist(s), runs in parallel, aggregates findings. |
-| `ziyan-chen` | Ziyan Chen, Senior Editor | sonnet | Manuscript citations and scientific validity. DOI resolution, author verification, claim-vs-abstract mismatch, overclaimed results. |
-| `priya-nair` | Dr. Priya Nair, Quant Analyst | sonnet | Numeric claim verification from raw anchor data (CSV, instrument, brokerage statement). Independent re-derivation. |
-| `lars-eriksson` | Lars Eriksson, Senior Engineer | haiku | Code auditor. Math errors, edge cases, sign-convention bugs, silent-failure modes at file:line. Read-only. |
-| `jordan-kim` | Jordan Kim, Data Engineer | sonnet | Data integrity. Extraction quality (raw source → anchor) and end-to-end pipeline tracing (drops, duplication, time-alignment). |
-| `sophia-okafor` | Sophia Okafor, Tech Writer/Engineer | haiku | Spec drift. Docs, methods sections, and configs vs actual code behavior. |
-| `dev-nakamura` | Dev Nakamura, Release Engineer | sonnet | Software releases, CI/CD, versioning, changelog accuracy, build reproducibility, deployment pipelines. |
-| `rafael-santos` | Dr. Rafael Santos, Physicist | sonnet | Physical validity: dimensional analysis, conservation laws, boundary conditions, approximation validity, numerical scheme physics. |
-| `ingrid-lindqvist` | Prof. Ingrid Lindqvist, Mathematician | sonnet | Mathematical rigor: derivation correctness, theorem applicability, numerical stability, linear algebra, inverse problems, statistical assumptions. |
-| `kai-fischer` | Kai Fischer, Senior Engineer | sonnet | Refactoring. Simplifies, dedupes, improves naming. Applies edits. Does not hunt bugs — use `lars-eriksson` for that. |
+The team uses a mix of model sizes by role. Heaviest reasoning (orchestration,
+final verdicts, adversarial reviewing) runs on opus; deep-but-specific work
+runs on sonnet; pattern-match-heavy auditing runs on haiku.
+
+| Model | Agents |
+|---|---|
+| opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi` |
+| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `haruto-nakamura`, `anya-petrov` |
+| haiku | `lars-eriksson`, `sophia-okafor` |
 
 ## How it works
 
-- **Independence.** Each subagent runs in its own context and doesn't see your
-  prior conversation. This forces re-derivation from raw sources.
-- **Read-only specialists.** Auditors verify; they don't fix. Apply fixes, then
-  re-run the auditor to confirm. (`kai-fischer` is the exception — refactors apply edits.)
-- **Clear boundaries.** Each agent states what falls outside their scope and who
-  to hand off to.
-- **Hierarchy.** Elena sits above the team. Victor routes technical work.
-  Specialists go deep on one dimension each.
+- **Independence.** Each subagent runs in its own context and doesn't see
+  your prior conversation. This forces re-derivation from raw sources.
+- **Read-only specialists.** Auditors and reviewers verify; they don't fix.
+  Apply fixes, then re-run to confirm. `kai-fischer` and `anya-petrov` are
+  the exceptions — they apply edits within their scope.
+- **Clear boundaries.** Each agent states what falls outside their scope
+  and who to hand off to.
+- **One routing table.** Victor owns the technical routing; Elena delegates
+  technical work to him rather than maintaining a parallel table.
 - **Final sign-off rests with the human.**
 
 ## Commands (slash)
 
-| Slash | What |
-|---|---|
-| `/audit` | Eight-section project audit via `victor-reyes`. Writes `AUDIT.md`. Sections: goal & implementation, inventory & stale, reproducibility, physics & numerics, implementation consistency, logging & errors, performance, top-N priorities. |
-| `/audit-citations` | Manuscript citations via `ziyan-chen` — DOI resolution, author lists, claim-vs-abstract mismatches. |
-| `/audit-claim` | Verify a specific numeric claim via `priya-nair` — re-derives from raw anchor data. |
-| `/audit-code` | Source-file bug hunt via `lars-eriksson` — math, edge cases, sign conventions. |
-| `/audit-data` | Data integrity via `jordan-kim` — extraction quality and pipeline tracing. |
-| `/audit-math` | Mathematical rigor via `ingrid-lindqvist` — derivations, stability, theorem applicability. |
-| `/audit-physics` | Physical validity via `rafael-santos` — units, conservation, BCs. |
-| `/audit-spec` | Spec drift via `sophia-okafor` — docs/config vs code. |
-| `/refactor` | Refactor via `kai-fischer` — simplify, dedupe, improve naming. Applies edits. |
-| `/release` | Versioned-release workflow via `dev-nakamura`. Triggers: `release` (patch), `release minor`, `release major`. |
-| `/review` | Full editorial decision via `elena-hartmann` — verdict, core weakness, what Reviewer 2 will say. |
+| Slash | Agent | What |
+|---|---|---|
+| `/audit` | `victor-reyes` | Eight-section project audit. Writes `AUDIT.md`. |
+| `/audit-citations` | `ziyan-chen` | Manuscript citations — DOIs, authors, claim-vs-abstract. |
+| `/audit-claim` | `priya-nair` | Verify a specific numeric claim against raw anchor data. |
+| `/audit-code` | `lars-eriksson` | Source-file bug hunt — math, edge cases, sign conventions. |
+| `/audit-data` | `jordan-kim` | Data integrity — extraction and pipeline. |
+| `/audit-math` | `ingrid-lindqvist` | Mathematical rigor — derivations, stability, theorems. |
+| `/audit-physics` | `rafael-santos` | Physical validity — units, conservation, BCs. |
+| `/audit-spec` | `sophia-okafor` | Spec drift — docs / config vs code. |
+| `/refactor` | `kai-fischer` | Simplify, dedupe, improve naming. Applies edits. |
+| `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
+| `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
+| `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
 
 ## Adding a new agent
 
@@ -125,7 +180,7 @@ See `evals/README.md` for the fixture format and how to run a case.
 
 ## Roadmap
 
-- Expand `evals/` coverage across every specialist.
+- Expand `evals/` coverage across every specialist (currently `lars-001`, `sophia-001`).
 - Statistics specialist for p-hacking, multiple comparisons, study design.
 - Security/privacy agent for credential leaks, PII, supply-chain risk.
 - GitHub-Action wiring so audits run automatically on PRs.
