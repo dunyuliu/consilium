@@ -1,0 +1,46 @@
+id: sophia-001
+agent: sophia-okafor
+prompt: |
+  Audit the project in input/ for spec drift. Compare README.md and
+  config.yaml against what ingest.py actually does. Flag every divergence.
+input_dir: input
+expected:
+  - kind: keyword
+    any_of:
+      - "millimetres"
+      - "millimeters"
+      - "mm"
+      - "1000"
+  - kind: keyword
+    any_of:
+      - "output_units"
+      - "units"
+  - kind: location
+    file: ingest.py
+    line_range: [27, 30]
+    keywords:
+      - "1000"
+      - "millimetre"
+      - "mm"
+      - "units"
+must_not_find:
+  - keywords:
+      - "spike_threshold_m default is wrong"
+      - "rolling_window_hours default is wrong"
+notes: |
+  Planted defect: README documents `output_units: metres` as the cleaned
+  output, and the config file sets it to `centimetres`. The code ignores
+  the config entirely and hardcodes a `* 1000.0` multiply (ingest.py:29)
+  with a comment claiming "always in millimetres for the downstream model".
+  Three sources, three different unit stories, and the config knob is
+  completely dead.
+
+  Sophia should report at least:
+  (a) `output_units` config key is never read by the code, and
+  (b) the cleaned output is in millimetres, not metres (README) or
+      centimetres (config).
+
+  The `must_not_find` guards against Sophia mistakenly treating the
+  configured numeric values as "wrong defaults" — they're not defaults, they
+  are the configured values for this deployment; the README only states the
+  defaults. The drift is in units, not in the numeric thresholds.

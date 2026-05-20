@@ -1,0 +1,40 @@
+id: lars-001
+agent: lars-eriksson
+prompt: |
+  Audit input/compute_returns.py for math correctness, edge cases, and
+  sign-convention bugs. Report findings at file:line.
+input_dir: input
+expected:
+  - kind: location
+    file: compute_returns.py
+    line_range: [16, 20]
+    keywords:
+      - "look-ahead"
+      - "future"
+      - "leakage"
+      - "lookahead"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "fillna(0)"
+      - "silent"
+      - "swallow"
+      - "masking"
+must_not_find:
+  - keywords:
+      - "switch to numpy"
+      - "rewrite using vectorized"
+notes: |
+  Planted defect 1 (critical, line 17): rolling_baseline uses
+  prices.iloc[i : i + window] — the window of "prior" days actually contains
+  today plus the next four days, leaking future prices into a series the
+  docstring calls a trailing mean. The docstring on line 15 even claims
+  "prior `window` days (exclusive of today)".
+
+  Planted defect 2 (medium, line 24): r.fillna(0) silently turns the first
+  day's NaN return into zero, which masks a missing-data condition and lets
+  the day-1 excess return appear well-defined when it isn't.
+
+  Lars should catch at least defect 1 (the look-ahead) — that's the primary
+  pass condition. Catching defect 2 is bonus and tested via the keyword
+  match on "fillna(0)" / "silent" / "swallow".
