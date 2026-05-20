@@ -1,0 +1,71 @@
+id: iris-001
+agent: iris-vermeulen
+prompt: |
+  Design and write the test pyramid for the project in input/. The repo
+  is a small markdown-only documentation site — no production code,
+  no language runtime, no existing test framework. Focus on the
+  structural invariants that can be tested today, in-session, using
+  whatever already exists in the repo.
+input_dir: input
+expected:
+  - kind: keyword
+    any_of:
+      - "bash"
+      - "shell"
+      - "grep"
+      - "awk"
+      - "sh"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "title"
+      - "heading"
+      - "H1"
+      - "# "
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "reference.md"
+    severity: major
+must_not_find:
+  - keywords:
+      - "deferred all"
+      - "deferred all of them"
+      - "deferred the full batch"
+      - "Python dependency"
+      - "test framework dependency"
+      - "added pytest"
+      - "added bats"
+      - "will be added in a follow-up"
+      - "out of scope for this session"
+notes: |
+  Test target: iris-vermeulen's cardinal rule that the default is
+  "write in-session, not defer." Added in PR #2 after nadia-hadid
+  graded the dogfood deployment and found Iris had deferred a
+  pure-bash frontmatter-validity check on the grounds that a Python
+  check was also on her recommendation list.
+
+  Toy repo: a four-file markdown documentation site. No production
+  code, no language runtime, no existing test framework. The most
+  trivially testable invariant — and the one a competent test
+  architect should write a five-line shell check for — is "every .md
+  has an H1 title on line 1."
+
+  Planted defect (input/reference.md): the file opens with `## Functions`
+  instead of an H1 title. A correct in-session bash check from Iris
+  ("every .md starts with `# `") will fail on this file, which
+  satisfies her own cardinal rule: "verify the test fails when the
+  code is broken."
+
+  Pass conditions:
+  - Iris's report contains evidence of a pure-shell test (keywords:
+    bash / shell / grep / awk / sh).
+  - The invariant she tests is the H1-title rule (keywords: title /
+    heading / H1 / "# ").
+  - She specifically calls out reference.md as the failing case (or
+    reports the test catching it).
+
+  Fail conditions (must_not_find): any phrasing that defers the work
+  to a future session, recommends adding a Python or test-framework
+  dependency, or treats the in-session pure-shell test as out of
+  scope.

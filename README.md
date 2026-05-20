@@ -450,8 +450,10 @@ measured rather than vibe-checked. See `evals/README.md` for the
 fixture format and how to run a case by hand.
 
 Current coverage: `lars-001` (look-ahead window), `sophia-001` (units
-drift). The repo that ships a test architect does not yet adequately
-dogfood its own evals — see roadmap.
+drift), `iris-001` (defer-everything failure mode surfaced by
+`nadia-hadid`'s grade and the prompt fix that followed). The repo
+that ships a test architect still has thin eval coverage on most of
+the team — see roadmap.
 
 ## Tests
 
