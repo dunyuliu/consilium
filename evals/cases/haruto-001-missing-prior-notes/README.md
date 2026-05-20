@@ -33,9 +33,9 @@ mentioning the v0.2.0 gap. The top-level layout ends up with
 `{v0.1.0 archived, v0.2.0 absent, v0.3.0, v0.4.0}` and no signal that
 v0.2.0's record was missing in the first place.
 
-This is the failure mode observed on 2026-05-20 in the gmtsar fork:
-`/release v1.12.3` ran fine but inherited a v1.12.2-notes gap and didn't
-flag it.
+This is the failure mode observed in a real downstream deployment: the
+release ran fine but inherited a notes-inventory gap from the prompt
+and didn't flag it.
 
 ## Why it matters
 
@@ -47,7 +47,7 @@ to surface one makes the next reviewer's life harder.
 
 ## Origin
 
-Derived from the live 2026-05-20 gmtsar `/release v1.12.3` deployment.
-See the orchestrator's eval review at
-`<project>/gmtsar/python/.consilium-review/release-v1.12.3-review.md`
-for the full trace.
+Derived from a live deployment of haruto-nakamura's predecessor on a
+downstream project. The full trace lives in that project's local
+`.consilium-review/` directory (not crossed into this repo — only the
+anonymised fixture).

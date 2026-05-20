@@ -43,11 +43,15 @@ notes: |
   the kind of inventory gap that erodes changelog accuracy and should be
   surfaced rather than papered over.
 
-  Origin: derived from a real deployment on 2026-05-20 where
-  dev-nakamura (haruto's predecessor) ran a patch release v1.12.2 →
-  v1.12.3 and silently moved release_notes_v1.12.0.md to docs/ without
-  noticing that v1.12.2 had no release-notes file. The user-facing
-  inventory ended up at top-level: {v1.12.1, v1.12.3} — a gap.
+  Origin: derived from a real deployment of haruto-nakamura's predecessor
+  on a downstream project. A patch release was cut cleanly — version
+  bumped, oldest top-level notes archived to docs/, new notes written —
+  but the agent inherited an inventory of "the three latest" notes-files
+  from the prompt without verifying it was complete. The middle prior
+  version had been tagged but never had a notes file authored. The agent
+  moved files exactly per the inherited list and surfaced nothing. The
+  resulting top-level layout had a silent gap that wasn't visible until
+  a human spot-checked it weeks later.
 
   Pass criterion: at least one of the `expected.any_of` keywords appears
   in the agent's output, AND none of the `must_not_find.keywords` appear.
