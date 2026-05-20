@@ -195,6 +195,99 @@ code outside it.
 
 ---
 
+## Responsibility map
+
+The team has overlapping coverage by design — many issues benefit
+from two independent lenses. The table below names the primary owner
+of each issue type, the secondary lens that catches it from a
+different angle when one applies, and the hand-off when a finding is
+real but outside the finder's scope. This is the canonical routing
+table; the per-agent "Cardinal rules" footers must agree with it.
+
+### Code
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Math bug / sign / off-by-one in code | `lars-eriksson` | `ingrid-lindqvist` (math), `rafael-santos` (physics) | — |
+| Edge case / NaN / silent failure | `lars-eriksson` | — | — |
+| Placeholder (`TODO`, stub, `NotImplementedError`) | `lars-eriksson` | `sophia-okafor` (if docs claim it's shipped) | — |
+| Structural cleanup / dedup / naming | `kai-fischer` | — | `lars-eriksson` if a latent bug is suspected |
+| Untestable shape | `kai-fischer` | `iris-vermeulen` | — |
+
+### Physics & math
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Units / conservation / boundary conditions | `rafael-santos` | — | — |
+| Wrong sign in a physics formula | `rafael-santos` | `lars-eriksson` (if it's a code typo, not a physics error) | — |
+| Approximation regime invalid | `rafael-santos` | — | — |
+| Theorem applicability / derivation step | `ingrid-lindqvist` | — | — |
+| Numerical stability / convergence order | `ingrid-lindqvist` | `rafael-santos` (if the scheme is physically wrong) | — |
+| Linear algebra (conditioning, rank, SPD) | `ingrid-lindqvist` | — | — |
+| Statistical assumption (normality, independence, multiple testing) | `ingrid-lindqvist` | — | — |
+| Earthquake source physics / rupture dynamics / ground motion | `selin-aydin` | `rafael-santos` (physics), `ingrid-lindqvist` (math) | `lars-eriksson` for solver code bugs |
+| Long-timescale geodynamics / GIA / postseismic / geodesy | `marco-bianchi` | `rafael-santos`, `ingrid-lindqvist` | `lars-eriksson` for solver code bugs |
+
+### Data
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Pipeline drops / silent joins / leakage | `jordan-kim` | — | — |
+| Raw extraction quality (PDF, OCR, instrument, API dump) | `jordan-kim` | — | — |
+| Train/val/test leakage | `jordan-kim` | — | — |
+
+### Numbers and claims
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Numeric claim wrong vs raw anchor data | `priya-nair` | — | `lars-eriksson` if the code produced it wrong |
+| Numeric claim wrong vs cited paper | `ziyan-chen` | — | — |
+
+### Docs and spec
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| README / methods / config vs code | `sophia-okafor` | — | `lars-eriksson` if the code has a placeholder |
+| Citations / DOIs / author lists / claim-vs-abstract | `ziyan-chen` | — | — |
+
+### Tests, releases, publication
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Missing test | `iris-vermeulen` | — | flagged by the auditor who surfaced the gap |
+| Overfit / tautological / wrong-oracle test | `iris-vermeulen` | — | — |
+| Failing test in CI | `haruto-nakamura` (gate) | — | `lars-eriksson` for the underlying bug; the human applies the fix |
+| Quarantined / skipped tests | `iris-vermeulen` (cleanup) | `haruto-nakamura` (gate) | — |
+| Version bump / tag / changelog | `haruto-nakamura` | — | — |
+| CI step exits 0 on failure | `haruto-nakamura` | — | — |
+| Dependency / Docker image floats by tag | `haruto-nakamura` | — | — |
+| Pre-publication scrub / CITATION.cff / Zenodo / DOI | `anya-petrov` | — | `iris-vermeulen` if test coverage is thin |
+
+### Scientific verdict
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| "Is this paper publishable?" | `elena-hartmann` | — | dispatches specialists |
+| Reviewer-2 attack vector — general | `elena-hartmann` | — | — |
+| Reviewer-2 attack vector — rupture / source / ground motion | `selin-aydin` | — | — |
+| Reviewer-2 attack vector — long-timescale geodynamics | `marco-bianchi` | — | — |
+
+### Meta — agent performance
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Did an agent deliver against the task? | `nadia-hadid` | — | routes prompt edits to the affected agent's file (human applies); routes test gaps to `iris-vermeulen` |
+| Should this wild miss become a regression fixture? | `nadia-hadid` (stages anonymised proposal in project-local dir) | — | human moves the approved proposal into `evals/cases/` |
+
+### Orchestration
+
+| Front door | When |
+|---|---|
+| `victor-reyes` | "Audit my project", "find what's wrong" — technical scope. Runs specialists in parallel. |
+| `elena-hartmann` | "Is the science sound?", "review this manuscript" — scientific scope. Delegates technical work to Victor. |
+
+---
+
 ## Start here
 
 | What you need | Front door |
