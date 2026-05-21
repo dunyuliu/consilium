@@ -191,6 +191,7 @@ code outside it.
 |---|---|
 | `kai-fischer` | Refactoring engineer. Simplifies, dedupes, improves naming. Edits production code. Use after a `lars-eriksson` audit, not before. |
 | `iris-vermeulen` | Test architect. Designs and writes the test pyramid. Edits test files, fixtures, CI config only. The mechanical floor the release gate enforces. |
+| `mira-volkov` | C/Fortran-to-Python porting + numerical optimization specialist. Bit-faithful parity to the reference binary on real data, then aggressive numpy/scipy optimization. Edits the Python port, parity tests, and CI; never the C reference. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews real deployments, diagnoses misses, recommends prompt or fixture edits. Closes the loop between the team and the wild. |
 
 ---
@@ -213,6 +214,7 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | Placeholder (`TODO`, stub, `NotImplementedError`) | `lars-eriksson` | `sophia-okafor` (if docs claim it's shipped) | — |
 | Structural cleanup / dedup / naming | `kai-fischer` | — | `lars-eriksson` if a latent bug is suspected |
 | Untestable shape | `kai-fischer` | `iris-vermeulen` | — |
+| C/Fortran→Python port — bit-faithful parity + numpy/scipy optimization | `mira-volkov` | `lars-eriksson` (code bugs in the port), `ingrid-lindqvist` (math-rigor on library substitutions), `rafael-santos` (physics in the underlying numerics) | `iris-vermeulen` for the project-wide pyramid beyond the parity test; `haruto-nakamura` for the release gate after wire-in |
 
 ### Physics & math
 
@@ -296,6 +298,7 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | Code, data, audits — "find what's wrong" | `victor-reyes` (or `/audit`) |
 | Refactor working code | `kai-fischer` (or `/refactor`) |
 | Design / write tests for a project | `iris-vermeulen` (or `/test-design`) |
+| Port a C/Fortran binary to Python with bit-faithful parity | `mira-volkov` (or `/port`) |
 | Cut a release / fix CI / keep the project shippable | `haruto-nakamura` (or `/release`) |
 | Stage for public release — GitHub + Zenodo | `anya-petrov` (or `/stage-publish`) |
 | Grade what an agent just produced — improve next time | `nadia-hadid` (or `/eval-deployment`) |
@@ -319,6 +322,7 @@ routes.
 | `/audit-spec` | `sophia-okafor` | Spec drift — docs / config vs code. |
 | `/refactor` | `kai-fischer` | Simplify, dedupe, improve naming. Applies edits. |
 | `/test-design` | `iris-vermeulen` | Design and write the test pyramid. Applies edits to test files only. |
+| `/port` | `mira-volkov` | Port a C/Fortran numerical binary to vectorized Python with bit-faithful parity, then optimize. Applies edits to the Python port, tests, and CI; never the C reference. |
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
@@ -335,7 +339,7 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 | Model | Agents |
 |---|---|
 | opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `haruto-nakamura`, `anya-petrov` |
+| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov` |
 | haiku | `lars-eriksson`, `sophia-okafor` |
 
 ---
@@ -384,7 +388,8 @@ consilium/
 │   ├── review.md           #   /review           — full editorial decision
 │   ├── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
 │   ├── eval-deployment.md  #   /eval-deployment  — grade a real agent run
-│   └── test-design.md      #   /test-design      — design + write the test pyramid
+│   ├── test-design.md      #   /test-design      — design + write the test pyramid
+│   └── port.md             #   /port             — C/Fortran→Python port with parity gate
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
@@ -399,6 +404,7 @@ consilium/
 │   ├── ingrid-lindqvist.md #   mathematical rigor — derivations, stability, proofs
 │   ├── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
 │   ├── iris-vermeulen.md   #   test architect — designs + writes the pyramid
+│   ├── mira-volkov.md      #   C/Fortran→Python porting + numerical optimization
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
 │   └── nadia-hadid.md      #   onsite eval PM — grades real deployments

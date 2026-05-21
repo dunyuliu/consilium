@@ -51,6 +51,10 @@ What's being audited?
 ├─ Test architecture — missing unit / integration / end-to-end / physical-behaviour tests
 │  → spawn iris-vermeulen
 │
+├─ C/Fortran binary being ported to Python, OR an existing Python port
+│  that breaks parity / is slow vs the reference
+│  → spawn mira-volkov
+│
 ├─ Physical validity (units, conservation laws, boundary conditions,
 │  approximation validity, numerical scheme physics)
 │  → spawn rafael-santos
