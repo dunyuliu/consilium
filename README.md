@@ -183,7 +183,7 @@ releases versus one-shot publication staging.
 
 ### Quality bench
 
-Three engineers who keep the work and the team itself honest. Each
+Four engineers who keep the work and the team itself honest. Each
 applies edits within a tightly-scoped surface; none touch production
 code outside it.
 
@@ -193,6 +193,20 @@ code outside it.
 | `iris-vermeulen` | Test architect. Designs and writes the test pyramid. Edits test files, fixtures, CI config only. The mechanical floor the release gate enforces. |
 | `mira-volkov` | C/Fortran-to-Python porting + numerical optimization specialist. Bit-faithful parity to the reference binary on real data, then aggressive numpy/scipy optimization. Edits the Python port, parity tests, and CI; never the C reference. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews real deployments, diagnoses misses, recommends prompt or fixture edits. Closes the loop between the team and the wild. |
+
+### Campaign orchestration
+
+A higher-altitude orchestrator than Victor or Elena. Where Victor
+routes specialists for one audit task and Elena delegates technical
+work for one scientific verdict, Wei runs a multi-mission campaign
+over hours-to-days — dispatching `mira-volkov` / `iris-vermeulen` /
+`lars-eriksson` / `haruto-nakamura` / `kai-fischer` in isolated
+worktrees, gating each merge on the project's smoke tier, bumping
+tags per soft-pass, reverting and logging on regression.
+
+| Member | Role |
+|---|---|
+| `wei-lin` | Workflow conductor and release-discipline owner. Owns merge gates, version cadence, and the session log during a long-running campaign. Refuses to merge without a gate, suppress a regression, or bump a version without an artifact. |
 
 ---
 
@@ -285,8 +299,9 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 
 | Front door | When |
 |---|---|
-| `victor-reyes` | "Audit my project", "find what's wrong" — technical scope. Runs specialists in parallel. |
-| `elena-hartmann` | "Is the science sound?", "review this manuscript" — scientific scope. Delegates technical work to Victor. |
+| `victor-reyes` | "Audit my project", "find what's wrong" — technical scope. Single audit task. Runs specialists in parallel. |
+| `elena-hartmann` | "Is the science sound?", "review this manuscript" — scientific scope. Single verdict. Delegates technical work to Victor. |
+| `wei-lin` | "Run this porting / refactor / optimization roadmap for X hours" — campaign scope spanning hours-to-days. Owns merge gates, version cadence, session log. Dispatches Mira / Iris / Lars / Haruto / Kai in isolated worktrees. |
 
 ---
 
@@ -299,6 +314,7 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | Refactor working code | `kai-fischer` (or `/refactor`) |
 | Design / write tests for a project | `iris-vermeulen` (or `/test-design`) |
 | Port a C/Fortran binary to Python with bit-faithful parity | `mira-volkov` (or `/port`) |
+| Conduct a long-running multi-mission engineering campaign | `wei-lin` (or `/campaign`) |
 | Cut a release / fix CI / keep the project shippable | `haruto-nakamura` (or `/release`) |
 | Stage for public release — GitHub + Zenodo | `anya-petrov` (or `/stage-publish`) |
 | Grade what an agent just produced — improve next time | `nadia-hadid` (or `/eval-deployment`) |
@@ -323,6 +339,7 @@ routes.
 | `/refactor` | `kai-fischer` | Simplify, dedupe, improve naming. Applies edits. |
 | `/test-design` | `iris-vermeulen` | Design and write the test pyramid. Applies edits to test files only. |
 | `/port` | `mira-volkov` | Port a C/Fortran numerical binary to vectorized Python with bit-faithful parity, then optimize. Applies edits to the Python port, tests, and CI; never the C reference. |
+| `/campaign` | `wei-lin` | Conduct a long-running multi-mission engineering campaign. Dispatches specialists in isolated worktrees, gates merges, bumps tags, reverts + logs on regression, writes the session log. |
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
@@ -339,7 +356,7 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 | Model | Agents |
 |---|---|
 | opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov` |
+| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin` |
 | haiku | `lars-eriksson`, `sophia-okafor` |
 
 ---
@@ -389,7 +406,8 @@ consilium/
 │   ├── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
 │   ├── eval-deployment.md  #   /eval-deployment  — grade a real agent run
 │   ├── test-design.md      #   /test-design      — design + write the test pyramid
-│   └── port.md             #   /port             — C/Fortran→Python port with parity gate
+│   ├── port.md             #   /port             — C/Fortran→Python port with parity gate
+│   └── campaign.md         #   /campaign         — Wei conducts a multi-mission campaign
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
@@ -407,7 +425,8 @@ consilium/
 │   ├── mira-volkov.md      #   C/Fortran→Python porting + numerical optimization
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
-│   └── nadia-hadid.md      #   onsite eval PM — grades real deployments
+│   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
+│   └── wei-lin.md          #   campaign conductor — multi-mission orchestration
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
 │   └── cases/              # one directory per planted-bug case
