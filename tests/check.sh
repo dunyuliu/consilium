@@ -393,6 +393,25 @@ for stem in "${AGENTS[@]}"; do
     fi
 done
 
+# --- Check 11: every write-surface owner declares isolation first ---------
+#
+# PROJECT_RULES.md rule 20. Containment stated at line 80 — after the agent
+# has read its mission — is advice; stated first it is a precondition. An
+# audit on 2026-07-31 found 2 of 9 writers declared isolation at all, both
+# buried, and five (including the refactorer and the release engineer) had
+# no containment statement anywhere.
+echo "Check 11: write-surface owners declare isolation as their first section"
+for owner in "${!is_owner[@]}"; do
+    first_heading=$(grep -m1 '^## ' "agents/$owner.md" || true)
+    if [ -z "$first_heading" ]; then
+        fail "agents/$owner.md has no '##' sections at all"
+    elif printf '%s' "$first_heading" | grep -qi '^## Isolation'; then
+        ok
+    else
+        fail "agents/$owner.md holds a write surface but its first section is '$first_heading' — isolation must come first (rule 20)"
+    fi
+done
+
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
 [ "$fail_count" -eq 0 ] || exit 1

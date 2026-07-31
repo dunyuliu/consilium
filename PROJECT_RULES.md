@@ -81,6 +81,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 17 | Cross-references between agents must resolve | mechanical |
 | 18 | One writer per repo — never run two mutating workflows at once | judgment |
 | 19 | One owner per write surface | mechanical |
+| 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
 
 ---
 
@@ -355,6 +356,41 @@ checked. A rename breaks them silently.
 
 **Proposed Tier-1 upgrade**: extend Check 5's backtick scan to `agents/*.md`
 and `commands/*.md` bodies, not just `README.md`.
+
+## 20. Every writer declares isolation first, and is evaluated at the merge
+
+An agent with write access follows one lifecycle, and its prompt states the
+containment half **before anything else it says**:
+
+1. **Isolate.** Work in your own worktree, branch, or scratch directory.
+   Never write to the repo root, the `main`/`master` checkout, or the master
+   project folder. Never touch a file another live mission holds.
+2. **Stay in your surface** (rule 19). Work adjacent to your mission that
+   belongs to another owner is reported, not done.
+3. **Finish.** Deliver a complete unit of work with its gate result. A
+   half-landed change in a shared tree is worse than no change, because the
+   next agent inherits it without knowing.
+4. **Be evaluated.** Nothing merges on its author's say-so. The merge is a
+   separate decision made by someone else — `wei-lin` inside a campaign,
+   `haruto-nakamura` at a release boundary, the human otherwise — against a
+   fresh gate run, not the author's report of one.
+
+**Placement is the rule, not just the content.** The isolation section is the
+first `##` heading in the file. A containment rule buried at line 80, after
+the agent has already read its mission, is advice; at the top it is a
+precondition. `tests/check.sh` Check 11 enforces the position.
+
+**Rationale**: the expensive failures in this repo were never bad analysis —
+they were correct work written to the wrong place, or landed without an
+independent check. Two agents in one tree, a scratch run writing through a
+symlink into golden data, a release cut while another release was running.
+Analysis errors cost a rerun; containment errors destroy work that was
+already right.
+
+**Incident (2026-07-31)**: an audit of all nine write-surface owners found
+**two** declared isolation at all, both buried past line 70. Five — including
+the refactorer, the test architect, and the release engineer — had no
+containment statement anywhere in their prompt.
 
 ## 19. One owner per write surface
 
