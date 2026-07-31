@@ -390,7 +390,15 @@ bash ~/consilium/install.sh
 ```
 
 Idempotent symlinks; safe to re-run after `git pull`. Use `--force` to
-re-link when targets have moved.
+re-link when targets have moved — without it, a symlink pointing
+elsewhere or a real file is reported and skipped, never clobbered.
+
+The installer also wires two git hooks in this checkout:
+
+- **post-merge** — re-runs `install.sh` after every `git pull`, so new
+  agents appear without a manual step.
+- **pre-push** — runs `tests/check.sh` and aborts the push if it fails.
+  Bypass deliberately with `git push --no-verify`.
 
 ---
 
@@ -505,8 +513,9 @@ bash tests/check.sh
 ```
 
 Pure bash, no dependencies. The same checks run on every push and
-pull request via `.github/workflows/check.yml`. Failures exit
-non-zero and the CI run goes red.
+pull request via `.github/workflows/check.yml`, and locally via the
+pre-push hook `install.sh` wires. Failures exit non-zero and the CI
+run goes red.
 
 Add new structural checks to `tests/check.sh` when they cost less
 than the rule they enforce. `iris-vermeulen`'s default applies here

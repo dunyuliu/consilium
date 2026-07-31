@@ -157,6 +157,13 @@ confirm the count it prints matches `ls agents/*.md | wc -l`.
 
 **How to apply**: local green → push. Not push → check CI.
 
+**Now mechanical (2026-07-31)**: `install.sh` wires a `pre-push` hook that
+runs `tests/check.sh` and aborts the push on failure. The rule was previously
+unenforceable — nothing recorded whether the gate ran before a given push, so
+after the fact it was indistinguishable from "CI happened to be green".
+Deliberate bypass is `git push --no-verify`, and a release that used it says
+so in its release note.
+
 ## 10. Every agent-behaviour bug gets an eval fixture before the fix ships
 
 When an agent misbehaves in a real deployment — wrong scope, missed finding,
@@ -200,14 +207,19 @@ codifications of existing agreements, not new policy — except where marked
 row, a model-table row under the correct model, and a Layout-tree line. A
 new command additionally needs a row in the commands table.
 
-**Partly mechanical**: `tests/check.sh` Check 3 and Check 4 cover the
-commands table and *any* mention of the agent. Nothing checks the model
-table or the roster table — an agent listed only in the Layout tree passes
-the gate today.
+**Mechanical (2026-07-31)**: `tests/check.sh` **Check 6** asserts every agent
+appears exactly once in the README model table, under the model its own
+frontmatter declares, and that no table row names a non-existent agent.
+Check 3 and Check 4 already cover the commands table and *any* mention.
 
-**Proposed Tier-1 upgrade**: add a Check 6 to `tests/check.sh` asserting
-every agent stem appears in the model table, and that its listed model
-matches its frontmatter `model:` field.
+**Incident**: Check 4 passes on a mention alone, so an agent could be absent
+from the model table with the gate green — and twice in one session it was
+(`zofia-kaminska`, then `dunyu-liu`), along with a stale "Three engineers"
+line that had drifted to seven. Check 6 was negative-tested against both a
+missing row and a wrong model before landing.
+
+**Still not mechanical**: the roster-table row and the Layout-tree line. An
+agent in the model table but missing from its team roster still passes.
 
 ## 13. A new agent lands with at least one eval fixture
 

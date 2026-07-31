@@ -141,6 +141,57 @@ for ref in "${refs[@]}"; do
     fi
 done
 
+# --- Check 6: README model table lists every agent, with the right model ---
+#
+# PROJECT_RULES.md rule 12. Check 4 only proves an agent is *mentioned*
+# somewhere in the README, which passes even when the model table is missing
+# a row — that gap let two agents drift out of the table before this existed.
+# Here we parse the table rows (| opus | `a`, `b`, ... |) and require every
+# agent to appear exactly once, under the model its own frontmatter declares.
+echo "Check 6: README model table matches agent frontmatter"
+declare -A readme_model=()
+table_dupes=0
+while IFS= read -r line; do
+    model=$(printf '%s' "$line" | sed -E 's/^\| *([a-z0-9.-]+) *\|.*/\1/')
+    case "$model" in
+        opus|sonnet|haiku) ;;
+        *) continue ;;
+    esac
+    for name in $(printf '%s' "$line" | grep -oE '`[a-z]+-[a-z]+`' | tr -d '`'); do
+        if [ -n "${readme_model[$name]:-}" ]; then
+            fail "README model table lists '$name' more than once"
+            table_dupes=$((table_dupes + 1))
+        fi
+        readme_model[$name]="$model"
+    done
+done < <(grep -E '^\| *(opus|sonnet|haiku) *\|' README.md)
+
+if [ "${#readme_model[@]}" -eq 0 ]; then
+    fail "README model table not found (expected rows like '| opus | \`agent-name\` |')"
+fi
+
+for stem in "${AGENTS[@]}"; do
+    declared=$(sed -n 's/^model: *//p' "agents/$stem.md" | head -1 | tr -d '[:space:]')
+    listed="${readme_model[$stem]:-}"
+    if [ -z "$listed" ]; then
+        fail "agents/$stem.md missing from the README model table"
+    elif [ "$listed" != "$declared" ]; then
+        fail "agents/$stem.md declares model '$declared' but README lists it under '$listed'"
+    else
+        ok
+    fi
+done
+
+# Every name in the table must be a real agent (catches a stale row after a
+# rename or removal).
+for name in "${!readme_model[@]}"; do
+    if is_agent "$name"; then
+        ok
+    else
+        fail "README model table lists '$name' but no agents/$name.md exists"
+    fi
+done
+
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
 [ "$fail_count" -eq 0 ] || exit 1

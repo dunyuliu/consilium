@@ -74,6 +74,26 @@ HOOK_EOF
     chmod +x "$HOOK"
 fi
 
+# Wire a pre-push hook so the gate runs before anything leaves the machine
+# (PROJECT_RULES.md rule 9). Without it, "the check ran locally" is a claim
+# nobody can verify after the fact.
+PREPUSH="$ROOT/.git/hooks/pre-push"
+if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PREPUSH" ] || ! grep -q 'tests/check.sh' "$PREPUSH"; }; then
+    cat > "$PREPUSH" << 'HOOK_EOF'
+#!/usr/bin/env bash
+# Auto-installed by consilium/install.sh — runs the structural gate before push.
+# Bypass deliberately with `git push --no-verify` (and say so in the release note).
+REPO=$(cd "$(dirname "$0")/../.." && pwd -P)
+if [ -f "$REPO/tests/check.sh" ]; then
+    if ! bash "$REPO/tests/check.sh"; then
+        echo "pre-push: tests/check.sh FAILED — push aborted." >&2
+        exit 1
+    fi
+fi
+HOOK_EOF
+    chmod +x "$PREPUSH"
+fi
+
 echo "consilium installed: $(ls "$CLAUDE/agents" | wc -l) agents, $(ls "$CLAUDE/commands" | wc -l) commands"
 [ "$skipped" -gt 0 ] && echo "$skipped item(s) skipped — re-run with --force to replace them" >&2
 exit 0
