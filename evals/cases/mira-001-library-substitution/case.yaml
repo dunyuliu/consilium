@@ -9,6 +9,7 @@ expected:
   - kind: location
     file: resample_port.py
     line_range: [14, 19]
+    anchor: "gaussian_filter"   # literal text that must sit inside line_range
     keywords:
       - "gaussian_filter"
       - "circular"
@@ -19,6 +20,7 @@ expected:
   - kind: location
     file: resample_port.py
     line_range: [22, 27]
+    anchor: "CubicSpline"   # literal text that must sit inside line_range
     keywords:
       - "CubicSpline"
       - "Catmull"

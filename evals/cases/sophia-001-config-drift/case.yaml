@@ -18,6 +18,7 @@ expected:
   - kind: location
     file: ingest.py
     line_range: [30, 33]     # the `return cleaned * 1000.0` is at :32
+    anchor: "* 1000.0"   # literal text that must sit inside line_range
     keywords:
       - "1000"
       - "millimetre"

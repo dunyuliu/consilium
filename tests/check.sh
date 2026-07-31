@@ -16,10 +16,13 @@
 #   6. The README model table lists every agent exactly once, under the
 #      model its own frontmatter declares, with no stale rows.
 #   7. Every agent has a README roster-table row and a Layout-tree line.
+#   8. Agent references inside agents/*.md and commands/*.md bodies resolve.
+#   9. Every eval fixture's line_range still brackets its declared anchor.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
-# gate green. Both were negative-tested when added.
+# gate green. Every check here was negative-tested when added — a check
+# that has never failed is not known to be a gate.
 #
 # Usage: bash tests/check.sh
 # Exit code: 0 if all checks pass, 1 otherwise.
@@ -286,6 +289,62 @@ for f in agents/*.md commands/*.md; do
             fail "$f references '$ref' but no agents/$ref.md exists"
         fi
     done
+done
+
+# --- Check 9: eval fixture line_range still brackets its planted defect ----
+#
+# PROJECT_RULES.md rule 5. A `kind: location` entry asserts the agent must
+# cite a line inside line_range. If the fixture's input file is edited, that
+# range silently stops matching the defect — and the case then FAILS a
+# correct answer, which is worse than no test.
+#
+# Incident (2026-07-31): sophia-001 asserted ingest.py:[27,30] while the
+# planted `* 1000.0` sat at :32. Found by running the case, not by reading
+# it. This check makes that class mechanical.
+#
+# Verifies, per location entry: the referenced input file exists, and the
+# entry's `anchor:` — a literal string from the input file — sits inside
+# line_range. The anchor is a separate field on purpose: `keywords:` are
+# strings the AGENT'S REPORT must contain, and evals/README.md explicitly
+# warns against planting those in the input ("you're testing string-match,
+# not detection"). Checking the range against report keywords was this
+# check's first design and it was wrong; entries with no anchor are skipped.
+echo "Check 9: eval fixture line_range brackets its planted defect"
+LOC_AWK='
+function flush() {
+    if (inloc && f != "" && s != "") print f "|" s "|" e "|" kw
+    inloc=0; f=""; s=""; e=""; kw=""; inkw=0
+}
+/^  - kind:/            { flush(); inloc = ($3 == "location"); next }
+/^[a-z_]+:/             { flush(); next }
+inloc && /^    file:/   { f=$2; inkw=0; next }
+inloc && /^    line_range:/ { line=$0; sub(/#.*/, "", line); gsub(/[^0-9,]/, "", line);
+                              split(line, a, ","); s=a[1]; e=a[2]; inkw=0; next }
+inloc && /^    anchor:/ { line=$0; sub(/^    anchor: */, "", line); sub(/ *#.*$/, "", line);
+                          gsub(/^"|"$/, "", line); kw=line; inkw=0; next }
+inloc && /^    keywords:/ { inkw=0; next }
+inloc && /^    [a-z_]+:/ { inkw=0 }
+END { flush() }'
+
+for case_yaml in evals/cases/*/case.yaml; do
+    case_dir=$(dirname "$case_yaml")
+    while IFS='|' read -r loc_file lo hi kws; do
+        [ -z "$loc_file" ] && continue
+        target="$case_dir/input/$loc_file"
+        if [ ! -f "$target" ]; then
+            fail "$case_yaml: location entry names '$loc_file', missing at $target"
+            continue
+        fi
+        if [ -z "$kws" ]; then
+            ok      # no anchor declared; range staleness is unverifiable here
+            continue
+        fi
+        if sed -n "${lo},${hi}p" "$target" | grep -qF -- "$kws"; then
+            ok
+        else
+            fail "$case_yaml: anchor '$kws' not found in $loc_file lines $lo-$hi — stale range?"
+        fi
+    done < <(awk "$LOC_AWK" "$case_yaml")
 done
 
 echo

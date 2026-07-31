@@ -8,6 +8,7 @@ expected:
   - kind: location
     file: compute_returns.py
     line_range: [16, 20]
+    anchor: "i : i + window"   # literal text that must sit inside line_range
     keywords:
       - "look-ahead"
       - "future"

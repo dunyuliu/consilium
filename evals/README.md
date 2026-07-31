@@ -57,6 +57,13 @@ notes: |
 
 - `kind: location` — the agent's report contains the file name and at least
   one line number in `line_range`. Keywords are case-insensitive substrings.
+  Add an **`anchor:`** — a literal string from the input file that must sit
+  inside `line_range`. `tests/check.sh` Check 9 verifies it on every run, so
+  an edit to the input that shifts the defect fails the gate instead of
+  silently failing a correct answer later. The anchor is a separate field
+  from `keywords` on purpose: keywords describe the *report*, the anchor
+  describes the *code*, and conflating them means testing string-match
+  rather than detection.
 - `kind: keyword` — at least one keyword from `any_of` appears anywhere in
   the agent's report.
 - `must_not_find` — if any keyword from a `must_not_find` entry appears, the
