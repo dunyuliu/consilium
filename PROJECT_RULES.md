@@ -79,7 +79,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 15 | A release is a note plus a matching tag, both pushed | mechanical |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical |
 | 17 | Cross-references between agents must resolve | mechanical |
-| 18 | One writer per repo — never run two mutating workflows at once | judgment |
+| 18 | One writer per repo — never run two mutating workflows at once | mechanical |
 | 19 | One owner per write surface | mechanical |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
 
@@ -448,6 +448,24 @@ dispatched release agent was still running, because a to-do-list query was
 misread as proof it had died. Both wrote tags to the same repo seconds apart.
 The tags happened to be correct and were verified before the push, but nothing
 made that outcome likely — two writers raced and the good result was luck.
+
+**Now mechanical (2026-07-31)**: `tests/lock.sh` takes a named lock and the
+`pre-commit` hook installed by `install.sh` refuses a commit from anyone else
+while it is held.
+
+```bash
+export CONSILIUM_LOCK_OWNER=<who-you-are>
+bash tests/lock.sh acquire "release v1.7.0"   # ... work ... 
+bash tests/lock.sh release
+```
+
+Ownership is a **label, not a pid**. The first version stored `$$` and checked
+liveness — and read as stale the instant it was taken, because `$$` is the pid
+of the short-lived `lock.sh` shell itself. Agents run each command in a fresh
+shell, so no pid outlives the work it protects. Found by running it.
+
+A lock is never auto-cleared, however old: "probably stale" is precisely the
+reasoning that caused the incident.
 
 **How to apply**: one release at a time. If a workflow appears stuck, stop it
 explicitly and confirm it stopped before taking over its work.

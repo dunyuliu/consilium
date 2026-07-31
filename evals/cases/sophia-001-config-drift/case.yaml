@@ -15,6 +15,13 @@ expected:
     any_of:
       - "output_units"
       - "units"
+  - kind: keyword
+    any_of:
+      - "empty series"
+      - "empty Series"
+      - "silent"
+      - "min_valid_fraction"
+      - "indistinguishable"
   - kind: location
     file: ingest.py
     line_range: [30, 33]     # the `return cleaned * 1000.0` is at :32

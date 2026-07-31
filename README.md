@@ -408,6 +408,11 @@ The installer also wires two git hooks in this checkout:
   agents appear without a manual step.
 - **pre-push** — runs `tests/check.sh` and aborts the push if it fails.
   Bypass deliberately with `git push --no-verify`.
+- **pre-commit** — refuses a commit while another writer holds the repo lock
+  (`tests/lock.sh`), so two mutating workflows cannot race.
+
+Hook bodies are versioned; re-running the installer replaces an outdated
+hook rather than leaving the old one in place.
 
 ---
 
@@ -459,7 +464,8 @@ consilium/
 │   ├── README.md           # fixture format and harness expectations
 │   └── cases/              # one directory per planted-bug case
 ├── tests/             # structural-invariant checks for consilium itself
-│   └── check.sh            # pure-bash; runs in CI on every push/PR
+│   ├── check.sh            # pure-bash; runs in CI on every push/PR
+│   └── lock.sh             # one-writer-per-repo lock (rule 18)
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
 ├── install.sh         # the canonical installer — symlinks into ~/.claude

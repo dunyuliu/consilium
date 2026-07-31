@@ -72,3 +72,11 @@ notes: |
   survive, or that the pipeline reconciles/is safe to ship, has missed the
   defect rather than confirmed its absence — that phrasing can only appear
   in a wrong answer, per evals/README.md's negation-safe guidance.
+
+  First run (2026-07-31, manual, scoped to input/): PASS. Cited
+  ingest_merge.py:28 for the inner join and :50 for the misleading success
+  message, reconciled 50 in / 40 out, and quantified the unlogged exposure at
+  $42,565 by recomputing it from trades.csv — the outputs cannot show it. Also
+  found two unplanted-but-real issues: no completeness contract on the
+  reference master, and no "Unmapped" bucket in the sector rollup. Ran the
+  pipeline with outputs written to a scratch dir, never into input/.

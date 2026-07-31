@@ -91,3 +91,11 @@ notes: |
 
   Not yet run against the agent — numbers above are from the fixture
   code, not from an agent report. Record the run outcome here.
+
+  First run (2026-07-31, manual, scoped to input/): PASS. Derived the von
+  Neumann condition independently (g(k) = 1 - 4r sin^2(k dx/2), r <= 1/2),
+  quoted the docstring's convexity argument and showed it is self-invalidating
+  at cfl=0.9 because the centre coefficient 1-2r goes negative, and reproduced
+  the blow-up (errors inf/nan, "orders" -111). Also caught the secondary
+  unnormalised-L2 defect at :64. Matched the author's planted amplification
+  factor of 2.6 without seeing the notes.

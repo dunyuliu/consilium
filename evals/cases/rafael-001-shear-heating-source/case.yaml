@@ -95,3 +95,13 @@ notes: |
   tested by the keyword entry.
 
   Run log: not yet run.
+
+  First run (2026-07-31, manual, scoped to input/): PASS. Carried units through
+  tau*V to show q*dt/(rho*c) has units of m*K not K, identified the missing
+  width normalisation, and reproduced the factor-of-1/w = 100 error (7.4 K as
+  written vs ~740 K corrected) — matching the author's numbers without seeing
+  them. Caught the secondary clip defect as an energy-conservation violation
+  and noted it is latent until the primary is fixed. Raised a THIRD issue not
+  planted: T_MELT = 1450 K is ambiguous between dry (~1488-1533 K) and
+  fluid-present (~923 K) granite solidus, which matters because the corrected
+  peak lands within ~200 K of the threshold. Real, and a legitimate finding.

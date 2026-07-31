@@ -6,11 +6,14 @@ prompt: |
   which claims hold and which do not, with the corrected values.
 input_dir: input
 expected:
-  - kind: location
-    file: PERFORMANCE_SUMMARY.md
-    line_range: [20, 24]
-    anchor: "(1 + mean(monthly returns)) ** 12 - 1"   # literal text inside line_range
-    keywords:
+  # NOT kind: location. priya-nair's output schema (agents/priya-nair.md:108)
+  # is a per-claim table with an Anchor column — she cites the data file and
+  # the re-derivation, never doc:line. Demanding a line citation would fail a
+  # correct audit for using its own documented format. The anchor is retained
+  # as a comment so the planted defect stays locatable by a human:
+  #   PERFORMANCE_SUMMARY.md:24 — "(1 + mean(monthly returns)) ** 12 - 1"
+  - kind: keyword
+    any_of:
       - "geometric"
       - "arithmetic"
       - "mean of"
@@ -77,3 +80,18 @@ notes: |
 
   must_not_find is phrased as verdict assertions only, so a correct report
   saying "total return reconciles" cannot trip it.
+
+  First run (2026-07-31, manual, scoped to input/): PASS on substance. Found
+  all three planted defects — the arithmetic-vs-geometric formula (9.68% vs
+  9.5937%), the 59-vs-60 interval error, and the worst month (-1.90%, not
+  -1.5%) — and correctly PASSED the total-return control. It also identified
+  the exact wrong month the -1.5% came from (2020-11, the 3rd worst), and ran
+  an internal-consistency check that was not planted: (1.097)^5 - 1 = 58.9%
+  contradicts the document's own 56.9% total return, a 2.0 pp self-inconsistency
+  visible without any external data.
+
+  The run exposed a fixture defect, since fixed: expected[0] was kind: location,
+  demanding a doc:line citation. priya-nair's documented output schema is a
+  per-claim table with an Anchor column and she never cites doc:line — the
+  criterion would have failed a correct audit for using its own format. A
+  fixture must assert what the agent's contract says it produces.
