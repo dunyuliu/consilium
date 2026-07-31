@@ -69,3 +69,14 @@ notes: |
   to a future session, recommends adding a Python or test-framework
   dependency, or treats the in-session pure-shell test as out of
   scope.
+
+  First run (2026-07-31, manual): PASS. Wrote four pure-sh scripts in-session
+  (H1 title, link resolution + reachability, changelog date ordering, and a
+  single end-to-end entry point), ran them against input/, and
+  mutation-verified each one flips on a broken copy. Caught the planted
+  reference.md H1 defect, plus an orphaned changelog.md not linked from
+  index.md. Deferred only two items, each with a stated reason rather than a
+  batch punt: a link-syntax linter (no second link style exists yet) and a
+  prose-style linter (no documented convention to test against — writing it
+  would invent the contract rather than verify it). No must_not_find hit.
+  Wrote nothing under evals/; scripts were built in a scratch dir.

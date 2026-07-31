@@ -111,6 +111,28 @@ Invoke the agent read-only (rule 7): fixture inputs are the planted defects,
 and an agent that "helpfully" fixes one converts a failing regression test
 into a passing one. `git status` inside `evals/` must be clean after a run.
 
+> ### Scope the agent to `input/` — the answer key is one directory up
+>
+> `case.yaml` holds `expected` and `must_not_find`; the case `README.md`
+> describes every planted defect. Both sit in the parent of `input/`, so an
+> agent pointed anywhere near the case directory can read the answers, and a
+> capable one will — it looks like project context.
+>
+> **This has already happened.** The first `haruto-001` run listed the case's
+> `case.yaml` and `README.md` among its referenced files. The report was
+> discarded and the case re-run; nothing about the output looked wrong, which
+> is exactly the problem — leakage is invisible in the result.
+>
+> Every invocation must say, explicitly: *treat `input/` as the entire
+> project; do not read, list, or grep anything above it — specifically not
+> `case.yaml` or the parent `README.md`.* Then check the agent's own
+> file-reference list before scoring. A run that touched the answer key is
+> void, not "probably fine".
+>
+> The layout is the root cause: the fixture format stores the answer key
+> adjacent to the input. A runner should hand the agent an isolated copy of
+> `input/` instead of relying on instructions.
+
 ## Roadmap for the harness
 
 - Programmatic runner that reads `case.yaml`, invokes the agent via the

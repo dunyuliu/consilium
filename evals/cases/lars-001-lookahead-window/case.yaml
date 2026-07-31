@@ -38,3 +38,12 @@ notes: |
   Lars should catch at least defect 1 (the look-ahead) — that's the primary
   pass condition. Catching defect 2 is bonus and tested via the keyword
   match on "fillna(0)" / "silent" / "swallow".
+
+  First run (2026-07-31, manual): PASS. Cited compute_returns.py:19 for the
+  look-ahead (inside the 16-20 range), named "look-ahead"/"future"/"leak" at
+  Critical, and hit the fillna(0) silent-NaN keyword. No must_not_find entry
+  appeared — no "switch to numpy", no "rewrite using vectorized".
+  Went beyond the planted set with three further findings (division-by-zero
+  on a zero baseline, formula incoherence vs the docstring, and asymmetric
+  window coverage at the series ends). Those are real properties of the
+  fixture code, not hallucinations, so they are not scored against it.

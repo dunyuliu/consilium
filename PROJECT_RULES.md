@@ -120,6 +120,13 @@ A well-reasoned alternative reading of an agent's output is not a pass.
 `evals/README.md` or `tests/check.sh` in the same PR — do not report against
 an uncommitted standard.
 
+**A run that read the answer key does not have a verdict at all.** `case.yaml`
+and the case `README.md` sit one directory above `input/` and contain the
+expected findings. Scope every invocation to `input/`, then check the agent's
+own file-reference list before scoring. Void the run if it touched either —
+leakage does not make the output look wrong, which is why it must be checked
+rather than noticed. Incident: the first `haruto-001` run, 2026-07-31.
+
 ## 6. *(dropped)*
 
 Number retained so rule citations elsewhere never shift. See "Dropped

@@ -17,16 +17,21 @@ expected:
       - "units"
   - kind: location
     file: ingest.py
-    line_range: [27, 30]
+    line_range: [30, 33]     # the `return cleaned * 1000.0` is at :32
     keywords:
       - "1000"
       - "millimetre"
       - "mm"
       - "units"
+# Phrase guards so they can only appear in a wrong answer (see evals/README.md).
+# The originals ("spike_threshold_m default is wrong") were so specific that the
+# failure mode they exist for sailed straight past them — see notes.
 must_not_find:
   - keywords:
-      - "spike_threshold_m default is wrong"
-      - "rolling_window_hours default is wrong"
+      - "default value mismatch"
+      - "defaults diverge"
+      - "config contradicts the documented default"
+      - "README default is contradicted"
 notes: |
   Planted defect: README documents `output_units: metres` as the cleaned
   output, and the config file sets it to `centimetres`. The code ignores
@@ -44,3 +49,28 @@ notes: |
   configured numeric values as "wrong defaults" — they're not defaults, they
   are the configured values for this deployment; the README only states the
   defaults. The drift is in units, not in the numeric thresholds.
+
+  First run (2026-07-31, manual): the primary defect was caught — the report
+  named output_units as documented-but-never-read and the hardcoded
+  millimetre conversion, satisfying the two keyword criteria. The run exposed
+  two defects in THIS FIXTURE, both since fixed:
+
+  1. Stale line range. `expected` asserted ingest.py:[27,30] and these notes
+     said ":29", but `return cleaned * 1000.0` is at :32. The run cited :32 —
+     correctly — and would have failed the location criterion on a right
+     answer. Range corrected to [30,33]. Line numbers in a fixture drift the
+     moment its input file is edited; cite them from the file, never memory.
+
+  2. Ineffective guard. must_not_find held "spike_threshold_m default is
+     wrong" / "rolling_window_hours default is wrong". The run reported the
+     configured values as "default value mismatch" at High severity — exactly
+     the failure mode the guard exists for — and sailed past it, because the
+     guard matched a phrasing nobody would use. Reworded to the phrasings
+     actually produced.
+
+  Open behavioural finding (NOT a fixture bug): treating configured values as
+  contradicted defaults is a false positive worth addressing in
+  sophia-okafor's prompt. README documents defaults; a config that sets other
+  values is configuration working as intended, not drift. The run hedged this
+  correctly in its closing note but still ranked all three at High. Route to
+  nadia-hadid — do not weaken the fixture to make it pass.
