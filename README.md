@@ -5,7 +5,7 @@
 > same discipline, the same skepticism, the same insistence on
 > evidence — applied to your own work, before it goes out the door.
 
-Sixteen specialists organised into three teams and a quality bench,
+Nineteen specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
 Claude Code; installs by symlink and follows you across machines.
 
@@ -183,7 +183,7 @@ releases versus one-shot publication staging.
 
 ### Quality bench
 
-Four engineers who keep the work and the team itself honest. Each
+Five engineers who keep the work and the team itself honest. Each
 applies edits within a tightly-scoped surface; none touch production
 code outside it.
 
@@ -193,6 +193,7 @@ code outside it.
 | `iris-vermeulen` | Test architect. Designs and writes the test pyramid. Edits test files, fixtures, CI config only. The mechanical floor the release gate enforces. |
 | `mira-volkov` | C/Fortran-to-Python porting + numerical optimization specialist. Bit-faithful parity to the reference binary on real data, then aggressive numpy/scipy optimization. Edits the Python port, parity tests, and CI; never the C reference. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews real deployments, diagnoses misses, recommends prompt or fixture edits. Closes the loop between the team and the wild. |
+| `zofia-kaminska` | Project-rules enforcer. Seeds a rule book for a new project, audits a repo against the one it has, and codifies incidents into rules. Edits the rule book only; routes every violation it finds to the owning specialist. |
 
 ### Campaign orchestration
 
@@ -344,6 +345,7 @@ routes.
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
 | `/eval-deployment` | `nadia-hadid` | Grade a real agent run against its contract, diagnose misses, recommend prompt or fixture edits. |
+| `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book. No argument audits, `seed` writes one for a new project, `codify` turns an incident into a rule. |
 
 ---
 
@@ -356,7 +358,7 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 | Model | Agents |
 |---|---|
 | opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin` |
+| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska` |
 | haiku | `lars-eriksson`, `sophia-okafor` |
 
 ---
@@ -407,7 +409,8 @@ consilium/
 │   ├── eval-deployment.md  #   /eval-deployment  — grade a real agent run
 │   ├── test-design.md      #   /test-design      — design + write the test pyramid
 │   ├── port.md             #   /port             — C/Fortran→Python port with parity gate
-│   └── campaign.md         #   /campaign         — Wei conducts a multi-mission campaign
+│   ├── campaign.md         #   /campaign         — Wei conducts a multi-mission campaign
+│   └── enforce-rules.md    #   /enforce-rules    — seed / audit / codify the rule book
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
@@ -426,6 +429,7 @@ consilium/
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
 │   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
+│   ├── zofia-kaminska.md   #   project-rules enforcer — seed, audit, codify
 │   └── wei-lin.md          #   campaign conductor — multi-mission orchestration
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
@@ -436,6 +440,8 @@ consilium/
 │   └── check.yml      # CI runner for tests/check.sh
 ├── scripts/
 │   └── install.sh     # symlink everything into ~/.claude
+├── install.sh         # root installer — also wires the post-merge hook
+├── PROJECT_RULES.md   # the rule book /enforce-rules audits against
 └── README.md
 ```
 
@@ -476,7 +482,8 @@ fixture format and how to run a case by hand.
 
 Current coverage: `lars-001` (look-ahead window), `sophia-001` (units
 drift), `iris-001` (defer-everything failure mode surfaced by
-`nadia-hadid`'s grade and the prompt fix that followed). The repo
+`nadia-hadid`'s grade and the prompt fix that followed), `haruto-001`
+(missing prior release notes). The repo
 that ships a test architect still has thin eval coverage on most of
 the team — see roadmap.
 

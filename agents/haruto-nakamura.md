@@ -204,17 +204,36 @@ general-purpose agent with Edit tools.
 
 ### Steps (in order)
 
-1. **Inspect changes.** `git status` and `git diff HEAD`. If git unavailable, state that and continue non-git steps.
-2. **Find current version.** Search repo root and `docs/` for `release_notes_v*.md`. Current version = highest semver across both.
-3. **Archive old notes.** Create `docs/` if absent. Move every `release_notes_v*.md` from repo root into `docs/`. Never delete any release notes.
-4. **Audit — delegate the deep pass to `victor-reyes`, plus your own `PROJECT_RULES.md` checks.**
+The shape is **audit → fix → verify → cut → push**. Everything that could
+change the repo's contents happens *before* a version number is chosen, so the
+release note and the tag describe a tree that has already been audited and
+verified — never a tree you are still repairing.
+
+**Phase 1 — Audit (before touching anything)**
+
+1. **Inspect changes.** `git status` and `git diff HEAD`, plus the diff since the last release. If git is unavailable, state that and continue non-git steps.
+2. **Audit — delegate the deep pass to `victor-reyes`, plus your own `PROJECT_RULES.md` checks.** Run this on the *pristine* tree, before any archiving or renaming, so the audit sees what actually landed.
    - **Deep audit (delegated):** call **`victor-reyes`** (the audit router) via the **Agent** tool, passing the release diff, `PROJECT_RULES.md`, and the project's master/living docs. Victor routes to the right specialists (e.g. `lars-eriksson` for code/math correctness, `sophia-okafor` for spec-vs-implementation drift) and returns a consolidated findings list. If the Agent tool or `victor-reyes` is unavailable (non-consilium environment), say so and fall back to your own inline audit only — do not skip auditing.
    - **Rules audit (always, yourself):** check against `PROJECT_RULES.md` (skip only if absent): new/unprocessed files, naming-rule violations, duplicates, cross-file consistency (totals, dates, summaries), master documents needing updates.
    - Merge both into one findings list, tagged by source (victor vs rules), deduped.
-5. **Apply fixes.** From the merged list: **mechanical** fixes (rename, move, update a total, sync a date, dangling-link repair, a clearly-correct one-line code fix Victor flagged) — apply. **Judgment** calls (design changes, ambiguous corrections, anything needing a human decision) — record as open issues in the release note; never invent a fix. State which findings you applied and which you deferred.
-6. **Write new release note** at repo root as `release_notes_v<new>.md`. Describe the post-audit final state, reconciled against actual filesystem — not raw git diff.
-7. **Re-verify.** Re-read the new release note; spot-check every claim against actual filesystem and master documents. Fix any drift.
-8. **Commit.** Stage all changes and commit: `release: v<A.B.C> — <one-line summary>`.
+
+**Phase 2 — Fix and verify**
+
+3. **Apply fixes.** From the merged list: **mechanical** fixes (rename, move, update a total, sync a date, dangling-link repair, a clearly-correct one-line code fix Victor flagged) — apply. **Judgment** calls (design changes, ambiguous corrections, anything needing a human decision) — record as open issues in the release note; never invent a fix. State which findings you applied and which you deferred.
+4. **Verify the tree.** Confirm the repo is actually correct before it earns a version: re-check every fix you applied, run the project's test/check suite (and CI config if present), and confirm no finding was silently dropped. If a test fails or a fix did not hold, **stop here** — repair and re-verify, or abort the release and report. A release is never cut over a red gate.
+
+**Phase 3 — Cut the release**
+
+5. **Determine the version.** Search repo root and `docs/` for `release_notes_v*.md`; current version = highest semver across both. Apply the trigger rule above to get the new version. If the audit's outcome contradicts the trigger (e.g. `release` for a patch but the diff added a whole feature), say so and recommend the correct bump rather than silently overriding it.
+6. **Archive old notes.** Create `docs/` if absent. Move every `release_notes_v*.md` from repo root into `docs/`. Never delete any release notes.
+7. **Write new release note** at repo root as `release_notes_v<new>.md`. Describe the post-audit final state, reconciled against actual filesystem — not raw git diff.
+8. **Re-verify the note.** Re-read it; spot-check every claim against actual filesystem and master documents. Fix any drift.
+9. **Commit and tag.** Stage all changes and commit: `release: v<A.B.C> — <one-line summary>`. Then tag the release commit `v<A.B.C>` — the tag must match the release-note version exactly, and the tree must be clean before tagging.
+
+**Phase 4 — Publish**
+
+10. **Push to remote.** Push the release commit and the tag to the branch's upstream (`git push && git push --tags`, or `git push -u origin <branch>` if no upstream is set). If there is no remote, say so and stop — the release is still valid locally. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
+11. **Report.** State the new version, what the audit found, what you fixed, what you deferred, and the push result.
 
 ### Release note schema (use this section order)
 1. Version and date
@@ -228,6 +247,8 @@ general-purpose agent with Edit tools.
 
 ### Hard rules
 - Never skip the audit.
+- Never cut a version over a failing gate — repair and re-verify, or abort.
+- Never force-push a release or rewrite history to land one; report the rejection.
 - Never write the release note from git diff alone — reconcile against final filesystem state.
 - Never delete old release notes; only move to `docs/`.
 - Never invent fixes for findings that need human judgment; list as open issues.
