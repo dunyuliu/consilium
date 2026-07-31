@@ -506,7 +506,8 @@ the team — see roadmap.
 
 Structural invariants of consilium itself — agent frontmatter
 validity, command-to-agent cross-references, README/filesystem sync,
-and stale-reference detection — are checked by:
+stale-reference detection, and README completeness for every agent
+(model table, roster row, Layout entry) — are checked by:
 
 ```bash
 bash tests/check.sh

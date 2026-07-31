@@ -12,7 +12,14 @@
 #   4. Every agent file is mentioned at least once in the README.
 #   5. Every README backtick-quoted agent-shaped reference resolves to
 #      an existing agent file (catches stale references from past
-#      renames).
+#      renames). Command stems and NON_AGENT_TERMS are skipped.
+#   6. The README model table lists every agent exactly once, under the
+#      model its own frontmatter declares, with no stale rows.
+#   7. Every agent has a README roster-table row and a Layout-tree line.
+#
+# Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
+# could be absent from the model table, the roster, or the tree with the
+# gate green. Both were negative-tested when added.
 #
 # Usage: bash tests/check.sh
 # Exit code: 0 if all checks pass, 1 otherwise.
@@ -43,6 +50,33 @@ is_agent() {
     local a
     for a in "${AGENTS[@]}"; do
         [ "$a" = "$needle" ] && return 0
+    done
+    return 1
+}
+
+is_command() {
+    local needle="$1"
+    local c
+    for c in "${COMMANDS[@]}"; do
+        [ "$c" = "$needle" ] && return 0
+    done
+    return 1
+}
+
+# Hyphenated terms that are legitimately backticked in prose and are not
+# agent references. Keep this list short and specific: every entry is a hole
+# in Check 5, so add one only when the term is genuinely unavoidable.
+NON_AGENT_TERMS=(
+    pre-push        # git hook wired by install.sh
+    post-merge      # git hook wired by install.sh
+    no-verify       # git push flag
+)
+
+is_non_agent_term() {
+    local needle="$1"
+    local t
+    for t in "${NON_AGENT_TERMS[@]}"; do
+        [ "$t" = "$needle" ] && return 0
     done
     return 1
 }
@@ -129,6 +163,12 @@ done
 # one hyphen, alphabetic on both sides, nothing else. Tokens with two or
 # more hyphens (e.g. claim-vs-abstract, end-to-end) are not agent-shaped
 # and are ignored.
+#
+# Two classes of token are agent-shaped but legitimately not agents: command
+# stems (`enforce-rules`) and a short allowlist of technical terms
+# (`pre-push`). Both are skipped. Without this the check false-positives on
+# correct prose, which trains the reader to work around the gate rather than
+# trust it — it blocked twice during the v1.2.0 cycle for exactly this.
 echo "Check 5: README backtick agent references resolve"
 mapfile -t refs < <(grep -oE '`[a-z]+-[a-z]+`' README.md \
     | sed 's/^`//; s/`$//' \
@@ -136,6 +176,8 @@ mapfile -t refs < <(grep -oE '`[a-z]+-[a-z]+`' README.md \
 for ref in "${refs[@]}"; do
     if is_agent "$ref"; then
         ok
+    elif is_command "$ref" || is_non_agent_term "$ref"; then
+        continue    # legitimately backticked, not an agent reference
     else
         fail "README references '$ref' but no agents/$ref.md exists"
     fi
@@ -189,6 +231,30 @@ for name in "${!readme_model[@]}"; do
         ok
     else
         fail "README model table lists '$name' but no agents/$name.md exists"
+    fi
+done
+
+# --- Check 7: every agent has a roster row and a Layout-tree line ----------
+#
+# The other half of rule 12. Check 6 covers the model table; an agent could
+# still be in the model table and missing from the team roster that tells a
+# reader what it does, or absent from the Layout tree.
+#
+# Roster row: a table line whose FIRST cell is exactly the backticked agent
+# name — `| \`lars-eriksson\` | Code auditor ... |`. The model table is
+# excluded because its first cell is a model name, not an agent.
+# Layout line: a tree line naming <agent>.md.
+echo "Check 7: every agent has a README roster row and Layout entry"
+for stem in "${AGENTS[@]}"; do
+    if grep -qE "^\| *\`$stem\` *\|" README.md; then
+        ok
+    else
+        fail "agents/$stem.md has no README roster-table row"
+    fi
+    if grep -qE "^│.*$stem\.md" README.md; then
+        ok
+    else
+        fail "agents/$stem.md missing from the README Layout tree"
     fi
 done
 

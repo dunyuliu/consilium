@@ -37,6 +37,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 15 | A release is a note plus a matching tag, both pushed | mechanical |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical |
 | 17 | Cross-references between agents must resolve | mechanical |
+| 18 | One writer per repo — never run two mutating workflows at once | judgment |
 
 ---
 
@@ -80,10 +81,11 @@ against `origin` (`https://github.com/dunyuliu/consilium.git`). Nothing
 merges to `main` over a red gate. Never merge intending to fix the failure
 in a follow-up commit.
 
-**Rationale**: the five structural invariants — frontmatter validity,
-command→agent resolution, README/disk sync, agent-mentioned-in-README, and
-stale-backtick-reference detection — are the only automated protection this
-repo has. If they are allowed to be red, it has none.
+**Rationale**: the seven structural invariants — frontmatter validity,
+command→agent resolution, README/disk sync, agent-mentioned-in-README,
+stale-backtick-reference detection, model-table/frontmatter agreement, and
+roster+Layout completeness — are the only automated protection this repo has.
+If they are allowed to be red, it has none.
 
 **How to apply**: run it locally (it takes under a second), then push.
 
@@ -210,7 +212,10 @@ new command additionally needs a row in the commands table.
 **Mechanical (2026-07-31)**: `tests/check.sh` **Check 6** asserts every agent
 appears exactly once in the README model table, under the model its own
 frontmatter declares, and that no table row names a non-existent agent.
-Check 3 and Check 4 already cover the commands table and *any* mention.
+**Check 7** covers the other two artifacts: a roster-table row whose first
+cell is the backticked agent name, and a Layout-tree line naming its file.
+Check 3 and Check 4 already cover the commands table and *any* mention. All
+three of rule 12's artifacts are now gated.
 
 **Incident**: Check 4 passes on a mention alone, so an agent could be absent
 from the model table with the gate green — and twice in one session it was
@@ -218,8 +223,9 @@ from the model table with the gate green — and twice in one session it was
 line that had drifted to seven. Check 6 was negative-tested against both a
 missing row and a wrong model before landing.
 
-**Still not mechanical**: the roster-table row and the Layout-tree line. An
-agent in the model table but missing from its team roster still passes.
+Checks 6 and 7 were each negative-tested before landing — a missing row, a
+wrong model, a dropped roster line, and a dropped Layout line all fail as
+intended. A check that has never failed is not known to be a gate.
 
 ## 13. A new agent lands with at least one eval fixture
 
@@ -281,11 +287,36 @@ must resolve to a file in `agents/`.
 
 **Tier 1**: enforced by `tests/check.sh` Checks 2 and 5.
 
+Check 5 skips command stems and a short allowlist of hyphenated technical
+terms (`NON_AGENT_TERMS` in the script). Before that narrowing it blocked
+twice on correct prose — a gate that cries wolf trains the reader to work
+around it. Every allowlist entry is a hole, so keep the list short.
+
 **Gap**: agent-to-agent references *inside* `agents/*.md` bodies are not
 checked. A rename breaks them silently.
 
 **Proposed Tier-1 upgrade**: extend Check 5's backtick scan to `agents/*.md`
 and `commands/*.md` bodies, not just `README.md`.
+
+## 18. One writer per repo — never run two mutating workflows at once
+
+A workflow that commits, tags, or edits files owns the repo for its duration.
+Do not start a second one — by hand or by dispatching an agent — until the
+first has reported.
+
+Before concluding a background agent is finished, check the **right** signal:
+its transcript mtime, or by messaging it. An empty to-do list is not evidence
+that an agent stopped, and a long-running agent that fans out to subagents may
+not notify for many minutes because notification waits on its children.
+
+**Incident (2026-07-31)**: the v1.1.0 release was cut by hand while a
+dispatched release agent was still running, because a to-do-list query was
+misread as proof it had died. Both wrote tags to the same repo seconds apart.
+The tags happened to be correct and were verified before the push, but nothing
+made that outcome likely — two writers raced and the good result was luck.
+
+**How to apply**: one release at a time. If a workflow appears stuck, stop it
+explicitly and confirm it stopped before taking over its work.
 
 ---
 
