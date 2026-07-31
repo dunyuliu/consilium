@@ -100,6 +100,18 @@ v1 — start strict, relax later if needed.
   directory. Future-you will not remember.
 - **Include a clean control occasionally.** A case with no defect should
   yield no findings — confirms the agent isn't hallucinating.
+- **Verify the control is actually clean, as rigorously as you verify the
+  planted defect is present.** This is the single most common way a fixture
+  has been wrong here. On 2026-07-31 three consecutive cases shipped with
+  contaminated "clean" regions: `sophia-001` had an undeclared silent-failure
+  return, `sophia-002`'s negative keys documented defaults the code had no
+  fallback for, and `ziyan-001`'s control references were never `\cite`d and
+  one overclaimed its own abstract. In every case a thorough run was scored
+  as noisy for reporting something real.
+  An undeclared true defect in a control does not merely produce a false
+  failure — it makes a complete audit score *worse* than an incomplete one,
+  which is the exact opposite of what the suite is for. Either declare it in
+  `expected` or remove it; never leave it unlisted.
 
 ## Running a case (manual, for now)
 

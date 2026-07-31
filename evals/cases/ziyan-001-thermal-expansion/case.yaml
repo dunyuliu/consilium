@@ -1,0 +1,118 @@
+id: ziyan-001-thermal-expansion
+agent: ziyan-chen
+prompt: |
+  Audit input/manuscript.tex and input/references.bib for citation accuracy.
+  Check that all claims in the text are supported by the cited references.
+  Verify author names, years, and that the manuscript does not overclaim
+  results from the cited papers.
+input_dir: input
+expected:
+  - kind: location
+    file: manuscript.tex
+    line_range: [23, 26]
+    anchor: "demonstrate that thermal expansion will cause 1 meter"
+    keywords:
+      - "overclaim"
+      - "unsupported"
+      - "Smith"
+      - "claim"
+    severity: critical
+  - kind: location
+    file: manuscript.tex
+    line_range: [30, 32]
+    anchor: "Johnson (2019)"
+    keywords:
+      - "wrong year"
+      - "year mismatch"
+      - "2019"
+      - "2018"
+must_not_find:
+  - keywords:
+      - "Williams"
+      - "overclaimed"
+  - keywords:
+      - "Brown"
+      - "wrong year"
+  - keywords:
+      - "recommend deleting"
+      - "edit the manuscript"
+notes: |
+  PLANTED DEFECTS:
+
+  1. PRIMARY (OVERCLAIM) — manuscript.tex lines 23-26:
+     Text claims: "Smith et al. (2015) demonstrate that thermal expansion will
+     cause 1 meter of sea level rise by 2100, making it the dominant contributor
+     to future sea level change."
+     
+     Defect: The bib entry for Smith2015 states the abstract is "We present
+     numerical models of seawater thermal expansion under various warming
+     scenarios with uncertainty bounds...Expansion coefficients are computed
+     across a range of temperatures, salinities, and pressures." The paper is
+     about modeling with uncertainty bounds and regional variations, NOT a
+     definitive 1-meter prediction. The text overstates the paper's findings.
+
+  2. SECONDARY (WRONG YEAR) — manuscript.tex line 30:
+     Text cites: "Johnson (2019)"
+     Bib entry: Johnson2018 has year=2018
+     Defect: Citation year in text (2019) does not match bib entry year (2018).
+     This is a mechanical error detectable without network access.
+
+  3. CONTROL (CORRECT) — Williams et al. (2020), lines 35-37:
+     Text: "Williams et al. (2020) provide detailed measurements of seawater
+     density at various depths, which are essential for understanding expansion
+     rates under different conditions."
+     Bib: Williams2020 with abstract about "detailed measurements and analysis
+     of seawater density...and physical properties."
+     Status: Claim is supported by the abstract. Entry is correct.
+
+  4. CONTROL (CORRECT) — Brown and Lee (2012), lines 41-44:
+     Text: "Brown and Lee (2012) conducted extensive modeling of thermal
+     expansion under various warming scenarios. Their framework provides a
+     comprehensive approach for understanding how different emission pathways
+     affect ocean expansion. The results demonstrate significant regional
+     variation in expansion rates, with larger effects in tropical regions."
+     Bib: BrownLee2012 with abstract about "modeling framework" and "thermal
+     expansion responses" and "significant regional variation in expansion rates."
+     Status: Claim is supported by the abstract. Entry is correct.
+
+  NETWORK ACCESS REQUIRED:
+  All BibTeX entries are synthetic (no DOI fields). No network/WebFetch access
+  is required or useful for verification. All defects are detectable from the
+  manuscript text and bib entries directly:
+  - PRIMARY defect: Text overstates what abstract describes (detectable by
+    comparing text claim to abstract field in bib)
+  - SECONDARY defect: Year mismatch (detectable by comparing text citation
+    year to "year=" field in bib)
+  - CONTROLS: Abstracts support the claims (detectable by reading both)
+
+  PASS CONDITION:
+  - ziyan-chen must find the PRIMARY defect (overclaim) at manuscript.tex:23-26
+  - ziyan-chen must find the SECONDARY defect (wrong year) at manuscript.tex:30
+  - ziyan-chen must NOT flag Williams2020 or BrownLee2012 as problematic
+  - The agent's output should be a table per its contract
+  
+  RUN RECORD:
+  Not yet run.
+
+  First run (2026-07-31, manual, scoped to input/): INCONCLUSIVE — fixture at
+  fault, agent correct.
+
+  Both planted defects were found: the Smith2015 overclaim (manuscript.tex:23-26)
+  and the Johnson year mismatch (:30). It additionally reported that the
+  manuscript's "controls" were defective — and it was right on every count:
+
+  1. The manuscript contained exactly ONE \cite{} command (line 21, Smith2015).
+     Williams2020, BrownLee2012 and Johnson2018 were named in prose only, so
+     under \bibliographystyle{plain} they would be dropped from the reference
+     list entirely. A real mechanical defect, undeclared.
+  2. The text claimed "larger effects in tropical regions"; BrownLee2012's
+     abstract says "regional effects dominating over global averages" and
+     never mentions the tropics. A genuine overclaim, in a supposed control.
+  3. A "30--50% of observed sea level rise" figure was attributed to satellite
+     altimetry with no citation and no supporting bib entry.
+
+  FIXED: \cite commands added for all three prose-named references, the
+  tropical claim reworded to match its abstract, and the uncited percentage
+  removed. The controls are now genuinely clean.
+
+  Run record: corrected, not yet re-run.

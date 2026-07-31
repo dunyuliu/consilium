@@ -15,13 +15,17 @@ expected:
     any_of:
       - "output_units"
       - "units"
+  # Tightened 2026-07-31: the first wording included "silent" and
+  # "min_valid_fraction", both of which match incidental mentions elsewhere in
+  # a report. A criterion that passes without the defect being found is worse
+  # than no criterion. These phrases require the actual observation.
   - kind: keyword
     any_of:
       - "empty series"
       - "empty Series"
-      - "silent"
-      - "min_valid_fraction"
-      - "indistinguishable"
+      - "indistinguishable from"
+      - "cannot distinguish"
+      - "returns an empty"
   - kind: location
     file: ingest.py
     line_range: [30, 33]     # the `return cleaned * 1000.0` is at :32
@@ -41,6 +45,14 @@ must_not_find:
       - "config contradicts the documented default"
       - "README default is contradicted"
 notes: |
+  ALSO PRESENT, now declared (found by the 2026-07-31 re-run, not planted
+  deliberately): README.md:12 says spikes are rejected "above the rolling
+  median", but ingest.py:18 uses (series - med).abs() <= threshold_m, which is
+  symmetric and also drops anomalously LOW readings. This is a genuine
+  doc-vs-code drift. It is declared here so a thorough run is not penalised as
+  noisy — an undeclared real defect makes a complete audit score no better
+  than an incomplete one.
+
   Planted defect: README documents `output_units: metres` as the cleaned
   output, and the config file sets it to `centimetres`. The code ignores
   the config entirely and hardcodes a `* 1000.0` multiply (ingest.py:29)
@@ -82,3 +94,23 @@ notes: |
   values is configuration working as intended, not drift. The run hedged this
   correctly in its closing note but still ranked all three at High. Route to
   nadia-hadid — do not weaken the fixture to make it pass.
+
+  Second run (2026-07-31, after the prompt fix): PASS — and the fix is
+  verified in the suppression direction. The three High-severity false
+  positives ("default value mismatch" on configured values) are GONE. She
+  reported the primary output_units defect, and recall IMPROVED: she found two
+  drifts the first run missed — the symmetric spike filter (README says
+  "above", code uses .abs()), and that the README documents defaults the code
+  has no fallback for, so omitting a key raises KeyError rather than falling
+  back. That second one is the correctly-framed version of what she previously
+  got wrong: she no longer claims a config value contradicts a default.
+
+  Overcorrection not observed — she still reports genuine default-related
+  drift, which is what nadia-hadid's anti-overcorrection clamp was for. Two-
+  sided confirmation still requires sophia-002.
+
+  This run also exposed a defect in the criterion added earlier the same day:
+  its keyword list included "silent" and "min_valid_fraction", generic enough
+  to match incidental mentions, so it passed without the silent-failure defect
+  being found. Tightened. A criterion that passes without the defect being
+  found is worse than no criterion.

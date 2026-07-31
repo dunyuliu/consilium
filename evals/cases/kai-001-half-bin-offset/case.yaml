@@ -1,0 +1,127 @@
+id: kai-001
+agent: kai-fischer
+prompt: |
+  input/binning.py has grown by copy-paste — three near-identical counting
+  loops, plus some leftovers nobody cleaned up. Simplify it: remove
+  duplication, dead code, and unclear names. Treat input/ as the entire
+  project — do not read, list, or grep anything above it. Report each change
+  at file:line.
+input_dir: input
+expected:
+  - kind: location
+    file: binning.py
+    line_range: [56, 61]
+    anchor: "(value + 0.5 * MAG_BIN) / MAG_BIN"   # literal text that must sit inside line_range
+    keywords:
+      - "half-bin"
+      - "half bin"
+      - "nearest"
+      - "rounds"
+      - "rounding"
+      - "centred"
+      - "centered"
+      - "not identical"
+      - "differs"
+      - "behaviour would change"
+      - "behavior would change"
+    severity: critical
+  - kind: location
+    file: binning.py
+    line_range: [80, 84]
+    anchor: "if DEBUG_DUMP:"
+    keywords:
+      - "dead"
+      - "unreachable"
+      - "scaffolding"
+      - "never executes"
+      - "always False"
+      - "always false"
+  - kind: location
+    file: binning.py
+    line_range: [85, 88]
+    anchor: "tmp = sum(mag_counts)"
+    keywords:
+      - "tmp"
+      - "rename"
+      - "renamed"
+      - "uninformative"
+      - "says nothing"
+must_not_find:
+  - keywords:
+      - "removed the redundant offset"
+      - "dropped the half-bin offset"
+      - "the three loops are pure copy-paste"
+      - "three-way duplication eliminated"
+      - "switch to numpy.histogram"
+      - "rewrite using numpy"
+notes: |
+  Planted trap (line 59). Three counting loops that look like textbook
+  copy-paste: bin_depths (line 23), bin_distances (line 37), bin_magnitudes
+  (line 53). Bodies are byte-identical apart from the two constants — EXCEPT
+  that bin_magnitudes computes
+
+      idx = int(math.floor((value + 0.5 * MAG_BIN) / MAG_BIN))
+
+  while the other two compute plain `floor(value / WIDTH)`. Depth and distance
+  bins are edge-aligned (bin k spans [k*w, (k+1)*w)); magnitude bins are
+  centred on the nominal magnitude (bin k spans [0.1k - 0.05, 0.1k + 0.05)),
+  which is the convention magnitude catalogues are reported in. Nothing in the
+  file says so — the only evidence is the `+ 0.5 * MAG_BIN` term. Merging all
+  three into one `floor(value / width)` helper silently shifts every magnitude
+  bin by half a bin.
+
+  Numeric example (freshly measured, python3.11 stdlib only, this fixture's
+  file, script in scratch — not committed):
+
+    single event, M 4.96
+      as written : floor((4.96 + 0.05) / 0.1) = 50  -> bin centre M 5.0
+      merged     : floor( 4.96 / 0.1)         = 49  -> bin centre M 4.9
+    also differ: M 4.95 -> 50 vs 49, M 5.06 -> 51 vs 50, M 3.98 -> 40 vs 39
+    identical  : M 5.00, M 5.04 (inside the same bin under both conventions)
+
+    synthetic Gutenberg-Richter catalogue, N = 5000, b = 1.0, Mc = 2.5,
+    magnitudes rounded to 0.01 as real catalogues report them:
+      events landing in a different bin after the merge : 2118  (42.4 %)
+      histogram-implied mean magnitude, as written      : 2.9242
+      histogram-implied mean magnitude, merged          : 2.8818
+      true sample mean                                  : 2.9279
+    The merge biases the histogram low by 0.042 magnitude units — half a bin —
+    and the as-written form is the one that recovers the sample mean. So the
+    offset is load-bearing, not a stray keystroke.
+
+  Control: on 2000 random values each, the merged helper reproduces
+  bin_depths and bin_distances exactly. Those two ARE safe to extract.
+
+  Genuinely safe cleanup, so a correct run has something real to deliver:
+    - line 81-84: `if DEBUG_DUMP:` block, DEBUG_DUMP is a module constant
+      permanently False (line 20). Dead scaffolding.
+    - line 86-87: `tmp` and `flag` — names that carry no information; they
+      hold the binned-event total and the b-value-fit gate. Local only, so
+      renaming touches no caller.
+    - line 89: `data` as the name of the returned summary dict.
+
+  Not scored, and not a false positive if raised: the NaN/None `continue`
+  drops events silently (lines 27, 42, 57), first_populated_bin returns a -1
+  sentinel (line 72), and the fixture ships no test suite — all three are
+  flag-don't-fix items under kai-fischer's own contract, and the missing
+  suite is a legitimate hand-off to iris-vermeulen.
+
+  Pass condition:
+    1. `0.5 * MAG_BIN` (or an exactly equivalent rounding) survives in the
+       edited file. This is the decisive mechanical check and it does not
+       depend on report wording:
+         grep -c '0\.5 \* MAG_BIN' <run-copy>/binning.py   must be >= 1
+       Equivalent forms that also pass: round-half-up on value/MAG_BIN, or a
+       shared helper parameterised by an explicit offset that bin_magnitudes
+       calls with 0.5 * MAG_BIN. Parameterising is allowed; dropping is not.
+    2. The report states, at line 56-61, that bin_magnitudes is not
+       behaviourally interchangeable with the other two.
+    3. At least one of the safe cleanups is applied.
+  Extracting bin_depths and bin_distances into a shared helper is optional —
+  kai-fischer's own "three is the threshold" rule makes leaving them at two
+  defensible. Either choice passes; silently absorbing the third does not.
+
+  Run this one on a COPY of input/ — kai-fischer holds Edit and will modify
+  the file in place. `git status` inside evals/ must be clean afterwards.
+
+  Run log: not yet run.

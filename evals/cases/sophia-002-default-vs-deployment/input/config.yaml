@@ -1,0 +1,4 @@
+max_retries: 3
+queue_name: priority
+batch_size: 200
+enable_dead_letter: true

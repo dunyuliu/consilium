@@ -1,0 +1,143 @@
+id: sophia-002
+agent: sophia-okafor
+prompt: |
+  Audit the project in input/ for spec drift. Compare README.md and
+  config.yaml against what worker.py actually does. Flag every divergence.
+  Treat input/ as the entire project; do not read, list, or grep anything
+  above it — specifically not case.yaml or the parent README.md.
+input_dir: input
+expected:
+  # (1) TRUE POSITIVE — code's own fallback disagrees with the documented
+  # default. README says max_retries defaults to 3; worker.py's cfg.get
+  # fallback is 5. Two defaults, in conflict, independent of what this
+  # deployment's config.yaml happens to set.
+  - kind: location
+    file: worker.py
+    line_range: [20, 23]
+    anchor: cfg.get("max_retries", 5)
+    keywords:
+      - "max_retries"
+      - "5"
+    severity: major
+  - kind: keyword
+    any_of:
+      - "fallback"
+      - "cfg.get"
+  # (2) TRUE POSITIVE — a documented, configured key the code never reads
+  # at all.
+  - kind: location
+    file: config.yaml
+    line_range: [4, 4]
+    anchor: "enable_dead_letter: true"
+    keywords:
+      - "enable_dead_letter"
+      - "never"
+      - "unused"
+      - "ignored"
+      - "dead code"
+      - "not read"
+      - "no effect"
+must_not_find:
+  # (3) NEGATIVE — queue_name and batch_size are read via bare cfg["key"]
+  # subscripts with no fallback anywhere, and this deployment's config.yaml
+  # sets them away from the README defaults ("default" -> "priority",
+  # 50 -> 200). That is configuration working as intended, not drift.
+  # Phrased as verdict/recommendation assertions per evals/README.md so a
+  # correct report's negation ("not drift, no fallback exists") cannot
+  # trip the guard.
+  - keywords:
+      - "queue_name default mismatch"
+      - "queue_name's default is wrong"
+      - "queue_name contradicts the documented default"
+      - "documented default for queue_name is wrong"
+      - "queue_name diverges from its documented default"
+      - "recommend updating the documented default for queue_name"
+      - "recommend changing queue_name's default"
+  - keywords:
+      - "batch_size default mismatch"
+      - "batch_size's default is wrong"
+      - "batch_size contradicts the documented default"
+      - "documented default for batch_size is wrong"
+      - "batch_size diverges from its documented default"
+      - "recommend updating the documented default for batch_size"
+      - "recommend changing batch_size's default"
+notes: |
+  Pass interval: exactly two DISTINCT DEFECTS (not report rows; see the
+  second run record below) — (1) the max_retries fallback vs
+  documented-default conflict, and (2) enable_dead_letter never read. A
+  report with zero or one of these has been overcorrected by the new
+  "cite a code-side fallback" rule; a report with three or more (i.e. one
+  that also flags queue_name and/or batch_size) has reverted to the old
+  bug of treating a configured value as a wrong default.
+
+  This case exists to lock BOTH directions of the fix to
+  agents/sophia-okafor.md's "Distinguish the default from the deployment"
+  principle in one fixture, per sophia-001's closing note ("route to
+  nadia-hadid — do not weaken the fixture to make it pass").
+
+  Design:
+  - max_retries: README default `3` (README.md:12); config.yaml:1 also
+    sets `3` for this deployment — so the fallback bug never manifests at
+    runtime, which is the point. The drift is between the two written
+    defaults (doc vs. code), not between config and doc. Sophia's fix
+    requires her to cite worker.py:22 (`cfg.get("max_retries", 5)`) before
+    calling it a default mismatch; she should still find it, because the
+    citable fallback exists and disagrees.
+  - enable_dead_letter: documented (README.md:15) and set in config.yaml:4,
+    but grep confirms worker.py never references the key at all — dead
+    config, unconditionally a finding regardless of the fallback rule.
+  - queue_name / batch_size: documented defaults ("default", 50); this
+    deployment's config.yaml sets "priority" / 200; worker.py:20-21 reads
+    both via bare `cfg["..."]` subscripts with no `.get`, no signature
+    default, no fallback of any kind anywhere in the file. No citable
+    code-side default exists, so under the fixed prompt these must NOT be
+    reported as default mismatches.
+
+  Run record: not yet run.
+
+  First run (2026-07-31, manual, scoped to input/): INCONCLUSIVE — and the
+  fixture was at fault, not the agent.
+
+  Both true positives were found: F1 the max_retries fallback (5) contradicting
+  the documented default (3), and F2 the entirely unreferenced
+  enable_dead_letter. That confirms the default-vs-deployment fix in BOTH
+  directions — the false positive is suppressed and the genuine code-fallback
+  drift still fires, which is exactly what this case exists to prove.
+
+  But the run reported FOUR findings, not two. The two extra were queue_name
+  and batch_size — and they were NOT the old false positive. She did not claim
+  the config contradicted a default. She observed that documenting a default
+  implies the key is optional, while `cfg["queue_name"]` has no fallback and
+  raises KeyError if omitted. That is a genuine doc-vs-code divergence: a
+  "Default" column asserts a fallback exists, and none did.
+
+  The negative case therefore contained an undeclared real defect, which is
+  the same failure nadia-hadid flagged in sophia-001. FIXED by giving worker.py
+  fallbacks that MATCH the documented defaults:
+    queue = cfg.get("queue_name", "default")     # doc says "default"
+    batch = jobs[: cfg.get("batch_size", 50)]    # doc says 50
+  Now doc-default and code-default agree, config sets different values, and
+  reporting them is unambiguously the false positive this case guards.
+
+  must_not_find also failed to fire: its guards were key-specific verdict
+  phrasings, and "documented as optional, required by code" was not among
+  them. Sixth distinct fixture-defect class of the day, and the third traced
+  to must_not_find guarding phrasing rather than behaviour.
+
+  Re-run required against the corrected input before this case counts as
+  passed. Run record: corrected, not yet re-run.
+
+  Second run (2026-07-31, against the corrected input): PASS. The negative
+  case is now correctly SILENT — queue_name and batch_size were not reported,
+  which is the behaviour this case exists to test. Both true positives found
+  again (max_retries fallback 5 vs documented 3; enable_dead_letter inert).
+
+  She reported three findings, not two, but the third is a FACET of the
+  second rather than a false positive: the knob is inert (F2) and the
+  dead-letter routing is absent from the loop (F3). Both statements are true
+  and both trace to one planted defect.
+
+  Pass interval corrected accordingly: count DISTINCT DEFECTS, not findings.
+  An agent may legitimately decompose one defect into several claims, and a
+  criterion that counts report rows punishes thoroughness. Pass = exactly two
+  distinct defects identified, and the two bare-default keys silent.
