@@ -347,6 +347,52 @@ for case_yaml in evals/cases/*/case.yaml; do
     done < <(awk "$LOC_AWK" "$case_yaml")
 done
 
+# --- Check 10: one owner per write surface --------------------------------
+#
+# PROJECT_RULES.md rule 19. Boundaries written only in prose cannot be
+# checked, and two agents quietly holding the same surface is how a project
+# ends up with two rule books under different filenames (2026-07-31).
+#
+# Parses the ownership table in PROJECT_RULES.md and asserts:
+#   a. every listed owner is a real agent
+#   b. every listed owner actually holds Edit or Write
+#   c. every agent holding Edit or Write is listed as some surface's owner
+#      (an unscoped writer is a boundary waiting to be crossed)
+#   d. no surface is listed twice
+echo "Check 10: write-surface ownership table is complete and exclusive"
+declare -A surface_owner=()
+declare -A is_owner=()
+while IFS= read -r row; do
+    surface=$(printf '%s' "$row" | awk -F'|' '{print $2}' | sed 's/^ *//; s/ *$//')
+    owner=$(printf '%s' "$row" | awk -F'|' '{print $3}' | grep -oE '[a-z]+-[a-z]+' | head -1)
+    [ -z "$owner" ] && continue
+    if [ -n "${surface_owner[$surface]:-}" ]; then
+        fail "rule 19 table lists surface '$surface' more than once"
+    fi
+    surface_owner[$surface]="$owner"
+    if is_agent "$owner"; then ok; else fail "rule 19 table names '$owner', no such agent"; continue; fi
+    if grep -q '^tools:.*\(Edit\|Write\)' "agents/$owner.md"; then
+        ok
+    else
+        fail "rule 19 gives '$owner' a write surface but its tools include neither Edit nor Write"
+    fi
+    is_owner[$owner]=1
+done < <(sed -n '/^## 19\./,/^## 18\./p' PROJECT_RULES.md | grep -E '^\| .* \| `[a-z]+-[a-z]+` *\|')
+
+if [ "${#surface_owner[@]}" -eq 0 ]; then
+    fail "rule 19 ownership table not found or unparseable in PROJECT_RULES.md"
+fi
+
+for stem in "${AGENTS[@]}"; do
+    if grep -q '^tools:.*\(Edit\|Write\)' "agents/$stem.md"; then
+        if [ -n "${is_owner[$stem]:-}" ]; then
+            ok
+        else
+            fail "agents/$stem.md holds Edit/Write but owns no surface in rule 19 — unscoped writer"
+        fi
+    fi
+done
+
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
 [ "$fail_count" -eq 0 ] || exit 1

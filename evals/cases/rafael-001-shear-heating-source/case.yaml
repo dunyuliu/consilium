@@ -1,0 +1,97 @@
+id: rafael-001
+agent: rafael-santos
+prompt: |
+  Check input/fault_heating.py for physical validity: dimensional
+  consistency, conservation, boundary conditions, and whether the
+  approximations hold in the regime the defaults describe. Report findings
+  at file:line. Treat input/ as the entire project — do not read, list, or
+  grep anything above it.
+input_dir: input
+expected:
+  - kind: location
+    file: fault_heating.py
+    line_range: [61, 65]
+    anchor: "q * dt / (RHO * C_P)"   # literal text that must sit inside line_range
+    keywords:
+      - "dimension"
+      - "unit mismatch"
+      - "shear-zone width"
+      - "shear zone width"
+      - "length scale"
+      - "per unit volume"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "np.clip"
+      - "clip("
+      - "T_MELT"
+      - "solidus"
+must_not_find:
+  - keywords:
+      - "safe to use as written"
+      - "the source term is dimensionally correct"
+      - "rewrite the solver as an implicit"
+      - "recommend switching to scipy"
+notes: |
+  Planted defect 1 (critical, line 63): the frictional-heating source is
+  added as a temperature increment `q * dt / (RHO * C_P)`, where
+  `q = tau * V` is power per unit *area* of the fault (W m^-2, line 47).
+  Dividing an area-density by rho*c gives
+
+      (Pa * m s^-1 * s) / (J m^-3 K^-1) = (J m^-2)(m^3 K J^-1) = K m,
+
+  not K. The correct increment converts the area source to a volumetric one
+  by dividing by the shear-zone width: `q * dt / (RHO * C_P * w)`. The width
+  `w` is already a parameter (line 67) and is used for the mask (line 41) but
+  never enters the normalization, so there is no reading under which the line
+  as written is dimensionally sound.
+
+  Consequence (freshly measured, numpy 1.26 / python3, this fixture's code
+  with tau = 20 MPa, V = 1 m/s, w = 10 mm, defaults otherwise):
+
+    t = 1 s   as written    peak dT =   7.41 K   (peak T =  487 K)
+              width-fixed   peak dT = 741.26 K   (peak T = 1221 K)
+              ratio = 100.0 = 1/w  (exactly the missing length, in metres)
+
+  Correctness of the fixed form, three independent checks:
+    - Adiabatic limit. At t = 1 s the diffusion length sqrt(4*alpha*t) is
+      2.11 mm << w = 10 mm, so the core should track tau*V*t/(rho*c*w) =
+      740.74 K. Fixed solver gives 741.26 K (+0.07%); as-written gives 7.41 K
+      (-99%).
+    - Grid convergence of the fixed form at t = 1 s: nz = 500/1000/2000/4000
+      -> 735.94 / 741.26 / 740.59 / 740.59 K. Converged to 4 digits by
+      nz = 2000; the nz = 1000 default is within 0.1%.
+    - Long-time asymptote. For sqrt(4*alpha*t) >> w the finite-width source
+      must approach the Carslaw & Jaeger constant-flux plane-source result
+      dT = 2*(q/2)*sqrt(alpha*t/pi)/K. Fixed solver / analytic =
+      0.861, 0.954, 0.985 at t = 200, 2000, 20000 s (Ld/w = 3.0, 9.4, 29.8).
+      Converging to 1 from below, as a distributed source must. (Those runs
+      are validation only — steady 1 m/s sliding for hours is not a physical
+      scenario.)
+
+  So the module predicts a 7 K coseismic temperature rise where the physics
+  gives 741 K: no thermal weakening, no melting, no pressurization. That is
+  the whole point of the calculation.
+
+  Planted defect 2 (major, line 64): `np.clip(Tn, T_AMBIENT, T_MELT)`
+  silently caps the profile at the solidus, hiding an unphysical excursion
+  rather than raising — rafael-santos's own prompt names this failure class.
+  It is latent while defect 1 is present (the as-written run peaks at 487 K
+  and never touches the cap) and bites the moment defect 1 is fixed: at
+  t = 2 s the fixed solver reaches 1957 K but reports 1450 K, swallowing a
+  507 K overshoot with no signal to the caller.
+
+  Deliberate non-defects (a finding on these is a false positive, though they
+  are not in must_not_find because a careful conditional caveat is fair):
+    - cfl = 0.4 satisfies the explicit-diffusion limit dt <= dz^2/(2*alpha).
+    - The insulating far edge at half_width = 0.1 m sits ~47 diffusion
+      lengths from the source at t = 1 s.
+    - lap[0] = (T[1] - T[0])/dz^2 is the correct mirror condition for the
+      symmetric half-profile.
+    - The mask z < w/2 resolves the half shear zone with 50 cells at defaults.
+
+  Pass condition: a finding citing lines 61-65 that names the missing length
+  scale / dimensional inconsistency in the source term. Defect 2 is bonus,
+  tested by the keyword entry.
+
+  Run log: not yet run.

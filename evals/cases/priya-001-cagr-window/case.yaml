@@ -1,0 +1,79 @@
+id: priya-001
+agent: priya-nair
+prompt: |
+  Verify the headline figures in input/PERFORMANCE_SUMMARY.md by
+  re-deriving them independently from input/account_values.csv. Report
+  which claims hold and which do not, with the corrected values.
+input_dir: input
+expected:
+  - kind: location
+    file: PERFORMANCE_SUMMARY.md
+    line_range: [20, 24]
+    anchor: "(1 + mean(monthly returns)) ** 12 - 1"   # literal text inside line_range
+    keywords:
+      - "geometric"
+      - "arithmetic"
+      - "mean of"
+      - "compounding the average"
+      - "9.59"
+      - "9.6"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "9.59"
+      - "9.5937"
+      - "4.92"
+      - "59"
+      - "period"
+    severity: major
+  - kind: keyword
+    any_of:
+      - "-1.9"
+      - "−1.9"
+      - "1.90"
+      - "worst month"
+must_not_find:
+  - keywords:
+      - "all figures are correct"
+      - "the summary is accurate"
+      - "total return is wrong"
+      - "total return does not reconcile"
+      - "56.9% is incorrect"
+notes: |
+  Three planted defects and one deliberate control. All values below were
+  computed from the committed CSV, not estimated.
+
+  The CSV holds 60 month-end marks (2019-01 .. 2023-12), first 100000.00,
+  last 156895.91. Sixty observations bound FIFTY-NINE monthly intervals,
+  i.e. 4.9167 years — not 5.
+
+  Defect 1 (critical, PERFORMANCE_SUMMARY.md:20). The stated method
+  compounds the ARITHMETIC mean monthly return: (1 + mean(r))**12 - 1 =
+  9.6792%, reported as "9.7%". The correct geometric figure is
+  (last/first)**(12/59) - 1 = 9.5937%. Averaging returns before compounding
+  is the classic overstatement — Jensen's inequality guarantees the
+  arithmetic route is >= the true compounded rate, so the error always
+  flatters the manager. This is the primary defect and the one the fee
+  calculation depends on.
+
+  Defect 2 (major, the "5 years" period claim). Treating 60 marks as 5.0
+  years instead of 59 intervals / 4.9167 years. Note the direction: on its
+  own, this defect would UNDERSTATE the rate (9.4265% if you compound
+  geometrically over 5.0 years), so the two errors partly offset. A verifier
+  who finds only one may conclude the headline is "about right"; both must
+  be unpicked to land on 9.5937%.
+
+  Defect 3 (minor, "Worst month -1.5%"). The actual minimum monthly return
+  is -1.90%. Best month +2.60% is stated correctly.
+
+  CONTROL (must not be flagged): total return 56.9% is CORRECT —
+  156895.91/100000 - 1 = 56.8959%. An auditor who reports it as wrong is
+  manufacturing findings, which the must_not_find entries guard against.
+
+  Pass condition: identify the arithmetic-vs-geometric error at the method
+  line AND land on ~9.59% as the corrected CAGR. Catching the period-length
+  and worst-month errors is the strong pass. Falsely flagging total return
+  fails the case.
+
+  must_not_find is phrased as verdict assertions only, so a correct report
+  saying "total return reconciles" cannot trip it.

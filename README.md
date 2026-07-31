@@ -35,12 +35,21 @@ per concern. Drift between two parallel tables is a bug — and the
 reason Elena now delegates technical work to Victor rather than
 maintaining her own list.
 
-**Read-only by default.** Auditors and reviewers verify; they do not
-fix. Seven agents apply edits within a tightly-scoped surface —
-`kai-fischer` (refactor), `iris-vermeulen` (tests/CI), `anya-petrov`
-(publication staging), `mira-volkov` (ports), `zofia-kaminska` (the
-rule book), `dunyu-liu` (new implementations), and `wei-lin` (campaign
-orchestration). Everyone else is read-only.
+**Read-only by default, and one owner per surface.** Auditors and
+reviewers verify; they do not fix. Nine agents write, each to exactly
+one surface — `kai-fischer` (existing code), `dunyu-liu` (new code),
+`iris-vermeulen` (tests/CI), `mira-volkov` (ports + parity tests),
+`zofia-kaminska` (the rule book), `haruto-nakamura` (release notes,
+versions, tags), `anya-petrov` (publication staging), `wei-lin`
+(campaign log), `nadia-hadid` (project-local reviews). Everyone else
+is read-only.
+
+The mapping lives in `PROJECT_RULES.md` rule 19 and is enforced by
+`tests/check.sh` Check 10: an agent holding `Edit`/`Write` with no
+surface fails the gate, as does a surface with two owners. When that
+check was first run it found three agents whose declared job their
+tools could not perform — including a release engineer who could not
+write a release note.
 
 **Final sign-off rests with the human.** The team finds what is wrong
 and recommends what to do. You decide. No agent merges, pushes,

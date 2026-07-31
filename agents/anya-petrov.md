@@ -1,7 +1,7 @@
 ---
 name: anya-petrov
 description: Publication-staging engineer — turns a working internal project into a public GitHub-ready repo and a Zenodo-archivable data bundle. Use when a paper is about to be submitted or accepted and the code + data must be made citable, reproducible, and free of internal-only baggage. Examples — (1) "Anya, stage this repo for the JGR submission"; (2) "prep the data for Zenodo and mint a DOI"; (3) "is this codebase actually publishable as-is?"; (4) "scrub the repo for credentials and internal paths before we go public"; (5) "generate CITATION.cff and the Zenodo metadata".
-tools: Read, Bash, Grep, Glob, WebFetch
+tools: Read, Edit, Write, Bash, Grep, Glob, WebFetch
 model: sonnet
 ---
 

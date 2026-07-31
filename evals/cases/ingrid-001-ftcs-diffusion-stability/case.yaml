@@ -1,0 +1,93 @@
+id: ingrid-001
+agent: ingrid-lindqvist
+prompt: |
+  Audit input/thermal_column.py for mathematical rigor: stability of the
+  time-stepping scheme, the convergence order it claims, and whether the
+  refinement study measures what it says it measures. Treat input/ as the
+  entire project — do not read, list, or grep anything above it. Report
+  findings at file:line.
+input_dir: input
+expected:
+  - kind: location
+    file: thermal_column.py
+    line_range: [19, 26]
+    anchor: "cfl * dx ** 2 / kappa"   # literal text that must sit inside line_range
+    keywords:
+      - "1/2"
+      - "0.5"
+      - "von neumann"
+      - "diffusion number"
+      - "unstable"
+      - "stability limit"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "sqrt(dx)"
+      - "np.sqrt(dx"
+      - "grid-normal"
+      - "not normalis"
+      - "not normaliz"
+      - "unnormalis"
+      - "unnormaliz"
+      - "1.5"
+      - "half an order"
+must_not_find:
+  - keywords:
+      - "No mathematical issues found"
+      - "the time step is stable as written"
+      - "recommend keeping cfl = 0.9"
+      - "patched thermal_column.py"
+      - "rewrote thermal_column.py"
+notes: |
+  Planted defect 1 (critical, line 26, function `stable_timestep`):
+  the explicit FTCS update for dT/dt = kappa d2T/dx2 has amplification
+  factor g(k) = 1 - 4r sin^2(k dx / 2) with r = kappa dt / dx^2, so von
+  Neumann stability requires r <= 1/2. The module ships r = cfl = 0.9 and
+  the docstring justifies it with a false convexity argument (the update
+  T_i^{n+1} = r T_{i-1} + (1 - 2r) T_i + r T_{i+1} is convex only for
+  r <= 1/2, not r < 1). The 0.9 looks like the advective CFL habit.
+
+  Measured (2026-07-31, python 3.12.4 / numpy 1.26.4, fresh run of the
+  fixture file itself, t_end = 1e12 s, L = 1e4 m, kappa = 1e-6 m^2/s):
+
+    nx    dx     nsteps   r       |g|max   max|T| at t_end (K)
+    51   200.0      28   0.8929   2.571    9.06e+01
+   101   100.0     112   0.8929   2.571    3.70e+31
+   201    50.0     445   0.8989   2.596    7.29e+169
+   401    25.0    1778   0.8999   2.600    nan
+
+  Initial amplitude is 100 K. The sawtooth mode is seeded by roundoff and
+  grows by 2.57 per step, so it needs ~40 steps to reach O(1): at nx=101
+  max|T| is 98 K after 20 steps, 398 K after 40, 5.8e10 after 60. The
+  coarsest grid (28 steps) still looks fine at t_end — the failure is
+  invisible on the grid a reviewer would try first, which is the point.
+
+  `convergence_study()` as shipped therefore returns
+  errors = [6.43e-02, 1.94e+32, inf, nan], orders = [-111.2, -inf, nan].
+
+  Planted defect 2 (major, line 64, function `l2_error`): the docstring
+  claims a grid-normalised discrete L2 norm but the body is the plain
+  Euclidean vector norm, missing the sqrt(dx) (equivalently 1/sqrt(N))
+  factor. Since ||e||_2 ~ sqrt(N) * ||e||_{L2}, it depletes the measured
+  order by exactly 1/2. Verified on the same fixture with cfl forced to
+  0.5 so the run is stable:
+
+    module l2_error   : 2.945e-02, 1.040e-02, 3.678e-03, 1.300e-03
+                        -> orders 1.501, 1.500, 1.500
+    sqrt(dx)-scaled   : 4.165e-01, 1.040e-01, 2.600e-02, 6.501e-03
+                        -> orders 2.001, 2.000, 2.000
+
+  So the acceptance criterion stated in `convergence_study` ("order ~2")
+  cannot be met even after the stability defect is fixed — the norm is
+  wrong too. The second-order claim in the module docstring is correct
+  mathematics; the measurement of it is not.
+
+  Pass condition: a finding citing lines 19-26 that identifies r <= 1/2
+  (equivalently dt <= dx^2 / (2 kappa)) as the stability requirement.
+  Catching defect 2 is the secondary bar and is tested by the keyword
+  entry; the measured 1.5 should appear if the refinement study is
+  actually run, which Ingrid's prompt requires ("verify numerics by
+  running code").
+
+  Not yet run against the agent — numbers above are from the fixture
+  code, not from an agent report. Record the run outcome here.

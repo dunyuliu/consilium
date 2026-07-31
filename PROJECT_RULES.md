@@ -14,12 +14,54 @@ artifacts by path. A rule that cannot name a path is not a rule here.
 the rule book. `agents/haruto-nakamura.md` and `commands/release.md` already
 cite it by that name. There is no second rule book.
 
+## Rule 0 — Always eat what you cook
+
+**Every discipline this repo sells, it applies to itself first.** consilium
+ships agents that audit, gate, test, and enforce. Any of those pointed at
+someone else's project and never at this one is a claim, not a practice.
+
+Numbered 0 because it is not one rule among the others — it is the reason the
+others get checked. Numbering starts at 1 below and never shifts (see rule 6).
+
+**Concretely**: before shipping a discipline, run it here. Before claiming a
+gate works, watch it fail. Before recommending a fixture, run the ones we
+have. Before telling a user their docs have drifted, check ours.
+
+**Incidents — all four found on 2026-07-31, all four only by turning consilium
+on consilium:**
+
+- `haruto-nakamura` and `commands/release.md` audited against
+  `PROJECT_RULES.md`. The file did not exist. Two agents had been enforcing a
+  rule book the repo never had.
+- `wei-lin` seeded `project_rules.md` while `haruto-nakamura` audited
+  `PROJECT_RULES.md`. On a case-sensitive filesystem each wrote a file the
+  other could not find. Nobody noticed because nobody ran them together here.
+- Five eval fixtures existed across three releases and **none had ever been
+  executed**. Running them found four defects in the fixtures themselves —
+  including a `line_range` that would have failed a correct answer, and a
+  `must_not_find` that punished an agent for stating what it had refrained
+  from doing.
+- `tests/check.sh` Check 9 was written to verify fixture ranges against
+  *report* keywords. It failed on the first case it touched, because
+  `evals/README.md` — this repo's own documentation — says explicitly not to
+  plant report keywords in fixture input. The check was rewritten around an
+  explicit `anchor:` field. It was wrong for a reason already written down
+  here.
+
+**How to apply**: when adding or changing an agent, a check, or a rule, ask
+what it would find if aimed at this repo — then aim it. If the answer is
+"nothing, we're fine", that is the least trustworthy answer available and the
+strongest reason to run it.
+
+---
+
 ## Index
 
 Read this list first; jump to a rule only when it is load-bearing.
 
 | # | Rule | Tier |
 |---|---|---|
+| 0 | **Always eat what you cook** — apply every discipline here first | judgment |
 | 1 | Minimal changes; no new files until necessary | judgment |
 | 2 | No silent fallbacks or swallowed errors | judgment |
 | 3 | `bash tests/check.sh` is the gate; green before merge | mechanical |
@@ -38,6 +80,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical |
 | 17 | Cross-references between agents must resolve | mechanical |
 | 18 | One writer per repo — never run two mutating workflows at once | judgment |
+| 19 | One owner per write surface | mechanical |
 
 ---
 
@@ -312,6 +355,46 @@ checked. A rename breaks them silently.
 
 **Proposed Tier-1 upgrade**: extend Check 5's backtick scan to `agents/*.md`
 and `commands/*.md` bodies, not just `README.md`.
+
+## 19. One owner per write surface
+
+Every file class in a project has exactly one agent that may write it. Two
+agents holding the same surface do not collide loudly — they diverge quietly,
+and the divergence surfaces months later as two files that were supposed to
+be one.
+
+**Ownership table** — `tests/check.sh` Check 10 parses this table, so it is
+the machine-readable source of truth, not documentation of one.
+
+| Surface | Owner |
+|---|---|
+| `PROJECT_RULES.md` (the rule book) | `zofia-kaminska` |
+| test files, fixtures, CI config | `iris-vermeulen` |
+| a language port + its parity tests | `mira-volkov` |
+| existing production code (simplify) | `kai-fischer` |
+| new production code (create) | `dunyu-liu` |
+| release notes, version files, tags | `haruto-nakamura` |
+| publication staging, citation files | `anya-petrov` |
+| campaign session log, merge decisions | `wei-lin` |
+| `.consilium-review/` in a deployed project | `nadia-hadid` |
+
+Everyone not listed is read-only. An agent with `Edit` or `Write` in its
+frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
+
+**Precedence when surfaces touch.** CI config is `iris-vermeulen`'s; a port
+needing a CI change asks her rather than editing it. Production code is
+`kai-fischer`'s to simplify and `dunyu-liu`'s to create — whoever holds the
+mission holds the file for its duration, and the other one waits.
+
+**Incident (2026-07-31)**: `wei-lin` seeded `project_rules.md` while
+`haruto-nakamura` audited `PROJECT_RULES.md`. Two owners, two filenames, and
+on a case-sensitive filesystem each wrote a file the other could not find.
+The filename was fixed first; the ownership was the actual bug. `wei-lin` now
+specifies rules and delegates the writing to `zofia-kaminska`.
+
+**How to apply**: adding an agent with write tools means adding a row here.
+If the row would duplicate an existing surface, the agent is the wrong shape
+— split the surface or fold the agent in.
 
 ## 18. One writer per repo — never run two mutating workflows at once
 

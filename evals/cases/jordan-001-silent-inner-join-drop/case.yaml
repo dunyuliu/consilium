@@ -1,0 +1,74 @@
+id: jordan-001
+agent: jordan-kim
+prompt: |
+  Pipeline audit (mode 2). input/ingest_merge.py enriches input/trades.csv
+  with input/instruments.csv and writes enriched_trades.csv and
+  sector_summary.csv. Trace the trades end-to-end and confirm every input
+  row is accounted for in the output. Report findings at script:line.
+input_dir: input
+expected:
+  - kind: location
+    file: ingest_merge.py
+    line_range: [26, 30]
+    anchor: "trades.merge(instruments,"
+    keywords:
+      - "inner join"
+      - "drop"
+      - "dropped"
+      - "unmatched"
+      - "silent"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "ENRN"
+      - "WCOM"
+      - "LEH"
+  - kind: keyword
+    any_of:
+      - "50"
+      - "10 trades"
+      - "10 rows"
+must_not_find:
+  - keywords:
+      - "no rows were dropped"
+      - "no rows are dropped"
+      - "all 50 trades are accounted for"
+      - "all trades are accounted for"
+      - "no data loss"
+      - "pipeline is correct as written"
+      - "reconciles cleanly"
+      - "safe to ship"
+notes: |
+  Planted defect (critical, ingest_merge.py:28): `enrich()` does
+  `trades.merge(instruments, on="symbol")`, an inner join with no `how=`
+  keyword. Three symbols in trades.csv — ENRN, WCOM, LEH (legacy/delisted
+  positions) — are absent from instruments.csv, the current instrument
+  master. Those 10 trade rows vanish from `merged` with no warning, no row-
+  count check, and no log line. `run()` prints
+  "Processed {len(enriched)} trades successfully" using the post-merge
+  count as if it were the input count, so the pipeline reports success on
+  an 80%-complete blotter.
+
+  Measured row counts (2026-07-31, `python3 ingest_merge.py trades.csv
+  instruments.csv out/` run from input/):
+    - input/trades.csv: 50 data rows (10 symbols x 4 rows + ENRN x4 +
+      WCOM x3 + LEH x3).
+    - input/instruments.csv: 10 symbols (ENRN/WCOM/LEH absent).
+    - out/enriched_trades.csv: 40 data rows.
+    - Dropped: 10 rows (all of ENRN, WCOM, LEH), 20% of input, zero
+      diagnostic output.
+    - stdout: "Processed 40 trades successfully." — never mentions 50.
+
+  Pass condition: Jordan must (a) cite ingest_merge.py:28 (or the enrich()
+  function, lines 26-30) as the drop point with inner-join / silent-drop
+  language, and (b) name at least one of the three dropped symbols
+  (ENRN/WCOM/LEH) or the 50-in/40-out (10-row) count, showing the trace was
+  actually run/reasoned through rather than guessed. A report that merely
+  says "the merge could drop rows" without identifying which rows or the
+  magnitude should not satisfy criterion 2 or 3.
+
+  must_not_find guards against a wrong-direction verdict: an agent that
+  inspects the merge and concludes (incorrectly) that all input rows
+  survive, or that the pipeline reconciles/is safe to ship, has missed the
+  defect rather than confirmed its absence — that phrasing can only appear
+  in a wrong answer, per evals/README.md's negation-safe guidance.
