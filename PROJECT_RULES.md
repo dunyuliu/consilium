@@ -140,6 +140,14 @@ failing regression test into a passing one.
 **How to apply**: `git status` inside `evals/` must be clean after any eval
 run. If it is not, `git checkout -- evals/` and rerun with a read-only agent.
 
+**Incident (2026-07-31)**: the first eval run in this repo's history left a
+`__pycache__/` directory inside `mira-001`'s `input/` — the agent imported
+the fixture module to measure it, which is legitimate and read-only in
+intent, but Python writes bytecode as a side effect. `.gitignore` now covers
+`__pycache__/` and compiled objects. Note the rule's real scope: *no
+meaningful change to fixture content*, not "no byte ever written". Editing a
+planted defect is the violation; an interpreter's cache is noise to ignore.
+
 ## 8. Never delete evidence — release notes archive, they do not vanish
 
 `release_notes_v*.md` are the project's only history outside git. On a new

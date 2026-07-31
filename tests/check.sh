@@ -70,6 +70,7 @@ NON_AGENT_TERMS=(
     pre-push        # git hook wired by install.sh
     post-merge      # git hook wired by install.sh
     no-verify       # git push flag
+    fast-check      # JS property-testing library (agents/iris-vermeulen.md)
 )
 
 is_non_agent_term() {
@@ -256,6 +257,35 @@ for stem in "${AGENTS[@]}"; do
     else
         fail "agents/$stem.md missing from the README Layout tree"
     fi
+done
+
+# --- Check 8: agent-to-agent references inside prompt bodies resolve ------
+#
+# PROJECT_RULES.md rule 17. Check 5 scans README.md only, so a rename could
+# break every routing line inside agents/*.md and commands/*.md silently —
+# and routing is the one cross-reference that changes agent behaviour rather
+# than just documentation.
+#
+# The same skip rules as Check 5 apply. Measured before writing this: of 22
+# backticked hyphen-tokens across all prompt bodies, exactly one was neither
+# an agent nor a command, so the naive scan is accurate enough to be a gate
+# without a large allowlist.
+echo "Check 8: agent references inside agents/ and commands/ bodies resolve"
+for f in agents/*.md commands/*.md; do
+    mapfile -t body_refs < <(grep -oE '`[a-z]+-[a-z]+`' "$f" \
+        | sed 's/^`//; s/`$//' \
+        | sort -u)
+    for ref in "${body_refs[@]:-}"; do
+        [ -z "$ref" ] && continue
+        # An agent naming itself is fine; so is any real agent or command.
+        if is_agent "$ref"; then
+            ok
+        elif is_command "$ref" || is_non_agent_term "$ref"; then
+            continue
+        else
+            fail "$f references '$ref' but no agents/$ref.md exists"
+        fi
+    done
 done
 
 echo

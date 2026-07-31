@@ -63,6 +63,18 @@ notes: |
   case fails. Use this to guard against scope creep, hallucinated bugs, or
   unwanted fix-recommendations.
 
+> **Matching is literal, so it cannot tell an assertion from its negation.**
+> A `must_not_find` entry of `"loosen the tolerance"` also fires on *"I did
+> not loosen the tolerance"* — a sentence only a correct run produces. Agents
+> routinely state what they refrained from doing, so a naive guard punishes
+> exactly the behaviour it is meant to reward.
+>
+> Phrase every entry so it can only appear in a genuinely wrong answer:
+> prefer verdict assertions (`"parity is confirmed"`, `"safe to ship"`) and
+> recommendation imperatives (`"recommend loosening"`, `"edit resamp.c to"`)
+> over bare descriptions of the bad act. `mira-001` shipped with the naive
+> wording and passed its first run only by luck of phrasing.
+
 ### Pass criteria
 
 A case passes when every `expected` entry matches AND no `must_not_find`
@@ -91,6 +103,13 @@ There is no automated harness yet. To run a case by hand:
 3. Run `/agents` and invoke the agent named in `case.yaml`.
 4. Paste the `prompt` field as your message, scoping it to `input/`.
 5. Compare the agent's report against `expected` and `must_not_find` by eye.
+6. Record the outcome in the case's `notes:` — date, verdict, and anything
+   the run revealed about the fixture itself. A run nobody wrote down is a
+   run that will be repeated.
+
+Invoke the agent read-only (rule 7): fixture inputs are the planted defects,
+and an agent that "helpfully" fixes one converts a failing regression test
+into a passing one. `git status` inside `evals/` must be clean after a run.
 
 ## Roadmap for the harness
 

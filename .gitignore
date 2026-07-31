@@ -1,0 +1,10 @@
+# Byte-compiled artifacts. Running an eval case imports its fixture module,
+# which drops __pycache__/ inside evals/cases/*/input/ — a rule 7 violation
+# (fixture inputs are read-only; `git status` inside evals/ must be clean
+# after a run). Ignoring it keeps an eval run from dirtying the tree.
+__pycache__/
+*.py[cod]
+
+# Compiled reference binaries built while checking a port against its oracle.
+*.o
+*.so
