@@ -5,7 +5,7 @@
 > same discipline, the same skepticism, the same insistence on
 > evidence — applied to your own work, before it goes out the door.
 
-Nineteen specialists organised into three teams and a quality bench,
+Twenty specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
 Claude Code; installs by symlink and follows you across machines.
 
@@ -36,9 +36,11 @@ reason Elena now delegates technical work to Victor rather than
 maintaining her own list.
 
 **Read-only by default.** Auditors and reviewers verify; they do not
-fix. Three engineers (`kai-fischer`, `iris-vermeulen`, `anya-petrov`)
-apply edits within a tightly-scoped surface — refactor, tests/CI,
-publication staging. Everyone else is read-only.
+fix. Seven agents apply edits within a tightly-scoped surface —
+`kai-fischer` (refactor), `iris-vermeulen` (tests/CI), `anya-petrov`
+(publication staging), `mira-volkov` (ports), `zofia-kaminska` (the
+rule book), `dunyu-liu` (new implementations), and `wei-lin` (campaign
+orchestration). Everyone else is read-only.
 
 **Final sign-off rests with the human.** The team finds what is wrong
 and recommends what to do. You decide. No agent merges, pushes,
@@ -183,7 +185,7 @@ releases versus one-shot publication staging.
 
 ### Quality bench
 
-Five engineers who keep the work and the team itself honest. Each
+Six engineers who keep the work and the team itself honest. Each
 applies edits within a tightly-scoped surface; none touch production
 code outside it.
 
@@ -191,7 +193,8 @@ code outside it.
 |---|---|
 | `kai-fischer` | Refactoring engineer. Simplifies, dedupes, improves naming. Edits production code. Use after a `lars-eriksson` audit, not before. |
 | `iris-vermeulen` | Test architect. Designs and writes the test pyramid. Edits test files, fixtures, CI config only. The mechanical floor the release gate enforces. |
-| `mira-volkov` | C/Fortran-to-Python porting + numerical optimization specialist. Bit-faithful parity to the reference binary on real data, then aggressive numpy/scipy optimization. Edits the Python port, parity tests, and CI; never the C reference. |
+| `mira-volkov` | Bit-identical porting specialist, any source language to any target. Parity against the reference on real full-scale data first; optimization only after. Works in an isolated worktree; never the reference implementation. |
+| `dunyu-liu` | Senior computational researcher. Owns research-heavy new implementations where no reference exists — frames the question, designs the numerical experiment, spikes cheaply, lands the minimal version, and reports what failed. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews real deployments, diagnoses misses, recommends prompt or fixture edits. Closes the loop between the team and the wild. |
 | `zofia-kaminska` | Project-rules enforcer. Seeds a rule book for a new project, audits a repo against the one it has, and codifies incidents into rules. Edits the rule book only; routes every violation it finds to the owning specialist. |
 
@@ -229,7 +232,7 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | Placeholder (`TODO`, stub, `NotImplementedError`) | `lars-eriksson` | `sophia-okafor` (if docs claim it's shipped) | — |
 | Structural cleanup / dedup / naming | `kai-fischer` | — | `lars-eriksson` if a latent bug is suspected |
 | Untestable shape | `kai-fischer` | `iris-vermeulen` | — |
-| C/Fortran→Python port — bit-faithful parity + numpy/scipy optimization | `mira-volkov` | `lars-eriksson` (code bugs in the port), `ingrid-lindqvist` (math-rigor on library substitutions), `rafael-santos` (physics in the underlying numerics) | `iris-vermeulen` for the project-wide pyramid beyond the parity test; `haruto-nakamura` for the release gate after wire-in |
+| Port between languages — bit-faithful parity + numpy/scipy optimization | `mira-volkov` | `lars-eriksson` (code bugs in the port), `ingrid-lindqvist` (math-rigor on library substitutions), `rafael-santos` (physics in the underlying numerics) | `iris-vermeulen` for the project-wide pyramid beyond the parity test; `haruto-nakamura` for the release gate after wire-in |
 
 ### Physics & math
 
@@ -314,8 +317,9 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | Code, data, audits — "find what's wrong" | `victor-reyes` (or `/audit`) |
 | Refactor working code | `kai-fischer` (or `/refactor`) |
 | Design / write tests for a project | `iris-vermeulen` (or `/test-design`) |
-| Port a C/Fortran binary to Python with bit-faithful parity | `mira-volkov` (or `/port`) |
+| Port a binary between languages with bit-identical parity | `mira-volkov` (or `/port`) |
 | Conduct a long-running multi-mission engineering campaign | `wei-lin` (or `/campaign`) |
+| New feature or method with no reference implementation | `dunyu-liu` (or `/implement`) |
 | Cut a release / fix CI / keep the project shippable | `haruto-nakamura` (or `/release`) |
 | Stage for public release — GitHub + Zenodo | `anya-petrov` (or `/stage-publish`) |
 | Grade what an agent just produced — improve next time | `nadia-hadid` (or `/eval-deployment`) |
@@ -345,6 +349,7 @@ routes.
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
 | `/eval-deployment` | `nadia-hadid` | Grade a real agent run against its contract, diagnose misses, recommend prompt or fixture edits. |
+| `/implement` | `dunyu-liu` | Research-heavy new implementation with no reference. `implement <feature>` builds; `implement spike <question>` is feasibility only. |
 | `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book. No argument audits, `seed` writes one for a new project, `codify` turns an incident into a rule. |
 
 ---
@@ -357,7 +362,7 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 
 | Model | Agents |
 |---|---|
-| opus | `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
+| opus | `dunyu-liu`, `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
 | sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska` |
 | haiku | `lars-eriksson`, `sophia-okafor` |
 
@@ -381,7 +386,7 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 
 ```bash
 git clone https://github.com/dunyuliu/consilium.git ~/consilium
-bash ~/consilium/scripts/install.sh
+bash ~/consilium/install.sh
 ```
 
 Idempotent symlinks; safe to re-run after `git pull`. Use `--force` to
@@ -410,7 +415,8 @@ consilium/
 │   ├── test-design.md      #   /test-design      — design + write the test pyramid
 │   ├── port.md             #   /port             — C/Fortran→Python port with parity gate
 │   ├── campaign.md         #   /campaign         — Wei conducts a multi-mission campaign
-│   └── enforce-rules.md    #   /enforce-rules    — seed / audit / codify the rule book
+│   ├── enforce-rules.md    #   /enforce-rules    — seed / audit / codify the rule book
+│   └── implement.md        #   /implement        — research-heavy new feature
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)
 │   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
@@ -425,11 +431,12 @@ consilium/
 │   ├── ingrid-lindqvist.md #   mathematical rigor — derivations, stability, proofs
 │   ├── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
 │   ├── iris-vermeulen.md   #   test architect — designs + writes the pyramid
-│   ├── mira-volkov.md      #   C/Fortran→Python porting + numerical optimization
+│   ├── mira-volkov.md      #   bit-identical porting, any language pair
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
 │   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
 │   ├── zofia-kaminska.md   #   project-rules enforcer — seed, audit, codify
+│   ├── dunyu-liu.md        #   computational researcher — new implementations
 │   └── wei-lin.md          #   campaign conductor — multi-mission orchestration
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
@@ -438,9 +445,8 @@ consilium/
 │   └── check.sh            # pure-bash; runs in CI on every push/PR
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
-├── scripts/
-│   └── install.sh     # symlink everything into ~/.claude
-├── install.sh         # root installer — also wires the post-merge hook
+├── install.sh         # the canonical installer — symlinks into ~/.claude
+│                      #   and wires the post-merge hook
 ├── PROJECT_RULES.md   # the rule book /enforce-rules audits against
 └── README.md
 ```
@@ -464,12 +470,12 @@ Adding a new specialist to the team:
    code. Skip them if they're editorial.
 5. **Plant at least one regression fixture** under `evals/cases/`
    covering their core competency, so prompt changes can be measured.
-6. Drop `agents/<name>.md` and run `bash scripts/install.sh`.
+6. Drop `agents/<name>.md` and run `bash install.sh`.
 
 Adding a new slash command:
 
 1. Drop `commands/<name>.md` (use existing files as templates).
-2. Run `bash scripts/install.sh`.
+2. Run `bash install.sh`.
 
 ---
 
@@ -483,7 +489,8 @@ fixture format and how to run a case by hand.
 Current coverage: `lars-001` (look-ahead window), `sophia-001` (units
 drift), `iris-001` (defer-everything failure mode surfaced by
 `nadia-hadid`'s grade and the prompt fix that followed), `haruto-001`
-(missing prior release notes). The repo
+(missing prior release notes), `mira-001` (library substitution behind a
+matching name, plus a toy-grid parity claim). The repo
 that ships a test architect still has thin eval coverage on most of
 the team — see roadmap.
 

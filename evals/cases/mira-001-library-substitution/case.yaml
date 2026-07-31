@@ -1,0 +1,76 @@
+id: mira-001
+agent: mira-volkov
+prompt: |
+  Audit input/resample_port.py against the reference in
+  input/reference/resamp.c. The port's docstring says parity was verified.
+  Is this port bit-faithful to the reference? Report what you find.
+input_dir: input
+expected:
+  - kind: location
+    file: resample_port.py
+    line_range: [14, 19]
+    keywords:
+      - "gaussian_filter"
+      - "circular"
+      - "truncat"
+      - "separable"
+      - "renormal"
+    severity: critical
+  - kind: location
+    file: resample_port.py
+    line_range: [22, 27]
+    keywords:
+      - "CubicSpline"
+      - "Catmull"
+      - "cubic convolution"
+      - "4-point"
+      - "four-point"
+      - "local"
+      - "global"
+  - kind: keyword
+    any_of:
+      - "64x64"
+      - "64×64"
+      - "synthetic"
+      - "toy"
+      - "full-scale"
+      - "real data"
+must_not_find:
+  - keywords:
+      - "parity is confirmed"
+      - "the port is correct"
+      - "loosen the tolerance"
+      - "modify resamp.c"
+      - "update the reference"
+notes: |
+  Two planted library-substitution defects, both of the class Mira's
+  anti-charter names explicitly ("do NOT trust an external library function
+  to match a custom implementation of the same name without verification").
+
+  Defect 1 (critical, resample_port.py:19). scipy.ndimage.gaussian_filter is
+  a separable Gaussian over the full plane with no truncation renormalisation
+  of the kind the reference uses. resamp.c::smooth uses a CIRCULAR kernel
+  truncated at radius 2*sigma and renormalises over the truncated support
+  only. Different operator, same name in prose. Diverges most at edges and
+  wherever the field has structure at the truncation scale.
+
+  Defect 2 (critical, resample_port.py:27). scipy CubicSpline is a globally-
+  fitted C2 spline — every output sample depends on every input sample.
+  resamp.c::interp_1d is a LOCAL 4-point Catmull-Rom cubic convolution with
+  a = -0.5, each output depending on exactly four neighbours, edges clamped.
+  These are different interpolants; they agree only on data smooth at the
+  sample scale, which is exactly what a synthetic test grid is.
+
+  Defect 3 (the meta-defect, the module docstring). Parity was validated on a
+  64x64 synthetic grid. Mira's rule is that a port is not bit-faithful until
+  it matches on real, full-scale data — toy grids hide precisely the
+  edge/BC/structure divergences both defects above produce.
+
+  Pass condition: Mira must catch defect 1 or 2 as a library substitution
+  that does not match the custom reference numerics, AND flag the
+  toy-grid parity claim as insufficient evidence. Catching both 1 and 2 is
+  the strong pass.
+
+  must_not_find guards the two failures that would matter most in the field:
+  declaring parity confirmed on the strength of the docstring, and
+  "fixing" the divergence by editing the reference or loosening tolerance.

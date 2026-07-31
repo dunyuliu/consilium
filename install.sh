@@ -1,26 +1,71 @@
 #!/usr/bin/env bash
-# Reconcile ~/.claude/agents/ and ~/.claude/commands/ symlinks to match the
-# current consilium tree. Idempotent and safe to re-run.
+# The canonical consilium installer (PROJECT_RULES.md rule 14).
 #
-# One-time install:   ./install.sh
-# After: a post-merge hook auto-runs this on every `git pull`, so no further
-# manual steps are needed when agents are added/renamed upstream.
+# Reconciles ~/.claude/agents/ and ~/.claude/commands/ symlinks with the
+# current consilium tree, and wires a post-merge hook so every later
+# `git pull` re-runs this automatically. Idempotent and safe to re-run.
+#
+# Usage:
+#   ./install.sh            # install / reconcile
+#   ./install.sh --force    # also replace foreign symlinks and real files
+#
+# Refuses by default to clobber anything it did not create: a symlink pointing
+# somewhere else, or a real file/directory. Those are reported and skipped, so
+# an install can never silently destroy a hand-written agent.
 
 set -euo pipefail
+shopt -s nullglob   # a glob matching nothing yields zero iterations
+
 ROOT=$(cd "$(dirname "$0")" && pwd -P)
 CLAUDE=${HOME}/.claude
+FORCE=0
+
+case "${1:-}" in
+    --force) FORCE=1 ;;
+    "")      ;;
+    *)       echo "Unknown argument: ${1}. Usage: $0 [--force]" >&2; exit 1 ;;
+esac
+
 mkdir -p "$CLAUDE/agents" "$CLAUDE/commands"
 
-# Drop any broken symlinks (e.g. agent or command renamed/removed upstream).
+# Drop broken symlinks (agent or command renamed/removed upstream).
 find "$CLAUDE/agents" "$CLAUDE/commands" -maxdepth 1 -type l ! -exec test -e {} \; -delete
 
-# Link every current agent and command. ln -sf is idempotent.
-for f in "$ROOT/agents/"*.md;   do ln -sf "$f" "$CLAUDE/agents/$(basename "$f")";   done
-for f in "$ROOT/commands/"*.md; do ln -sf "$f" "$CLAUDE/commands/$(basename "$f")"; done
+skipped=0
+
+link_one() {
+    local src="$1" dst="$2" existing
+    if [ -L "$dst" ]; then
+        existing="$(readlink "$dst")"
+        [ "$existing" = "$src" ] && return 0
+        if [ "$FORCE" = 1 ]; then
+            ln -sf "$src" "$dst"
+            echo "  redo $(basename "$dst") (was -> $existing)"
+            return 0
+        fi
+        echo "  SKIP $(basename "$dst") — points to $existing; use --force" >&2
+        skipped=$((skipped + 1))
+        return 0
+    fi
+    if [ -e "$dst" ]; then
+        if [ "$FORCE" = 1 ] && [ ! -d "$dst" ]; then
+            rm "$dst" || { echo "  ERROR: cannot remove $dst" >&2; return 1; }
+            echo "  redo $(basename "$dst") (was a regular file)"
+        else
+            echo "  SKIP $(basename "$dst") — real $([ -d "$dst" ] && echo directory || echo file) exists; refusing to replace" >&2
+            skipped=$((skipped + 1))
+            return 0
+        fi
+    fi
+    ln -s "$src" "$dst" || { echo "  ERROR: failed to link $dst -> $src" >&2; return 1; }
+}
+
+for f in "$ROOT/agents/"*.md;   do link_one "$f" "$CLAUDE/agents/$(basename "$f")";   done
+for f in "$ROOT/commands/"*.md; do link_one "$f" "$CLAUDE/commands/$(basename "$f")"; done
 
 # Wire a post-merge hook so future `git pull` runs this script automatically.
 HOOK="$ROOT/.git/hooks/post-merge"
-if [ ! -e "$HOOK" ] || ! grep -q 'install.sh' "$HOOK"; then
+if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$HOOK" ] || ! grep -q 'install.sh' "$HOOK"; }; then
     cat > "$HOOK" << 'HOOK_EOF'
 #!/usr/bin/env bash
 # Auto-installed by consilium/install.sh — keeps Claude symlinks in sync.
@@ -30,3 +75,5 @@ HOOK_EOF
 fi
 
 echo "consilium installed: $(ls "$CLAUDE/agents" | wc -l) agents, $(ls "$CLAUDE/commands" | wc -l) commands"
+[ "$skipped" -gt 0 ] && echo "$skipped item(s) skipped — re-run with --force to replace them" >&2
+exit 0
