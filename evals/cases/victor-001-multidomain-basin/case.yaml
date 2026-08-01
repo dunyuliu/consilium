@@ -1,0 +1,271 @@
+id: victor-001
+agent: victor-reyes
+prompt: |
+  This is a small internal project I am about to publish results from. I do
+  not know which of your specialists it needs — diagnose the scope, dispatch
+  the ones that apply, and give me the aggregated findings with the
+  responsible specialist named against each finding. Treat input/ as the
+  entire project: do not read, list, or grep anything above it —
+  specifically not case.yaml or the parent README.md.
+input_dir: input
+expected:
+  # --- the two code-resident defects, cited at file:line in the aggregation
+  - kind: location
+    file: budget.py
+    line_range: [37, 41]
+    anchor: "/ BASIN_AREA_KM2 * 1000.0"   # literal text that must sit inside line_range
+    keywords:
+      - "km"
+      - "m^2"
+      - "m²"
+      - "area"
+      - "1e6"
+      - "10^6"
+      - "million"
+      - "dimension"
+      - "unit"
+    severity: critical
+  - kind: location
+    file: budget.py
+    line_range: [50, 53]
+    anchor: "depth_m[i] - depth_m[i - 1]"   # literal text that must sit inside line_range
+    keywords:
+      - "wrap"
+      - "negative index"
+      - "index"
+      - "first month"
+      - "first element"
+      - "i = 0"
+      - "off-by-one"
+    severity: critical
+  # --- ROUTING: the pass condition. Four distinct domains, four names.
+  - kind: keyword          # numerical / code correctness -> the index wraparound
+    any_of:
+      - "lars-eriksson"
+      - "lars"
+  - kind: keyword          # physical validity (units) -> the km2 vs m2 error
+    any_of:
+      - "rafael-santos"
+      - "rafael"
+  - kind: keyword          # docs vs code -> MIN_VALID_DAYS 25 documented, 20 in code
+    any_of:
+      - "sophia-okafor"
+      - "sophia"
+  - kind: keyword          # claim vs committed data -> the 812 mm precipitation figure
+    any_of:
+      - "priya-nair"
+      - "priya"
+  # --- the two non-code defects must appear as findings, not just as routing
+  - kind: keyword
+    any_of:
+      - "MIN_VALID_DAYS"
+      - "20 vs 25"
+      - "25 vs 20"
+      - "coverage threshold"
+      - "valid_days"
+  - kind: keyword
+    any_of:
+      - "737.5"
+      - "737"
+      - "2950"
+must_not_find:
+  # (a) lazy triage: one specialist handed the whole multi-domain project.
+  #     Verdict assertions only — a correct report negating these produces a
+  #     different string ("more than one specialist is needed").
+  - keywords:
+      - "a single specialist is sufficient"
+      - "one specialist is enough"
+      - "this is purely a code-correctness audit"
+      - "the findings all belong to one domain"
+  # (b) dispatching a domain that is absent from input/. Phrased as domain
+  #     CONTENT rather than agent names: victor-reyes.md instructs Victor to
+  #     mention haruto-nakamura and iris-vermeulen in the closing test-gate
+  #     note, and a bare-name guard would also fire on "ziyan-chen is not
+  #     needed here", which is a correct sentence. There is no reference
+  #     implementation, no manuscript and no bibliography anywhere in input/.
+  - keywords:
+      - "the port diverges from the reference"
+      - "the manuscript's citation list"
+      - "check the DOIs"
+  # (c) wrong headline verdicts.
+  - keywords:
+      - "the README figures reproduce from the committed data"
+      - "is safe to publish as written"
+notes: |
+  ROUTING fixture, not a detection fixture. Four real defects spanning four
+  distinct specialist domains. A triage that finds all four but files them
+  all under one specialist FAILS; so does one that dispatches a domain with
+  no material in input/. All numbers below were computed from the committed
+  files (python 3.12 / numpy, this fixture's own budget.py), not estimated.
+
+  ------------------------------------------------------------------
+  Defect 1 — PHYSICAL VALIDITY / UNITS -> rafael-santos
+  budget.py:40, `volume_m3 / BASIN_AREA_KM2 * 1000.0`
+
+  volume_m3 is m³; BASIN_AREA_KM2 is km². m³/km² x 1000 is not mm — the
+  km²->m² factor of 1e6 is missing, so the runoff depth is 1e6 times too
+  large. Correct form: volume_m3 / (BASIN_AREA_KM2 * 1e6) * 1000.0.
+
+  Freshly measured (python3 input/budget.py, and by re-deriving the corrected
+  form on the same arrays):
+    as-written runoff depth : 4.212e+06 .. 3.218e+07 mm/month
+    corrected runoff depth  : 4.212 .. 32.184 mm/month, mean 12.08
+    ratio                   : 1.000000e+06 exactly
+    as-written mean storage change : -12 204 407.2 mm/month  (12 km of water
+                                      leaving a 1240 km² basin every month)
+    corrected mean storage change  : -4.27 mm/month
+
+  Physical cross-check that the CORRECTED value is the right one, i.e. that
+  the fixture data are internally consistent and the defect is the code's:
+  corrected annual terms are P = 737.5, ET = 646.0, Q = 145.0 mm/yr, giving
+  P-ET-Q = -53.5 mm/yr and a runoff ratio Q/P = 0.197, both ordinary for a
+  semi-arid basin. That drawdown is consistent with the observed water-table
+  decline of 0.3779 m/yr at a specific yield of 0.142 — squarely inside the
+  0.10-0.25 range for an unconfined alluvial aquifer. The as-written value
+  is off by six orders of magnitude and consistent with nothing.
+
+  ------------------------------------------------------------------
+  Defect 2 — NUMERICAL / CODE CORRECTNESS -> lars-eriksson
+  budget.py:52, `dh[i] = depth_m[i] - depth_m[i - 1]` inside
+  `for i in range(len(depth_m))`
+
+  At i = 0 the index -1 wraps to the LAST month of the record, so dh[0] =
+  depth[0] - depth[47] — a spurious first difference spanning the whole
+  record with the sign reversed. Because the remaining 47 differences
+  telescope to depth[47] - depth[0], the wraparound term cancels the entire
+  series: the sum is identically zero for ANY input, and the reported mean
+  is exactly 0.0000 m/month regardless of the data.
+
+  Freshly measured:
+    reported (buggy) mean water-table change : 0.0000 m/month
+    true mean over the 47 real intervals     : 0.031489 m/month
+    net decline over the record              : 1.48 m (17.97 -> 19.45 m)
+
+  The bug is self-evidencing inside the fixture: budget.py's own last print
+  line reports a 1.48 m decline over the record on the line above a mean
+  monthly change of exactly zero.
+
+  ------------------------------------------------------------------
+  Defect 3 — DOCS vs CODE -> sophia-okafor
+  input/README.md "Quality control" vs budget.py:17
+
+  README: "Months with fewer than 25 valid daily stage readings are dropped
+  ... The threshold lives in budget.py as MIN_VALID_DAYS = 25."
+  Code:   MIN_VALID_DAYS = 20.
+
+  Load-bearing on the committed data, not cosmetic. Months with valid_days
+  below 25: 2016-02 (22), 2017-08 (23), 2018-11 (18), 2019-03 (24). Below
+  20: 2018-11 only. The documented threshold drops 4 months; the code drops
+  1, and budget.py prints "months dropped for coverage : 1". Three months
+  the documentation promises to exclude are in the balance.
+
+  ------------------------------------------------------------------
+  Defect 4 — CLAIM vs COMMITTED DATA -> priya-nair
+  input/README.md "Headline figures": "Mean annual precipitation over the
+  record is 812 mm."
+
+  Not reproducible from gauge_monthly.csv by any route:
+    annual sums    : 2016 = 731, 2017 = 698, 2018 = 776, 2019 = 745 mm
+    total / 4 yr   : 2950 / 4 = 737.5 mm
+    mean monthly x 12 : 61.458 x 12 = 737.5 mm
+    wettest single year : 776 mm
+  The stated 812 mm overstates by 74.5 mm (+10.1%) and matches no annual
+  total, no partial-record mean, and no year in the file. Independent of
+  every code defect above: the precipitation column never passes through
+  runoff_depth_mm or water_table_change_m, and the README states the
+  precipitation statistics use all months regardless of the runoff QC.
+
+  ------------------------------------------------------------------
+  CONTROLS — verified clean as rigorously as the defects. Reporting any of
+  these as wrong is a false positive.
+    - "The record covers 48 months, 2016-01 through 2019-12, with no gaps."
+      TRUE: 48 rows, consecutive calendar months, no duplicates, no missing
+      months, no empty cells.
+    - "The water table deepened by 1.48 m between the first and last month."
+      TRUE: 19.45 - 17.97 = 1.48 m exactly. It is the CODE's 0.0000 m/month
+      that is wrong, not this claim.
+    - The water-table column is a seasonal cycle on a linear decline with
+      sub-centimetre scatter; every calendar month's mean change follows the
+      same recharge/recession pattern in all four years, with no step, no
+      endpoint artefact and no month whose change is an outlier against its
+      own calendar month. Checked because an earlier draft of this fixture
+      pinned the endpoints and left 2019-12 rising 0.14 m where every other
+      December fell — an undeclared anomaly, now removed.
+    - The column table in README.md matches the CSV header exactly, all
+      seven columns, in order.
+    - The documented sign convention (depth positive downward, rising number
+      = falling water table) matches both the data and budget.py's docstrings.
+    - "python3 budget.py" runs and prints exactly the four quantities the
+      README says it prints.
+    - `days_in_month` is the true calendar length of every month, 2016 leap
+      year included.
+    - No fallback / placeholder / silent failure in budget.py: no try-except,
+      no fillna, no clip, no default substitution. A missing column raises
+      KeyError, a malformed number raises ValueError, and the coverage
+      exclusion is announced on stdout rather than swallowed.
+
+  DELIBERATE NON-DEFECTS (defensible to mention, not scored either way, and
+  deliberately absent from must_not_find):
+    - There is no test suite. True, and routing that gap to iris-vermeulen
+      is legitimate — it is simply not one of the four scored domains.
+    - The coverage exclusion drops a month from the balance. It is printed,
+      not silent, so it is not a pipeline data-loss defect; naming
+      jordan-kim for the ingest path is defensible and not scored.
+    - budget.py filters P and ET by the same coverage mask as runoff. That is
+      the documented behaviour ("a month dropped for coverage leaves the
+      balance in full, all three terms together"), so it is not drift.
+    - The specific yield needed to reconcile the corrected budget with the
+      water-table decline (0.142) is not stated anywhere in the project.
+      Observing that the two independent estimates are unreconciled in the
+      code is fair comment, not a planted defect.
+
+  ------------------------------------------------------------------
+  PASS CONDITION (routing)
+
+  1. The report states this needs MORE THAN ONE specialist, and
+  2. names lars-eriksson for the index defect, rafael-santos for the units
+     defect, sophia-okafor for the doc-vs-code divergence, and priya-nair
+     for the 812 mm claim, and
+  3. cites budget.py:40 and budget.py:52 in the aggregation, and
+  4. surfaces the MIN_VALID_DAYS divergence and the corrected 737.5 mm.
+
+  Known soft spot, stated so a future run is scored honestly: the units
+  defect could defensibly be routed to lars-eriksson IN ADDITION to
+  rafael-santos, since a dimensional error is also a code error. The
+  expected entries only require that rafael-santos be named somewhere; they
+  do not require exclusivity. If a run names rafael-santos ONLY in the
+  closing note and files the units defect entirely under lars, score it a
+  partial pass and record the wording — that is the fixture's weakest edge.
+
+  Run log: not yet run.
+
+  First run (2026-07-31, manual, scoped to input/): PASS — strongly, on the
+  criterion that matters. Victor diagnosed six concerns and dispatched six
+  specialists, and every planted defect was routed to the right one:
+  rafael-santos for the missing 1e6 m2/km2 factor, lars-eriksson for the
+  depth_m[i-1] wraparound, sophia-okafor for the MIN_VALID_DAYS 20-vs-25
+  split, priya-nair for the unsupported 812 mm claim. All four found, none
+  mis-routed, and the aggregation named the responsible specialist per finding
+  rather than presenting one undifferentiated list.
+
+  Beyond the plant, the panel closed the physics independently: with the 1e6
+  fix, the annual deficit and the observed 1.48 m decline imply a specific
+  yield of 0.145 and runoff coefficients of 0.190-0.203 — both squarely
+  physical, which is independent confirmation that 1240 km2 is the right area
+  and 1e6 the exact error factor. Priya also ruled out every plausible
+  derivation of 812 mm (day-weighting, leap adjustment, every rolling window,
+  every QC subset) and recorded it as unsupported rather than guessing.
+
+  PROCESS VIOLATION, self-reported: one dispatched specialist imported a
+  fixture module, creating input/__pycache__/, then deleted it. Victor flagged
+  it rather than burying it — the right behaviour, and the reason it is known.
+  Two other cases (ingrid-001, rafael-001) were found carrying the same
+  residue from earlier runs; removed.
+
+  This is the second failure mode that instruction alone cannot prevent. The
+  first was answer-key leakage (haruto-001). Both have the SAME structural
+  fix: a runner must hand the agent an isolated COPY of input/, not a path
+  inside the repo. Read-only-by-instruction and no-peeking-by-instruction are
+  both honour systems, and an honour system is not a gate. This is now the
+  strongest argument for building the runner, ahead of the grading it would
+  also enable.

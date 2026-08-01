@@ -37,6 +37,16 @@ must_not_find:
       - "recommend deleting"
       - "edit the manuscript"
 notes: |
+  DECLARED DEFECT SET (updated 2026-07-31 after two runs). The manuscript
+  contains FOUR real defects, not two. The two beyond the original plant were
+  found by the agent, verified against the bib, and are declared here rather
+  than removed — they are realistic and a thorough run should be credited for
+  them, not penalised:
+    3. manuscript.tex:21 — the specific value "2 x 10^-4 K^-1" is cited to
+       Smith2015, whose abstract reports no coefficient value at all.
+    4. manuscript.tex:34 — "Williams et al. (2020)" uses et al. for a
+       two-author paper (Williams, Patricia and Davis, Andrew).
+
   PLANTED DEFECTS:
 
   1. PRIMARY (OVERCLAIM) — manuscript.tex lines 23-26:
@@ -116,3 +126,20 @@ notes: |
   removed. The controls are now genuinely clean.
 
   Run record: corrected, not yet re-run.
+
+  Second run (2026-07-31, against the corrected input): PASS. Both original
+  planted defects found again (Smith2015 overclaim at :23-26; Johnson year at
+  :30). The controls I had just cleaned — the \cite commands and the tropical
+  claim — were correctly SILENT this time, confirming the correction.
+
+  It then found two MORE real defects, both verified: the uncited numeric
+  coefficient at :21, and "et al." used for a two-author reference at :34.
+  Both are now declared above.
+
+  Lesson, and it is the fourth time today: a fixture author cannot reliably
+  certify their own input clean. Two independent passes over this manuscript
+  by two different agents each surfaced defects the author had not declared,
+  and my own manual cleanup between them missed both of these. The only
+  reliable audit of a fixture is running it — rule 4 applied to fixtures
+  themselves. A case should not be marked ready until at least one run has
+  been reconciled against its declared defect set.

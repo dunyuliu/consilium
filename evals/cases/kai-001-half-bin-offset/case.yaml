@@ -125,3 +125,25 @@ notes: |
   the file in place. `git status` inside evals/ must be clean afterwards.
 
   Run log: not yet run.
+
+  First run (2026-07-31, on a scratch copy — kai-fischer holds Edit and this
+  case is about what he changes): PASS.
+
+  He merged all three loops into a shared _bin_counts(values, bin_width,
+  n_bins, center_offset=0.0) helper and called it from bin_magnitudes with
+  center_offset=0.5 * MAG_BIN — the parameterised-but-preserved outcome the
+  fixture explicitly allows. Verified mechanically rather than from his
+  summary: M 4.96 -> bin 50 (naive merge gives 49), 4.95 -> 50, 5.06 -> 51,
+  3.98 -> 40, while 5.00 and 5.04 are unchanged, matching the author's
+  predicted example set exactly.
+
+  He also delivered the safe cleanup (dead DEBUG_DUMP block, tmp/flag/data
+  renamed) and flagged that removing DEBUG_DUMP could matter to a caller
+  outside the isolated directory he was not permitted to check — declining to
+  assume rather than silently deleting.
+
+  Note on the verification, worth keeping: my first check asserted that the
+  FIRST populated bin should be 50, while feeding in M 3.98 which correctly
+  bins to 40. The check reported FAIL against a correct refactor. A criterion
+  that does not test what it claims is the same defect class the fixtures keep
+  exhibiting — and it caught the fixture maintainer this time.
