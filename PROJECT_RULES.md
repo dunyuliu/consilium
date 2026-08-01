@@ -164,6 +164,18 @@ A well-reasoned alternative reading of an agent's output is not a pass.
 `evals/README.md` or `tests/check.sh` in the same PR — do not report against
 an uncommitted standard.
 
+**Partly mechanical (2026-07-31)**: `bash evals/run.sh grade <case> <report>`
+applies the `evals/README.md` criterion — every `expected` matched, no
+`must_not_find` matched — identically every time, and voids a run whose report
+references the answer key. `bash evals/run.sh stage <case>` copies `input/` to
+an isolated directory outside the repo first, which is what actually closes
+leakage. Agent invocation stays manual: it needs API access, cannot run in
+free CI, and a gate that cannot run is worse than no gate.
+
+Grading is necessary, not sufficient — it cannot see precision. See
+`evals/README.md` for the proposed `declared_defects:` mechanism and why the
+grader refuses to certify rather than pretending to judge.
+
 **A run that read the answer key does not have a verdict at all.** `case.yaml`
 and the case `README.md` sit one directory above `input/` and contain the
 expected findings. Scope every invocation to `input/`, then check the agent's

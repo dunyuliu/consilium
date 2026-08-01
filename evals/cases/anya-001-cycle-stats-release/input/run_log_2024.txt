@@ -1,0 +1,11 @@
+cycle-stats — example run log (test.subei, 40 cycles)
+======================================================
+[2024-03-02 09:14:01] loading cycle catalogue from /home/researcher/eqdyna_runs/subei_2024/output
+[2024-03-02 09:14:02] fetching supplementary boundary-stress grid from mirror
+[2024-03-02 09:14:02] GET https://cluster-gateway.example.com/api/v2/fetch?dataset=subei_boundary&auth_token=ap7Xk2Qw9Lm4Rt6Yz1Bc3Vn5Hj8Ds0Fg
+[2024-03-02 09:14:03] downloaded 42.3 MB in 8.7s, checksum OK
+[2024-03-02 09:14:04] parsed 40 cycles from cyclelog.txt40
+[2024-03-02 09:14:04] mean recurrence interval = 87.4 yr
+[2024-03-02 09:14:04] std                      = 12.1 yr
+[2024-03-02 09:14:04] n intervals              = 39
+[2024-03-02 09:14:04] wrote aRawSimuData/summary_test.subei_2024.csv

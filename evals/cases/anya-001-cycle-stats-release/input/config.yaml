@@ -1,0 +1,16 @@
+# cycle-stats configuration
+# ---------------------------------------------------------------
+simulation:
+  case_name: test.subei
+  ncycles: 40
+  friction_law: rsf
+
+data_mirror:
+  # public read-only mirror for the predecessor dataset; no auth required
+  base_url: "https://data.example.org/eqdyna-mirrors/"
+
+testing:
+  # Fixture value consumed only by tests/test_config.py. Not a real
+  # credential: it authenticates against nothing, is never sent over
+  # the network, and is safe to leave in version control.
+  dummy_api_key: "TESTKEY-0000-DO-NOT-USE-AAAA"

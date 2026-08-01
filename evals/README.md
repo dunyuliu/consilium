@@ -152,11 +152,49 @@ into a passing one. `git status` inside `evals/` must be clean after a run.
 > adjacent to the input. A runner should hand the agent an isolated copy of
 > `input/` instead of relying on instructions.
 
+## Precision — the criterion we do not have
+
+`must_not_find` guards *phrasings*. It cannot see that a report found the
+planted defect and four things that are not there. A run at 25% signal scores
+identically to a clean one, and one did: `sophia-001` reported one true
+finding beside three unactionable ones at the same severity, and the fixture
+reported green.
+
+**The mechanism falls out of something we were forced into anyway.** Four
+fixtures shipped with undeclared real defects, and the fix was to declare the
+*complete* defect set rather than delete what the agent found. Once a case
+declares everything real in its input, precision becomes measurable:
+
+    findings in the report that map to a declared defect   -> true positives
+    findings that map to nothing declared                  -> either a NEW
+      real defect (declare it, and the fixture was incomplete) or a false
+      positive (and the run was noisy)
+
+That disjunction is the whole difficulty, and it is not automatable — deciding
+which branch a finding falls into is exactly the judgement a human or an
+evaluator agent has to make. What *is* automatable is surfacing the ratio and
+refusing to let it pass unexamined.
+
+Proposed, not implemented:
+
+- add `declared_defects:` to `case.yaml` — an id + one-line description per
+  real defect in `input/`, including ones that were not deliberately planted
+- `run.sh grade` reports `N findings / M declared` and lists report findings
+  it could not map to a declared defect
+- a case with unmapped findings is **INCONCLUSIVE**, never PASS, until a human
+  resolves each into "new defect, now declared" or "false positive"
+
+This keeps the grader honest about its own limits: it would not judge
+precision, it would refuse to certify a run whose precision is unknown. The
+current `grade` output says so explicitly rather than implying a clean bill.
+
 ## Roadmap for the harness
 
-- Programmatic runner that reads `case.yaml`, invokes the agent via the
-  Claude Agent SDK, and grades the output.
-- CI hook so every PR to this repo re-runs the suite.
+- ~~Programmatic runner that reads `case.yaml` and grades the output.~~
+  **Landed** as `evals/run.sh` (stage + grade). Agent *invocation* is
+  deliberately not automated: it needs API access and tokens, so it cannot run
+  in free CI, and a gate that cannot run is worse than no gate.
+- CI hook so every PR to this repo re-runs the suite — blocked on the above.
 - Per-case latency and token-cost tracking.
 - A "leaderboard" page so prompt changes can be A/B'd.
 
