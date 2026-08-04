@@ -87,7 +87,7 @@ code they review and as constraints on code they write:
    loops that swallow per-item errors — silent unless the silence
    is the documented contract.
 
-The editorial team (`elena-hartmann`, `ziyan-chen`, `selin-aydin`,
+The editorial team (`elena-hartmann`, `selin-aydin`,
 `marco-bianchi`) deliberately does not carry these rules — they
 review scientific work, not code. Every other agent does.
 
@@ -371,9 +371,9 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 
 | Model | Agents |
 |---|---|
-| opus | `dunyu-liu`, `elena-hartmann`, `victor-reyes`, `selin-aydin`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `ziyan-chen`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska` |
-| haiku | `lars-eriksson`, `sophia-okafor` |
+| opus | `dunyu-liu`, `elena-hartmann`, `victor-reyes`, `marco-bianchi`, `nadia-hadid` |
+| sonnet | `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin` |
+| haiku | `lars-eriksson`, `sophia-okafor`, `ziyan-chen` |
 
 ---
 

@@ -29,6 +29,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-005 | `docs/release_notes_*` | each release note matches the commit it tags | BROKEN | 2026-08-04 | 30 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-04 | 30 |
+| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-04 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | BROKEN | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | BROKEN |  | 30 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
@@ -189,6 +190,35 @@ since the cut, so "no regression" is currently a claim about one agent.
 ```bash
 cat agents/*.md | wc -l
 # → 4279 lines, was 4564; lars-001 re-run PASS, 14 fixtures unverified
+```
+
+### PF-013 — `agents/` — OPEN
+
+Three tiers tested by `model` override against the agent's own fixture, no file
+changed until a pass:
+
+- `ziyan-chen` sonnet → **haiku**: PASS 5/5, 11.9k tokens (was 14.4k), and more
+  precise — exactly the two planted defects, where the sonnet run listed nine.
+- `selin-aydin` opus → **sonnet**: PASS 9/9. Derived Λ₀ = 318 m from parameters
+  scattered across three sections, got 1.27 cells at 250 m, caught the
+  coarsening "convergence" test, and credited the station-exclusion control
+  rather than attacking it.
+- `priya-nair` sonnet → haiku: **FAIL**. It marked the 9.7% CAGR correct by
+  recomputing with the document's own formula. The planted trap is that the
+  formula is wrong, so re-deriving *with* it confirms the error. Kept on sonnet.
+
+The dividing line is not task difficulty: it is whether the job requires
+refusing the document's framing. Comparing stated text to stated text works on
+haiku; refusing a premise did not.
+
+Also cut `mira-volkov`'s 88-line optimization recipe book (601 → 513 lines);
+`mira-001` PASS 5/5 afterwards at 27k tokens vs 34.7k, 4 tool calls vs 12.
+
+Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged.
+
+```bash
+grep -H '^model:' agents/*.md | sed 's|agents/||' | awk '{print $2}' | sort | uniq -c
+# → 4 opus, 11 sonnet, 3 haiku (was 6/12/2); 14 of 20 tiers never challenged
 ```
 
 ## Deferral log

@@ -6,7 +6,7 @@
 # a commit from anyone else while it is held.
 #
 #   export CONSILIUM_LOCK_OWNER=wei-lin        # who you are
-#   bash tests/lock.sh acquire "release v1.7.0"
+#   bash tests/lock.sh acquire "release v1.7.0" [path-prefix ...]
 #   ... do the work ...
 #   bash tests/lock.sh release
 #
@@ -27,6 +27,15 @@
 # A lock is NEVER auto-cleared, however old. "Probably stale" is exactly the
 # reasoning that produced the incident: an agent was assumed dead because a
 # task list looked empty, and it was very much alive.
+#
+# SCOPE. Optional path prefixes after the description declare what the holder
+# intends to touch; the pre-commit hook then refuses a commit that stages
+# anything outside them. This exists because the lock alone did not prevent
+# the v1.10.0 incident: the lock stops OTHER writers from committing, and does
+# nothing about the holder running `git add -A` and swallowing an author
+# agent's half-written files. Six of them shipped inside a tagged release
+# whose notes did not mention them. Guarding "who may commit" is not the same
+# as guarding "what may be committed".
 
 set -euo pipefail
 
@@ -48,9 +57,11 @@ case "${1:-status}" in
 acquire)
     what="${2:-}"
     if [ -z "$what" ]; then
-        echo "usage: lock.sh acquire \"what you are doing\"" >&2
+        echo "usage: lock.sh acquire \"what you are doing\" [path-prefix ...]" >&2
         exit 2
     fi
+    shift 2 || true
+    scope="$*"
     if [ -f "$LOCK" ]; then
         holder=$(sed -n '1p' "$LOCK"); desc=$(sed -n '2p' "$LOCK"); when=$(sed -n '3p' "$LOCK")
         if [ "$holder" = "$OWNER" ]; then
@@ -62,8 +73,15 @@ acquire)
         echo "  If you are certain it is gone: bash tests/lock.sh release --force" >&2
         exit 1
     fi
-    printf '%s\n%s\n%s\n' "$OWNER" "$what" "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" > "$LOCK"
+    printf '%s\n%s\n%s\n%s\n' "$OWNER" "$what" "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$scope" > "$LOCK"
     echo "acquired by '$OWNER' — $what"
+    if [ -n "$scope" ]; then
+        echo "  scope: $scope (pre-commit refuses anything staged outside this)"
+    else
+        echo "  scope: UNRESTRICTED — no path prefixes given." >&2
+        echo "  If any author agent is live, declare a scope; \`git add -A\` will" >&2
+        echo "  otherwise sweep their in-flight files into your commit." >&2
+    fi
     ;;
 
 release)
@@ -88,7 +106,9 @@ status)
         exit 0
     fi
     holder=$(sed -n '1p' "$LOCK"); desc=$(sed -n '2p' "$LOCK"); when=$(sed -n '3p' "$LOCK")
+    sc=$(sed -n '4p' "$LOCK")
     echo "HELD by '$holder' for $(age_of "$when") min (since $when) — $desc"
+    [ -n "$sc" ] && echo "  scope: $sc" || echo "  scope: unrestricted"
     ;;
 
 *)

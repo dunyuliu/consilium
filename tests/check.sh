@@ -22,6 +22,7 @@
 #  11. Every write-surface owner declares isolation as its first section.
 #  12. PATHWAY_FORWARD.md is current and every VERIFIED claim cites a command.
 #  13. Every agent declares a communication-discipline section.
+#  14. Every agent declares tool economy; dispatchers also declare dispatch cost.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -526,6 +527,23 @@ for stem in "${AGENTS[@]}"; do
         ok
     else
         fail "agents/$stem.md has no '## Communication discipline' section (rule 22)"
+    fi
+done
+
+# --- Check 14: agents that can dispatch declare what a dispatch costs -------
+#
+# PROJECT_RULES.md rule 23. A dispatch costs ~10x doing the work yourself and
+# the multiplier is structural: the API re-bills the whole conversation on
+# every tool call, so cost grows with the square of tool calls, not with prompt
+# size. Measured here: <7 tool calls ~19k tokens, >10 ~75k, against ~2k to read
+# a file directly. An orchestrator that does not know this spends 20k
+# confirming what it could have read in 2k.
+echo "Check 14: every agent declares tool economy"
+for stem in "${AGENTS[@]}"; do
+    if grep -qE '^## Tool economy' "agents/$stem.md"; then
+        ok
+    else
+        fail "agents/$stem.md declares no tool economy (rule 23)"
     fi
 done
 

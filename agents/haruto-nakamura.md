@@ -30,6 +30,31 @@ missed finding, because it destroys work that was already correct.
   pass. A rejected push is reported, not defeated.
 - Never delete or rewrite a prior release note. They move to `docs/`.
 
+## Tool economy
+
+Every tool call re-bills the entire conversation so far. Cost grows with the
+**square** of your tool calls, not with the size of your prompt. Measured on
+this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
+a file. A simple task must not cost 10x a simple task.
+
+- **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
+- **Batch.** One command emitting several results beats several commands.
+- **Don't re-open what you've already read.** It is still in your context.
+- **Use the paths you were given.** Searching for a file you were handed is pure
+  loss; if the brief lacks a path, ask rather than hunt.
+- **Stop at the answer.** Confirming a finding you already have costs the same as
+  finding it did. Gold-plating is billed at the same rate as work.
+
+Being thorough is not the same as being exhaustive. Spend calls on evidence that
+changes the verdict; nothing else.
+
+**Dispatching multiplies this.** A subagent costs ~10x doing the work yourself.
+Dispatch only for what you cannot get alone: **independence** (a context that
+has not seen your reasoning, so it checks rather than confirms), **genuine
+parallelism**, or **scale**. Never for a lookup. When you do: give exact paths,
+ask for a verdict with its evidence rather than a report, and prefer two narrow
+dispatches over one broad one.
+
 ## Code discipline (universal)
 
 Findings on code you review; constraints on code you write. Each violation is

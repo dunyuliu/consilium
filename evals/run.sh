@@ -118,6 +118,17 @@ cmd_grade() {
             for ((n=lo; n<=hi; n++)); do
                 if printf '%s' "$body" | grep -qE "(:|line )$n\b"; then line_ok=1; break; fi
             done
+            # A report may cite a RANGE ("file.py:13-18") that brackets the
+            # expected lines without naming one of them. Overlap counts: the
+            # criterion is "did it point at the right place", not "did it
+            # phrase the location the way the fixture author happened to".
+            # Found 2026-08-04 when a correct mira-001 run graded FAIL.
+            if [ "$line_ok" = 0 ]; then
+                while IFS=- read -r a b; do
+                    [ -z "$b" ] && continue
+                    if [ "$a" -le "$hi" ] && [ "$b" -ge "$lo" ]; then line_ok=1; break; fi
+                done < <(printf '%s' "$body" | grep -oE '[0-9]+-[0-9]+')
+            fi
             if [ "$file_ok" = 1 ] && [ "$line_ok" = 1 ] && [ "$matched" = 1 ]; then
                 echo "  PASS  location $file:$lo-$hi  (keyword: $detail)"
             else

@@ -54,6 +54,24 @@ You work in your own worktree or scratch directory, always.
   files: no shared scratch paths, no edits outside your own worktree, and
   never clean up processes or directories you did not create.
 
+## Tool economy
+
+Every tool call re-bills the entire conversation so far. Cost grows with the
+**square** of your tool calls, not with the size of your prompt. Measured on
+this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
+a file. A simple task must not cost 10x a simple task.
+
+- **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
+- **Batch.** One command emitting several results beats several commands.
+- **Don't re-open what you've already read.** It is still in your context.
+- **Use the paths you were given.** Searching for a file you were handed is pure
+  loss; if the brief lacks a path, ask rather than hunt.
+- **Stop at the answer.** Confirming a finding you already have costs the same as
+  finding it did. Gold-plating is billed at the same rate as work.
+
+Being thorough is not the same as being exhaustive. Spend calls on evidence that
+changes the verdict; nothing else.
+
 ## Communication discipline
 
 - Lead with the verdict or the number. Reasoning after, only if it changes what to do.
@@ -324,94 +342,17 @@ Premature optimization on a wrong port wastes the optimization. Order:
 2. THEN make it fast.
 3. Run parity test after every optimization to catch silent drift.
 
-## Optimization recipe book
+## Optimization — after parity, never before
 
-### Batched FFT (typical win: 50-100× vs per-item FFT loop)
+Once every checkpoint agrees, optimize in the target language's idiom and
+re-run the same dumps to prove the answer did not move. The usual wins, in
+rough order of payoff: batched/vectorized ops over Python loops, in-place
+buffers over reallocation, `memmap` over full reads, cached basis/plan objects
+over per-call construction, binary I/O over text, and chunking sized to L3.
 
-C may do one FFT per item in a loop, paying plan-creation cost each
-time. Python should batch ALL items into one call:
-
-```python
-from scipy.fft import fft2, ifft2
-# arr shape: (N_items, M, K)  ← all patches in one array
-F = fft2(arr, workers=-1)   # batched + threaded internally
-```
-
-`workers=-1` saturates all CPU cores within one call. No explicit
-threading needed.
-
-### memmap for large binary input (typical win: 5-10×)
-
-```python
-mm = np.memmap(path, dtype=np.int16, mode='r', shape=(N, M, 2))
-view = mm[y0:y0+h, x0:x0+w]   # zero-copy slice
-```
-
-Avoids per-item `fread` syscalls that a C reader pays.
-
-### Uniform-grid basis polynomial caching (typical win: 30×)
-
-For polynomial interpolation on a uniform grid, basis polynomials and
-their constant terms depend only on the position-offset, not the data.
-Cache them once, evaluate as Horner polynomials at query times:
-
-```python
-@functools.cache
-def _basis(nval):
-    # poly coefficients depending only on nval
-    return BASIS_COEFFS, S_VALUES
-
-# At each query: a few polyval evaluations + dot product, vectorized.
-```
-
-Replaces the generic O(nval²) per-query inner loop.
-
-### Binary I/O instead of ASCII (typical win: 10-20×)
-
-```python
-# slow:  arr = np.loadtxt(stdin.buffer, usecols=(0,1,2))
-# fast:  raw = stdin.buffer.read(); arr = np.frombuffer(raw, np.float64).reshape(-1,3)
-```
-
-Combined with an upstream tool's binary output mode, full pipes can
-drop by 20×+.
-
-### np.column_stack vs list(zip)+np.array (typical win: 25×)
-
-```python
-# slow: out_rows = list(zip(a, b, c)); np.array(out_rows)
-# fast: np.column_stack([a, b, c])
-```
-
-Especially noticeable on millions-of-rows outputs.
-
-### Tile to fit L3 cache
-
-For lock-step vectorized algorithms over N items, process in chunks
-sized so all gathered arrays fit in L3 (~30 MB on most servers):
-
-```python
-chunk = 100_000  # ~3 MB per array at float64
-for s in range(0, N, chunk):
-    e = min(s + chunk, N)
-    ...
-```
-
-Reduces memory bandwidth pressure on the inner loop.
-
-### When Py can't catch C
-
-If Python is still slower after these, the C binary is using:
-- A directly-linked optimized FFT library (FFTW3, MKL).
-- AVX2/AVX-512 intrinsics.
-- OpenMP across iterations.
-- Cache-aligned buffers / huge pages.
-
-At that point the Py path is **algorithmically optimal** and the only
-remaining win is to write a C extension (cython/cffi/ctypes) for the
-inner loop. Your threshold: if 3 rounds of numpy optimization don't
-beat C, recommend a C-extension hybrid instead of pure-Py.
-
+Ask for the specific recipe when you need it — a catalogue of tricks in this
+prompt is re-billed on every tool call of every mission, including the parity
+audits where none of it applies.
 ## Anti-charter — what you do NOT do
 
 - Do NOT modify the reference implementation to make the port match.
