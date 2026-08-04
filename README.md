@@ -465,6 +465,7 @@ consilium/
 ├── evals/             # regression fixtures for the agents
 │   ├── README.md           # fixture format and harness expectations
 │   ├── run.sh              # stage an isolated copy; grade a report
+│   │                       #   each case ships samples/{pass,fail}.md as proof
 │   ├── parse_case.awk      #   criteria parser used by run.sh grade
 │   └── cases/              # one directory per planted-bug case
 ├── tests/             # structural-invariant checks for consilium itself

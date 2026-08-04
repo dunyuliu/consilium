@@ -23,6 +23,7 @@
 #  12. PATHWAY_FORWARD.md is current and every VERIFIED claim cites a command.
 #  13. Every agent declares a communication-discipline section.
 #  14. Every agent declares tool economy (section presence only).
+#  15. Every fixture ships pass/fail sample reports that grade as labelled.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -544,6 +545,41 @@ for stem in "${AGENTS[@]}"; do
         ok
     else
         fail "agents/$stem.md declares no tool economy (rule 23)"
+    fi
+done
+
+# --- Check 15: every fixture's criteria are provably executable --------------
+#
+# PROJECT_RULES.md rule 25. A case ships two sample reports — samples/pass.md
+# which MUST grade PASS, and samples/fail.md which MUST grade FAIL. The grader
+# is run against both and the verdicts checked.
+#
+# This exists because the grader shipped with a bug for its entire life:
+# `printf '%s'` emits no trailing newline, so `while read` silently dropped the
+# LAST keyword of every any_of list. Every grade recorded before 2026-08-04 ran
+# with its final term ignored. A must-pass sample containing only that last
+# keyword would have failed on day one and exposed it immediately.
+#
+# It also turns each criterion from an intention into executable proof: an
+# author who cannot write a report that passes their own criteria has not
+# written criteria that test what they think.
+echo "Check 15: fixture criteria are provably executable"
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir")
+    [ -f "$case_dir/case.yaml" ] || continue
+    if [ ! -f "$case_dir/samples/pass.md" ] || [ ! -f "$case_dir/samples/fail.md" ]; then
+        fail "$id: missing samples/pass.md and/or samples/fail.md (rule 25)"
+        continue
+    fi
+    if bash evals/run.sh grade "$id" "$case_dir/samples/pass.md" >/dev/null 2>&1; then
+        ok
+    else
+        fail "$id: samples/pass.md does not grade PASS — the criteria reject a report written to satisfy them"
+    fi
+    if bash evals/run.sh grade "$id" "$case_dir/samples/fail.md" >/dev/null 2>&1; then
+        fail "$id: samples/fail.md grades PASS — the criteria accept a report that should fail"
+    else
+        ok
     fi
 done
 

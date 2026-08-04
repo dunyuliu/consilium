@@ -86,6 +86,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 21a | *(Proposed)* Board `# →` lines are literal command stdout | proposed |
 | 22 | Every agent declares communication discipline | mechanical |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
+| 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |
 | 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical |
 
 ---
@@ -375,6 +376,46 @@ around it. Every allowlist entry is a hole, so keep the list short.
 and `commands/*.md` bodies used to go unchecked, so a rename could break every
 routing line silently. Check 8 now scans both, with the same skip rules as
 Check 5.
+
+## 25. A fixture proves its criteria are executable, and the suite absorbs every miss
+
+**Two halves. The first is mechanical.**
+
+Every case ships `samples/pass.md` and `samples/fail.md`. Check 15 grades both
+and verifies the verdicts: the pass sample must PASS, the fail sample must
+FAIL. A criterion that rejects a report written to satisfy it is not a
+criterion, it is a typo with authority.
+
+*Incident (2026-08-04)*: the grader shipped with `printf '%s'` where it needed
+`printf '%s\n'`, silently dropping the **last keyword of every `any_of` list**
+for its entire life. Every grade recorded before that date ran with its final
+term ignored. A pass sample would have caught it on day one. Check 15's own
+first run then found `ziyan-001` using `"wrong year"` as both an expected
+keyword and a `must_not_find` guard — criteria that contradicted each other,
+invisible until something executed them.
+
+**The second half is the point of the suite.**
+
+The suite is a living record of what has actually gone wrong, not a planned
+matrix of what might. **Every real miss becomes a case.** `sophia-002` exists
+because Sophia flagged configured values as drift; `lars-002` exists because
+nothing measured hallucination; `haruto-001` came from a deployment miss.
+
+Corollaries, each paid for:
+
+- **A fixture is never finished.** When a run finds something real the case
+  did not declare, declare it — do not delete it to keep the case tidy. An
+  undeclared true defect makes a thorough audit score worse than a shallow one.
+- **When the agent and the fixture disagree, the fixture is the more likely
+  defendant.** On 2026-08-04 that happened twelve times, across six authors.
+  A failing case is a hypothesis about who erred, not a verdict on the agent.
+- **Fix the criterion where the criterion is wrong, and never the reverse.**
+  Weakening a case to make an agent pass destroys the only instrument that can
+  tell you whether the next prompt edit helped.
+
+**How to apply**: author the case, write both samples, run it once yourself,
+record the outcome. When a real deployment misses, ask what case would have
+caught it and add that case before fixing the prompt.
 
 ## 24. Never audit a moving target, and brief with ranges not whole files
 

@@ -32,8 +32,14 @@ must_not_find:
       - "Williams"
       - "overclaimed"
   - keywords:
-      - "Brown"
-      - "wrong year"
+      # must_not_find entries are OR'd, so pairing a control's NAME with a
+      # generic defect word makes any correct use of that word trip the guard.
+      # "wrong year" is also an EXPECTED keyword for the Johnson defect, so the
+      # two criteria contradicted each other. Found by Check 15 on its first
+      # run. Guard on phrases only a wrong answer produces.
+      - "Brown and Lee (2012) has the wrong year"
+      - "BrownLee2012 year is wrong"
+      - "Brown and Lee year mismatch"
   - keywords:
       - "recommend deleting"
       - "edit the manuscript"
