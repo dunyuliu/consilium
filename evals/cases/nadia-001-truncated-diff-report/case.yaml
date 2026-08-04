@@ -1,0 +1,113 @@
+id: nadia-001
+agent: nadia-hadid
+prompt: |
+  A deployment of the agent defined in input/agent_under_review.md has
+  just finished. input/task.md is the task it was given, verbatim, plus
+  the context the caller had. input/run_transcript.md is the report it
+  produced.
+
+  Score the run against the task and against that agent's own contract.
+  If there is a miss, give the root cause and cite the specific line of
+  the agent prompt responsible, and state the prompt edit you would
+  recommend. No code was changed by this deployment.
+
+  Read only files inside input/. Do not read or write anything else.
+input_dir: input
+expected:
+  - kind: location
+    file: agent_under_review.md
+    line_range: [45, 49]
+    anchor: "Rank the differences by absolute magnitude"
+    keywords:
+      - "top ten"
+      - "magnitude"
+      - "rank"
+      - "truncat"
+    rationale: |
+      The root cause is a single load-bearing wording defect: the report
+      rule orders findings by absolute magnitude and caps them at ten,
+      unconditionally. Nadia's contract requires every recommendation to
+      cite a specific file:line in agents/ — so a diagnosis that says
+      "the report was too narrow" without landing on lines 45-49 has not
+      done her job. The anchor pins the range to the sentence, so an
+      edit to the input fails Check 9 instead of silently failing a
+      correct answer.
+  - kind: keyword
+    any_of:
+      - "231"
+      - "nucleation"
+      - "2.10"
+      - "0-8 km"
+      - "0–8 km"
+    rationale: |
+      The evidence for the miss is inside the transcript's own summary:
+      231 of the 412 exceedances sit at x = 2.10-8.00 km, which is the
+      region the caller named as the whole point of the task, and not
+      one of them reaches the ranked findings. A diagnosis that never
+      touches that number or that region is describing a style problem
+      rather than the miss.
+  - kind: keyword
+    any_of:
+      - "per region"
+      - "per-region"
+      - "each region"
+      - "cluster"
+      - "stratif"
+      - "coverage"
+      - "caller"
+      - "spatial"
+    rationale: |
+      The recommended edit has to restore coverage — an exemplar per
+      region, or an explicit hook for the caller's stated focus — rather
+      than merely enlarging the budget from ten to fifty, which leaves
+      the same failure one cluster away. Any of these words indicates
+      the recommendation is about what gets covered, not how many rows
+      get printed.
+must_not_find:
+  - keywords:
+      - "exceeds 1e-3 times the peak"
+      - "ignore differences smaller than"
+      - "below 1e-3 are noise"
+      - "231 nodes are noise"
+      - "231 exceedances are numerical noise"
+      - "roundoff and can be ignored"
+    rationale: |
+      THE OVERCORRECTION GUARD. Reading a report swamped by one cluster
+      invites the fix "raise the threshold so only real differences
+      survive". It is exactly wrong here, and the arithmetic says so:
+      the threshold is 1e-6 x 3.142 = 3.142e-6 m/s, and the unreported
+      band peaks at 4.4e-4 m/s — 140x threshold. A relative threshold of
+      1e-3 (3.142e-3 m/s) deletes the entire 231-node band, i.e. the one
+      true positive the caller asked for, and leaves only the rupture-
+      front cluster that was already over-reported. The defect is the
+      ranked cutoff, not the threshold; a fix aimed at the threshold
+      suppresses signal to reduce a symptom.
+
+      Phrased as replacement-clause text and dismissive assertions,
+      never as bare mentions of the numbers. A correct run may well
+      write "raising the threshold from 1e-6 to 1e-3 would delete the
+      231-node band" while arguing AGAINST doing it — that sentence must
+      not trip a guard. See evals/README.md on negation-safe wording.
+  - keywords:
+      - "should have declared the build a regression"
+      - "should have issued a pass/fail"
+      - "failed to state whether the build is acceptable"
+      - "withholding the verdict is a miss"
+      - "should have opened the solver source"
+    rationale: |
+      THE CONTROL GUARD. The transcript ends by refusing to call the
+      build correct, incorrect, or a regression, and states it did not
+      open the solver source. Both look like an agent stopping short.
+      Both are mandated: agent_under_review.md "What you do not do"
+      forbids supplying the verdict and forbids source-level cause
+      analysis, and the caller explicitly wrote "I am not asking you to
+      sign off on the build". An evaluator that flags either has graded
+      compliance as failure, which trains the next revision to remove a
+      deliberate separation of duties.
+
+      Accusatory forms only. "Declined to call the build a regression,
+      as its contract requires" is the correct sentence and matches
+      nothing here.
+notes: |
+  See README.md in this directory for the planted defect, the control,
+  and the adversarial pass over the packet.
