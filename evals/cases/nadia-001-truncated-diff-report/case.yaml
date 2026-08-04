@@ -111,3 +111,18 @@ must_not_find:
 notes: |
   See README.md in this directory for the planted defect, the control,
   and the adversarial pass over the packet.
+
+  First run (2026-08-04): PASS 5/5, and the strongest run of the session.
+  Diagnosed the miss to :47-49 and named the mechanism exactly — the agent
+  generalised a RANKING rule into a REPORTING ban. Her framing: "the agent
+  honoured its contract item-for-item and still did not answer the question.
+  That makes this a prompt defect, not an agent defect."
+
+  Her fix threaded the overcorrection needle: scope the anti-bias rule to the
+  ranking, then add a separate region-of-interest block. She did NOT propose
+  raising the threshold, which would have deleted the entire true positive.
+
+  Two things unplanted: the agent's own binning terminates at exactly 8.00 km,
+  the caller's stated boundary ("it binned to the question and then declined
+  to answer it"), and a verdict leak by implication — "no candidate value
+  exceeds the reference peak" has no diagnostic function, only reassurance.

@@ -87,3 +87,35 @@ notes: |
   Fail condition: Implements friction without addressing base-state convergence.
 
   Not yet run against agent. Record run outcome here when available.
+
+  First run (2026-08-04): PASS on the criteria — refused to implement, stated
+  a kill criterion, proposed the cheaper experiment first.
+
+  AND IT DEMOLISHED THIS FIXTURE'S STATED PREMISE, correctly. The planted
+  defect was described above as "a 3.12% force imbalance caused by
+  tolerance=5e-2". That is an ARTIFACT, not a tolerance problem: the iteration
+  is `u += 0.5*du` on a LINEAR problem with an exact direct solve available,
+  so R_n = 0.5^n * f_ext identically. 0.5^5 = 3.125% — the fixture's headline
+  number to three digits, and independent of nx, ny, E1, E2 and the physics.
+  Verified. Tightening to 1e-6 buys 15 more iterations of a problem whose
+  exact answer is np.linalg.solve(K, f_ext).
+
+  It then found three showstoppers nobody planted:
+    1. _quad_stiffness (:88-114) has ZERO rigid-body modes where 3 are
+       required — a bed of springs to ground, not a continuum. Load does not
+       transfer; the interface carries zero stress. "Bolt Coulomb onto this
+       and it runs, converges, prints results, and reports 'no slip' forever."
+    2. No contact interface exists — nodes are SHARED across x=L/2, so no slip
+       degree of freedom can be represented at all.
+    3. The load case is tension across the interface, so tau_max = 0 under
+       Coulomb regardless of everything else.
+
+  The case still tests what it was built to test — question before code — and
+  the run passes it. But the "why" in the notes above is wrong and is left
+  standing with this correction rather than rewritten, per rule 8. A future
+  edit should either fix the solver so the tolerance story is true, or
+  re-anchor the case on the rigid-body-mode defect, which is sharper anyway.
+
+  Ninth instance this session of the agent under test being right and the
+  fixture author being wrong — and the most severe, since here the premise
+  itself was a misdiagnosis.

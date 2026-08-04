@@ -32,10 +32,13 @@ expected:
   # (2) TRUE POSITIVE — PROJECT_RULES.md exists, has the canonical name, and
   # is a one-line stub (heading only). Step 0 must name it as such rather
   # than stopping there and concluding no real rules exist.
-  - kind: location
-    file: PROJECT_RULES.md
-    line_range: [1, 1]
-    anchor: "# Project Rules"
+  # NOT kind: location. This asks the run to classify a ONE-LINE stub; no
+  # report cites ":1" when writing "PROJECT_RULES.md is a 2-line stub". The
+  # criterion must assert what the agent's output actually contains — the
+  # same defect priya-001 had.
+  - kind: keyword
+    any_of:
+      - "PROJECT_RULES.md"
     keywords:
       - "stub"
       - "empty"
@@ -108,3 +111,10 @@ notes: |
   - scripts/migrate.sh is intentionally present but unused, so its existence
     can't be mistaken for compliance — deploy.sh still calls alembic
     directly.
+
+  First run (2026-08-04): PASS 5/5. Named CLAUDE.md as authoritative, called
+  PROJECT_RULES.md a stub rather than concluding no rules exist, dismissed
+  docs/RULES.md as a how-to, and cited deploy.sh:7 for the alembic bypass.
+  A criterion was fixed first: it demanded a kind:location citation of
+  PROJECT_RULES.md:1 for a ONE-LINE stub, which no report phrases that way.
+  Converted to kind:keyword — the same defect priya-001 had.

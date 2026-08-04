@@ -129,7 +129,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 370 passed, 0 failed
+# → Summary: 369 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
