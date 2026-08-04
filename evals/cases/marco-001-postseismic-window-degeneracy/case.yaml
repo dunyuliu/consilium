@@ -1,0 +1,246 @@
+id: marco-001-postseismic-window-degeneracy
+agent: marco-bianchi
+prompt: |
+  Give me a brutally honest, Reviewer-2 read of input/manuscript.md. Is the
+  central claim — that the postseismic GPS record requires an anomalously
+  weak asthenosphere beneath the rift — actually supported by the experiment
+  described? What is the one load-bearing weakness this paper lives or dies
+  on, and what would a hostile reviewer destroy them on? Rank what you find;
+  do not hand me a flat list of equally-weighted issues. Everything you need
+  is in that one file; no network.
+input_dir: input
+tier: smoke   # fast, offline, no network, single file
+expected:
+  # The load-bearing weakness: eta = 1.3e19 Pa s and mu = 30 GPa (:13, :76,
+  # :93) imply a Maxwell relaxation time tau_M = eta/mu ~ 13.7 yr, but the
+  # inversion window is only 600 days (~1.64 yr, :86-88) -- about 12% of one
+  # Maxwell time. Over that fraction the predicted viscoelastic transient and
+  # a logarithmic afterslip decay are not distinguishable in shape, and the
+  # manuscript's only argument against a residual afterslip contribution is
+  # an unverifiable "not shown" synthetic test restricted to near-field
+  # surface creep (:82-85), which says nothing about afterslip on the deep
+  # extension of the fault contributing to the far-field network used for
+  # the fit.
+  - kind: location
+    file: manuscript.md
+    line_range: [82, 89]
+    anchor: "600-day window (day 20 to day 620 after the mainshock"
+    keywords:
+      - "afterslip"
+      - "degenerat"
+      - "indistinguish"
+      - "too short"
+      - "not shown"
+      - "cannot separate"
+      - "cannot be separated"
+      - "cannot distinguish"
+    severity: critical
+  # Must derive or cite the Maxwell-time / window mismatch, not just gesture
+  # at "afterslip is a concern" -- the quantitative comparison is the point.
+  - kind: keyword
+    any_of:
+      - "Maxwell time"
+      - "relaxation time"
+      - "13.7"
+      - "13.6"
+      - "13.8"
+      - "~14 yr"
+      - "14 years"
+      - "order of magnitude longer than the window"
+      - "far shorter than"
+      - "much shorter than the relaxation"
+      - "only samples the early"
+      - "early-time"
+      - "early part of the relaxation"
+  # Must state the conclusion does not follow / is not identifiable from the
+  # stated experiment -- not merely "this could be improved".
+  - kind: keyword
+    any_of:
+      - "does not follow"
+      - "not supported"
+      - "unsupported"
+      - "not demonstrated"
+      - "non-identifiable"
+      - "not identifiable"
+      - "unresolved trade-off"
+      - "cannot rule out afterslip"
+      - "no experiment"
+must_not_find:
+  # --- attacking CONTROL 1: the reference-frame check (:49-56, defensible) -
+  - keywords:
+      - "the reference frame is the central weakness"
+      - "the reference frame is the load-bearing weakness"
+      - "recommend reprocessing in ITRF2014"
+      - "the IGS14 realization biases the inferred trend"
+      - "frame realization drives the result"
+      - "reference-frame artifact explains the postseismic signal"
+  # --- attacking CONTROL 2: the H=25 km sensitivity test (:76-80, disclosed)
+  - keywords:
+      - "elastic thickness was never tested"
+      - "the fixed elastic thickness invalidates"
+      - "H = 25 km is unjustified"
+      - "the trade-off with elastic thickness is hidden"
+      - "recommend testing sensitivity to H"
+  # --- promoting a minor distractor to the central problem ------------------
+  - keywords:
+      - "load-bearing weakness is the missing uncertainty"
+      - "load-bearing weakness is the confidence interval"
+      - "central weakness is the single InSAR track"
+      - "load-bearing weakness is the coseismic slip model"
+      - "load-bearing weakness is the dangling table"
+      - "central weakness is Table 2"
+  # --- inverting the verdict -------------------------------------------------
+  - keywords:
+      - "the viscosity estimate is well constrained"
+      - "the postseismic window is sufficient to separate"
+      - "afterslip and viscoelastic relaxation are cleanly resolved"
+      - "no degeneracy between afterslip and relaxation"
+      - "the central claim is supported"
+notes: |
+  DOMAIN: postseismic geodesy, Maxwell viscoelastic relaxation vs afterslip.
+  Synthetic manuscript, no real earthquake, no external references to check.
+  Everything needed for the verdict is arithmetic on numbers stated in the
+  text plus the standard postseismic-geodesy fact (Marco's own expertise,
+  not spelled out in the manuscript) that early-time viscoelastic relaxation
+  and logarithmic afterslip decay are not distinguishable in shape from
+  surface GPS alone without independent afterslip constraints.
+
+  WHAT THIS CASE TESTS: whether the agent derives the Maxwell time from the
+  manuscript's own numbers and recognizes the specific failure mode (window
+  too short relative to tau_M) rather than raising a generic "afterslip is a
+  confound" comment, or worse, reaching for the more obvious-looking but
+  defensible reference-frame or elastic-thickness critiques instead.
+
+  ---------------------------------------------------------------------------
+  1. LOAD-BEARING WEAKNESS -- manuscript.md:82-89 (Section 5, second para)
+
+     Text: eta = 1.3e19 Pa s (:14, :76 implicitly via H=25 preferred fit,
+     :93), mu = 30 GPa (:13, :62). tau_M = eta/mu = 1.3e19 / 3.0e10
+     = 4.333e8 s = 13.73 yr.
+
+     Inversion window: day 20 to day 620 after the mainshock (:87-88) =
+     600 days = 1.643 yr.
+
+     window / tau_M = 1.643 / 13.73 = 0.120 -> the fit uses ~12% of one
+     Maxwell time. At t << tau_M the Maxwell viscoelastic surface response
+     is close to linear in t and visually indistinguishable from the
+     logarithmic decay A*ln(1+t/ta) produced by afterslip, which is the
+     textbook degeneracy this class of study has to rule out (Hearn, 2003;
+     Barbot and Fialko, 2010 -- both cited by the manuscript itself, :30,
+     :80).
+
+     THE MANUSCRIPT'S ONLY DEFENSE against a residual afterslip contribution
+     is: "Forward synthetic tests (not shown) indicate that the shallow
+     fault-parallel creep signal at the four GPS stations closest to the
+     surface trace (5-20 km) decays below the GPS detection threshold
+     (< 1 mm) within the first three weeks" (:82-85). This is (a) an
+     unverifiable claim ("not shown"), and (b) even if true, only rules out
+     shallow creep AT the surface trace near-field stations -- it says
+     nothing about afterslip on the down-dip extension of the fault, which
+     produces a broader, farther-field surface signal indistinguishable in
+     pattern from shallow viscoelastic relaxation over a network extending
+     to 150 km (:47). Given the degeneracy and the short window, the
+     "anomalously weak asthenosphere" conclusion (Abstract :14-19,
+     Discussion :105-112, Conclusions :116-120) has no experiment behind it
+     that separates the two mechanisms.
+
+  ---------------------------------------------------------------------------
+  2. MINOR REAL ISSUES (the distractors -- all genuinely real, none fatal)
+
+     D1. No confidence interval on eta. :94-97 explicitly discloses this
+         ("We did not compute a formal confidence interval... point
+         estimate rather than a bounded range") -- honest, but still a
+         legitimate revise-level ask. A CI would not fix the identifiability
+         problem even if reported.
+     D2. Coseismic slip model from a single ascending-track InSAR
+         interferogram, not jointly inverted with GPS (:60-64, :68-69). The
+         manuscript discloses the dip-slip resolution is weaker than the
+         strike-slip resolution as a result. Real, minor, orthogonal to the
+         viscosity/afterslip issue.
+     D3. Dangling table reference. Results (:98-99) cites "Table 2" for
+         station-by-station residuals; the Table and Figure Captions section
+         (:132-137) defines only Table 1. Bookkeeping issue, not
+         substantive.
+
+     Any of D1-D3 is a legitimate "revise" comment. None of them, if fixed,
+     changes whether the central claim is supported.
+
+  ---------------------------------------------------------------------------
+  3. CONTROLS -- look aggressive, are defensible. Attacking either is a FAIL.
+
+     C1. Reference frame (:45-56). Looks like an obvious target (GPS trend
+         interpretation, frame realization) -- it is Marco's own listed
+         class of critique (b) in the brief this fixture was built against.
+         It is defensible here: velocities are estimated as residuals
+         relative to an 11-year pre-earthquake secular trend at each
+         station, not raw ITRF displacements (:49-52), and a same-network
+         ITRF2014-vs-IGS14 reprocessing test on 4 stations shows <0.05 mm/yr
+         difference against a 0.3 mm/yr formal uncertainty (:53-56). This is
+         a stated check with a quantitative null result, not an unexamined
+         assumption.
+
+         Note on C1's limit, declared so it is not a hidden trap: only 4 of
+         18 stations were reprocessed for the frame check. Asking whether
+         the other 14 behave the same way is a fair, small review comment.
+         Treating the reference frame as the central problem, or asserting
+         it explains the postseismic transient, in the face of the stated
+         test and its result, is not, and is what must_not_find guards.
+
+     C2. Fixed elastic layer thickness H = 25 km (:76-80). Looks like an
+         unexamined free parameter with a known trade-off against viscosity
+         (Hearn, 2003, cited by the manuscript itself, :80). It is
+         disclosed and bounded here: H is tied to an independent seismogenic
+         depth estimate (max aftershock depth 24.6 km, :40-41), and a
+         sensitivity test at H = 20 and 30 km shows eta shifts by a factor
+         of 1.6 (1.0e19 to 1.6e19 Pa s, :78-79) -- every value in that range
+         is still roughly an order of magnitude below the 10^20-10^21 Pa s
+         continental range quoted in Discussion (:105-107), so the
+         qualitative "anomalously weak" conclusion is robust to this
+         particular trade-off even though the point estimate is not.
+
+  ---------------------------------------------------------------------------
+  4. ADVERSARIAL PASS OVER MY OWN INPUT -- everything else real that I found,
+     declared here rather than left as an undeclared trap. A run that
+     reports any of these is CORRECT, not noisy; none is required to pass.
+
+     A1. Only 4 of 18 stations were reprocessed for the frame check (see C1
+         note above) -- a fair, minor ask.
+     A2. The magnetotelluric spatial correlation used to support the
+         interpretation (:99-101, :109) is a single prior study (Okonkwo et
+         al., 2016) by an overlapping author list with this manuscript
+         (T. Okonkwo appears as both an author, :3, and a cited reference,
+         :34, :101, :128) -- worth a COI/independence comment, real but
+         secondary.
+     A3. "Static coseismic offsets... reached 1.8 m" (:42-43) at 5-20 km is
+         large but plausible for Mw 7.5 strike-slip at that distance; not a
+         defect.
+
+     ARITHMETIC I VERIFIED CONSISTENT while writing, so a run flagging these
+     as errors would be wrong:
+       - M0 = mu*A*D = 3.0e10 Pa x (120e3 m x 15e3 m) x 4 m = 2.16e20 N m
+         (:66); Mw = (2/3)(log10(2.16e20) - 9.1) = (2/3)(20.335 - 9.1)
+         = 7.49 (:67) -- matches the stated Mw 7.49 and is consistent with
+         the regional Mw 7.5 solution.
+       - eta(H=20)/eta(H=30) = 1.0e19/1.6e19 -> a factor of 1.6 for a
+         +/-5 km change in H (:78-79) -- matches the stated "factor of 1.6".
+       - 600-day window / 365.25 = 1.643 yr; 1.3e19/3.0e10 = 4.333e8 s
+         = 13.73 yr; 1.643/13.73 = 0.120 -- the 12% figure used in the
+         primary weakness above.
+       - Aftershock max depth 24.6 km (:40-41) rounds sensibly to the
+         adopted H = 25 km elastic thickness (:41, :76) -- consistent, not
+         a defect.
+
+  ---------------------------------------------------------------------------
+  PASS CONDITION
+   - Names the short inversion window relative to the implied Maxwell time
+     (tau_M ~ 13.7 yr vs a 1.64 yr window) as the load-bearing weakness, and
+     states that this leaves the viscoelastic-relaxation vs afterslip
+     degeneracy unresolved, so the "anomalously weak asthenosphere" claim
+     does not follow from the experiment described.
+   - Treats D1-D3 as secondary / revise-level, not as the central problem.
+   - Does not attack C1 (reference frame) or C2 (fixed elastic thickness) as
+     the central problem.
+
+  RUN RECORD
+   Not yet run. Per evals/README.md, this fixture is not certified until one
+   run has been reconciled against the declared defect set above.

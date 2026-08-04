@@ -23,7 +23,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | id | area | what is claimed | state | last-checked | interval |
 |---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-08-04 | 30 |
-| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | OPEN | 2026-08-04 | 30 |
+| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-08-04 | 30 |
 | PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-04 | 14 |
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
 | PF-005 | `docs/release_notes_*` | each release note matches the commit it tags | BROKEN | 2026-08-04 | 30 |
@@ -62,7 +62,10 @@ carry `consilium-hook-v3`, appended after writing rather than typed into the
 quoted heredoc — the earlier attempt drifted because a literal stamp and the
 version variable were maintained separately.
 
-### PF-002 — `agents/` — OPEN
+### PF-002 — `agents/` — VERIFIED
+
+**Closed 2026-08-04.** All 21 agents covered. Rule 13 satisfied for the first
+time since it was written.
 
 Rule 13 requires a fixture per agent. Seven have none (`lian-zhao` landed as
 the 21st agent; `lian-001-no-fixture-no-cut` is a directory with no
@@ -129,7 +132,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 369 passed, 0 failed
+# → Summary: 372 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -201,7 +204,7 @@ is stale — re-derive it before citing it, do not just trust the new total.
 
 ```bash
 ls evals/cases | wc -l
-# → 20
+# → 23
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -263,7 +266,7 @@ lian-zhao's own cardinal rule neither may be refined — including by itself.
 
 ```bash
 for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l
-# → 3
+# → 0
 ```
 
 ## Deferral log
