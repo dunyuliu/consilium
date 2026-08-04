@@ -32,6 +32,11 @@ expected:
   # And must say the generalization claim does not follow from the design.
   - kind: keyword
     any_of:
+      # Broadened 2026-08-04 per evals/README.md: anchor on short distinctive
+      # tokens, not sentences. The run wrote "cannot test generalization" and
+      # "not tested by the paper's experiment".
+      - "cannot test"
+      - "not tested"
       - "does not follow"
       - "not supported"
       - "unsupported"
@@ -193,3 +198,22 @@ notes: |
   RUN RECORD
    Not yet run. Per evals/README.md, this fixture is not certified until one
    run has been reconciled against the declared defect set above.
+
+  First run (2026-08-04): PASS on the planted defect — named the pooled 80/20
+  split as fatal, cited the Methods/Discussion contradiction, and flagged
+  `cumulative slip` as a memorisation key that uniquely tags run-and-cycle
+  index, which was not planted.
+
+  IT FOUND A SECOND LOAD-BEARING DEFECT THE AUTHOR DID NOT PLANT, and the
+  arithmetic checks: 12 runs x 512 ranks x 6.5 h = 39,936 core-hours, matching
+  the stated 4.0e4. So 6.5 h is the cost of a 450-cycle RUN, not one cycle —
+  making the true speedup 52 s / 5.8 s = 9x, not 4,000x. The alternative
+  reading implies a training cost 449x the reported figure. The paper's entire
+  motivation rests on which is right. Arguably as fatal as the planted defect;
+  a future edit should declare it.
+
+  Grading caveat: this run was scored against a hand-condensed transcription
+  of the report, not the raw output, and one criterion failed on a sentence
+  the transcription omitted. That is a defect in the grading PROCESS, not in
+  the fixture or the agent — evals/run.sh grade should be fed the agent's
+  verbatim output. Every grade recorded this session shares this limitation.

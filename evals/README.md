@@ -82,6 +82,20 @@ notes: |
 > over bare descriptions of the bad act. `mira-001` shipped with the naive
 > wording and passed its first run only by luck of phrasing.
 
+> ### The most common criterion defect: enumerated paraphrases
+>
+> An `any_of` list of full sentences can never be exhaustive. Four cases failed
+> correct runs this way in one session — `"do not merge"` missing *"does not
+> merge"*, `"send it back"` missing *"send back"*, seven variants of *"rina has
+> no fixture"* missing *"zero fixtures"*, and a `kind: location` on a one-line
+> stub that no report cites as `:1`.
+>
+> **Anchor on the shortest distinctive token the answer must contain**, not on
+> a phrasing you imagine. `"refuse"` beats `"refuse to merge"`. `"1.27"` beats
+> `"1.27 cells across the cohesive zone"`. If no short token is distinctive
+> enough, the criterion is probably asking for a judgement rather than a fact,
+> and belongs in the notes for a human to score.
+
 ### Pass criteria
 
 A case passes when every `expected` entry matches AND no `must_not_find`
@@ -121,7 +135,11 @@ There is no automated harness yet. To run a case by hand:
 2. Open Claude Code in this repo (so the symlinked agents are loaded).
 3. Run `/agents` and invoke the agent named in `case.yaml`.
 4. Paste the `prompt` field as your message, scoping it to `input/`.
-5. Compare the agent's report against `expected` and `must_not_find` by eye.
+5. **Save the agent's verbatim output to a file** and run
+   `bash evals/run.sh grade <case> <that file>`. Do not grade a summary you
+   wrote — a condensed transcription drops the exact sentences the criteria
+   match on, and every failure it produces is your paraphrase failing, not
+   the agent. This happened repeatedly on 2026-08-04.
 6. Record the outcome in the case's `notes:` — date, verdict, and anything
    the run revealed about the fixture itself. A run nobody wrote down is a
    run that will be repeated.

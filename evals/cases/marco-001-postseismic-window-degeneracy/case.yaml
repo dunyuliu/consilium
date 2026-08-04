@@ -244,3 +244,18 @@ notes: |
   RUN RECORD
    Not yet run. Per evals/README.md, this fixture is not certified until one
    run has been reconciled against the declared defect set above.
+
+  First run (2026-08-04): PASS 7/7. Derived tau_M = 13.7 yr and put the window
+  at 0.004-0.124 Maxwell times, then went past the fixture: quantified the
+  tau-diagnostic curvature at 0.97% of signal (~0.5 mm) against the 2.1 mm
+  misfit, and got the bias DIRECTION right — afterslip's log curvature can
+  only be fit by shortening tau, so the "anomalously low viscosity" is the
+  expected artifact of the omitted mechanism, in the expected direction.
+
+  IT ALSO ATTACKED THE INTENDED CONTROL, CORRECTLY. The reference-frame decoy
+  is not defensible: IGS14 IS the IGS realization of ITRF2014, so "we
+  reprocessed in ITRF2014 instead of IGS14 and rates changed by <0.05 mm/yr"
+  is a tautology, not a frame test. The control needs rebuilding around a
+  genuine test (independent analysis centre, or plate-fixed vs global) before
+  it can guard anything. Tenth instance of the agent being right and the
+  fixture author wrong.

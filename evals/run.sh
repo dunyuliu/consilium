@@ -110,7 +110,7 @@ cmd_grade() {
             if printf '%s' "$body" | grep -qF -- "$(printf '%s' "$term" | tr '[:upper:]' '[:lower:]')"; then
                 matched=1; detail="$term"; break
             fi
-        done < <(printf '%s' "$terms" | tr '\037' '\n')
+        done < <(printf '%s\n' "$terms" | tr '\037' '\n')
 
         if [ "$kind" = "location" ]; then
             local file_ok=0 line_ok=0
@@ -156,7 +156,7 @@ cmd_grade() {
             if printf '%s' "$body" | grep -qF -- "$(printf '%s' "$term" | tr '[:upper:]' '[:lower:]')"; then
                 hit="$term"; break
             fi
-        done < <(printf '%s' "$terms" | tr '\037' '\n')
+        done < <(printf '%s\n' "$terms" | tr '\037' '\n')
         if [ -n "$hit" ]; then
             echo "  FAIL  must_not_find — report contains: \"$hit\""
             fails=$((fails + 1))

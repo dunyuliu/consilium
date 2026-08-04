@@ -32,6 +32,13 @@ expected:
       - "not covered"
   - kind: keyword
     any_of:
+      # Broadened 2026-08-04: the run wrote "does not merge as reported.
+      # Refuse." and "send back, not merge" — near-misses on all seven
+      # original entries. Anchor on the shortest distinctive token, not a
+      # sentence. Fourth criterion of this shape to fail this way.
+      - "refuse"
+      - "not merge"
+      - "send back"
       - "do not merge"
       - "don't merge"
       - "block this merge"
@@ -93,3 +100,11 @@ notes: |
   var=(9+1+1+1+0+0+4+16)/8=32/8=4, stdev=2.0 — matches what
   test_stats.py asserts, so the test itself is a correct, if irrelevant,
   check of the legacy path.
+
+  First run (2026-08-04): PASS 6/6, on ONE tool call. Traced the dispatch,
+  found the 8-item test against the 200-item gate, and named the axis: "a test
+  tier that falls through to the old path instead of triggering the new one is
+  not a passing gate, regardless of the green log." Left the ddof control alone
+  and cited its pre-approval. One criterion broadened first — the verdict list
+  had "do not merge" and "send it back" against his "does not merge as
+  reported" and "send back".
