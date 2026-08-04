@@ -82,6 +82,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical |
 | 19 | One owner per write surface | mechanical |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
+| 21 | Standing claims are re-checked on a schedule and cite a command | mechanical |
 
 ---
 
@@ -91,7 +92,7 @@ Prefer the smallest edit that solves the problem. Fold new content into the
 file it belongs to — a new top-level file needs an explicit ask. Never
 refactor unrelated agents in the same change. The repo root stays curated:
 `README.md`, `LICENSE`, `install.sh`, `PROJECT_RULES.md`, and exactly one
-`release_notes_v*.md`. Nothing else.
+`release_notes_v*.md`, and `PATHWAY_FORWARD.md`. Nothing else.
 
 **Rationale**: this repo's product is prose. Prose sprawls silently — a
 second file that half-covers the same ground is not caught by any compiler.
@@ -147,6 +148,9 @@ claim had been true once and was never re-run.
 
 **How to apply**: quote the command and its output, not the README's
 description of it.
+
+Rule 21 makes the standing half of this mechanical: a claim that was fresh once
+decays, and `PATHWAY_FORWARD.md` records when each was last re-derived.
 
 ## 5. One definition of "pass" — never invent a second
 
@@ -369,6 +373,44 @@ checked. A rename breaks them silently.
 **Proposed Tier-1 upgrade**: extend Check 5's backtick scan to `agents/*.md`
 and `commands/*.md` bodies, not just `README.md`.
 
+## 21. Standing claims are re-checked on a schedule, and cite a command
+
+`PATHWAY_FORWARD.md` is the present tense of this repository: every open issue,
+known-broken thing, and standing claim, by surface, with the date it was last
+audited, a re-check interval, and the command whose output was read. Release
+notes are append-only history (rule 8) and go stale by design — they are not
+the current view, and must not be used as one.
+
+- **A claim marked VERIFIED cites a command that ran.** A claim with no command
+  is not verified, it is remembered.
+- **A blank `last-checked` means never audited, and stays blank.** It is not an
+  unfilled field; it is the honest statement that nobody has checked this
+  surface. Never backfill a date to make a row look complete.
+- **Overdue is a failure; deferring is not.** An item may be postponed by
+  writing one line in the deferral log with a reason. Letting it lapse silently
+  may not. The gate reddens on an undecided item, never on a date alone.
+- **Items are never deleted.** The board only grows (rule 8).
+
+**Rationale**: rule 4 says only fresh runs are evidence, but it is applied at
+the moment of writing and never again. Nothing obliged anyone to re-check, so
+nothing did. This rule is the standing half of rule 4.
+
+**Incident (2026-07-31, found 2026-08-04)**: the v1.7.0 release note stated that
+rule 18 had become mechanical via `tests/lock.sh` and a versioned `pre-commit`
+hook installed by `install.sh`. `git log --oneline -S 'PRECOMMIT' -- install.sh`
+returns zero commits. The hook was never committed — it existed only in the
+authoring machine's untracked `.git/hooks/`, so the enforcement worked there and
+nowhere else, and every clone got the lock script with no gate. The *effect* had
+been verified once; the *source being committed* never was, and for four days
+nothing re-checked it. Two further record defects went unnoticed the same way:
+the v1.10.0 tag carries six files its note does not mention, and four eval
+fixtures shipped with undeclared defects in regions documented as clean.
+
+**How to apply**: run the command in the item's block, paste what it actually
+printed, set `last-checked` to today, append a dated note. `tests/check.sh`
+Check 12 enforces the shape; only you can enforce that the command was really
+run.
+
 ## 20. Every writer declares isolation first, and is evaluated at the merge
 
 An agent with write access follows one lifecycle, and its prompt states the
@@ -425,6 +467,7 @@ the machine-readable source of truth, not documentation of one.
 | publication staging, citation files | `anya-petrov` |
 | campaign session log, merge decisions | `wei-lin` |
 | `.consilium-review/` in a deployed project | `nadia-hadid` |
+| `PATHWAY_FORWARD.md` (the inspection log) | `zofia-kaminska` |
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.

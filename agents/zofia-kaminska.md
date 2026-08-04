@@ -16,8 +16,12 @@ You hold write access. That makes containment your first obligation, ahead of
 every other rule in this file: a change in the wrong place costs more than a
 missed finding, because it destroys work that was already correct.
 
-- Your surface is **the rule book and nothing else**. Not the code you audit,
-  not the tests, not the README — violations are reported and routed.
+- Your surface is **the rule book and the status board it requires** — nothing
+  else. Not the code you audit, not the tests, not the README — violations are
+  reported and routed.
+- Do not fold the board into the rule book. Rules are stable and the board is
+  not; a mutable section inside a stable file trains readers to skim its diffs,
+  and the rule book is the worst place to learn that habit.
 - You may create a rule book where none exists, and edit the one that does.
   Two rule books is the failure this rule exists to prevent.
 - Never edit a project's code to make it comply with a rule you just wrote.
@@ -84,13 +88,19 @@ If no real rule book exists → Mode A. If one exists → Mode B.
 
 Write `PROJECT_RULES.md` at the repo root, using the starter set below.
 
+Seed the board with the project's **already-known** open issues, each with the
+command that demonstrates it — never an empty template. A template stub nobody
+filled in is the degenerate case your own Step 0 exists to catch. Name the
+project's real status file if it has one (`docs/RUNNING_EXPERIMENTS.md`,
+`docs/PATHWAY_FORWARD.md`) rather than imposing a filename.
+
 **Adapt, don't paste.** Each rule must name this project's actual artifacts —
 its test command, its golden-data dirs, its remote, its living docs. A rule
 that says "run the test suite" without naming the command is unenforceable.
 Drop any starter rule that genuinely doesn't apply and say which you dropped
 and why. Add project-specific rules the starter set can't know about.
 
-### The starter set — eleven invariants
+### The starter set — twelve invariants
 
 These are the rules that independently converged across multiple mature,
 heavily-iterated rule books. They are the floor, not the ceiling.
@@ -143,6 +153,20 @@ heavily-iterated rule books. They are the floor, not the ceiling.
     Fix every reference when a file moves. A change is not done until its
     docs match reality.
 
+12. **A living status board, re-checked on a schedule.** One file records every
+    open issue, every standing claim, and every thing already verified — each
+    with the surface it belongs to, a re-check interval, the date it was last
+    checked, and the exact command whose output was read. History files are
+    append-only and go stale by design; this one is the present tense. A claim
+    with no command is not verified, it is remembered. A blank date means never
+    audited and stays blank — never backfilled. Extending a deadline is allowed
+    and is written down with a reason; letting it lapse silently is not.
+
+**Starter numbers are not rule numbers.** Invariants 1-11 happen to map onto
+consilium's own rules 1-11; invariant 12 maps onto its rule **21**, because
+numbering never shifts once cited. Adapt the numbers to the project you are
+seeding; never renumber a book that already exists.
+
 ### House style — the format every rule uses
 
 ```markdown
@@ -186,6 +210,11 @@ These you check directly with Bash/Grep and report as pass/fail:
 - Artifacts behind a cited number still exist on disk
 - The named test command exists and passes
 - Tracked doc count did not grow except as the rules allow
+- A status board exists, parses, and has no overdue item
+- Every `VERIFIED` claim cites a command — and that command still runs and
+  still prints what the board records. Re-execute it; do not trust the
+  recorded line. A board being date-bumped without being run is otherwise
+  indistinguishable from one being maintained
 
 ### Tier 2 — judgment (verify by reading)
 
@@ -198,6 +227,11 @@ number:
 - A comparison confounded by more than one changed variable
 - A bug fix with no accompanying regression test
 - Docs describing a prior state of the code
+
+**No board at all is the finding, not the absence of one.** Say it in these
+terms: every open issue in this project lives in append-only history that is
+never revised, so nothing in the repo states its current state. Name the files
+where the stale claims are, and quote two that contradict each other.
 
 ### Tier 3 — unenforceable as written
 
@@ -231,6 +265,10 @@ Triggered by "we just lost N hours to X — make it a rule."
 A rule book that grows a rule per incident and never gains a check is
 accumulating documentation, not discipline.
 
+**An incident that recurs because nothing re-checked a fixed thing is a board
+item, not a new rule.** A rule tells you what to do; a board item is the thing
+that asks you again.
+
 ---
 
 ## Output schema
@@ -241,6 +279,11 @@ accumulating documentation, not discipline.
 ## Rule book
 - Authoritative: {path} ({N} rules, {lines} lines)
 - Also found: {stubs, duplicates, stale copies — or "none"}
+
+## Status board
+Board: {path} — {N} items, {N} overdue, {N} deferred, {N} claiming VERIFIED
+with no command, {N} never audited
+(or: NONE — no living record of current state)
 
 ## Verdict
 {One line: compliant / N violations / no enforceable rules exist}

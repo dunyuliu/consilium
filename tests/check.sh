@@ -18,6 +18,9 @@
 #   7. Every agent has a README roster-table row and a Layout-tree line.
 #   8. Agent references inside agents/*.md and commands/*.md bodies resolve.
 #   9. Every eval fixture's line_range still brackets its declared anchor.
+#  10. The rule-19 write-surface ownership table is complete and exclusive.
+#  11. Every write-surface owner declares isolation as its first section.
+#  12. PATHWAY_FORWARD.md is current and every VERIFIED claim cites a command.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -411,6 +414,100 @@ for owner in "${!is_owner[@]}"; do
         fail "agents/$owner.md holds a write surface but its first section is '$first_heading' — isolation must come first (rule 20)"
     fi
 done
+
+# --- Check 12: PATHWAY_FORWARD.md is current and every claim cites a command
+#
+# PROJECT_RULES.md rule 21. Release notes are append-only history and go stale
+# by design; the board is the present tense. A claim that was true when written
+# decays silently — v1.7.0 shipped a pre-commit hook that was never committed,
+# and nothing re-checked it for four days because nothing existed whose job was
+# to re-check.
+#
+# The gate never reddens on a date alone: it reddens on an OVERDUE item with no
+# recorded decision. Writing one deferral line clears it. A blank last-checked
+# means never audited — permitted and reported, never silently backfilled,
+# because an unaudited surface must stay visible.
+echo "Check 12: PATHWAY_FORWARD.md is current and every claim cites a command"
+BOARD="PATHWAY_FORWARD.md"
+if [ ! -f "$BOARD" ]; then
+    fail "$BOARD missing — rule 21 requires a living inspection log"
+else
+    # epoch-days via awk (days_from_civil); `date -d` is GNU-only.
+    days() { awk -v d="$1" 'BEGIN{
+        split(d,a,"-"); y=a[1]; m=a[2]; dd=a[3];
+        if (m<=2) y--;
+        era=int((y>=0?y:y-399)/400); yoe=y-era*400;
+        doy=int((153*(m+(m>2?-3:9))+2)/5)+dd-1;
+        doe=yoe*365+int(yoe/4)-int(yoe/100)+doy;
+        print era*146097+doe-719468 }'; }
+    today_d=$(days "$(date -u +%Y-%m-%d)")
+
+    board_rows=0
+    declare -A item_state=() item_cmd=()
+    while IFS='|' read -r id st hc hr; do
+        [ -z "$id" ] && continue
+        item_state[$id]="$st"; item_cmd[$id]="$hc"
+    done < <(awk -f tests/parse_board.awk -v section=items "$BOARD")
+
+    declare -A defer_until=() defer_count=()
+    while IFS='|' read -r id un; do
+        [ -z "$id" ] && continue
+        defer_until[$id]="$un"
+        defer_count[$id]=$(( ${defer_count[$id]:-0} + 1 ))
+    done < <(awk -f tests/parse_board.awk -v section=defer "$BOARD")
+
+    while IFS='|' read -r id area st last iv; do
+        [ -z "$id" ] && continue
+        board_rows=$((board_rows + 1))
+        err=""
+        case "$st" in VERIFIED|OPEN|BROKEN|DEFERRED) ;; *) err="bad state '$st'" ;; esac
+        if [ -z "${item_state[$id]:-}" ]; then
+            err="${err:-no matching '### $id' block}"
+        elif [ "${item_state[$id]}" != "$st" ]; then
+            err="${err:-table says $st, block says ${item_state[$id]}}"
+        fi
+        if [ -z "$last" ]; then
+            # never audited: information, not an error — but cannot be VERIFIED
+            [ "$st" = "VERIFIED" ] && err="${err:-VERIFIED with no last-checked date}"
+            if [ -z "$err" ]; then
+                echo "  NEVER AUDITED: $id ($area)"
+                ok
+            else
+                fail "$id: $err"
+            fi
+            continue
+        fi
+        if ! printf '%s' "$last" | grep -qE '^20[0-9]{2}-[0-9]{2}-[0-9]{2}$'; then
+            err="${err:-last-checked '$last' is not YYYY-MM-DD}"
+        elif [ "$(days "$last")" -gt "$today_d" ]; then
+            err="${err:-last-checked is in the future}"
+        fi
+        [ "$st" = "VERIFIED" ] && [ "${item_cmd[$id]:-0}" != "1" ] \
+            && err="${err:-VERIFIED but its block records no command}"
+        if printf '%s' "$iv" | grep -qE '^[0-9]+$' && [ "$iv" -ge 1 ] && [ "$iv" -le 90 ]; then
+            if [ -z "$err" ]; then
+                due=$(( $(days "$last") + iv ))
+                if [ "$st" = "DEFERRED" ]; then
+                    if [ -z "${defer_until[$id]:-}" ]; then
+                        err="DEFERRED with no deferral-log row"
+                    elif [ "${defer_count[$id]}" -gt 2 ]; then
+                        err="deferred ${defer_count[$id]} times — that is a decision, not a deferral"
+                    elif [ "$(days "${defer_until[$id]}")" -lt "$today_d" ]; then
+                        err="deferral lapsed on ${defer_until[$id]}"
+                    fi
+                elif [ "$today_d" -gt "$due" ]; then
+                    err="overdue by $(( today_d - due ))d — re-run the command in its block, or defer it in writing"
+                fi
+            fi
+        else
+            err="${err:-interval '$iv' not an integer in 1..90}"
+        fi
+        if [ -n "$err" ]; then fail "$id: $err"; else ok; fi
+    done < <(awk -f tests/parse_board.awk -v section=board "$BOARD")
+
+    [ "$board_rows" -eq 0 ] && fail "$BOARD has no parseable board rows"
+fi
+
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

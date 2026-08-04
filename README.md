@@ -470,6 +470,7 @@ consilium/
 │   └── lock.sh             # one-writer-per-repo lock (rule 18)
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
+├── PATHWAY_FORWARD.md # inspection log — what is audited, when, with what evidence
 ├── install.sh         # the canonical installer — symlinks into ~/.claude
 │                      #   and wires the post-merge hook
 ├── PROJECT_RULES.md   # the rule book /enforce-rules audits against
@@ -523,8 +524,9 @@ the team — see roadmap.
 
 Structural invariants of consilium itself — agent frontmatter
 validity, command-to-agent cross-references, README/filesystem sync,
-stale-reference detection, and README completeness for every agent
-(model table, roster row, Layout entry) — are checked by:
+stale-reference detection, README completeness for every agent (model
+table, roster row, Layout entry), write-surface ownership, isolation-first
+prompts, and the inspection log's currency — are checked by:
 
 ```bash
 bash tests/check.sh
@@ -534,6 +536,24 @@ Pure bash, no dependencies. The same checks run on every push and
 pull request via `.github/workflows/check.yml`, and locally via the
 pre-push hook `install.sh` wires. Failures exit non-zero and the CI
 run goes red.
+
+### The inspection log
+
+`PATHWAY_FORWARD.md` is the present tense: one row per surface of the repo,
+with the date it was last audited and the command whose output was read.
+Release notes are history and are never revised — the board is what you read
+to know where things actually stand.
+
+A row is `VERIFIED`, `OPEN`, `BROKEN`, or `DEFERRED`. `VERIFIED` requires a
+command that ran; a claim with no command is not verified, it is remembered.
+A **blank date means never audited** and stays blank — it is the honest
+statement that nobody has checked that surface, and backfilling it to look
+tidy is the failure the whole file exists to prevent.
+
+Check 12 fails the gate on an item that is overdue against its own stated
+interval. Deferring is legitimate and costs one line in the deferral log with
+a reason; letting an inspection lapse silently is not. The gate reddens on an
+undecided item, never on a date alone.
 
 Add new structural checks to `tests/check.sh` when they cost less
 than the rule they enforce. `iris-vermeulen`'s default applies here
