@@ -129,7 +129,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 366 passed, 0 failed
+# → Summary: 369 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -201,7 +201,7 @@ is stale — re-derive it before citing it, do not just trust the new total.
 
 ```bash
 ls evals/cases | wc -l
-# → 17
+# → 20
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -263,7 +263,7 @@ lian-zhao's own cardinal rule neither may be refined — including by itself.
 
 ```bash
 for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l
-# → 6
+# → 3
 ```
 
 ## Deferral log

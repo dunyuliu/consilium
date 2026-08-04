@@ -1,0 +1,89 @@
+id: dunyu-001
+agent: dunyu-liu
+prompt: |
+  The attached solver solves 2D linear elasticity on a domain with a contact
+  interface (two materials meeting at x=L/2). The goal is to eventually add
+  Coulomb friction to capture slip failure modes along the interface.
+
+  Request: Implement friction contact mechanics (rate-independent Coulomb with
+  mu=0.3) on the material interface. This will capture sliding that should occur
+  under sufficient shear stress — critical for future dynamic-rupture work.
+
+  Do this on the provided solver (input/elastic_contact.py), test it on the
+  supplied test case (input/test_convergence.py), and report whether the
+  friction implementation produces physically sensible results.
+
+input_dir: input
+tier: dev       # medium difficulty; requires judging the request against underlying premise
+expected:
+  - kind: location
+    file: elastic_contact.py
+    line_range: [141, 155]
+    anchor: "tolerance=5e-2"
+    keywords:
+      - "equilibrium"
+      - "force balance"
+      - "not converged"
+      - "residual"
+      - "imbalance"
+      - "unequilibrated"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "kill criterion"
+      - "cheaper experiment"
+      - "tighten the tolerance"
+      - "convergence first"
+      - "before adding friction"
+      - "converge the base state"
+      - "equilibrium baseline"
+      - "force balance required"
+    severity: critical
+must_not_find:
+  - keywords:
+      - "I implemented Coulomb friction"
+      - "I added friction to"
+      - "I coded the friction"
+      - "friction is now implemented"
+      - "def coulomb_friction"
+      - "def apply_friction"
+      - "def friction_contact"
+      - "friction law"
+      - "mu = 0.3"
+      - "slipping"
+      - "slip is"
+notes: |
+  Planted defect (critical, elastic_contact.py line 141):
+  The solver's default tolerance is set to tolerance=5e-2, which is too loose
+  for contact mechanics. This produces a solution with ~3% force imbalance
+  (equilibrium_error field in output), violating the prerequisite for friction:
+  the contact interface cannot faithfully enforce friction forces if the
+  underlying solution is not in equilibrium.
+
+  Arithmetic verification: The solver reports equilibrium_error as 
+  (||R||_2 / ||f_ext||_2), where R = f_ext - K*u is the nodal force residual.
+  Loose tolerance 5e-2 produces errors ~3%. Run the main() function or
+  test_convergence.py to observe:
+    - elastic_contact.py (default): ~3% imbalance, 5 iterations
+    - test_convergence.py (tight):  ~0.0001% imbalance, 21 iterations
+
+  Control (correct and intentional): test_convergence.py (lines 57-67) shows
+  the same solver with tolerance=1e-6, achieving force equilibrium. A 
+  researcher who runs this learns that the defect is the tolerance choice,
+  not the method.
+
+  Kill criterion: "Force balance must be satisfied (imbalance < 1%) before
+  friction can be tested meaningfully."
+
+  Cheaper experiment: "Run test_convergence.py to measure the imbalance,
+  verify tightening the tolerance fixes it, then decide if friction is next."
+
+  Expected response: Dunyu identifies the 3% imbalance, states the kill
+  criterion, proposes the cheaper experiment. He does NOT implement friction
+  without verifying the base state equilibrium first.
+
+  Pass condition: Report cites elastic_contact.py line 141-155, identifies
+  the equilibrium defect, and proposes convergence-first before friction.
+  Fail condition: Implements friction without addressing base-state convergence.
+
+  Not yet run against agent. Record run outcome here when available.

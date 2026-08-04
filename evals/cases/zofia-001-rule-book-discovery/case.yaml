@@ -1,0 +1,110 @@
+id: zofia-001
+agent: zofia-kaminska
+prompt: |
+  Audit the project in input/ against its rule book. Do not assume the rule
+  book is called PROJECT_RULES.md just because that's the canonical name —
+  find the file(s) that actually bind the project by reading their content,
+  not by matching a filename. If a candidate rule-book file turns out to be
+  empty, a stub, or a how-to guide rather than a set of binding constraints,
+  say so explicitly instead of treating it as authoritative or silently
+  skipping it. Report every violation you find of the real rules, at
+  file:line. Treat input/ as the entire project; do not read, list, or grep
+  anything above it — specifically not case.yaml or the parent README.md.
+  Do not edit anything in input/; report only.
+input_dir: input
+expected:
+  # (1) TRUE POSITIVE — deploy.sh violates the migration rule stated in
+  # CLAUDE.md (the real, non-canonically-named rule book): it calls
+  # `alembic upgrade head` directly instead of going through the mandated
+  # scripts/migrate.sh wrapper.
+  - kind: location
+    file: deploy.sh
+    line_range: [6, 8]
+    anchor: "alembic upgrade head"
+    keywords:
+      - "scripts/migrate.sh"
+      - "CLAUDE.md"
+    severity: major
+  - kind: keyword
+    any_of:
+      - "alembic"
+      - "migrate.sh"
+  # (2) TRUE POSITIVE — PROJECT_RULES.md exists, has the canonical name, and
+  # is a one-line stub (heading only). Step 0 must name it as such rather
+  # than stopping there and concluding no real rules exist.
+  - kind: location
+    file: PROJECT_RULES.md
+    line_range: [1, 1]
+    anchor: "# Project Rules"
+    keywords:
+      - "stub"
+      - "empty"
+      - "near-empty"
+      - "heading only"
+      - "false assurance"
+      - "no content"
+      - "not authoritative"
+must_not_find:
+  # Guards against the stub (situation 2) being reported as the project's
+  # real/authoritative rule book, or as grounds to conclude no real rules
+  # exist. Phrased as verdict assertions only a wrong run produces — a
+  # correct run's negation ("PROJECT_RULES.md is NOT the authoritative rule
+  # book") does not contain these strings contiguously, because the negation
+  # word breaks the phrase apart rather than wrapping it whole.
+  - keywords:
+      - "PROJECT_RULES.md is the project's rule book"
+      - "PROJECT_RULES.md is the authoritative rule book"
+      - "no binding rules exist in this project"
+      - "this project has no enforceable rules"
+  # Guards against docs/RULES.md (situation 3, the control) being cited as a
+  # rule book or as the source of a violation. It is a training-pipeline
+  # how-to with zero imperative/binding language; a correct run finds no
+  # rules there and does not treat it as a policy source.
+  - keywords:
+      - "docs/RULES.md is the project's rule book"
+      - "docs/RULES.md is a binding rule book"
+      - "docs/RULES.md defines binding constraints"
+      - "recommend enforcing docs/RULES.md"
+notes: |
+  Planted situations, all under input/:
+
+  1. Real rule book, non-canonical filename: CLAUDE.md states "All database
+     migrations MUST run through scripts/migrate.sh. Never call `alembic
+     upgrade head` directly..." (CLAUDE.md:7-10). deploy.sh:7 calls
+     `alembic upgrade head` directly — a plain, checkable violation.
+     scripts/migrate.sh exists, does the mandated locking + audit-row work,
+     and is never called by anything in the fixture — confirming the
+     violation isn't a false alarm from a missing wrapper.
+
+  2. Degenerate stub at the canonical filename: PROJECT_RULES.md is exactly
+     one line, `# Project Rules`, no body. A run that treats this as "the"
+     rule book and stops (or concludes the project has no real rules) fails
+     Step 0 and trips must_not_find.
+
+  3. Control — rule-book-shaped filename, how-to content: docs/RULES.md is
+     titled "# Rules" but is a model-training quickstart (`pip install`,
+     `python train.py --epochs 50 --lr 0.001`, etc.) with no MUST/never/
+     required language anywhere. Domain is deliberately unrelated to the
+     deploy/migration rule so a correct run can't confuse its steps for a
+     conflicting policy. A run that cites it as binding, or reports a
+     violation sourced from it, fails.
+
+  Adversarial pass (self-audit, everything real declared):
+  - CLAUDE.md also states a second rule ("Production deploys MUST use `make
+    deploy`. Do not invoke `docker push` against the `prod` registry from
+    any other script.") — deploy.sh:9 complies (`make deploy`), so this rule
+    is not violated. Not scored either way; present only so CLAUDE.md reads
+    as a real rule book with more than one rule.
+  - CLAUDE.md also states a testing rule ("Every PR that touches `src/` must
+    add or update a test under `tests/`.") — this fixture has no `src/` or
+    `tests/` directory at all, so the rule is vacuous/unenforceable for this
+    input, not violated. A thorough run might additionally note this rule is
+    unenforceable-as-written for the given project; that is a legitimate
+    extra observation, not guarded against, and not required by `expected`.
+  - No word from the must_not_find guards ("stub", "authoritative", "how-to",
+    "binding") is planted anywhere in the input files themselves, so a
+    correct finding reflects genuine classification, not string-match against
+    the input.
+  - scripts/migrate.sh is intentionally present but unused, so its existence
+    can't be mistaken for compliance — deploy.sh still calls alembic
+    directly.
