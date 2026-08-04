@@ -6,6 +6,7 @@ prompt: |
   Verify author names, years, and that the manuscript does not overclaim
   results from the cited papers.
 input_dir: input
+tier: smoke   # fast, offline, no network
 expected:
   - kind: location
     file: manuscript.tex

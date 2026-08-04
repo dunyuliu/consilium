@@ -22,7 +22,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 
 | id | area | what is claimed | state | last-checked | interval |
 |---|---|---|---|---|---|
-| PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | BROKEN | 2026-08-04 | 14 |
+| PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-08-04 | 30 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | OPEN | 2026-08-04 | 30 |
 | PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-04 | 14 |
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
@@ -38,7 +38,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 
 ## Items
 
-### PF-001 — `install.sh` — BROKEN
+### PF-001 — `install.sh` — VERIFIED
 
 The v1.7.0 release note states rule 18 became mechanical via "`tests/lock.sh` and a
 versioned `pre-commit` hook installed by `install.sh`". `tests/lock.sh` landed. The hook
@@ -52,9 +52,15 @@ Rule 4 was applied to the artifact, not to the claim. Nothing re-checked it for 
 days because nothing existed whose job was to re-check — which is why this file exists.
 
 ```bash
-git log --oneline -S 'PRECOMMIT' -- install.sh | wc -l
-# → 0
+grep -c 'PRECOMMIT\|HOOK_VERSION' install.sh
+# → 10
 ```
+
+**Closed 2026-08-04.** The hook and the versioning are now in the tracked
+installer, not only in this machine's untracked `.git/hooks/`. All three hooks
+carry `consilium-hook-v3`, appended after writing rather than typed into the
+quoted heredoc — the earlier attempt drifted because a literal stamp and the
+version variable were maintained separately.
 
 ### PF-002 — `agents/` — OPEN
 

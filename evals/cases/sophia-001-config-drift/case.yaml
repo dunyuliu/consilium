@@ -4,6 +4,7 @@ prompt: |
   Audit the project in input/ for spec drift. Compare README.md and
   config.yaml against what ingest.py actually does. Flag every divergence.
 input_dir: input
+tier: smoke   # fast, exercises the default-vs-deployment fix
 expected:
   - kind: keyword
     any_of:

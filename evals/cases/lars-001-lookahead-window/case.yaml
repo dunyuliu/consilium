@@ -4,6 +4,7 @@ prompt: |
   Audit input/compute_returns.py for math correctness, edge cases, and
   sign-convention bugs. Report findings at file:line.
 input_dir: input
+tier: smoke   # fast, 3 tool calls, catches the classic look-ahead
 expected:
   - kind: location
     file: compute_returns.py

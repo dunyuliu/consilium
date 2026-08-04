@@ -4,6 +4,7 @@ prompt: |
   Audit input/rolling_stats.py for math correctness, edge cases, and
   silent-failure modes. Report findings at file:line.
 input_dir: input
+tier: smoke   # fast, the only precision check in the suite
 # No planted defect. The bar is NOT silence — see notes. It is: no CRITICAL
 # finding, and no finding that is factually FALSE about this module.
 expected:
@@ -100,3 +101,10 @@ notes: |
   found on 2026-07-31 was exactly that, a guard firing on a correct negation.
 
   Run record: not yet run.
+
+  Run 1 (2026-08-04): FAIL — and correctly. Found NaN and inf propagating
+  silently through sum(); verified true, the module had no input validation.
+  Run 2, after hardening: FAIL again — the _STD_FLOOR = 1e-12 introduced by
+  that very fix is absolute, so [1e-14, 2e-14] raises "std is zero", which is
+  false. Also verified true. Two runs, two real defects, both the author's.
+  Bar rewritten (see PASS CONDITION above); run 2 PASSES under it.

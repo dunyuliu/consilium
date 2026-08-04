@@ -31,6 +31,12 @@ mkdir -p "$CLAUDE/agents" "$CLAUDE/commands"
 # Drop broken symlinks (agent or command renamed/removed upstream).
 find "$CLAUDE/agents" "$CLAUDE/commands" -maxdepth 1 -type l ! -exec test -e {} \; -delete
 
+# Bump when any hook body changes. The marker is appended after writing, not
+# typed into the body: the heredocs are quoted, so a literal stamp silently
+# drifts from this variable — it did, and the hook then rewrote itself on every
+# run while never matching.
+HOOK_VERSION="consilium-hook-v3"
+
 skipped=0
 
 link_one() {
@@ -65,12 +71,13 @@ for f in "$ROOT/commands/"*.md; do link_one "$f" "$CLAUDE/commands/$(basename "$
 
 # Wire a post-merge hook so future `git pull` runs this script automatically.
 HOOK="$ROOT/.git/hooks/post-merge"
-if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$HOOK" ] || ! grep -q 'install.sh' "$HOOK"; }; then
+if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$HOOK" ] || ! grep -q "$HOOK_VERSION" "$HOOK"; }; then
     cat > "$HOOK" << 'HOOK_EOF'
 #!/usr/bin/env bash
 # Auto-installed by consilium/install.sh — keeps Claude symlinks in sync.
 exec "$(dirname "$0")/../../install.sh"
 HOOK_EOF
+    printf '# %s\n' "$HOOK_VERSION" >> "$HOOK"
     chmod +x "$HOOK"
 fi
 
@@ -78,7 +85,7 @@ fi
 # (PROJECT_RULES.md rule 9). Without it, "the check ran locally" is a claim
 # nobody can verify after the fact.
 PREPUSH="$ROOT/.git/hooks/pre-push"
-if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PREPUSH" ] || ! grep -q 'tests/check.sh' "$PREPUSH"; }; then
+if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PREPUSH" ] || ! grep -q "$HOOK_VERSION" "$PREPUSH"; }; then
     cat > "$PREPUSH" << 'HOOK_EOF'
 #!/usr/bin/env bash
 # Auto-installed by consilium/install.sh — runs the structural gate before push.
@@ -91,7 +98,50 @@ if [ -f "$REPO/tests/check.sh" ]; then
     fi
 fi
 HOOK_EOF
+    printf '# %s\n' "$HOOK_VERSION" >> "$PREPUSH"
     chmod +x "$PREPUSH"
+fi
+
+# Wire a pre-commit hook enforcing one-writer-per-repo (rule 18). The lock
+# guards WHO may commit; a declared scope guards WHAT — the v1.10.0 incident
+# was the holder's own `git add -A` swallowing an author agent's in-flight
+# files. See tests/lock.sh.
+PRECOMMIT="$ROOT/.git/hooks/pre-commit"
+if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PRECOMMIT" ] || ! grep -q "$HOOK_VERSION" "$PRECOMMIT"; }; then
+    cat > "$PRECOMMIT" << 'HOOK_EOF'
+#!/usr/bin/env bash
+# Auto-installed by consilium/install.sh — one writer per repo (rule 18).
+REPO=$(cd "$(dirname "$0")/../.." && pwd -P)
+LOCK="$REPO/.git/consilium.lock"
+[ -f "$LOCK" ] || exit 0
+holder=$(sed -n '1p' "$LOCK"); what=$(sed -n '2p' "$LOCK"); since=$(sed -n '3p' "$LOCK")
+me="${CONSILIUM_LOCK_OWNER:-${USER:-unknown}}"
+if [ "$me" != "$holder" ]; then
+    echo "pre-commit: repo is held by '$holder' since $since — $what" >&2
+    echo "  Rule 18: one writer per repo. Wait, or stop it and confirm it stopped," >&2
+    echo "  then: bash tests/lock.sh release --force" >&2
+    exit 1
+fi
+scope=$(sed -n '4p' "$LOCK")
+[ -n "$scope" ] || exit 0
+outside=""
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    ok=0
+    for pre in $scope; do case "$f" in "$pre"*) ok=1; break ;; esac; done
+    [ "$ok" = 0 ] && outside="$outside  $f"$'\n'
+done < <(git diff --cached --name-only)
+if [ -n "$outside" ]; then
+    echo "pre-commit: staged files fall OUTSIDE the declared lock scope." >&2
+    echo "  scope: $scope" >&2
+    printf '%s' "$outside" >&2
+    echo "  Stage explicit paths, or re-acquire the lock with a wider scope." >&2
+    exit 1
+fi
+exit 0
+HOOK_EOF
+    printf '# %s\n' "$HOOK_VERSION" >> "$PRECOMMIT"
+    chmod +x "$PRECOMMIT"
 fi
 
 echo "consilium installed: $(ls "$CLAUDE/agents" | wc -l) agents, $(ls "$CLAUDE/commands" | wc -l) commands"

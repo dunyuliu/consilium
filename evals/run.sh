@@ -4,6 +4,7 @@
 #   bash evals/run.sh stage <case-id>              # isolate input/, print the prompt
 #   bash evals/run.sh grade <case-id> <report.md>  # score a report against case.yaml
 #   bash evals/run.sh list                         # cases and whether they have run
+#   bash evals/run.sh smoke                        # the fast tier — run after any prompt edit
 #
 # WHY STAGING EXISTS AT ALL — this is the load-bearing part, not the grading.
 #
@@ -201,5 +202,9 @@ case "${1:-}" in
     stage) [ $# -ge 2 ] || die "usage: run.sh stage <case-id>"; cmd_stage "$2" ;;
     grade) [ $# -ge 3 ] || die "usage: run.sh grade <case-id> <report-file>"; cmd_grade "$2" "$3" ;;
     list)  cmd_list ;;
-    *) echo "usage: run.sh {stage <case>|grade <case> <report>|list}" >&2; exit 2 ;;
+    smoke) # the tier to run after any prompt edit; full suite before a release
+           for d in "$CASES_DIR"/*/; do
+               grep -q '^tier: smoke' "$d/case.yaml" 2>/dev/null && basename "$d"
+           done ;;
+    *) echo "usage: run.sh {stage <case>|grade <case> <report>|list|smoke}" >&2; exit 2 ;;
 esac
