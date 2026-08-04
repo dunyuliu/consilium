@@ -9,6 +9,28 @@ Twenty-one specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
 Claude Code; installs by symlink and follows you across machines.
 
+**And the machinery that keeps them honest**, which is now most of the
+repo:
+
+- **`PROJECT_RULES.md`** — 25 binding rules, 16 of them enforced by a
+  gate rather than by good intentions. Each carries the incident that
+  paid for it.
+- **`tests/check.sh`** — 464 structural checks, every one negative-tested
+  when it landed. A check that has never failed is not known to be a gate.
+- **`evals/cases/`** — 23 regression fixtures, one per agent, all executed.
+  Prompt edits are measurable instead of vibe-checked.
+- **`PATHWAY_FORWARD.md`** — the inspection log: what is true *now*, by
+  surface, with the date it was last checked and the command that checked
+  it. A blank date means never audited, and stays blank.
+- **`tests/lock.sh`** and three git hooks — one writer per repo, the gate
+  before every push, and a scope guard so a `git add -A` cannot sweep
+  another agent's in-flight work into your commit.
+
+Two of those exist because this repo audited itself and found it was
+shipping claims it could not support: a release note describing a hook
+that had never been committed, and a tagged release containing six files
+its notes did not mention.
+
 ---
 
 ## What we believe
@@ -387,8 +409,10 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
   a specific agent with a scoped prompt.
 - The orchestrators (Elena, Victor) spawn specialists via the Claude
   Code Agent tool, in parallel when independent.
-- Regression evals live in `evals/cases/`. No automated harness yet —
-  fixtures first.
+- Regression evals live in `evals/cases/`, one per agent. `evals/run.sh`
+  stages an isolated copy and grades a report mechanically; invoking the
+  agent stays manual, because it needs API access and a gate that cannot
+  run in CI is worse than no gate.
 
 ---
 
@@ -515,21 +539,32 @@ miscited papers) with expected findings, so prompt changes can be
 measured rather than vibe-checked. See `evals/README.md` for the
 fixture format and how to run a case by hand.
 
-Current coverage: `lars-001` (look-ahead window), `sophia-001` (units
-drift), `iris-001` (defer-everything failure mode surfaced by
-`nadia-hadid`'s grade and the prompt fix that followed), `haruto-001`
-(missing prior release notes), `mira-001` (library substitution behind a
-matching name, plus a toy-grid parity claim). The repo
-that ships a test architect still has thin eval coverage on most of
-the team — see roadmap.
+**Coverage: all 21 agents, 23 cases, every one executed at least once.**
+
+Roughly half test *detection* — can the agent find a planted defect. The
+other half test *refusal*: `lars-002` is correct code where any invented
+finding fails; `lian-001` makes the tempting cut the one with no fixture;
+`dunyu-001` poses a request that is implementable and meaningless.
+
+Each case ships `samples/pass.md` and `samples/fail.md`, and Check 15
+grades both — a criterion that rejects a report written to satisfy it is a
+typo with authority, not a criterion. That check found a grader bug on its
+first run: `printf '%s'` had been silently dropping the last keyword of
+every `any_of` list since the grader landed.
+
+The suite is a living record of what has gone wrong, not a planned matrix
+of what might (rule 25). Every case here came from a real miss. On
+2026-08-04, twelve times a run was right and the fixture was wrong — when
+they disagree, the fixture is the more likely defendant.
 
 ## Tests
 
-Structural invariants of consilium itself — agent frontmatter
-validity, command-to-agent cross-references, README/filesystem sync,
-stale-reference detection, README completeness for every agent (model
-table, roster row, Layout entry), write-surface ownership, isolation-first
-prompts, and the inspection log's currency — are checked by:
+Sixteen structural invariants of consilium itself — agent frontmatter,
+command-to-agent references, README/filesystem sync, stale-reference
+detection, README completeness per agent, write-surface ownership,
+isolation-first prompts, tool-economy and communication declarations, the
+inspection log's currency, and the eval suite's own criteria (executable,
+non-contradictory, token-anchored) — are checked by:
 
 ```bash
 bash tests/check.sh
@@ -567,11 +602,21 @@ required.
 
 ## Roadmap
 
-- Expand `evals/` coverage across every specialist.
-- Automated eval harness (`evals/run.py`).
+- ~~Expand `evals/` coverage across every specialist.~~ **Done** — 21 of 21.
+- ~~Automated eval harness.~~ **Partly** — `evals/run.sh` stages and grades;
+  invoking the agent needs API access and stays manual.
+- **Measure precision, not just phrasing.** `must_not_find` catches forbidden
+  wordings; nothing catches a report that finds the planted defect *plus four
+  things that are not there*. `declared_defects:` is sketched in
+  `evals/README.md`, unbuilt.
+- **Execute the inspection log's evidence.** Check 12 verifies a `VERIFIED`
+  claim cites a command, not that the recorded output is still true — four
+  rows drifted within a day of landing. Rule 21a proposes byte-diffing the
+  real stdout; the `# →` lines are now literal output, which was the
+  precondition.
 - `install.sh` idempotency / `--force` behaviour tests (the structural
-  invariants are now covered by `tests/check.sh`; the script itself
-  isn't).
+  invariants are covered by `tests/check.sh`; the script itself isn't). A
+  clean-clone install has never been executed — tracked as PF-010.
 - Statistics specialist for p-hacking, multiple comparisons, study
   design.
 - Security/privacy agent for credential leaks, PII, supply-chain risk.
