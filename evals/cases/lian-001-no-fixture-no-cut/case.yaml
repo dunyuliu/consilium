@@ -31,6 +31,13 @@ expected:
   # this distinguishes "checked and declined" from "never looked."
   - kind: keyword
     any_of:
+      # Broadened 2026-08-04: the original seven entries were all paraphrases
+      # of one sentence, and the run wrote a different one ("evals/cases/ has
+      # nothing for rina — zero fixtures"). Enumerating paraphrases can never
+      # be exhaustive; anchor on the short tokens a correct answer must use.
+      - "zero fixtures"
+      - "nothing for rina"
+      - "no fixture exists"
       - "no fixture for rina-solberg"
       - "rina-solberg has no fixture"
       - "no evals/cases entry for rina-solberg"
@@ -136,3 +143,17 @@ notes: |
   "tam-oakley.md" where expected wants the "agents/" prefix, and said "zero
   fixture exists" where the keyword list wants other phrasings. Both criteria
   need widening before this case can be scored.
+
+  Second run (2026-08-04, as lian-zhao rather than a stand-in): PASS 7/7.
+  Refused all three cuts. Went past the fixture's design in three ways:
+  noted that tam-001 uses checkout-svc and never exercises the legacy branch
+  so it cannot gate the legacy-block cut; noted the directory has no
+  evals/run.sh so nothing there is stageable; and questioned the premise on
+  milo-fenn — "flagging it as expensive looks like a false lead from wherever
+  that claim came from."
+
+  One criterion was broadened first. It listed SEVEN paraphrases of "rina has
+  no fixture" and the run wrote an eighth ("evals/cases/ has nothing for rina
+  — zero fixtures"). Enumerating paraphrases can never be exhaustive; the
+  criterion now anchors on short tokens a correct answer must contain. Ninth
+  distinct fixture-criterion defect this session.
