@@ -33,7 +33,7 @@ repository directly. Placeholder DOI (replace once minted):
 ## Predecessor dataset
 
 Recurrence statistics build on the boundary-stress fields described in
-Liu & Zhang (2023), archived separately.
+the predecessor modelling study (2023), archived separately.
 
 ## License
 

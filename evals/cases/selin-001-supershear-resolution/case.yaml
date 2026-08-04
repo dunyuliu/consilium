@@ -1,0 +1,317 @@
+id: selin-001
+agent: selin-aydin
+prompt: |
+  Reviewer-2 this manuscript. It is under review at GJI and I am the handling
+  editor; I want the adversarial read before I write the decision letter.
+  Treat input/ as the entire submission: do not read, list, or grep anything
+  above it — specifically not case.yaml or the parent README.md.
+expected:
+  # --- the primary defect: the grid spacing, justified by the wrong criterion
+  - kind: location
+    file: manuscript.md
+    line_range: [94, 101]
+    anchor: "uniform on-fault node spacing of 250 m"
+    keywords:
+      - "cohesive zone"
+      - "process zone"
+      - "breakdown zone"
+      - "under-resolved"
+      - "underresolved"
+      - "cells across"
+      - "nodes across"
+      - "elements across"
+    severity: critical
+  # --- the second limb of the same defect: refinement run in the wrong
+  #     direction, scored on an observable that cannot see the defect
+  - kind: location
+    file: manuscript.md
+    line_range: [103, 107]
+    anchor: "uniform on-fault spacing of 500 m"
+    keywords:
+      - "coarser"
+      - "500 m"
+      - "125 m"
+      - "refine"
+      - "refinement"
+      - "convergence"
+      - "insensitive"
+    severity: critical
+  # --- the arithmetic must actually be run, not asserted
+  - kind: keyword
+    any_of:
+      - "423"
+      - "420"
+      - "425"
+      - "430"
+      - "317"
+      - "320"
+      - "1.69"
+      - "1.27"
+      - "1.7 cells"
+      - "1.3 cells"
+      - "2 cells"
+      - "two cells"
+      - "fewer than two"
+      - "fewer than 2"
+  # --- the verdict the arithmetic forces
+  - kind: keyword
+    any_of:
+      - "grid-dependent"
+      - "grid dependent"
+      - "mesh-dependent"
+      - "mesh dependent"
+      - "numerical artifact"
+      - "numerical artefact"
+      - "resolution artifact"
+      - "resolution artefact"
+      - "not converged"
+  # --- the claim that dies with it
+  - kind: keyword
+    any_of:
+      - "transition distance"
+      - "44 km"
+      - "supershear transition"
+must_not_find:
+  # (a) attacking the station-exclusion CONTROL. The exclusion has a stated
+  #     physical cause (no basin in the velocity model), was declared before
+  #     the fits were computed, the excluded residuals are printed in Table 2
+  #     with their sign and size, both the 12-station and 14-station means are
+  #     given, and the retained set keeps the four worst non-basin fits.
+  #     Phrased as assertions a correct run cannot produce: a run that finds
+  #     the exclusion defensible writes "is justified", not "is not
+  #     unjustified".
+  - keywords:
+      - "the station exclusion is unjustified"
+      - "no physical reason is given for excluding"
+      - "no physical reason is given for the exclusion"
+      - "the exclusion of KVK and DRB is post hoc"
+      - "the excluded stations are not reported"
+      - "recommend including KVK and DRB in the"
+      - "the two basin stations must be included in the"
+  # (b) attacking the frequency-band CONTROL. 2600 m/s / (1 Hz x 250 m) =
+  #     10.4 nodes per wavelength, twice the stated criterion, and the paper
+  #     explicitly declines to claim PGA. The band claim is conservative.
+  - keywords:
+      - "the reported frequency band exceeds what the grid resolves"
+      - "the 1 Hz band is overstated"
+      - "the PGA comparison is unsupported"
+  # (c) attacking the nucleation CONTROL or the stress budget, both of which
+  #     are internally consistent (see notes for the arithmetic).
+  - keywords:
+      - "the nucleation patch is too large"
+      - "the nucleation is oversized"
+      - "the nucleation procedure contaminates the reported"
+      - "the static stress drop is inconsistent with the mean slip"
+      - "the supershear speed is unphysical"
+  # (d) scope creep: selin-aydin is read-only and does not rewrite manuscripts.
+  - keywords:
+      - "I have revised Section"
+      - "I edited the manuscript"
+      - "I rewrote the resolution section"
+notes: |
+  DETECTION fixture. One primary methodological defect, planted with two
+  limbs in the same section, plus four controls that a trigger-happy reviewer
+  would wrongly attack. Every number below was computed with python3 from the
+  values stated in input/manuscript.md — nothing is inherited or recalled.
+
+  ------------------------------------------------------------------
+  PLANTED DEFECT — the rupture is not resolved, and the resolution argument
+  the authors give is for the wrong physics.
+
+  manuscript.md:92-107 (Section 2.5, both paragraphs).
+
+  Everything needed sits in the manuscript:
+    rho   = 2700 kg/m3, Vs = 3300 m/s     (Section 2.2 table)
+    nu    = 0.25                          (Section 2.2)
+    Dc    = 0.22 m                        (Table 1)
+    sigma_n = 60 MPa, mu_s = 0.60, mu_d = 0.30   (Table 1)
+    dx    = 250 m                         (Section 2.5)
+
+  Arithmetic:
+    mu          = rho Vs^2 = 2.9403e10 Pa = 29.40 GPa
+    mu*         = mu/(1-nu) = 3.9204e10 Pa      (mode II)
+    tau_p       = 0.60 x 60 = 36.0 MPa
+    tau_r       = 0.30 x 60 = 18.0 MPa
+    strength drop tau_p - tau_r = 18.0 MPa
+    Lambda_0(II)  = (9 pi/32) mu* Dc / (tau_p - tau_r) = 423.4 m
+    Lambda_0(III) = (9 pi/32) mu  Dc / (tau_p - tau_r) = 317.5 m
+
+    cells across the zone at dx = 250 m:  1.69 (mode II), 1.27 (mode III)
+
+  Below 2 by either mode, and the quasi-static Lambda_0 is the OPTIMISTIC
+  bound — the zone contracts further as the front approaches the Rayleigh
+  speed and again in the supershear phase, so the running simulation resolves
+  the breakdown zone with roughly one node. Day et al. (2005) put the working
+  threshold at 3-5 cells. The defect is robust to which constant the reviewer
+  picks: any form of the Palmer-Rice/Andrews estimate lands in 300-460 m,
+  i.e. 1.2-1.8 cells. The 500 m run in the second paragraph gives 0.85 and
+  0.64 cells.
+
+  Limb 1 (manuscript.md:94-101) — the grid is justified by
+  nodes-per-shear-wavelength: 2600/(1 x 250) = 10.4, which is arithmetically
+  CORRECT and irrelevant. Points per wavelength governs the propagating
+  wavefield; it says nothing about the on-fault breakdown zone, which is set
+  by mu* Dc/(tau_p - tau_r) and not by frequency. The sentence "The simulation
+  is therefore resolved throughout the band in which it is used" is a true
+  premise supporting a false conclusion. This is the load-bearing sentence.
+
+  Limb 2 (manuscript.md:103-107) — the "convergence" test refines in the
+  wrong direction (250 -> 500 m, never 250 -> 125 m) and scores it on Mw and
+  mean slip, the two observables least able to detect the defect. Mw is a
+  volume integral of slip and is controlled by the stress drop and the fault
+  area, not by the breakdown-zone discretisation; an under-resolved LSW
+  rupture reproduces Mw to a few per cent while getting rupture speed and
+  transition distance wrong. The quantities that ARE grid-sensitive — rupture
+  speed, the supershear transition distance, peak slip rate — are exactly the
+  quantities the paper reports as results and never compared across grids.
+
+  Consequence: the headline claim, that the transition at 44 km along strike
+  constrains the asperity prestress to 31.0 +/- 2.0 MPa, rests on a
+  transition distance that has not been shown to be independent of dx. The
+  claimed sensitivity is 9 km of transition distance for 6 MPa of prestress;
+  the untested sensitivity is 9 km of transition distance for a factor of 2
+  in dx.
+
+  ------------------------------------------------------------------
+  CONTROLS — verified as rigorously as the defect. Attacking any of these is
+  a false positive; the first three are guarded by must_not_find.
+
+  C1. STATION EXCLUSION (Section 4, Table 2). Two of 14 stations are dropped
+      from the summary variance reduction. This LOOKS like the classic
+      station-picking that a rupture-modelling reviewer is trained to hunt,
+      and it is defensible on all four counts that matter:
+        - physical cause, not statistical: KVK and DRB are on the 1.8 km
+          Ovacik basin and the velocity model is 1-D with no basin, so the
+          model structurally cannot produce their site response;
+        - stated as decided before the fits were computed;
+        - the excluded residuals are printed in Table 2 with sign and size
+          (ratios 0.42 and 0.34, VR 9 and -14 per cent), so nothing is hidden;
+        - both statistics are given, 60 per cent over 12 and 51 per cent over
+          14, and the paper says no claim depends on which is used.
+      Crucially the retained set is not sanitised: it keeps ILC, KZL, MRD and
+      NVS at VR 38-52 per cent, the four worst non-basin fits. A reviewer who
+      calls this cherry-picking has not read Table 2.
+      Checked: all 14 rows present; every Ratio column equals Syn/Obs to two
+      decimals (0.95, 1.16, 0.89, 1.13, 0.89, 1.16, 0.90, 1.15, 0.79, 1.25,
+      0.73, 1.38, 0.42, 0.34); mean of the 12 retained VRs = 59.9 -> "60 per
+      cent"; mean of all 14 = 51.0 -> "51 per cent". The stated
+      underprediction factors 2.4 and 2.9 equal 0.86/0.36 = 2.39 and
+      0.64/0.22 = 2.91.
+
+  C2. FREQUENCY BAND (Section 2.5, Section 4). 2600/(1 Hz x 250 m) = 10.4
+      nodes per shear wavelength at the top of the interpreted band, twice
+      the criterion the authors quote, and PGA is explicitly disclaimed as
+      out of band. The band claim is conservative, not overstated. This
+      control exists because the same sentence carries the defect: the
+      arithmetic is right and the inference from it is wrong, and a reviewer
+      must separate the two.
+
+  C3. NUCLEATION (Section 2.4). Patch radius 2.0 km, overstress 1.005 tau_p.
+      Uenishi & Rice (2003) 2-D critical half-length
+      L_c = 1.158 mu* Dc/(tau_p - tau_r) = 555 m; the Day-type 3-D estimate
+      (7 pi/24) mu Dc/(tau_p - tau_r) = 329 m. The patch is 3.6x the larger
+      of the two — the smallest size that reliably nucleates, not an
+      oversized forcing. It is 1.3 per cent of the 150 km rupture length,
+      reported speeds start 15 km away, and the transition is 44 km away.
+      This is honest practice.
+      (Note: at dx = 250 m the nucleation patch is itself only ~8 nodes in
+      radius. That is a consequence of the planted grid defect, not a
+      separate one; a reviewer folding it into the resolution finding is
+      correct.)
+
+  C4. STRESS AND MOMENT BUDGET (Table 1, Section 3). Internally consistent,
+      freshly recomputed:
+        dynamic stress drop tau_0 - tau_r = 24.2 - 18.0 = 6.2 MPa
+        mean slip from (pi/2)(tau_0-tau_r)W/mu, W = 15 km  -> 4.97 m
+                                          reported          4.9 m
+        static drop (2/pi) mu D/W at D = 4.9 m -> 5.99 MPa
+                                    reported     6.0 MPa
+        M0 = mu L W D = 2.9403e10 x 1.5e5 x 1.5e4 x 4.9 = 3.24e20 N m
+        Mw = (log10 M0 - 9.05)/1.5 = 7.64          reported 7.64
+      Background S = (36-24.2)/(24.2-18) = 1.90, above the ~1.19 threshold,
+      so sub-Rayleigh propagation outside the asperity is correct. Asperity
+      S = (36-31)/(31-18) = 0.385, well below it, so a supershear transition
+      inside the asperity is expected — the S-ratio check the paper omits
+      actually SUPPORTS the paper. Reported speeds: 2.8 km/s = 0.85 Vs, below
+      the Rayleigh speed 3.03 km/s; 4.9 km/s, between sqrt(2) Vs = 4.67 km/s
+      and Vp = 5.72 km/s, i.e. in the stable supershear window, not the
+      forbidden gap. Fracture energy Gc = 0.5 x 18 MPa x 0.22 m = 1.98 MJ/m2,
+      in range for ~5 m of slip under Abercrombie & Rice scaling. Stress drop
+      6 MPa is inside the ordinary 0.1-10 MPa band. Courant number
+      5716 x 0.005/250 = 0.114, far inside stability for a 4th-order scheme.
+      Transition distances are order-consistent with the Andrews estimate
+      9.8 Lambda_0 (1.77 - S)^-3: 4.6 km at S = 0.80 (tau_0a = 28 MPa),
+      1.6 km at S = 0.385 (31 MPa), 0.9 km at S = 0.125 (34 MPa), against the
+      manuscript's 11, 4 and 2 km into the asperity — a uniform factor of
+      2.2-2.6, which is the expected 3-D lengthening. So the reported
+      transition distances are not internally absurd; they are simply
+      unverified against dx, which is the planted defect.
+
+  ------------------------------------------------------------------
+  ADVERSARIAL PASS OVER THE INPUT — everything real that I found, declared.
+  Three genuine contaminants were found and REMOVED before shipping:
+    (i)   an earlier draft said the asperity prestress "was adjusted until
+          the modelled transition distance matched the observed one" and then
+          claimed the transition distance constrains the prestress — textbook
+          circular reasoning and a second load-bearing defect. Replaced with
+          an independent provenance (stress inversion + 86 per cent of static
+          strength from the microseismicity gap) and an explicit statement
+          that neither value was fitted.
+    (ii)  the fault was described as "planar" and as having a 12-degree bend
+          in the same sentence. "Planar" removed.
+    (iii) the first draft put the transition at 58 km with the asperity
+          ending at 56 km — the transition would have occurred outside the
+          asperity that causes it. Asperity widened to 40-75 km and the
+          transition moved to 44 km, and all three sensitivity cases
+          re-checked against the Andrews scaling (see C4).
+
+  Remaining known soft edges — DEFENSIBLE TO MENTION, deliberately NOT in
+  must_not_find, and a run that raises them should not be scored down:
+    - Table 2 uses epicentral distance for a 150 km rupture. R_epi is the
+      wrong distance metric for a long rupture; the column is honestly
+      labelled and the manuscript states ALT is 3 km from the trace, but
+      "report R_rup" is fair comment.
+    - GNSS residuals are given as RMS with no covariance and no per-component
+      breakdown. Selin's own checklist asks for covariance; fair comment.
+    - Off-fault plasticity is neglected. Stated as a limitation in Section 5
+      with a direction of bias, so it is disclosed, not hidden — but a
+      reviewer may reasonably press on whether "a few per cent" is defended.
+    - The 12-degree bend at 96 km is introduced and never discussed. It sits
+      past the transition at 44 km so it cannot be the cause, but "did you
+      test the bend as an alternative supershear trigger" is a legitimate
+      alternative-explanation question, and Section 6 of the agent prompt
+      invites exactly that.
+    - The 0.02 Hz low corner against a 90 s window is under two cycles.
+      Marginal, common practice, fair comment.
+    - The abstract generalises to "similar mature strike-slip faults" on one
+      event. Mild overreach; unscored.
+  None of these is a planted defect and none is guarded. They are listed so a
+  thorough run is not penalised for finding something real, which is the
+  failure mode this suite has hit repeatedly.
+
+  Deliberately absent from the input, so the reviewer must supply them: the
+  words "cohesive zone", "process zone", "breakdown zone", "S-ratio",
+  "resolution test", "grid-dependent". The input never states Lambda, never
+  states S, and never states cells-per-zone. Detection here cannot be string
+  matching.
+
+  ------------------------------------------------------------------
+  PASS CONDITION
+
+  1. The report identifies the cohesive/breakdown zone as under-resolved and
+     cites Section 2.5 (manuscript.md:94-101) for the 250 m spacing, and
+  2. states a computed number — Lambda_0 of order 300-460 m and/or fewer than
+     ~2 cells across it — rather than asserting the mesh is coarse, and
+  3. attacks the 500 m "convergence" run (manuscript.md:103-107) as refining
+     in the wrong direction and/or scored on an observable insensitive to the
+     defect, and
+  4. connects the defect to the headline claim: the 44 km transition distance
+     and the 31.0 +/- 2.0 MPa prestress constraint are not established, and
+  5. does NOT attack C1-C4.
+
+  A run that reports the defect but blesses the paper overall is a partial
+  pass; a run that flags the station exclusion as cherry-picking fails on
+  must_not_find regardless of what else it found, because a reviewer who
+  flags everything is as useless as one who flags nothing.
+
+  Run log: not yet run.

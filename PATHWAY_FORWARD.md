@@ -24,13 +24,13 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | BROKEN | 2026-08-04 | 14 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | OPEN | 2026-08-04 | 30 |
-| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | OPEN | 2026-08-04 | 14 |
+| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-04 | 14 |
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
 | PF-005 | `docs/release_notes_*` | each release note matches the commit it tags | BROKEN | 2026-08-04 | 30 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-04 | 30 |
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-04 | 60 |
-| PF-007 | `tests/check.sh` | the header comment describes the checks that exist | BROKEN | 2026-08-04 | 30 |
+| PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | BROKEN |  | 30 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | OPEN |  | 60 |
@@ -58,18 +58,35 @@ git log --oneline -S 'PRECOMMIT' -- install.sh | wc -l
 
 ### PF-002 — `agents/` — OPEN
 
-Rule 13 requires a fixture per agent. Six have none.
+Rule 13 requires a fixture per agent. Seven have none (`lian-zhao` landed as
+the 21st agent; `lian-001-no-fixture-no-cut` is a directory with no
+`case.yaml`, so it does not count — see PF-003).
 
 ```bash
-ls evals/cases | sed 's/-[0-9].*//' | sort -u | wc -l
-# → 14 of 20 agents covered
+for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l
+# → 15
+#   → 14 of 21 agents covered
 ```
 
-### PF-003 — `evals/cases/` — OPEN
+### PF-003 — `evals/cases/` — BROKEN
+
+The cited command no longer tells the truth: `evals/cases/lian-001-no-fixture-no-cut/`
+has no `case.yaml`, and `cmd_list` in `evals/run.sh` exits 2 partway through the
+directory scan instead of reporting the missing file (a silent failure, rule 2).
+Piping through `grep -c` hides the crash and quietly undercounts — this is why the
+number below was found by bypassing `evals/run.sh list`, not by re-running the block
+as originally written. Route: the crash is a code bug in `evals/run.sh` →
+`lars-eriksson`; the missing fixture is a coverage gap → `iris-vermeulen`.
 
 ```bash
-bash evals/run.sh list | grep -c 'NEVER RUN'
-# → 2 (anya-001, selin-001)
+for d in evals/cases/*/; do
+  [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }
+  grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"
+done
+# → anya-001-cycle-stats-release: NEVER RUN
+# → lars-002-clean-control: NEVER RUN
+# → selin-001-supershear-resolution: NEVER RUN
+# → lian-001-no-fixture-no-cut: NO case.yaml
 ```
 
 ### PF-004 — `evals/` — OPEN
@@ -80,7 +97,7 @@ plus four things that are not there scores identically to a clean one. The
 
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh
-# → evals/README.md:1  evals/run.sh:0 — proposed, absent from the grader
+# → evals/README.md:1
 ```
 
 ### PF-005 — `docs/release_notes_*` — BROKEN
@@ -106,18 +123,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 327 passed, 0 failed
+# → Summary: 366 passed, 0 failed
 ```
 
-### PF-007 — `tests/check.sh` — BROKEN
+### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment enumerates checks 1–9 and has been wrong since Checks 10 and 11
-landed. Same defect class as PF-001: a record of what a file does that stopped matching
-the file.
+Checks 12–14 landed since this row was last written; the header comment now
+documents 14 checks and 14 exist. Fixed, not just re-counted — re-check this on
+any future change to the number of checks.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 11 checks exist; header documents 9
+# → 14
 ```
 
 ### PF-008 — `tests/check.sh` — BROKEN — never audited
@@ -132,7 +149,7 @@ is not the same as watching it fail.
 
 ```bash
 # no command run — this row records an absence of evidence, not a result
-# → never audited
+# → (no output)
 ```
 
 ### PF-009 — `agents/` — OPEN — never audited
@@ -143,7 +160,7 @@ description claims.
 
 ```bash
 # no command run
-# → never audited
+# → (no output)
 ```
 
 ### PF-010 — `install.sh` — OPEN — never audited
@@ -154,7 +171,7 @@ executed.
 
 ```bash
 # no command run
-# → never audited
+# → (no output)
 ```
 
 ### PF-011 — `evals/cases/*/input/` — BROKEN
@@ -171,9 +188,14 @@ verifying a control as rigorously as the planted defect, and two authors (`victo
 `anya-001`) have since caught their own contaminants before shipping. The other nine
 cases have not been re-audited under that rule.
 
+Case count grew 15 → 17 since this row was last checked (`lars-002-clean-control`,
+`lian-001-no-fixture-no-cut` landed). Neither has been audited under the
+adversarial-self-pass rule yet, so the "2 authored / N predate it" split below
+is stale — re-derive it before citing it, do not just trust the new total.
+
 ```bash
 ls evals/cases | wc -l
-# → 15 cases; 2 authored under the adversarial-self-pass rule, 13 predate it
+# → 17
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -184,12 +206,16 @@ across 13. Agent-specific tails inside those sections were preserved — the
 first pass deleted them and was reverted.
 
 Only `lars-001` has been re-run (PASS, and its report is as strong as before —
-he lost the largest share at 35%). The other 14 fixtures have not been re-run
+he lost the largest share at 35%). The other fixtures have not been re-run
 since the cut, so "no regression" is currently a claim about one agent.
+`lian-zhao` landed after this slimming pass and adds lines unrelated to it, so
+the raw total below is no longer directly comparable to the 4279 figure
+without subtracting her file first.
 
 ```bash
 cat agents/*.md | wc -l
-# → 4279 lines, was 4564; lars-001 re-run PASS, 14 fixtures unverified
+# → 4758
+#   remaining fixtures still unverified against the cut
 ```
 
 ### PF-013 — `agents/` — OPEN
@@ -214,11 +240,24 @@ haiku; refusing a premise did not.
 Also cut `mira-volkov`'s 88-line optimization recipe book (601 → 513 lines);
 `mira-001` PASS 5/5 afterwards at 27k tokens vs 34.7k, 4 tool calls vs 12.
 
-Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged.
+Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged, plus
+`lian-zhao` (sonnet), who landed after this row was last written and has not been
+challenged either way — the untested count grows by one, it does not shrink.
 
 ```bash
 grep -H '^model:' agents/*.md | sed 's|agents/||' | awk '{print $2}' | sort | uniq -c
-# → 4 opus, 11 sonnet, 3 haiku (was 6/12/2); 14 of 20 tiers never challenged
+# → 3 haiku
+```
+
+### PF-014 — `agents/` — OPEN — never audited
+
+`lian-zhao` and the four fixtures in this batch are unlanded. Two agents have
+no fixture at all (`lian-zhao`, `zofia-kaminska`), so by rule 13 and by
+lian-zhao's own cardinal rule neither may be refined — including by itself.
+
+```bash
+for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l
+# → 6
 ```
 
 ## Deferral log

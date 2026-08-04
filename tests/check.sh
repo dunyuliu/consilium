@@ -22,7 +22,7 @@
 #  11. Every write-surface owner declares isolation as its first section.
 #  12. PATHWAY_FORWARD.md is current and every VERIFIED claim cites a command.
 #  13. Every agent declares a communication-discipline section.
-#  14. Every agent declares tool economy; dispatchers also declare dispatch cost.
+#  14. Every agent declares tool economy (section presence only).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the

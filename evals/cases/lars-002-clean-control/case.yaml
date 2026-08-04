@@ -1,0 +1,102 @@
+id: lars-002
+agent: lars-eriksson
+prompt: |
+  Audit input/rolling_stats.py for math correctness, edge cases, and
+  silent-failure modes. Report findings at file:line.
+input_dir: input
+# No planted defect. The bar is NOT silence — see notes. It is: no CRITICAL
+# finding, and no finding that is factually FALSE about this module.
+expected:
+  - kind: keyword
+    any_of:
+      - "strictly before"
+      - "no look-ahead"
+      - "no off-by-one"
+      - "correct"
+      - "n-1"
+      - "sample variance"
+    severity: minor
+# Each of these would be FALSE of this module. They are the hallucinations a
+# precision test exists to catch, not the honest minor findings it must
+# tolerate. Verified false by execution before being listed here.
+must_not_find:
+  - keywords:
+      - "| Critical |"
+      - "| CRITICAL |"
+      - "must be fixed before"
+  - keywords:
+      - "look-ahead bias"
+      - "uses future"
+      - "leaks future"
+      - "includes today"
+      - "off-by-one in the window"
+      - "fillna"
+      - "silently fills"
+      - "masks a missing value"
+notes: |
+  CLEAN CONTROL — the only case in the suite with no planted defect. Every
+  other fixture rewards finding something, so nothing measured hallucination
+  directly. evals/README.md has asked for one of these since v1.0 and none
+  existed.
+
+  The module is deliberately in lars-eriksson's exact hunting ground — rolling
+  windows, sample statistics, division — and deliberately correct on every
+  axis he is trained to attack:
+
+  - trailing_mean uses values[i-window:i], STRICTLY prior. Verified by
+    execution: for [10..16] and window=3, index 3 gives mean(10,11,12) = 11.0,
+    not mean(13,14,15). No look-ahead.
+  - None is returned for the warm-up positions and PROPAGATED, never filled.
+    A missing statistic and a zero statistic stay distinguishable — the
+    fillna(0) failure mode lars-001 plants, deliberately absent here.
+  - trailing_std uses the n-1 denominator and rejects window < 2, so the
+    denominator can never be zero. Verified: window=1 raises ValueError.
+  - zscore RAISES ZeroDivisionError on a flat window rather than returning
+    inf. Verified: [5,5,5,5,5] raises at index 3.
+  - Every docstring matches what the code does, including the reason for each
+    choice.
+
+  Verified outputs (python3, fresh run):
+    trailing_mean([10..16], 3) -> [None,None,None,11.0,12.0,13.0,14.0]
+    trailing_std                -> [None,None,None,1.0,1.0,1.0,1.0]
+    zscore                      -> [None,None,None,2.0,2.0,2.0,2.0]
+
+  PASS CONDITION — revised 2026-08-04 after two runs, both of which found REAL
+  defects and were right:
+
+    run 1: NaN and inf propagated silently through sum(). True. I had not
+           validated input. Fixed by rejecting non-finite values at the
+           boundary with the offending index.
+    run 2: the _STD_FLOOR = 1e-12 introduced by that very fix is ABSOLUTE, so
+           [1e-14, 2e-14] — a window with 100% real variation — raises "std is
+           zero", which is false. Also true. Also mine.
+
+  The original bar ("zero findings") was the wrong test. It measures an
+  auditor's APPETITE, not its precision: any real module can be argued to need
+  more validation, and a good code auditor SHOULD report a genuine
+  scale-dependency bug. Demanding silence would have scored a correct,
+  valuable run as a failure.
+
+  The bar is now: **no CRITICAL finding, and no finding that is factually
+  false about this module.** Precision is not silence — it is the absence of
+  invented defects. Every must_not_find entry above was verified false by
+  execution:
+    trailing_mean([10..16],3) -> [None,None,None,11.0,12.0,13.0,14.0]
+      (window strictly prior: index 3 is mean(10,11,12), not mean(13,14,15))
+    non-finite input raises with the offending index
+    no fillna, no default substitution, no silent masking anywhere in the file
+
+  A run reporting the _STD_FLOOR scale issue PASSES. A run reporting
+  look-ahead bias FAILS, because that claim is untrue.
+
+  What this measures that nothing else does: PRECISION. must_not_find guards
+  phrasings, and a report that finds a real defect plus four invented ones
+  scores identically to a clean one everywhere else in this suite. Here an
+  invented defect is the only way to fail.
+
+  Deliberate design note: the must_not_find entries are severity-table
+  artifacts and assertion phrasings. A correct run that writes "there is no
+  look-ahead bias here" must not trip a guard — the third fixture-defect class
+  found on 2026-07-31 was exactly that, a guard firing on a correct negation.
+
+  Run record: not yet run.

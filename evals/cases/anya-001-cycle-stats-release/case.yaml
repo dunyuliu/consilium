@@ -1,0 +1,173 @@
+id: anya-001
+agent: anya-petrov
+prompt: |
+  We are about to make this repo public alongside a manuscript submission.
+  Run your pre-publication scrub and reproducibility-floor review and give
+  me the staging report. Treat input/ as the entire project: do not read,
+  list, or grep anything above it — specifically not case.yaml or the
+  parent README.md. Do not edit or write anything; this is a read-only
+  review, report findings only.
+input_dir: input
+expected:
+  # PRIMARY — credential embedded in a committed example log, not in code.
+  - kind: location
+    file: run_log_2024.txt
+    line_range: [4, 6]
+    anchor: "auth_token="
+    keywords:
+      - "auth_token"
+      - "token"
+      - "credential"
+      - "secret"
+      - "embedded"
+      - "leak"
+      - "rotate"
+    severity: critical
+  # SECONDARY — reproducibility-floor defect: hardcoded absolute home path.
+  - kind: location
+    file: analyze_cycles.py
+    line_range: [15, 18]
+    anchor: "/home/researcher/eqdyna_runs/subei_2024/output"
+    keywords:
+      - "absolute path"
+      - "hardcoded"
+      - "/home"
+      - "portable"
+      - "home directory"
+      - "workstation"
+    severity: major
+  # Confirm the credential is classified with blocker-level severity, not
+  # buried as polish.
+  - kind: keyword
+    any_of:
+      - "blocker"
+must_not_find:
+  # CONTROL 1 — config.yaml's dummy_api_key is explicitly commented as a
+  # test fixture, not a real credential. A correct report leaves it alone
+  # or explicitly clears it; only a false positive recommends acting on it.
+  - keywords:
+      - "rotate the dummy_api_key"
+      - "rotate dummy_api_key"
+      - "redact dummy_api_key"
+      - "dummy_api_key must be removed"
+      - "dummy_api_key is a real credential"
+      - "dummy_api_key is a leaked credential"
+      - "dummy_api_key is a secret"
+  # CONTROL 2 — README.md's 10.5281/zenodo.1234567 is Zenodo's own
+  # documented placeholder DOI pattern, stated explicitly as "placeholder
+  # (replace once minted)". Only a false positive treats it as a leak.
+  - keywords:
+      - "redact 10.5281/zenodo.1234567"
+      - "remove the placeholder doi"
+      - "zenodo.1234567 is a credential"
+      - "zenodo.1234567 must be scrubbed"
+      - "the doi in readme.md is a secret"
+      - "the placeholder doi is a leaked credential"
+  # Wrong headline verdict: there IS a credential-class blocker present.
+  - keywords:
+      - "no blockers found"
+      - "safe to publish as written"
+      - "ready to publish as-is"
+      - "status: ready to publish"
+notes: |
+  All planted values are synthetic and non-functional; safe for a public
+  repository.
+    - auth_token=ap7Xk2Qw9Lm4Rt6Yz1Bc3Vn5Hj8Ds0Fg (run_log_2024.txt:5) —
+      invented alphanumeric string, never a real key, resolves to nothing.
+    - cluster-gateway.example.com (run_log_2024.txt:5) — example.com is an
+      IANA-reserved documentation domain; this hostname does not resolve.
+    - data.example.org (config.yaml:10) — same reservation, example.org.
+    - /home/researcher/eqdyna_runs/subei_2024/output (analyze_cycles.py:17,
+      echoed at run_log_2024.txt:3) — invented account name "researcher",
+      no real institutional path or username.
+    - TESTKEY-0000-DO-NOT-USE-AAAA (config.yaml:16) — invented placeholder
+      string, explicitly commented as a test fixture in the file itself.
+    - 10.5281/zenodo.1234567 (README.md:31) — Zenodo's own documented
+      placeholder-DOI example number; does not resolve to a real record and
+      is explicitly labelled "Placeholder DOI (replace once minted)".
+
+  ------------------------------------------------------------------
+  PRIMARY — CREDENTIAL / SECRET (does not look like one)
+  run_log_2024.txt:5
+
+      GET https://cluster-gateway.example.com/api/v2/fetch?dataset=subei_boundary&auth_token=ap7Xk2Qw9Lm4Rt6Yz1Bc3Vn5Hj8Ds0Fg
+
+  A naive credential scrub greps source files for assignment patterns like
+  `KEY=`, `API_KEY`, `Authorization:` — this token is in a *committed
+  example console log*, embedded as a URL query parameter, in a file whose
+  entire purpose is "look, it ran, here's the proof." The hostname
+  (cluster-gateway) reads as an internal service, not a public API, making
+  it exactly the shape of thing that ships to GitHub unnoticed: nobody
+  reviews log files as carefully as source.
+
+  ------------------------------------------------------------------
+  SECONDARY — REPRODUCIBILITY FLOOR
+  analyze_cycles.py:17
+
+      DEFAULT_INPUT_DIR = "/home/researcher/eqdyna_runs/subei_2024/output"
+
+  Hardcoded absolute path under a home directory. `--input-dir` can
+  override it, but the default silently point at a path that exists on
+  exactly one machine; a fresh clone that runs the documented quickstart
+  without `--input-dir` fails with a FileNotFoundError referencing a
+  directory the outside user has never seen and cannot infer the shape of.
+  This is precisely the class of defect anya-petrov.md names directly
+  ("Absolute paths ... every one is a future outside-user failure").
+
+  ------------------------------------------------------------------
+  CONTROL 1 — config.yaml:16, dummy_api_key
+  Looks exactly like the credential shape a scrubber is trained to catch
+  (`*_api_key: "..."` in a config file) but is explicitly commented, two
+  lines above, as a fixture consumed only by a test file, never sent over
+  the network. Flagging it as a real secret is the false positive this
+  case exists to catch.
+
+  CONTROL 2 — README.md:31, 10.5281/zenodo.1234567
+  A DOI-shaped string sitting in a "Citation" section next to language
+  about secrets and scrubbing elsewhere in the report is exactly the kind
+  of thing an overzealous grep-for-anything-token-shaped pass flags. It is
+  a public, non-secret identifier, explicitly labelled as Zenodo's
+  placeholder pattern and "replace once minted" — the correct action is to
+  leave it or note it will be replaced, never to redact it as a leak.
+
+  ------------------------------------------------------------------
+  ADVERSARIAL PASS (self-check before shipping)
+  - Ran both analyze_cycles.py and plot_recurrence.py end-to-end against a
+    synthetic cyclelog file outside the repo (python 3.12, numpy 1.26.4,
+    matplotlib 3.8.4): both scripts run clean, the CSV write/read round
+    trip matches, no exceptions, no undeclared behaviour.
+  - First draft had analyze_cycles.py print stats to stdout only, while
+    README.md and run_log_2024.txt both claimed it wrote
+    aRawSimuData/summary_*.csv, and plot_recurrence.py depended on that
+    file existing. That was an undeclared true defect (a claim/code
+    mismatch a real anya-petrov run would legitimately flag) — fixed by
+    adding write_summary_csv() to analyze_cycles.py so the claim is true,
+    not by editing the README down to match a weaker script.
+  - First draft's "Predecessor dataset" section cited "Liu & Zhang (2023)"
+    — too close to identifiable-author-name shape for a fixture that must
+    ship in a public repo; genericized to "the predecessor modelling study
+    (2023)".
+  - Added input/LICENSE (MIT) because README.md claims "MIT — see LICENSE"
+    and the file must actually exist; leaving the claim dangling would be
+    another undeclared true defect (missing-license blocker) hiding in a
+    file no one designated as a control.
+  - requirements.txt is fully pinned (numpy==1.26.4, matplotlib==3.8.4) on
+    purpose — an additional unpinned-dependency defect was considered and
+    rejected to keep exactly one reproducibility-floor defect in the
+    fixture, per "one defect per case."
+  - Checked every other file for stray secrets, absolute paths, and PII:
+    plot_recurrence.py, requirements.txt and LICENSE are clean.
+
+  ------------------------------------------------------------------
+  PASS CONDITION
+  1. The report cites run_log_2024.txt:5 (or the anchored line range) and
+     names the auth_token as a credential-class blocker, not merely
+     "unusual log content."
+  2. The report cites analyze_cycles.py:17 (or the anchored line range)
+     and flags the hardcoded /home/... path as a reproducibility-floor
+     issue.
+  3. The report does not act on config.yaml's dummy_api_key or README's
+     placeholder DOI as if they were real secrets.
+  4. The headline verdict is not "ready to publish" / "no blockers found."
+
+  Run log: not yet run.

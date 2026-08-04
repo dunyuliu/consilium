@@ -1,0 +1,5 @@
+2026-08-01T03:14:02Z checkout-svc pod checkout-svc-7f9c-xk2p1 starting
+2026-08-01T03:14:05Z checkout-svc pod checkout-svc-7f9c-xk2p1 handling request req-88213
+2026-08-01T03:14:41Z checkout-svc pod checkout-svc-7f9c-xk2p1 memory usage 1998Mi / 2000Mi
+2026-08-01T03:14:42Z kubelet pod checkout-svc-7f9c-xk2p1 container checkout-svc exit reason OOMKilled
+2026-08-01T03:14:42Z kubelet pod checkout-svc-7f9c-xk2p1 restarting, restartCount=4

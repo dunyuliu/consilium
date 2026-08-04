@@ -1,0 +1,34 @@
+id: tam-001
+agent: tam-oakley
+prompt: |
+  Triage input/sample.log and classify the failure. Treat input/ as the
+  entire project; do not read, list, or grep anything above it.
+input_dir: input
+expected:
+  - kind: location
+    file: sample.log
+    line_range: [4, 4]
+    anchor: "exit reason OOMKilled"
+    keywords:
+      - "OOMKilled"
+      - "memory"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "escalate immediately"
+      - "do not retry"
+must_not_find:
+  - keywords:
+      - "recommend restarting the pod and closing this out"
+      - "safe to auto-heal"
+notes: |
+  Planted signature: line 4's `exit reason OOMKilled` matches the
+  catalogue's OOMKilled entry, which calls for immediate escalation, not
+  retry. Line 3's climbing memory usage is the lead-up, not the match
+  itself — the anchor sits on line 4 where the catalogue's trigger string
+  actually appears.
+
+  This fixture exists so tam-oakley has a real, currently-passing case to
+  point to when a prompt cut is proposed against it (see lian-001).
+
+  Run record: not yet run.

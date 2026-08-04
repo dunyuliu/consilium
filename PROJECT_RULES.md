@@ -83,7 +83,10 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 19 | One owner per write surface | mechanical |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical |
+| 21a | *(Proposed)* Board `# →` lines are literal command stdout | proposed |
 | 22 | Every agent declares communication discipline | mechanical |
+| 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
+| 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical |
 
 ---
 
@@ -361,18 +364,59 @@ An agent that routes work to another agent names it by its exact stem
 `commands/*.md` and every backtick agent-shaped reference in `README.md`
 must resolve to a file in `agents/`.
 
-**Tier 1**: enforced by `tests/check.sh` Checks 2 and 5.
+**Tier 1**: enforced by `tests/check.sh` Checks 2, 5, and 8.
 
 Check 5 skips command stems and a short allowlist of hyphenated technical
 terms (`NON_AGENT_TERMS` in the script). Before that narrowing it blocked
 twice on correct prose — a gate that cries wolf trains the reader to work
 around it. Every allowlist entry is a hole, so keep the list short.
 
-**Gap**: agent-to-agent references *inside* `agents/*.md` bodies are not
-checked. A rename breaks them silently.
+**Gap closed (2026-08-04)**: agent-to-agent references *inside* `agents/*.md`
+and `commands/*.md` bodies used to go unchecked, so a rename could break every
+routing line silently. Check 8 now scans both, with the same skip rules as
+Check 5.
 
-**Proposed Tier-1 upgrade**: extend Check 5's backtick scan to `agents/*.md`
-and `commands/*.md` bodies, not just `README.md`.
+## 24. Never audit a moving target, and brief with ranges not whole files
+
+Three orchestration rules, all paid for on 2026-08-04. Roughly 20% of that
+day's ~1M subagent tokens produced nothing durable, and every instance was an
+orchestration error — not an agent failing at its job.
+
+**1. Never dispatch an auditor while another agent is writing its subject.**
+The lock (rule 18) guards commits, not reads. An auditor pointed at a
+directory being written reports on a state that no longer exists by the time
+you read the report.
+
+*Incident*: `zofia-kaminska` was dispatched to audit the repo while
+`iris-vermeulen` was still authoring `evals/cases/lian-001-*`. Two of her seven
+findings — a missing `case.yaml` and a crash in `evals/run.sh` caused by it —
+were artifacts of the half-written directory. 90k tokens, and the two wrong
+findings were indistinguishable in tone from the five right ones.
+
+**2. A fixture is not runnable until its author's adversarial pass is
+recorded.** Shipping an unverified fixture means paying for every run that
+rediscovers its defects.
+
+*Incident*: `lars-002` was written and dispatched without its own adversarial
+pass. Run 1 found real NaN propagation. The fix for that introduced an
+absolute `_STD_FLOOR` that rejects legitimate small-scale data; run 2 found
+that. Two runs, ~46k tokens, both spent proving the fixture author wrong. The
+rule requiring this pass was written the previous day, by the same author who
+skipped it.
+
+**3. Brief with `sed -n` ranges, not whole file paths.** A whole-file read is
+re-billed on every subsequent tool call of that agent's run. Naming the file is
+not enough; name the lines.
+
+*Incident*: the same Zofia dispatch was told to read `PROJECT_RULES.md` (590
+lines), `tests/check.sh` (470), and the board — costing ~3.5k per call across
+26 calls. A dispatch given exact narrow paths ran at 3.2k per call on a task
+of similar shape.
+
+**How to apply**: before dispatching, ask what else is writing to that path;
+check the fixture's run record exists; and quote line ranges in the brief. The
+cost of getting this wrong is not a bad answer — it is a confident answer about
+a state that has changed.
 
 ## 22. Every agent declares communication discipline
 
@@ -424,6 +468,30 @@ fixtures shipped with undeclared defects in regions documented as clean.
 printed, set `last-checked` to today, append a dated note. `tests/check.sh`
 Check 12 enforces the shape; only you can enforce that the command was really
 run.
+
+## 21a. *(Proposed)* The board's `# →` line is the command's literal stdout
+
+**Proposed — not yet binding; awaiting the maintainer's decision.** Check 12
+verifies that a `VERIFIED` claim *cites* a command; it cannot tell whether the
+recorded `# →` line still matches what that command prints today, because
+several rows record a hand-written summary (`14 of 20 agents covered`)
+instead of the command's raw output (which is just `14`). A summary can be
+date-bumped without being re-derived and nothing catches it — four rows in
+`PATHWAY_FORWARD.md` did exactly that on a day their `last-checked` already
+read today (found 2026-08-04).
+
+**The fix, if adopted**: require every `# →` line to be the command's exact
+stdout, with narration moved into the item's prose above the fence. Check 12
+can then execute the fenced command and byte-diff its output against the
+recorded line, failing on drift instead of only on absence.
+
+**What it cannot fix**: a command whose true output is a derived tally from a
+larger listing (PF-002's fixture count, PF-013's tier breakdown) still needs a
+second, narrower command whose raw output *is* the number — this rule is
+upstream of the check, not a substitute for writing a checkable command.
+
+**Route**: implementing the Check 12 diff is a `tests/check.sh` change —
+`iris-vermeulen`'s surface, not this file's.
 
 ## 20. Every writer declares isolation first, and is evaluated at the merge
 
@@ -482,6 +550,7 @@ the machine-readable source of truth, not documentation of one.
 | campaign session log, merge decisions | `wei-lin` |
 | `.consilium-review/` in a deployed project | `nadia-hadid` |
 | `PATHWAY_FORWARD.md` (the inspection log) | `zofia-kaminska` |
+| `agents/*.md` (the prompts themselves) | `lian-zhao` |
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
@@ -538,6 +607,26 @@ reasoning that caused the incident.
 
 **How to apply**: one release at a time. If a workflow appears stuck, stop it
 explicitly and confirm it stopped before taking over its work.
+
+## 23. Every agent declares tool economy; dispatchers declare dispatch cost
+
+Every `agents/*.md` carries a `## Tool economy` section. A dispatch re-bills
+the entire prior conversation on every tool call, so cost grows with the
+square of tool calls, not with prompt size — measured here: under 7 calls ≈
+19k tokens, over 10 ≈ 75k, against ~2k to read a file directly. An agent that
+dispatches subagents states that multiplier explicitly; every agent states
+the discipline of batching, reading once, and not re-confirming a finding it
+already has.
+
+**Rationale**: the user's harness already prepends "BE CONCISE" to every
+prompt (rule 22). An orchestrator that does not know its own dispatch cost
+burns 20k tokens confirming what a single 2k read would have settled.
+
+**Tier 1**: enforced by `tests/check.sh` Check 14 — presence of the section
+on every agent. **Limit, stated rather than papered over**: the check
+verifies the section exists; it does not separately verify that an agent
+capable of dispatching a subagent states the dispatch-cost multiplier inside
+it — that half is judgment, not gated.
 
 ---
 

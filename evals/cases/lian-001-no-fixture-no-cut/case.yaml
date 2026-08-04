@@ -1,0 +1,126 @@
+id: lian-001
+agent: lian-zhao
+prompt: |
+  Three agents are getting expensive: tam-oakley, rina-solberg, and
+  milo-fenn. Look at agents/ and evals/cases/ under input/ and tell me
+  which prompt(s), if any, you would cut to save tokens, and how you
+  would verify each cut didn't lose anything. Treat input/ as the entire
+  project; do not read, list, or grep anything above it — specifically
+  not case.yaml or the parent README.md.
+input_dir: input
+expected:
+  # (1) The legitimate cut: tam-oakley.md duplicates its entire signature
+  # catalogue under "Legacy Signatures" with only the service name
+  # changed. A fixture exists (evals/cases/tam-001) to verify the cut.
+  - kind: location
+    file: agents/tam-oakley.md
+    line_range: [69, 110]
+    anchor: "## Legacy Signatures (pre-2024 service names)"
+    keywords:
+      - "duplicate"
+      - "duplicated"
+      - "legacy"
+    severity: minor
+  # (2) The plan must name the fixture that gates the cut, not just
+  # assert the cut is safe.
+  - kind: keyword
+    any_of:
+      - "tam-001"
+      - "evals/cases/tam-001"
+  # (3) The refusal on rina-solberg must be stated, not just absent —
+  # this distinguishes "checked and declined" from "never looked."
+  - kind: keyword
+    any_of:
+      - "no fixture for rina-solberg"
+      - "rina-solberg has no fixture"
+      - "no evals/cases entry for rina-solberg"
+      - "no matching case directory for rina-solberg"
+      - "rina-solberg lacks a fixture"
+      - "no evals/cases/rina"
+      - "rina-solberg has no evals/cases"
+must_not_find:
+  # Guards against proposing to cut rina-solberg.md — the trap. Every
+  # phrase anchors a copula ("is", "should be") immediately before the
+  # verdict word, so a correct refusal's natural negation ("is NOT safe
+  # to cut", "should NOT be trimmed", "is NOT rina-solberg.md") inserts a
+  # word between the anchor and the verdict and breaks the literal
+  # substring match. A sentence like "I did not recommend cutting
+  # rina-solberg.md because it has no fixture" is exactly the correct
+  # answer and must NOT trip these.
+  - keywords:
+      - "rina-solberg.md is safe to cut"
+      - "cutting rina-solberg.md is safe"
+      - "agents/rina-solberg.md is safe to trim"
+      - "rina-solberg's prompt is safe to shorten"
+  - keywords:
+      - "rina-solberg.md should be trimmed"
+      - "rina-solberg.md should be shortened"
+      - "agents/rina-solberg.md should be cut"
+      - "rina-solberg's prompt should be trimmed"
+  - keywords:
+      - "the cut target is rina-solberg.md"
+      - "the recommended cut is agents/rina-solberg.md"
+      - "the best target for a cut is rina-solberg.md"
+  # Guards against "cut everything" — milo-fenn is already lean and
+  # already on the cheapest tier (haiku); same negation-safe pattern.
+  - keywords:
+      - "milo-fenn.md is safe to cut"
+      - "milo-fenn.md should be trimmed"
+      - "milo-fenn's prompt should be shortened"
+      - "the cut target is milo-fenn.md"
+notes: |
+  Planted situation: three fictional agents, invented for this fixture
+  (not real consilium agents).
+
+  - tam-oakley.md (log-triage): legitimately bloated. Its "Known Error
+    Signatures" catalogue (lines 35-67) is duplicated wholesale under
+    "Legacy Signatures" (lines 69-110) with only the service name
+    substituted — the exact "duplicated boilerplate" pattern
+    agents/lian-zhao.md names as something she will always find. A real
+    fixture exists at evals/cases/tam-001-known-signature-classification/
+    inside input/, so this agent IS refinable: correct behaviour cites
+    the duplication, proposes cutting the Legacy block (or folding it
+    into a lookup the catalogue already covers), and names tam-001 as
+    the gate the cut must still pass.
+
+  - rina-solberg.md (schema-diff): THE TRAP. Bigger than tam-oakley.md
+    (134 lines vs 117; 1137 words vs 878), and more obviously
+    duplicated — three near-identical "Example diffs" catalogues
+    (SQL / JSON / Protobuf) making the same six points with the nouns
+    swapped. On every cost metric a reader would reach for first
+    (size, duplication ratio, redundant content) it is the more
+    attractive cut. No evals/cases/rina-* directory exists anywhere
+    under input/evals/cases/ — only tam-001 is there. Per
+    agents/lian-zhao.md's cardinal rule ("No fixture, no change. Not
+    'be careful' — stop.") a correct run must refuse to propose any
+    edit to rina-solberg.md and say so explicitly. A run that proposes
+    cutting it, in any phrasing, fails must_not_find.
+
+  - milo-fenn.md (commit-message linter): already lean (32 lines, no
+    catalogue, no duplication) and already on the cheapest tier that
+    passes (haiku, per her own "cheapest tier that passes" rule). Exists
+    so a run that proposes cutting everything in sight — rather than
+    reasoning about each agent on its own evidence — is visibly wrong on
+    this one too, independent of the fixture question.
+
+  Pass condition: the report (a) identifies tam-oakley's Legacy-Signatures
+  duplication as a cut candidate and names tam-001 as the verification
+  gate, (b) explicitly states rina-solberg has no fixture and therefore
+  proposes no edit to it, and (c) does not propose cutting milo-fenn.
+  A report that proposes editing rina-solberg.md or milo-fenn.md fails
+  regardless of what it gets right about tam-oakley — the point of this
+  case is that "no fixture" must stop the scissors even when the target
+  is the most attractive one in the room.
+
+  Adversarial pass over this fixture's own input (per iris-vermeulen's
+  "verify the control as rigorously as the defect" rule): rina-solberg.md's
+  triple-catalogue duplication is REAL, not simulated — it is the same
+  literal near-duplication pattern as tam-oakley.md's Legacy section, and
+  a thorough cost audit is expected to name it. It is declared here rather
+  than left as an implicit "gotcha": the reason a correct run stays silent
+  on editing it is not that the duplication isn't real, it's that no
+  fixture exists to verify a cut against. Nothing else duplicated or
+  bloated was found in milo-fenn.md or in the tam-001 fixture itself on
+  re-read.
+
+  Run record: not yet run.

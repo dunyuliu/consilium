@@ -5,7 +5,7 @@
 > same discipline, the same skepticism, the same insistence on
 > evidence — applied to your own work, before it goes out the door.
 
-Twenty specialists organised into three teams and a quality bench,
+Twenty-one specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
 Claude Code; installs by symlink and follows you across machines.
 
@@ -205,6 +205,7 @@ code outside it.
 | `mira-volkov` | Bit-identical porting specialist, any source language to any target. Parity against the reference on real full-scale data first; optimization only after. Works in an isolated worktree; never the reference implementation. |
 | `dunyu-liu` | Senior computational researcher. Owns research-heavy new implementations where no reference exists — frames the question, designs the numerical experiment, spikes cheaply, lands the minimal version, and reports what failed. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews real deployments, diagnoses misses, recommends prompt or fixture edits. Closes the loop between the team and the wild. |
+| `lian-zhao` | Agent-refinement engineer. Owns the prompts themselves — measures where tokens go, changes one variable, verifies on the agent's own fixture, reverts on failure keeping the reason. Never grades its own work. |
 | `zofia-kaminska` | Project-rules enforcer. Seeds a rule book for a new project, audits a repo against the one it has, and codifies incidents into rules. Edits the rule book only; routes every violation it finds to the owning specialist. |
 
 ### Campaign orchestration
@@ -372,7 +373,7 @@ on sonnet; pattern-match-heavy auditing runs on haiku.
 | Model | Agents |
 |---|---|
 | opus | `dunyu-liu`, `elena-hartmann`, `victor-reyes`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin` |
+| sonnet | `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin`, `lian-zhao` |
 | haiku | `lars-eriksson`, `sophia-okafor`, `ziyan-chen` |
 
 ---
@@ -458,6 +459,7 @@ consilium/
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
 │   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
 │   ├── zofia-kaminska.md   #   project-rules enforcer — seed, audit, codify
+│   ├── lian-zhao.md        #   agent refinement — cheaper without worse
 │   ├── dunyu-liu.md        #   computational researcher — new implementations
 │   └── wei-lin.md          #   campaign conductor — multi-mission orchestration
 ├── evals/             # regression fixtures for the agents
