@@ -413,6 +413,11 @@ Corollaries, each paid for:
   Weakening a case to make an agent pass destroys the only instrument that can
   tell you whether the next prompt edit helped.
 
+**Mechanically linted (Check 16)**: an `expected` term may not also be a
+`must_not_find` guard, and an `any_of` entry may not be sentence-length. Six of
+the twelve defects were one of those two shapes. The word cap is deliberately
+loose — it flags clauses, not technical phrases.
+
 **How to apply**: author the case, write both samples, run it once yourself,
 record the outcome. When a real deployment misses, ask what case would have
 caught it and add that case before fixing the prompt.

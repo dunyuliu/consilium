@@ -24,6 +24,7 @@
 #  13. Every agent declares a communication-discipline section.
 #  14. Every agent declares tool economy (section presence only).
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
+#  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -578,6 +579,48 @@ for case_dir in evals/cases/*/; do
     fi
     if bash evals/run.sh grade "$id" "$case_dir/samples/fail.md" >/dev/null 2>&1; then
         fail "$id: samples/fail.md grades PASS — the criteria accept a report that should fail"
+    else
+        ok
+    fi
+done
+
+# --- Check 16: criteria linter ----------------------------------------------
+#
+# PROJECT_RULES.md rule 25. Six of the twelve fixture defects found on
+# 2026-08-04 were one of two shapes, both mechanically detectable:
+#
+#   * ENUMERATED PARAPHRASES — an any_of list of full sentences can never be
+#     exhaustive. "do not merge" missed "does not merge"; "send it back"
+#     missed "send back"; seven variants of "rina has no fixture" missed
+#     "zero fixtures". Anchor on the shortest distinctive token instead.
+#   * CONTRADICTORY CRITERIA — a term appearing in both `expected` and
+#     `must_not_find`, so satisfying one trips the other. ziyan-001 had this
+#     and nothing could see it until Check 15 executed the criteria.
+#
+# The word cap is deliberately loose: it flags sentences, not phrases. A
+# four-word technical term is fine; a clause is a guess about phrasing.
+echo "Check 16: fixture criteria are linted"
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
+    [ -f "$cy" ] || continue
+    exp_terms=$(awk -f evals/parse_case.awk -v section=expected "$cy" | cut -d'|' -f5- | tr '\037' '\n')
+    mnf_terms=$(awk -f evals/parse_case.awk -v section=must_not_find "$cy" | cut -d'|' -f5- | tr '\037' '\n')
+
+    # (a) an expected term must not also be a must_not_find term
+    clash=0
+    while IFS= read -r t; do
+        [ -z "$t" ] && continue
+        if printf '%s\n' "$mnf_terms" | grep -qxF -- "$t"; then
+            fail "$id: \"$t\" is both an expected keyword and a must_not_find guard"
+            clash=1
+        fi
+    done <<< "$exp_terms"
+    [ "$clash" -eq 0 ] && ok
+
+    # (b) expected any_of entries should be tokens, not sentences
+    long=$(printf '%s\n' "$exp_terms" | awk 'NF>=6' | head -1)
+    if [ -n "$long" ]; then
+        fail "$id: expected keyword is a sentence, not a token: \"$long\" — anchor on the shortest distinctive phrase"
     else
         ok
     fi

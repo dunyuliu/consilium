@@ -40,8 +40,6 @@ expected:
       - "no fixture exists"
       - "no fixture for rina-solberg"
       - "rina-solberg has no fixture"
-      - "no evals/cases entry for rina-solberg"
-      - "no matching case directory for rina-solberg"
       - "rina-solberg lacks a fixture"
       - "no evals/cases/rina"
       - "rina-solberg has no evals/cases"

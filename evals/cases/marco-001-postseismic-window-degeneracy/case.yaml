@@ -46,7 +46,7 @@ expected:
       - "13.8"
       - "~14 yr"
       - "14 years"
-      - "order of magnitude longer than the window"
+      - "longer than the window"
       - "far shorter than"
       - "much shorter than the relaxation"
       - "only samples the early"
