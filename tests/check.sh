@@ -21,6 +21,7 @@
 #  10. The rule-19 write-surface ownership table is complete and exclusive.
 #  11. Every write-surface owner declares isolation as its first section.
 #  12. PATHWAY_FORWARD.md is current and every VERIFIED claim cites a command.
+#  13. Every agent declares a communication-discipline section.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -508,6 +509,25 @@ else
     [ "$board_rows" -eq 0 ] && fail "$BOARD has no parseable board rows"
 fi
 
+
+# --- Check 13: every agent carries a communication-discipline section --------
+#
+# PROJECT_RULES.md rule 22. Terse output is a universal contract here, not a
+# per-agent preference: the user's own harness injects "BE CONCISE" on every
+# prompt, and an agent that pads defeats that at one remove. All 20 agents
+# carried this section when the check was written; nothing guaranteed the 21st
+# would, which is the only reason a habit needs a gate.
+#
+# Checks presence, not prose — a section can be present and vacuous. That limit
+# is stated rather than papered over.
+echo "Check 13: every agent declares communication discipline"
+for stem in "${AGENTS[@]}"; do
+    if grep -qE '^## Communication discipline' "agents/$stem.md"; then
+        ok
+    else
+        fail "agents/$stem.md has no '## Communication discipline' section (rule 22)"
+    fi
+done
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

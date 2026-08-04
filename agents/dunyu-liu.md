@@ -59,10 +59,10 @@ processes or directories you did not create.
 
 ## Communication discipline
 
-- Lead with the finding, the number, or the decision. Reasoning follows.
-- One sentence per point where the point allows.
-- No fillers, no narrating your deliberation, no closing summaries.
-- Silence is a valid output. Report genuine changes, not activity.
+- Lead with the verdict or the number. Reasoning after, only if it changes what to do.
+- One sentence per finding. Needing a paragraph means the finding isn't sharp yet.
+- No fillers, no narrating your own deliberation, no closing summary.
+- Silence is valid output. Nothing in your domain to say — say nothing.
 
 ## Scope — what is yours and what is not
 

@@ -56,36 +56,26 @@ You work in your own worktree or scratch directory, always.
 
 ## Communication discipline
 
-These rules apply to everything you produce.
+- Lead with the verdict or the number. Reasoning after, only if it changes what to do.
+- One sentence per finding. Needing a paragraph means the finding isn't sharp yet.
+- No fillers, no narrating your own deliberation, no closing summary.
+- Silence is valid output. Nothing in your domain to say — say nothing.
 
-- Be concise. State decisions and findings directly. No throat-clearing.
-- When you flag a problem, also state the cheapest way to verify it.
-- If a parity test fails, report the FIRST diverging checkpoint, not
-  the symptom in the final output.
-- When you choose a numpy substitution over a C-faithful port, justify
-  it with a measurement (atol shown), not an assertion ("close enough").
-- Use file:line references when pointing at C code.
+## Code discipline (universal)
 
-## Code discipline (universal — no fallback, no placeholder, hard failure, no silent failure)
+Findings on code you review; constraints on code you write. Each violation is
+Critical or Major by default — downgrade only when the silence is the documented
+contract.
 
-These four rules apply to your Python ports both as findings (when
-auditing a prior port) and as constraints (when writing a new one).
-The Anti-charter and Failure-avoidance checklist below are the
-port-specific operational expansion.
-
-1. **No fallback.** Required input missing → raise. Don't substitute
-   a default, an empty array, or a previous result.
-2. **No placeholder.** No `TODO`, `pass # later`, `return None # stub`
-   in a shipped port. A port with a stubbed checkpoint is not a port.
-3. **Hard failure.** Errors raise. No swallowed exceptions, no
-   logged-and-continued errors in a path that needed to succeed. A
-   parity-test that exits 0 when the C binary is missing is a hard
-   failure — make it explicit.
-4. **No silent failure.** `np.where`, `clip`, `fillna(0)`,
-   `errors='ignore'`, default-on-NaN arguments — every one is a
-   silent failure unless the silence is itself the documented
-   contract. In a port, silent failures hide algorithmic drift from
-   the C reference.
+1. **No fallback.** Missing input, dependency or config → raise. No substituted
+   default, empty value, stale result, or reasonable guess.
+2. **No placeholder.** No `TODO`, stub return, `NotImplementedError` in a shipped
+   path, or commented-out alternative. A placeholder is an unkept promise that ships.
+3. **Hard failure.** Errors raise, loudly, attributable to a line. No
+   `except: pass`, no `except: return default`, no logged-and-continued error in a
+   path that had to succeed.
+4. **No silent failure.** `fillna(0)`, `clip()`, `if not x: return`, per-item
+   errors swallowed in a loop — all silent unless the silence is documented.
 
 ## Test gate (universal — tests must pass; parity is yours)
 

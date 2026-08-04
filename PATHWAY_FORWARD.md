@@ -28,6 +28,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
 | PF-005 | `docs/release_notes_*` | each release note matches the commit it tags | BROKEN | 2026-08-04 | 30 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
+| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-04 | 30 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | BROKEN | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | BROKEN |  | 30 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
@@ -104,7 +105,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 296 passed, 0 failed
+# → Summary: 327 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — BROKEN
@@ -172,6 +173,22 @@ cases have not been re-audited under that rule.
 ```bash
 ls evals/cases | wc -l
 # → 15 cases; 2 authored under the adversarial-self-pass rule, 13 predate it
+```
+
+### PF-012 — `agents/` — OPEN
+
+Duplicated boilerplate cut fleet-wide (4564 → 4279 lines): the communication
+block was byte-identical across all 20 agents, the code-discipline preamble
+across 13. Agent-specific tails inside those sections were preserved — the
+first pass deleted them and was reverted.
+
+Only `lars-001` has been re-run (PASS, and its report is as strong as before —
+he lost the largest share at 35%). The other 14 fixtures have not been re-run
+since the cut, so "no regression" is currently a claim about one agent.
+
+```bash
+cat agents/*.md | wc -l
+# → 4279 lines, was 4564; lars-001 re-run PASS, 14 fixtures unverified
 ```
 
 ## Deferral log

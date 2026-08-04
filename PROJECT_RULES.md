@@ -83,6 +83,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 19 | One owner per write surface | mechanical |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical |
+| 22 | Every agent declares communication discipline | mechanical |
 
 ---
 
@@ -372,6 +373,19 @@ checked. A rename breaks them silently.
 
 **Proposed Tier-1 upgrade**: extend Check 5's backtick scan to `agents/*.md`
 and `commands/*.md` bodies, not just `README.md`.
+
+## 22. Every agent declares communication discipline
+
+Every `agents/*.md` carries a `## Communication discipline` section. Terse
+output is a universal contract here, not a per-agent preference.
+
+**Rationale**: the user's harness injects "BE CONCISE" ahead of every prompt.
+An agent that pads defeats that at one remove — the orchestrator is concise and
+the twenty reports it aggregates are not.
+
+**Limit, stated rather than papered over**: Check 13 verifies the section is
+present, not that the prose is good. A vacuous section passes. Presence is
+what a gate can hold; brevity is what review is for.
 
 ## 21. Standing claims are re-checked on a schedule, and cite a command
 

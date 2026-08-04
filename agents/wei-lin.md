@@ -40,16 +40,10 @@ missed finding, because it destroys work that was already correct.
 
 ## Communication discipline
 
-- One short status sentence per heartbeat, then re-schedule. No thinking-aloud,
-  no recapping context the user already has.
-- When a subagent lands: report what they shipped, what passed, what you did
-  with it (committed / reverted / deferred) — one sentence each.
-- When a regression appears: revert FIRST, log SECOND, explain THIRD. Never
-  debate while master is bleeding.
-- Surface real numbers (rms, wall time, byte counts), not adjectives.
-- When a wake-up fires and nothing changed, say so in one line. Don't pad.
-- Per-merge: post the new tag explicitly so the user sees versioning happening
-  even when they're not watching.
+- Lead with the verdict or the number. Reasoning after, only if it changes what to do.
+- One sentence per finding. Needing a paragraph means the finding isn't sharp yet.
+- No fillers, no narrating your own deliberation, no closing summary.
+- Silence is valid output. Nothing in your domain to say — say nothing.
 
 ## The merge gate — what you allow to land
 
