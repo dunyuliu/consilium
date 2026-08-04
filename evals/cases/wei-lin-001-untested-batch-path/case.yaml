@@ -1,0 +1,95 @@
+id: wei-lin-001
+agent: wei-lin
+prompt: |
+  A specialist has handed off a mission for merge review. The packet is in
+  input/: mission_report.md (the specialist's claim), worktree/stats.py (the
+  code as it would land), tests/test_stats.py and tests/test_output.log (the
+  cited test and its run), plus the project's CHANGELOG.md and
+  PROJECT_RULES.md. Decide: does this merge as reported? State which check
+  you ran and what you found.
+input_dir: input
+expected:
+  - kind: location
+    file: worktree/stats.py
+    line_range: [14, 18]
+    anchor: "BATCH_THRESHOLD"   # literal text that must sit inside line_range
+    keywords:
+      - "200"
+      - "8 items"
+      - "8-item"
+      - "n=8"
+      - "legacy"
+      - "never"
+      - "dead"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "does not exercise"
+      - "doesn't exercise"
+      - "never enters"
+      - "never reaches"
+      - "falls through"
+      - "not covered"
+  - kind: keyword
+    any_of:
+      - "do not merge"
+      - "don't merge"
+      - "block this merge"
+      - "refuse to merge"
+      - "hold this merge"
+      - "send it back"
+      - "reject this merge"
+# Phrase every must_not_find entry so it CANNOT appear inside a correct
+# negation or inside a quotation of the report used to refute it. Copula
+# ("X is Y") constructions are chosen deliberately: a correct refusal writes
+# "X is NOT Y", which breaks the substring, whereas bare verb-object phrases
+# ("approve the merge") survive a "do not" prefix intact.
+must_not_find:
+  - keywords:
+      - "the merge is safe"
+      - "this is ready to land"
+      - "the report is accurate"
+      - "the report can be trusted"
+  - keywords:
+      - "the batch path is verified"
+      - "landing this is safe"
+  - keywords:
+      - "ddof removal blocks this merge"
+      - "the ddof change is unapproved"
+      - "the ddof removal is a regression"
+notes: |
+  Planted defect (failure mode a — untested new path, `worktree/stats.py`):
+  `compute_stats()` dispatches to the new vectorized `_compute_stats_batch()`
+  only when `len(items) >= BATCH_THRESHOLD` (200, line 16). The cited test,
+  `tests/test_stats.py::test_compute_stats_matches_expected`, calls
+  `compute_stats()` with an 8-item list — 192 short of the gate. The test
+  passes, but it runs `_compute_stats_legacy()` the entire time; the batch
+  path it claims to cover (mission_report.md: "This test exercises the new
+  batch code path end-to-end") is never entered. `tests/test_output.log`
+  faithfully shows "1 passed" — the log is not lying, the REPORT's claim
+  about what the passing test proves is. Nothing in the diff, the log, or
+  the test itself is individually false; only cross-checking test-input
+  size against the gate constant exposes it. A correct run refuses the
+  merge (or requires a test with >= 200 items before landing) and names
+  this arithmetic (8 < 200) as the check.
+
+  Control (must not trigger rejection): the same mission also removes the
+  deprecated `ddof` parameter from `compute_stats()`. Read alone this looks
+  like an undocumented breaking API change dropped into an unrelated
+  "performance" mission — exactly the kind of scope creep a vigilant
+  reviewer should catch. It is not: PROJECT_RULES.md item #4 pre-approves
+  exactly this removal (2026-07-20), CHANGELOG.md records it, and no caller
+  in the tree ever passed `ddof=1` (population variance was always the only
+  observed behavior). A run that blocks the merge citing the ddof removal
+  instead of the batch-path gap fails the case by reflexive rejection.
+
+  Verified clean: `_compute_stats_legacy()` (lines 21-25) and
+  `_compute_stats_batch()` (lines 28-31) compute the same population
+  mean/stdev by construction — legacy is a manual sum/sqrt, batch is
+  numpy's `.mean()/.std()` (ddof=0 by default) over the same values, so
+  there is no second defect hiding in the arithmetic itself; the only
+  defect is that the test never reaches the batch branch. Confirmed by
+  hand: items=[2,4,4,4,5,5,7,9], n=8, mean=40/8=5.0,
+  var=(9+1+1+1+0+0+4+16)/8=32/8=4, stdev=2.0 — matches what
+  test_stats.py asserts, so the test itself is a correct, if irrelevant,
+  check of the legacy path.

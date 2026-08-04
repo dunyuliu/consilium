@@ -1,0 +1,7 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.6, pytest-7.4.3
+collected 1 item
+
+tests/test_stats.py::test_compute_stats_matches_expected PASSED        [100%]
+
+============================== 1 passed in 0.03s ===============================

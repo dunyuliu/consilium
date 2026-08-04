@@ -1,0 +1,195 @@
+id: elena-001-surrogate-generalization
+agent: elena-hartmann
+prompt: |
+  Give me a brutally honest editorial read of input/manuscript.md.
+  Is the central claim supported by the evidence presented? What is the
+  load-bearing weakness — the one thing this paper lives or dies on — and
+  what would a hostile reviewer destroy us on? Rank what you find; do not
+  hand me a flat list. Everything you need is in that one file; no network.
+input_dir: input
+tier: smoke   # fast, offline, no network, single file
+expected:
+  # The load-bearing weakness: the "held-out" test set is a random split of a
+  # pool that contains all 12 geometries, so no geometry is unseen.
+  - kind: location
+    file: manuscript.md
+    line_range: [74, 78]
+    anchor: "pooled and randomly partitioned"
+    keywords:
+      - "leak"
+      - "held out"
+      - "same geometr"
+      - "contaminat"
+      - "80/20"
+    severity: critical
+  # She must single out ONE weakness, not enumerate five at equal weight.
+  - kind: keyword
+    any_of:
+      - "load-bearing"
+      - "lives or dies"
+      - "central weakness"
+      - "fatal"
+  # And must say the generalization claim does not follow from the design.
+  - kind: keyword
+    any_of:
+      - "does not follow"
+      - "not supported"
+      - "unsupported"
+      - "not demonstrated"
+      - "never tested"
+      - "no held-out geometr"
+must_not_find:
+  # --- attacking CONTROL 1: the 50-cycle spin-up discard (defensible) -------
+  - keywords:
+      - "spin-up discard is unjustified"
+      - "spin-up removal is arbitrary"
+      - "discarding the first 50 cycles is cherry-picking"
+      - "restore the discarded cycles"
+      - "must justify discarding"
+  # --- attacking CONTROL 2: the 100 m element size (resolved, convergence-tested)
+  - keywords:
+      - "the mesh is too coarse"
+      - "recommend refining the mesh"
+      - "cohesive zone is underresolved"
+      - "cohesive zone is under-resolved"
+      - "resolution is inadequate"
+  # --- promoting a minor issue to the central problem ----------------------
+  - keywords:
+      - "load-bearing weakness is the missing uncertainty"
+      - "load-bearing weakness is the figure"
+      - "load-bearing weakness: figure"
+      - "load-bearing weakness is the abstract"
+      - "lives or dies on the persistence baseline"
+      - "central weakness is the abstract"
+  # --- inverting the verdict ------------------------------------------------
+  - keywords:
+      - "the train/test split is sound"
+      - "the generalization claim is supported"
+      - "no evidence of leakage"
+notes: |
+  DOMAIN: earthquake-cycle simulation + GNN surrogate. Synthetic manuscript,
+  no real data, no external references to check. Everything needed for the
+  verdict is arithmetic on numbers stated in the text.
+
+  WHAT THIS CASE TESTS: prioritisation, not detection. Five real problems are
+  present. A run that lists all five at equal weight has failed even if every
+  item is correct. The pass condition is that the leakage is named as the
+  thing the paper lives or dies on and the rest are secondary.
+
+  ---------------------------------------------------------------------------
+  1. LOAD-BEARING WEAKNESS — manuscript.md:76-77 (Methods 2.2)
+
+     Text: "The 4,800 samples from all 12 geometries were pooled and randomly
+     partitioned 80/20 into a training set (3,840 samples) and a test set
+     (960 samples)."
+
+     Central claim (abstract :16, Discussion :119, Conclusions :137): the
+     surrogate "generalizes to fault geometries it has never seen during
+     training".
+
+     THE ARITHMETIC:
+       - 12 geometries x 400 retained cycles = 4,800 samples (:61).
+       - Random 80/20 pooled split -> 960 test samples (:77).
+       - 960 / 12 = 80 test cycles per geometry, in expectation.
+       - P(a given geometry contributes zero test samples) = 0.8^400 ~ 1e-39.
+       => Every one of the 12 geometries appears in BOTH train and test.
+          Zero geometries are held out. The number of unseen geometries in
+          this experiment is 0, not "some".
+
+     Compounding it: samples are consecutive cycles of the same quasi-periodic
+     run, so train and test cycles are interleaved in time on the same fault
+     and are near-duplicates of each other. The reported 3.1%/4.4%/2.7% is an
+     in-distribution interpolation error, which the Introduction (:26-29)
+     itself says "replaces nothing".
+
+     WHY IT IS LOAD-BEARING: the paper's stated reason to exist is transfer to
+     geometries not in the training library (:120-122). Fix every other issue
+     listed below and that claim still has no supporting experiment. The
+     experiment that would support it — leave-one-geometry-out, or better,
+     hold out whole geometries by bend-angle range — was not run.
+
+     Also an internal contradiction, which is the shortest route in:
+     Methods :76 (pooled random split) vs Discussion :119 ("the network has
+     never seen the test geometries during training"). Both cannot be true.
+
+  ---------------------------------------------------------------------------
+  2. MINOR REAL ISSUES (the distractors — all genuinely real, none fatal)
+
+     M1. No uncertainty on the headline numbers. :91-93 and Table 1 report
+         medians with no spread (no IQR, no CI), and :86 states a single
+         training seed (20240617) with no seed ensemble. The 5.8 s and 6.5 h
+         timings (:104-106) are single measurements with no repeats.
+     M2. Dangling figure reference. Results :102 cites "Fig. 3c"; the Figure 3
+         caption (:157-159) defines only panels (a) and (b).
+     M3. Over-general abstract sentence. :17-18 "The approach is applicable to
+         any fault system" — the work is 2D, plane-strain, vertical, purely
+         strike-slip, uniform effective normal stress. Not dip-slip, not 3D,
+         not heterogeneous.
+     M4. Incomplete baseline. Table 1 (:111-115) gives the persistence
+         baseline for peak slip only; recurrence interval and rupture duration
+         have no baseline at all, so two of the three headline numbers are
+         uncalibrated.
+
+     Any of M1-M4 is a legitimate "revise" comment. None of them, if fixed,
+     changes whether the central claim is supported.
+
+  ---------------------------------------------------------------------------
+  3. CONTROLS — look aggressive, are defensible. Attacking these is a FAIL.
+
+     C1. Discarding the first 50 of 450 cycles per run (:59-63). Looks like
+         selective deletion of 11% of the data. It is standard SEAS practice:
+         the initial stress state is prescribed arbitrarily, the manuscript
+         states stationarity is reached by cycle 25-30 and shows it (Fig. 1b),
+         the discard margin is ~2x that, it is applied uniformly to all 12
+         runs, and the full 5,400 cycles including spin-up are archived
+         (:162). Retaining the spin-up would inject initial-condition memory
+         into the targets, which is the actual error.
+
+     C2. 100 m elements for dynamic rupture (:53-58). Looks under-resolved to
+         anyone with a reflex about cohesive-zone resolution. It is not: the
+         manuscript reports a measured cohesive-zone width of 0.7-1.0 km, i.e.
+         7-10 elements across the process zone (the usual floor is 3-5), CFL
+         0.4, and a 50 m convergence check on G07 with 1.8% / 1.4% change.
+         That is a stated resolution criterion plus a demonstration of
+         convergence — the thing most rupture papers omit.
+
+     Note on C2's limit, declared so it is not a hidden trap: the manuscript
+     reports the cohesive-zone criterion but not the rate-and-state nucleation
+     length h*. Asking for h* is a fair, small review comment. Treating 100 m
+     as unresolved in the face of the stated measurement and convergence test
+     is not, and is what must_not_find guards.
+
+  ---------------------------------------------------------------------------
+  4. ADVERSARIAL PASS OVER MY OWN INPUT — everything else real that I found,
+     declared here rather than left as an undeclared trap. A run that reports
+     any of these is CORRECT, not noisy; none is required to pass.
+
+     A1. The ~4,000x speedup compares 512 CPU cores (6.5 h) against 1 GPU
+         (5.8 s) as wall-clock, not core-hours. The manuscript labels it
+         "wall-clock", states both hardware configurations, and discloses the
+         4.0e4 core-hour training-data cost (:124-127), so it is disclosed
+         rather than hidden — but the asymmetry is still worth a comment.
+     A2. The 5 km edge-radius cutoff (:70-73) is an arbitrary truncation of
+         an elastic interaction that decays as a power law. Justifiable, not
+         justified in the text.
+     A3. Placeholder DOI (:163) — conventional at submission, trivially real.
+     A4. h* not reported (see C2 note above).
+
+     ARITHMETIC I VERIFIED CONSISTENT while writing, so a run flagging these
+     as errors would be wrong: 12x450 = 5,400 archived (:162) vs 12x400 =
+     4,800 retained (:61); 200x100 km at 100 m = 2.0e6 elements (:54);
+     80-120 km at 100 m node spacing = 800-1,200 nodes (:68); 6.5 h x 512 x 12
+     = 3.99e4 core-hours ~ 4.0e4 (:126); 23,400 s / 5.8 s = 4,034 ~ 4,000x;
+     rho*Vs^2 = 32 GPa and Vp/Vs = sqrt(3) at nu = 0.25 are self-consistent.
+
+  ---------------------------------------------------------------------------
+  PASS CONDITION
+   - Names the pooled random split (:76-77) as the load-bearing weakness and
+     states that the generalization claim therefore has no experiment behind
+     it.
+   - Treats M1-M4 as secondary / revise-level, not as the central problem.
+   - Does not attack C1 or C2.
+
+  RUN RECORD
+   Not yet run. Per evals/README.md, this fixture is not certified until one
+   run has been reconciled against the declared defect set above.
