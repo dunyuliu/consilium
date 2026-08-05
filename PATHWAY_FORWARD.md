@@ -28,14 +28,14 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-08-05 | 30 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
-| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-04 | 30 |
+| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-05 | 30 |
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-05 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
-| PF-014 | `agents/` | no agent is missing the fixture its name implies | OPEN |  | 30 |
+| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-08-05 | 30 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
 
 ## Items
@@ -649,10 +649,35 @@ since the cut, so "no regression" is currently a claim about one agent.
 the raw total below is no longer directly comparable to the 4279 figure
 without subtracting her file first.
 
+**Audited 2026-08-05, and the row's own support does not hold up.** Two things:
+
+**1. The evidence command measured the wrong thing.** `cat agents/*.md | wc -l`
+counts lines. The claim is about *behaviour*. A line count cannot rise or fall in
+a way that bears on whether an agent still finds what it used to, so the row
+carried a number that could never confirm or refute it. Replaced below with a
+command that does bear on the claim: how many cases still have a verdict recorded
+against a prompt that no longer exists.
+
+**2. The one re-run the row rests on is not recorded.** The paragraph above says
+"Only `lars-001` has been re-run". `evals/cases/lars-001-lookahead-window/case.yaml`
+contains exactly one run record, dated **2026-07-31** — before the slimming
+commit `d6f6dc9` of **2026-08-04**. Either the re-run happened and nobody wrote it
+down, or it did not happen. Rule 4 does not distinguish: an unrecorded run is not
+evidence. So the sole support for "no regression" is currently unsupported.
+
+**What the number below means.** Thirteen of twenty-four cases have their most
+recent recorded run dated in July, i.e. against the pre-slimming prompts. Their
+verdicts describe agents that no longer exist in that form. Four more have never
+run at all. That leaves seven whose verdict postdates the cut.
+
+**This row cannot be closed here.** Establishing it means re-running the affected
+fixtures and comparing verdicts, which needs actual agent dispatches; the
+autonomous loop does not do that. What it can do is state the size of the gap
+exactly, and now the command does.
+
 ```bash
-cat agents/*.md | wc -l
-# → 4758
-#   remaining fixtures still unverified against the cut
+for cy in evals/cases/*/case.yaml; do grep -oE 'run \(2026-[0-9]{2}-[0-9]{2}' "$cy" | grep -oE '2026-[0-9]{2}-[0-9]{2}' | sort | tail -1; done | grep -c '2026-07'
+# → 13
 ```
 
 ### PF-013 — `agents/` — OPEN
@@ -703,11 +728,23 @@ grep -H '^model:' agents/*.md | sed 's|agents/||' | awk '{print $2}' | sort | un
 # →      13 sonnet
 ```
 
-### PF-014 — `agents/` — OPEN — never audited
+### PF-014 — `agents/` — VERIFIED
 
 `lian-zhao` and the four fixtures in this batch are unlanded. Two agents have
 no fixture at all (`lian-zhao`, `zofia-kaminska`), so by rule 13 and by
 lian-zhao's own cardinal rule neither may be refined — including by itself.
+
+**Closed 2026-08-05.** Both fixtures landed; no agent is without one. The row
+had sat as `OPEN — never audited` with a blank `last-checked` while its command
+was in fact being executed and byte-diffed by Check 17 on every suite run — the
+blank was accurate when written and stopped being accurate when Check 17
+landed, and nothing connected the two.
+
+**What the command cannot see.** It matches a fixture to an agent by the stem
+before the first hyphen, so `wei-lin` is matched by `wei-lin-001` through `wei`.
+Two agents sharing a first name would both be satisfied by one fixture. No two
+do today; if that changes, this command starts lying and the row should be
+reopened rather than trusted.
 
 ```bash
 for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l
