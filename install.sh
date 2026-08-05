@@ -144,6 +144,21 @@ HOOK_EOF
     chmod +x "$PRECOMMIT"
 fi
 
-echo "consilium installed: $(ls "$CLAUDE/agents" | wc -l) agents, $(ls "$CLAUDE/commands" | wc -l) commands"
+# Count what this checkout actually linked, not what happens to sit in the
+# target directory. `ls | wc -l` counted every entry there — foreign symlinks
+# that were skipped, real files that were refused, and hand-written agents that
+# have nothing to do with consilium. On a machine where every target was a
+# foreign real file this printed "consilium installed: 21 agents" having
+# installed NONE, directly above "21 item(s) skipped". The success line comes
+# first, so a reader skimming sees the reassuring number. Found 2026-08-05.
+linked_count() {
+    local dir="$1" f n=0
+    for f in "$dir"/*; do
+        [ -L "$f" ] || continue
+        case "$(readlink -f "$f" 2>/dev/null)" in "$ROOT"/*) n=$((n + 1)) ;; esac
+    done
+    echo "$n"
+}
+echo "consilium installed: $(linked_count "$CLAUDE/agents") agents, $(linked_count "$CLAUDE/commands") commands"
 [ "$skipped" -gt 0 ] && echo "$skipped item(s) skipped — re-run with --force to replace them" >&2
 exit 0

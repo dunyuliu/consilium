@@ -324,6 +324,32 @@ One thing checked and NOT a defect: with no lock file present the hook exits 0
 and the commit proceeds. That is `[ -f "$LOCK" ] || exit 0` working as written —
 rule 18 governs concurrent writers, not every commit.
 
+**Re-audited 2026-08-05 on a DIRTY target, and the success line was lying.** The
+clean-clone test above installs into an empty `~/.claude`, which is the one case
+where the count could not be wrong. Installing into a directory that already
+holds foreign entries exposes it:
+
+    every target a foreign real file   ->  "consilium installed: 21 agents"
+                                           21 item(s) skipped
+                                           links actually pointing into the repo: 0
+
+It reported twenty-one installed having installed **none**. `ls "$CLAUDE/agents"
+| wc -l` counts every entry in the target directory — foreign symlinks that were
+skipped, real files that were refused, and hand-written agents that have nothing
+to do with consilium. The success line prints *above* the skip count, so a reader
+skimming sees the reassuring number first.
+
+Fixed by counting links that resolve into this checkout. Verified across three
+targets: all-foreign now reports 0 of 21, a mixed target reports 19 of 21 with
+2 skipped, a clean target reports 21.
+
+**The no-clobber claim itself holds**, which is why this was worth checking
+separately from the claim. A foreign symlink is skipped with `points to
+/etc/hostname; use --force`; a real file with `real file exists; refusing to
+replace`; `--force` replaces both and reports what it replaced; and a
+hand-written `my-own-agent.md` that consilium does not own survives every run,
+including `--force`.
+
 ```bash
 grep -c 'CLAUDE=\${HOME}/.claude' install.sh
 # → 1
