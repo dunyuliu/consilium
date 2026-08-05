@@ -32,7 +32,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-04 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
-| PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
+| PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | OPEN |  | 30 |
@@ -163,7 +163,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 503 passed, 0 failed
+# → Summary: 504 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -194,7 +194,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 503 passed, 0 failed
+# → Summary: 504 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -212,15 +212,51 @@ is not the same as watching it fail.
 # → (no output)
 ```
 
-### PF-009 — `agents/` — OPEN — never audited
+### PF-009 — `agents/` — OPEN
 
-Never audited as a set. Only agents with fixtures have any behavioural evidence at all,
-and a fixture tests one planted defect, not whether the prompt still says what its
-description claims.
+The prompts have never been audited as a set — only individually, when someone
+was already editing one.
+
+**Partially audited 2026-08-05.** Three narrow claims were checked completely.
+The row stays OPEN because the headline claim is broader than what was checked,
+and saying otherwise would be the v1.7.0 mistake again.
+
+**Checked, and clean — dispatch coherence.** All five agents holding the `Agent`
+tool name other agents they route to (`victor-reyes` 11, `wei-lin` 8, `elena-
+hartmann` 4, `lian-zhao` 4, `haruto-nakamura` 3), so none holds a capability it
+never uses. No agent lacking `Agent` is instructed to dispatch. `nadia-hadid`
+was the one candidate — she names three agents and has a `### Dispatch` heading —
+and reading it settles the question: it is a *field in the report she writes*
+("Right agent: yes / no / borderline"), a judgement about someone else's
+dispatch, not an instruction to perform one. Correct as written.
+
+**Checked, and clean — read-only claims against tool lists.** A deliberately
+loose grep for read-only language flagged three agents that hold `Edit`/`Write`.
+All three were read and all three are consistent: `haruto-nakamura` says
+"read-only for auditing; use Bash for release steps when asked to execute";
+`zofia-kaminska` says "never edit the code you are auditing" while owning the
+rule book under rule 19; `nadia-hadid`'s hits were the dispatch language above.
+The agents that declare themselves purely read-only (`lars-eriksson`,
+`sophia-okafor`, `jordan-kim`, `priya-nair`, and the reviewers) carry no `Edit`.
+
+**Checked, and a real limit found — Checks 13 and 14 verify presence, not
+content.** `## Communication discipline` is **byte-identical in all 21 agents**:
+one distinct body. `## Tool economy` has three distinct bodies across 21 (16
+share one, the four `Agent`-holders share another, `lian-zhao` has its own). The
+content is good and deliberately generic, so this is not a defect — but it means
+those two checks prove that 21 copies of a paragraph exist, not that 21 agents
+each declared a budget suited to their own work. An agent whose needs differ from
+the default and was never tailored is invisible to both.
+
+**Not checked, and named so the gap is not mistaken for coverage**: whether each
+agent's body actually implements its frontmatter `description`; whether any
+agent's procedure contradicts another's; whether the persona sections are
+honoured in practice. Those need reading twenty-one prompts against their
+fixtures, not a command.
 
 ```bash
-# no command run
-# → (no output)
+for f in agents/*.md; do awk '/^## Communication discipline/{f=1;next} /^## /{f=0} f' "$f" | md5sum; done | sort -u | wc -l
+# → 1
 ```
 
 ### PF-010 — `install.sh` — VERIFIED
