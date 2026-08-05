@@ -184,18 +184,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 664 passed, 0 failed
+# → Summary: 685 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 24 checks and 24 exist. This row is now
+The header comment documents 25 checks and 25 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 24
+# → 25
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -215,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 664 passed, 0 failed
+# → Summary: 685 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -920,11 +920,33 @@ was in fact being executed and byte-diffed by Check 17 on every suite run — th
 blank was accurate when written and stopped being accurate when Check 17
 landed, and nothing connected the two.
 
-**What the command cannot see.** It matches a fixture to an agent by the stem
-before the first hyphen, so `wei-lin` is matched by `wei-lin-001` through `wei`.
-Two agents sharing a first name would both be satisfied by one fixture. No two
-do today; if that changes, this command starts lying and the row should be
-reopened rather than trusted.
+**Closed properly 2026-08-05 — rule 13 now has a check.** The caveat recorded
+below was written when this row's command was the only enforcement, and both
+halves of it were worse than they read.
+
+The command matched a fixture to an agent by the stem before the first hyphen —
+`lars-eriksson` -> `lars` -> satisfied by `lars-001`. A second agent whose first
+name is Lars would be satisfied by a fixture written for somebody else. No two
+agents share a first name today, which is the only reason the shortcut held.
+
+The deeper problem was where the enforcement lived. **Rule 13 had no check at
+all.** A new agent without a fixture would have been caught only because this
+row's recorded `# → 0` became `1` and Check 17 byte-diffs it — enforcement as a
+side effect of a number, in a file whose purpose is recording state rather than
+gating it.
+
+**Check 25** now matches on the exact `agent:` field every `case.yaml` already
+carries, so the first-name shortcut is gone. Negative-tested by repointing
+`kai-001` at a fictitious `kai-svensson`: `kai-fischer: no eval fixture declares
+'agent: kai-fischer' (rule 13)`. The first attempt at that test was invalid —
+it repointed `lars-001`, and `lars-002` still names `lars-eriksson`, so nothing
+fired.
+
+**What the command below cannot see** — kept as the original record. It matches a
+fixture to an agent by the stem before the first hyphen, so `wei-lin` is matched
+by `wei-lin-001` through `wei`. Two agents sharing a first name would both be
+satisfied by one fixture. Check 25 no longer has this weakness; the command
+does, and is now a secondary signal rather than the enforcement.
 
 ```bash
 for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l | tr -d ' '

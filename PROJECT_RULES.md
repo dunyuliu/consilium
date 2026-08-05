@@ -89,6 +89,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
+| 13a | An agent's fixture must name it exactly | mechanical — Check 25 |
 | 22 | Every agent declares communication discipline | mechanical |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |

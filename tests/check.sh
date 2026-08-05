@@ -34,6 +34,7 @@
 #  22. Every case `tier:` value is one the tooling actually consumes.
 #  23. No fixture input contains a symlink (it would read out of the staged copy).
 #  24. An empty report fails every case (silence must not satisfy a case).
+#  25. Every agent has a fixture that names it exactly (rule 13).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -920,6 +921,29 @@ for case_dir in evals/cases/*/; do
     fi
 done
 rm -f "$empty_report"
+
+echo
+echo "Check 25: every agent has a fixture that names it (rule 13)"
+# Rule 13 had no check. Its only enforcement was PF-014's board evidence
+# command, which Check 17 byte-diffs — so a new agent without a fixture would be
+# caught only because a recorded "0" became "1". That works, and it is an odd
+# place for a rule to live: the enforcement is a side effect of a number.
+#
+# Worse, that command matches a fixture to an agent by the stem before the first
+# HYPHEN — `lars-eriksson` -> `lars` -> satisfied by `lars-001`. Add a second
+# agent whose first name is Lars and it is satisfied by a fixture written for
+# somebody else. No two agents share a first name today, which is the only
+# reason the shortcut has held.
+#
+# Every case.yaml already carries an exact `agent:` field. Match on that.
+for agent_file in agents/*.md; do
+    stem=$(basename "$agent_file" .md)
+    if grep -lx "agent: $stem" evals/cases/*/case.yaml >/dev/null 2>&1; then
+        ok
+    else
+        fail "$stem: no eval fixture declares 'agent: $stem' (rule 13). A fixture whose id merely starts with the same first name does not count."
+    fi
+done
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
