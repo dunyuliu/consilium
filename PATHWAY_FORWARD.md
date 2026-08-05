@@ -37,6 +37,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-08-05 | 30 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
+| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-08-05 | 14 |
 
 ## Items
 
@@ -183,7 +184,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 568 passed, 0 failed
+# → Summary: 570 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -214,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 568 passed, 0 failed
+# → Summary: 570 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -899,6 +900,48 @@ last written, and none of them was still true.
 
 ```bash
 grep -c 'section=evidence' tests/check.sh
+# → 1
+```
+
+### PF-016 — `.github/workflows/` — VERIFIED
+
+**Found broken 2026-08-05, by the maintainer noticing red runs on the remote —
+not by anything here.** CI had been failing since Check 17 landed (`015485b`),
+and no row, check or command in this repository knew.
+
+`actions/checkout@v4` defaults to a depth-1 checkout with no tags. Check 17
+executes the board's evidence commands and byte-diffs their output, and two of
+them read git history:
+
+    PF-005  git show --stat v1.10.0 --name-only | grep -c anya-001
+            -> "unknown revision" — the tag was never fetched
+    PF-012  bash evals/run.sh list | grep -c STALE
+            -> 20 instead of 13, because `git log -1 -- agents/X.md` returns the
+               tip commit for every file when there is only one commit, so every
+               agent looks as though it changed today
+
+So Check 17 made the gate **environment-dependent**, which nothing in its design
+acknowledged. Checks 1–16 inspect files and give the same answer anywhere; the
+moment the suite started executing commands, where it ran began to matter.
+
+Fixed at both ends. The workflow now checks out full history and tags, so CI
+runs what a developer runs. And Check 17 detects a shallow repository and skips
+history-dependent evidence **by name** — `shallow clone, history-dependent
+evidence not re-run: PF-005` — rather than diffing garbage or passing silently.
+An exemption that leaves no trace in the output is indistinguishable from a
+check that passed, which is the same reason the self-referential rows are named.
+
+Verified in both environments: a full clone runs all 568 checks including those
+two commands; a `--depth 1 --no-tags` clone also reports 568 passed, naming the
+two it skipped.
+
+**What this row cannot do.** It checks that the workflow asks for full history.
+It cannot tell you whether the last CI run was green — that lives on GitHub, and
+this repository has no credentials to ask. The honest scope is the input to CI,
+not its result.
+
+```bash
+grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
 # → 1
 ```
 

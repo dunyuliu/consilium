@@ -8,6 +8,17 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 is load-bearing, not hygiene. Check 17 executes the
+      # evidence commands recorded in PATHWAY_FORWARD.md and byte-diffs their
+      # output. Several read git history — one names a tag, another compares
+      # each fixture's run date against the last commit touching that agent's
+      # prompt. On the default depth-1 checkout the tag does not exist and every
+      # file appears to have been changed by the tip commit, so the recorded
+      # output cannot reproduce and the suite fails for a reason that has
+      # nothing to do with the repository being wrong.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - name: Run structural-invariant checks
         run: bash tests/check.sh

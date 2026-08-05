@@ -654,6 +654,7 @@ if [ ! -f "$BOARD" ]; then
     fail "$BOARD missing — rule 21a has nothing to execute"
 else
     ev_rows=0
+    is_shallow=$(git rev-parse --is-shallow-repository 2>/dev/null || echo false)
     while IFS=$'\037' read -r ev_id ev_n ev_cmd ev_res; do
         [ -z "$ev_id" ] && continue
         ev_rows=$((ev_rows + 1))
@@ -666,6 +667,20 @@ else
                 echo "  self-referential, not re-run: $ev_id"
                 ok; continue ;;
         esac
+        # A shallow clone has no tags and one commit, so any command reading
+        # history produces output that cannot match what a full clone recorded.
+        # CI hit exactly this: `git show --stat v1.10.0` found no tag, and
+        # `evals/run.sh list` reported 20 stale cases instead of 13 because
+        # `git log -1 -- agents/X.md` returns the tip commit for every file.
+        # Skipping is named in the output rather than silent — an exemption that
+        # leaves no trace is indistinguishable from a check that passed.
+        if [ "$is_shallow" = "true" ]; then
+            case "$ev_cmd" in
+                *"git "*|*"run.sh list"*|*"run.sh smoke"*)
+                    echo "  shallow clone, history-dependent evidence not re-run: $ev_id"
+                    ok; continue ;;
+            esac
+        fi
         ev_expected=$(printf '%s' "$ev_res" | tr '\036' '\n')
         set +e
         ev_actual=$(bash -c "$ev_cmd" 2>&1)
