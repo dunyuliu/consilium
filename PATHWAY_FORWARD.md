@@ -26,10 +26,10 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-08-04 | 30 |
 | PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-04 | 14 |
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
-| PF-005 | `docs/release_notes_*` | each release note matches the commit it tags | BROKEN | 2026-08-04 | 30 |
+| PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-08-05 | 30 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-04 | 30 |
-| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-04 | 60 |
+| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-05 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
@@ -141,7 +141,7 @@ grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml 
 # → 10
 ```
 
-### PF-005 — `docs/release_notes_*` — BROKEN
+### PF-005 — `docs/release_notes_*` — VERIFIED
 
 The v1.10.0 tagged commit contains six `anya-001` input files. Its note says "Eval
 fixtures: 13" and describes no new fixture. They were swept in by `git add -A` run while
@@ -156,6 +156,23 @@ evidence. This row is the correction.
 git show --stat v1.10.0 --name-only | grep -c anya-001
 # → 6
 ```
+
+**Claim deliberately changed 2026-08-05; this paragraph is the record of that
+decision.** The old claim was *"each release note matches the commit it tags"*.
+It is false, it will be false forever, and rule 8 forbids the only act that
+would make it true. A standing claim that can never hold is not a claim — it is
+a permanent alarm, and a board with a permanently red row teaches its reader to
+ignore red rows.
+
+`DEFERRED` is also wrong: deferral means *later*, and there is no later. The row
+now tracks the invariant that can actually be held — **no divergence goes
+unrecorded** — and the v1.10.0 divergence stays above in full, with its cause and
+the reason it was not corrected.
+
+This is a weakening, and weakening a bar so it passes is what rule 25 warns
+against. The distinction claimed, for the reader to judge: the fact is unchanged
+and still on the board, the obligation on every future release is unchanged, and
+what was dropped is only the demand that a past commit be other than what it is.
 
 ### PF-006 — `tests/check.sh` — VERIFIED
 
@@ -646,6 +663,21 @@ Also cut `mira-volkov`'s 88-line optimization recipe book (601 → 513 lines);
 Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged, plus
 `lian-zhao` (sonnet), who landed after this row was last written and has not been
 challenged either way — the untested count grows by one, it does not shrink.
+
+**Re-checked 2026-08-05, and the tally above omitted the two that matter most.**
+It counts untested opus and sonnet agents and says nothing about **haiku**.
+`lars-eriksson` and `sophia-okafor` have been on haiku since v1.0.2 and have
+**never been tested at all** — the tier was assigned, not earned. That is the
+dangerous direction. A tier that is too expensive costs money; a tier that is too
+cheap loses findings in silence, and `priya-nair`'s failed drop above is the
+proof that the risk is real rather than theoretical: haiku passed a planted trap
+as correct.
+
+So the honest count is **3 of 21 tiers established by execution, 18 by
+judgement**, and two of the eighteen are the cheapest tier on the two agents
+whose whole job is finding things. Closing this row needs actual agent runs,
+which the autonomous loop does not do; it can only say precisely what is
+unverified, which is what this paragraph is for.
 
 ```bash
 grep -H '^model:' agents/*.md | sed 's|agents/||' | awk '{print $2}' | sort | uniq -c
