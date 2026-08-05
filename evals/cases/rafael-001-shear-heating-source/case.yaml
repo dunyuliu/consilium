@@ -42,7 +42,7 @@ notes: |
 
   not K. The correct increment converts the area source to a volumetric one
   by dividing by the shear-zone width: `q * dt / (RHO * C_P * w)`. The width
-  `w` is already a parameter (line 67) and is used for the mask (line 41) but
+  `w` is already a parameter (line 67) and is used for the mask (line 42) but
   never enters the normalization, so there is no reading under which the line
   as written is dimensionally sound.
 

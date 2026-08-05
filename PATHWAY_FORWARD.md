@@ -231,7 +231,31 @@ only evidence there is.
 end to end against their notes. `kai-001`'s uniform out-of-range clamping and
 `ingrid-001`'s `dx`-halving refinement schedule were each examined and are
 correct as written; calling either a defect would have been an invented finding,
-which is the failure this row exists to prevent. Twelve remain.
+which is the failure this row exists to prevent.
+
+**Audited 2026-08-04: `rafael-001` — input clean.** Its notes pre-declare four
+non-defects (cfl = 0.4, the insulating far edge, the `lap[0]` mirror condition,
+the 50-cell shear-zone mask); each was re-derived independently and each is
+correct as written. One off-by-one line citation fixed (41 -> 42).
+
+**Audited 2026-08-04: `jordan-001` — UNDECLARED REAL DEFECT.** `side` is read on
+`ingest_merge.py:18`, only to fix its dtype, and never used again — grep returns
+exactly one hit in the file. `enrich()` therefore computes an unsigned
+`notional = qty * price`, and `sector_summary()` sums it while the module
+docstring calls the result "exposure". Measured on the fixture's own CSVs
+(26 BUY / 24 SELL): every sector is reported with the wrong sign and 3.5x-7x the
+net magnitude — total reported 1,607,795 against a net of -230,785.
+
+The declared defect (a silent inner join dropping 10 of 50 rows) reproduces
+exactly, so the fixture still tests what it says. But an auditor that also
+reported the unsigned rollup would have been right and earned nothing, which is
+the scoring inversion this row tracks. Declared in the case notes and
+deliberately **not** added to `expected`: the recorded PASS was graded against
+the criteria as they stood, and moving the bar afterwards leaves a verdict that
+corresponds to no run (rule 5).
+
+Ten remain: `dunyu-001`, `haruto-001`, `iris-001`, `lars-001`, `lars-002`,
+`mira-001`, `priya-001`, `sophia-001`, `sophia-002`, `ziyan-001`.
 
 **Three real fixture defects found in the same pass**, none of them in the input
 code, all of them in the answer key or the process around it:

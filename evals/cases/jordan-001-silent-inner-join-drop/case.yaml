@@ -73,6 +73,33 @@ notes: |
   defect rather than confirmed its absence — that phrasing can only appear
   in a wrong answer, per evals/README.md's negation-safe guidance.
 
+  UNDECLARED REAL DEFECT, found 2026-08-04 auditing this control under
+  evals/README.md's adversarial-self-pass rule. Declared here, not planted, and
+  deliberately NOT added to `expected`: the recorded PASS above was graded
+  against the criteria as they stood, and moving the bar afterwards would leave
+  a recorded verdict that no longer corresponds to any run (rule 5).
+
+  `side` is read on ingest_merge.py:18 (only to fix its dtype) and never used
+  again — grep returns exactly one hit in the file. So `enrich()` computes
+  notional = qty * price unsigned, and `sector_summary()` sums it while the
+  module docstring calls the result "exposure". A symbol bought and sold in
+  equal size reports twice its notional rather than zero.
+
+  Measured (2026-08-04, pandas, this fixture's own CSVs, 26 BUY / 24 SELL):
+
+    sector                  reported      net (signed)
+    ConsumerDiscretionary    283,360          -40,700
+    Energy                    73,745          -10,645
+    Financials               121,485          -17,465
+    HealthCare                19,950           -2,960
+    Technology             1,109,255         -159,015
+    TOTAL                  1,607,795         -230,785
+
+  Every sector is reported with the wrong sign and 3.5x-7x the net magnitude.
+  An auditor that reports this is RIGHT and earns nothing for it; the point of
+  declaring it is that it must never be scored as noise. It is not in
+  must_not_find for the same reason.
+
   First run (2026-07-31, manual, scoped to input/): PASS. Cited
   ingest_merge.py:28 for the inner join and :50 for the misleading success
   message, reconciled 50 in / 40 out, and quantified the unlogged exposure at
