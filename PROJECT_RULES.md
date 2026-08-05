@@ -88,6 +88,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 21a | Board `# →` lines are literal command stdout, and the command is re-run | mechanical — Check 17 |
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
+| 25c | Silence must not satisfy a case | mechanical — Check 24 |
 | 22 | Every agent declares communication discipline | mechanical |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |
@@ -445,6 +446,16 @@ Corollaries, each paid for:
   `mira-001`, `lars-001`); all three cases still read STALE, and correctly so.
   They were **not** transcribed — copying a claim you did not verify into the
   place the tooling trusts is manufacturing evidence, whatever its source.
+- **Silence must not satisfy a case (Check 24).** Every `must_not_find` guard
+  passes trivially on an empty report — a report that says nothing cannot contain
+  a forbidden phrase. So a case is only as strong as its *positive* criteria, and
+  a weak one is passed by doing no work. `lars-002` — the single fixture whose
+  purpose is measuring whether an agent invents defects — listed the bare word
+  `"correct"` among its expected terms, and a report consisting of that one word
+  scored 3 criteria, 0 failed (2026-08-05). Check 24 grades an empty file against
+  every case and requires a non-PASS. It cannot tell you a *weak* report fails —
+  "how much work does this show" is not mechanizable, and `lars-002` was found by
+  hand, not by the check.
 - **A fixture is never finished.** When a run finds something real the case
   did not declare, declare it — do not delete it to keep the case tidy. An
   undeclared true defect makes a thorough audit score worse than a shallow one.

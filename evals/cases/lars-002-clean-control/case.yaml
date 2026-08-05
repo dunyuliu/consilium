@@ -13,7 +13,13 @@ expected:
       - "strictly before"
       - "no look-ahead"
       - "no off-by-one"
-      - "correct"
+      # "correct" was here and was removed 2026-08-05. It is a word almost any
+      # affirmative report contains, and every must_not_find guard passes
+      # trivially on silence — so a report consisting of the single word
+      # `correct` PASSED this case, 3 criteria, 0 failed. On the one fixture in
+      # the suite whose purpose is measuring whether an agent invents defects,
+      # saying nothing scored full marks. The five remaining terms all require
+      # having read the module. Safe to tighten: this case has no recorded run.
       - "n-1"
       - "sample variance"
     severity: minor

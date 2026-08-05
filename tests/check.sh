@@ -33,6 +33,7 @@
 #  21. No PATHWAY_FORWARD.md evidence command reaches the network.
 #  22. Every case `tier:` value is one the tooling actually consumes.
 #  23. No fixture input contains a symlink (it would read out of the staged copy).
+#  24. An empty report fails every case (silence must not satisfy a case).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -888,6 +889,37 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+
+echo
+echo "Check 24: an empty report fails every case"
+# Rule 25. Check 15 proves a case's pass sample PASSES and its fail sample FAILS.
+# Neither says what happens to a report that does no work at all — and every
+# `must_not_find` guard is satisfied by silence, because an empty report cannot
+# contain a forbidden phrase. So a case whose positive requirement is weak is
+# passed by saying nothing.
+#
+# That was not hypothetical. `lars-002` — the one fixture in the suite whose
+# purpose is measuring whether an agent INVENTS defects — listed the bare word
+# "correct" among its expected terms, and a report consisting of that single
+# word scored 3 criteria, 0 failed on 2026-08-05. Fixed in the same change.
+#
+# WHAT THIS CHECKS, EXACTLY: that grading an empty file against every case gives
+# a non-PASS. It is complete for that. It does NOT establish that a weak report
+# fails — "how much work does this report show" is not mechanizable, and
+# `lars-002` was found by hand, not by this.
+empty_report=$(mktemp) || die_msg=""
+: > "$empty_report"
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir")
+    [ -f "$case_dir/case.yaml" ] || continue
+    verdict=$(bash evals/run.sh grade "$id" "$empty_report" 2>&1 | grep -cE '^PASS —' || true)
+    if [ "$verdict" -gt 0 ]; then
+        fail "$id: an EMPTY report passes this case — its guards are satisfied by silence and its expected criteria are too weak to require work (rule 25)"
+    else
+        ok
+    fi
+done
+rm -f "$empty_report"
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
