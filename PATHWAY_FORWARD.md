@@ -92,6 +92,7 @@ as originally written. Route: the crash is a code bug in `evals/run.sh` →
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → anya-001-cycle-stats-release: NEVER RUN
+# → anya-002-clean-publishable: NEVER RUN
 # → lars-002-clean-control: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
 ```
@@ -163,7 +164,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 504 passed, 0 failed
+# → Summary: 509 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -194,7 +195,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 504 passed, 0 failed
+# → Summary: 509 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -517,6 +518,12 @@ describes a sum: both describe one difference. Adding `r` to a relative
 deviation is a second term the documentation never mentions. Distinct from
 planted defect 2, which is about `fillna(0)` on the same line.
 
+**`anya-002` added 2026-08-05** and audited as it was written — its own guards
+were graded against the correct report's negation before shipping, and three of
+the five families failed that test and had to be rewritten (see PROJECT_RULES.md
+rule 25). The row stays VERIFIED: the new input was authored clean and
+adversarially self-passed, which is the standard this row now holds.
+
 **PF-011 CLOSED.** All fourteen un-audited inputs read end to end. Nine real
 fixture defects found across seven cases, none of them in an agent:
 
@@ -563,7 +570,7 @@ the anchor; when prose must cite a line, expect it to rot.
 
 ```bash
 ls evals/cases | wc -l
-# → 23
+# → 24
 ```
 
 ### PF-012 — `agents/` — OPEN

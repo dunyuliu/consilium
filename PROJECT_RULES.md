@@ -442,6 +442,13 @@ Corollaries, each paid for:
   tell you whether the next prompt edit helped. Loosening a `must_not_find`
   guard leaves earlier verdicts valid; tightening any criterion invalidates
   every recorded run that was graded before it.
+- **Guards are declarative, never imperative.** Negating an imperative
+  *prefixes* it — "do not rotate the token" contains "rotate the token" — so an
+  imperative guard fires on the correct report. Negating a declarative *infixes*
+  the negation — "must **not** be rotated" does not contain "must be rotated".
+  Write `X must be rotated`, never `rotate X`. Found 2026-08-05 while authoring
+  `anya-002`: three of its five guard families were imperative in the first
+  draft and every one of them failed a correct report.
 - **Before shipping a guard, write the correct report's negation and grade
   it.** A `must_not_find` entry must be a phrase only a *wrong* answer
   produces. A bare noun never is, because the right answer's denial contains

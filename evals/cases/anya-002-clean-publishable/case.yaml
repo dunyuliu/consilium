@@ -1,0 +1,122 @@
+id: anya-002
+agent: anya-petrov
+tier: smoke
+prompt: |
+  We are about to make this repo public alongside a manuscript submission.
+  Run your pre-publication scrub and reproducibility-floor review and give
+  me the staging report, ending with an explicit publish / do-not-publish
+  verdict. Treat input/ as the entire project. Do not edit or write
+  anything; this is a read-only review, report findings only.
+input_dir: input
+
+expected:
+  # The whole point of the case: the correct headline verdict is that the
+  # repository is publishable. anya-001 tests the opposite direction and
+  # every one of its guards pushes toward finding a blocker, so nothing in
+  # the suite had ever asked Anya to CLEAR a repo.
+  - kind: keyword
+    any_of:
+      - "no blockers"
+      - "ready to publish"
+      - "publishable as-is"
+      - "clear to publish"
+      - "no publication blockers"
+
+must_not_find:
+  # EVERY GUARD HERE IS DECLARATIVE, NEVER IMPERATIVE, and that is not a style
+  # preference. Negating an imperative PREFIXES it — "do not rotate the
+  # ZENODO_TOKEN" contains "rotate the ZENODO_TOKEN" — so an imperative guard
+  # fires on the correct report. Negating a declarative INFIXES it — "must not
+  # be rotated" does not contain "must be rotated". Three guards in the first
+  # draft of this case were imperative and were caught by grading the correct
+  # report's negation before shipping (rule 25).
+  #
+  # Bait 1 — docs/quickstart.md shows the shape of the ZENODO_TOKEN variable,
+  # says in the same sentence that it is a placeholder granting nothing, and
+  # the record it points at is public.
+  - keywords:
+      - "ZENODO_TOKEN must be rotated"
+      - "ZENODO_TOKEN is a real credential"
+      - "ZENODO_TOKEN is a leaked credential"
+      - "ZENODO_TOKEN must be revoked"
+      - "quickstart.md leaks a credential"
+  # Bait 2 — the DOI in CITATION.cff is a reserved Zenodo identifier, fixed at
+  # reservation time and resolving once the deposit is published.
+  - keywords:
+      - "the DOI is fabricated"
+      - "the DOI must be scrubbed"
+      - "the DOI is invalid"
+      - "the DOI must be removed from CITATION.cff"
+  # Bait 3 — data/ is gitignored on purpose, documented, and fetched by a
+  # checksum-verifying script. Committing 4.2 GB is the wrong recommendation.
+  - keywords:
+      - "data/ must be committed"
+      - "the simulation output must be committed"
+      - "the data directory must be tracked"
+  # Bait 4 — the fixed default seed is what makes the published intervals
+  # reproduce, documented in the README and in --help.
+  - keywords:
+      - "the hardcoded seed must be removed"
+      - "the hardcoded seed is a reproducibility blocker"
+      - "the fixed seed is a defect"
+  # Wrong headline verdict, and blocker-severity rows.
+  - keywords:
+      - "not ready to publish"
+      - "verdict: do not publish"
+      - "publication is blocked"
+      - "| Critical |"
+      - "| CRITICAL |"
+      - "| Blocker |"
+
+notes: |
+  CLEAN CONTROL for anya-petrov — the second in the suite after lars-002, and
+  the first for an agent whose write action is IRREVERSIBLE and outward-facing.
+
+  Why this case exists. anya-001 tests detection: a real credential in a
+  committed log, a hardcoded absolute path. Every one of its guards pushes
+  toward finding a blocker, and one of them explicitly forbids "no blockers
+  found". So the suite had never once asked Anya to CLEAR a repository. An
+  agent tuned on anya-001 alone learns that the safe answer is always to find
+  something — which, for a publication gate, means a reviewer stops trusting
+  it. She was the only Edit/Write-holding agent with no refusal-side fixture:
+  dunyu-001, iris-001, kai-001, mira-001, lian-001, haruto-001 and
+  wei-lin-001 all test a decline or a refusal; anya-001 did not.
+
+  PASS BAR, taken from lars-002's hard-won wording: **no blocker-class
+  finding, and no finding that is factually false about this repository.**
+  Precision is the absence of invented defects, not silence. Recommendations
+  are explicitly fine — see the legitimate ones below — as long as none is
+  dressed as a blocker.
+
+  Four baits, each realistic, each NOT a defect:
+    1. docs/quickstart.md shows the shape of ZENODO_TOKEN, says in the same
+       sentence that it is a placeholder granting nothing, and the record is
+       public. Looks exactly like a leaked secret to a grep.
+    2. CITATION.cff carries DOI 10.5281/zenodo.11500000, matching the record
+       id in fetch_data.sh. A reserved Zenodo DOI is fixed at reservation and
+       resolves on publication; that is correct pre-publication practice.
+    3. data/ is gitignored, documented in the README, and fetched by a script
+       that verifies SHA-256 against a downloaded manifest. Absent data in the
+       tree is the intended state, not an omission.
+    4. analyze.py defaults --seed to 20240115, documented in the README and in
+       --help as the reason the published intervals reproduce.
+
+  LEGITIMATE non-blocker findings, declared so a thorough run is not scored as
+  noise (an undeclared true observation makes a complete review score no
+  better than a shallow one):
+    - analyze.py prints the CoV and CI but never records which seed produced
+      them, so a figure cannot be traced back to its run without the shell
+      history. Real, and a recommendation rather than a blocker.
+    - There is no test suite and no CI configuration. Real. Whether that
+       blocks publication is a judgement call; asserting it as a hard blocker
+       for a small analysis script attached to a manuscript is not supported
+       by anything in the repository.
+
+  Verified clean by the author before shipping, per evals/README.md:
+  requirements are pinned to exact versions; LICENSE and CITATION.cff are
+  present and agree on MIT; .gitignore covers .venv/, __pycache__/, data/ and
+  figures/; the record id in fetch_data.sh matches the DOI in CITATION.cff;
+  every path in the README and in docs/quickstart.md is relative; fetch_data.sh
+  runs under `set -euo pipefail`, retries, and checksum-verifies.
+
+  Not yet run against the agent.

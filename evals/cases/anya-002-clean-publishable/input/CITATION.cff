@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: recurrence-stats
+message: If you use this software, please cite it as below.
+type: software
+authors:
+  - family-names: Okonkwo
+    given-names: Adaeze
+  - family-names: Berg
+    given-names: Halvard
+license: MIT
+version: 1.0.0
+date-released: 2024-06-01
+doi: 10.5281/zenodo.11500000
