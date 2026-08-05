@@ -95,6 +95,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 # → anya-002-clean-publishable: NEVER RUN
 # → lars-002-clean-control: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
+# → zofia-002-rule-already-exists: NEVER RUN
 ```
 
 ### PF-004 — `evals/` — OPEN
@@ -138,7 +139,7 @@ other.
 
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l
-# → 10
+# → 11
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -181,7 +182,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 554 passed, 0 failed
+# → Summary: 561 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -212,7 +213,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 554 passed, 0 failed
+# → Summary: 561 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -580,6 +581,23 @@ with no negatable auxiliary, 4 unsafe.
 `lars-001` produces the imperative failure). All eight touched fail-samples
 still FAIL, so the guards were made safe rather than gutted.
 
+**`zofia-002` added 2026-08-05** — the second refusal control for a write-capable
+agent, and the first that tests a refusal to **write** rather than a refusal to
+clear. Zofia's write surface is the rule book, and the consequential failure for
+a rule-book owner is not missing a violation but adding a rule that already
+exists. Her own Mode C step 2 says exactly that and nothing tested it. The trap
+sits in the input rather than the prompt: the incident write-up ends by
+recommending a new rule, in the project's own voice, while rule 4 already says
+the same thing in words matching the incident's root cause almost line for line.
+
+One guard was caught and reworded before shipping, and it sharpens rule 25a:
+`"the rule book is silent on baselines"` is declarative and infix-negates
+cleanly, yet the **external** denial *"it is not true that the rule book is
+silent on baselines"* still contains it. Declarative is necessary and not
+sufficient — a guard must also be a phrase a correct report would not quote.
+Replaced with a first-person form. Verified in all three directions: pass sample
+PASSes, the adversarial denial PASSes, the wrong report FAILs on both families.
+
 **`anya-002` added 2026-08-05** and audited as it was written — its own guards
 were graded against the correct report's negation before shipping, and three of
 the five families failed that test and had to be rewritten (see PROJECT_RULES.md
@@ -632,7 +650,7 @@ the anchor; when prose must cite a line, expect it to rot.
 
 ```bash
 ls evals/cases | wc -l
-# → 24
+# → 25
 ```
 
 ### PF-012 — `agents/` — OPEN

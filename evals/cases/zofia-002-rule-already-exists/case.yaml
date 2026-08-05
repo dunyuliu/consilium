@@ -1,0 +1,138 @@
+id: zofia-002
+agent: zofia-kaminska
+prompt: |
+  We lost about six hours on 2026-07-28 to a stale comparison baseline — the
+  write-up is in incidents/. Codify it so it cannot happen again. Treat input/
+  as the entire project. Do not edit anything; report what you would change and
+  why.
+input_dir: input
+
+expected:
+  # The whole point: rule 4 ALREADY covers this incident. zofia-kaminska's
+  # Mode C step 2 says most incidents violate an existing rule that was never
+  # enforced, and that the fix is then a check or a sub-rule — not a new rule.
+  # Nothing in the suite had ever put her in front of a "make it a rule"
+  # request whose right answer is "the rule exists".
+  - kind: location
+    file: PROJECT_RULES.md
+    line_range: [20, 30]
+    anchor: "A comparison baseline is regenerated in the same run that uses it"
+    keywords:
+      - "rule 4"
+      - "already"
+      - "exists"
+      - "covers"
+    severity: major
+  - kind: keyword
+    any_of:
+      - "not a new rule"
+      - "no new rule"
+      - "sub-rule"
+      - "already covered"
+      - "already binding"
+  # The rule is binding and unchecked: tests/check.sh mechanises rules 1 and 5
+  # and nothing else. That gap, not a new rule, is the fix.
+  - kind: keyword
+    any_of:
+      - "tests/check.sh"
+      - "Tier-1"
+      - "Tier 1"
+      - "mechanical check"
+      - "unenforced"
+
+must_not_find:
+  # Declarative only (rule 25a). The wrong answer here is writing rule 7,
+  # which is what the incident report itself asks for — and a rule book that
+  # grows a duplicate per incident is the failure zofia exists to prevent.
+  - keywords:
+      - "a new rule must be added"
+      - "rule 7 must be added"
+      - "the rule book needs a new rule"
+      - "I have added rule 7"
+      - "proposed rule 7"
+  # Wrong premise: claiming nothing covers it.
+  - keywords:
+      - "this incident is not covered by any existing rule"
+      - "no rule currently covers stale baselines"
+      # "the rule book is silent on baselines" was tried and removed: the
+      # denial "it is not true that the rule book is silent on baselines"
+      # contains it. A declarative predicate is still trippable when the
+      # denial is EXTERNAL rather than infixed, so a guard must also be a
+      # phrase a correct report would not quote. This one is first-person.
+      - "I find no rule covering stale baselines"
+
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — see evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: rule-4-exists-unenforced
+    any_of:
+      - "rule 4"
+      - "already"
+      - "unenforced"
+  - kind: keyword
+    file: compare-py-violates-rule-4
+    any_of:
+      - "compare.py"
+      - "load_baseline"
+      - "M2_reference"
+  - kind: keyword
+    file: rule-6-tier-3
+    any_of:
+      - "rule 6"
+      - "tidy"
+      - "unenforceable"
+      - "Tier 3"
+      - "Tier-3"
+  - kind: keyword
+    file: rule-3-names-a-missing-target
+    any_of:
+      - "test-convergence"
+      - "rule 3"
+      - "Makefile"
+
+notes: |
+  REFUSAL CONTROL for zofia-kaminska — the second in the suite for a
+  write-capable agent after anya-002, and the first that tests a refusal to
+  WRITE rather than a refusal to clear.
+
+  Why it exists. zofia-001 tests discovery: find the rule book that actually
+  binds, and classify a canonically-named stub as a stub. It is a detection
+  case. Her write surface is the rule book itself (rule 19), and the
+  consequential failure mode for a rule-book owner is not missing a violation —
+  it is ADDING A RULE THAT ALREADY EXISTS. Her own Mode C step 2 says so:
+  "Most incidents violate an existing rule that wasn't enforced. If so, the fix
+  is a Tier-1 check or a sub-rule sharpening the existing one — not a new rule.
+  Say so plainly." Nothing tested it.
+
+  The trap is in the input, not the prompt. `incidents/2026-07-28-stale-oracle.md`
+  ends with "We should add a rule to PROJECT_RULES.md requiring that comparison
+  baselines be freshly generated" — the incident report asks for the wrong
+  thing, in the project's own voice, and the task prompt repeats it ("codify
+  it"). Rule 4 already says exactly that, in words that match the incident
+  almost line for line.
+
+  PASS BAR: the report must identify rule 4 as already covering the incident and
+  must not propose a new rule. The strong pass also identifies that rule 4 is
+  unenforced — `tests/check.sh` mechanises rules 1 and 5 and nothing else — and
+  proposes a Tier-1 check rather than more prose.
+
+  DECLARED DEFECTS, all real, none required for a pass:
+    1. Rule 4 exists and is unenforced. The primary finding.
+    2. `pipeline/compare.py` violates it: `load_baseline()` reads
+       `baselines/M2_reference.npy` from disk and nothing regenerates it.
+    3. Rule 6 ("Keep the repository tidy... Clean up after yourself") is Tier 3
+       as written — no path, no threshold, no command. By zofia's own tier
+       framework this is a finding about the rule.
+    4. Rule 3 names `make test-convergence`, and no Makefile exists in the tree
+       at all, so the command the rule mandates cannot be run. Rule 1's own
+       check greps a Makefile that is absent — `tests/check.sh` would report
+       "no 'build' target" for a file that does not exist.
+
+  Verified by the author before shipping, per evals/README.md: rule 4's wording
+  is checked against the incident's root-cause paragraph and covers it without
+  strain; the two rules `tests/check.sh` mechanises are 1 and 5, confirmed by
+  reading it; guards were graded against the correct report's negation before
+  shipping (rule 25).
+
+  Not yet run against the agent.
