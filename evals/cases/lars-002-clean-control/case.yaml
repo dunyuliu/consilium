@@ -26,12 +26,24 @@ must_not_find:
       - "| CRITICAL |"
       - "must be fixed before"
   - keywords:
-      - "look-ahead bias"
+      # CORRECTED 2026-08-04. Two entries here were bare nouns, and a bare noun
+      # is not a verdict: a report's correct NEGATION contains it. Demonstrated —
+      # samples/pass.md plus "there is no fillna(0) masking here" graded
+      # FAIL must_not_find — report contains: "fillna". On the one fixture whose
+      # whole purpose is measuring precision, the guard failed a correct report.
+      # The notes even describe the absence in those words ("the fillna(0)
+      # failure mode lars-001 plants, deliberately absent here"). Loosening only,
+      # so the recorded verdicts stay valid (rule 5).
+      - "has look-ahead bias"
+      - "introduces look-ahead bias"
+      - "exhibits look-ahead bias"
       - "uses future"
       - "leaks future"
       - "includes today"
       - "off-by-one in the window"
-      - "fillna"
+      - "uses fillna"
+      - "calls fillna"
+      - "fillna(0) masks"
       - "silently fills"
       - "masks a missing value"
 notes: |

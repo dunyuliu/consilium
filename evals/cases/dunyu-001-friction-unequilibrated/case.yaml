@@ -48,10 +48,19 @@ must_not_find:
       - "def coulomb_friction"
       - "def apply_friction"
       - "def friction_contact"
-      - "friction law"
+      # CORRECTED 2026-08-04. "friction law", "slipping" and "slip is" were
+      # bare descriptive terms, not verdicts, and this case's right answer is a
+      # DEFERRAL that must describe the work it is deferring. Demonstrated —
+      # samples/pass.md plus "Before any friction law is added, the base state
+      # must reach equilibrium" graded
+      # FAIL must_not_find — report contains: "friction law".
+      # Loosening only, so the recorded verdicts stay valid (rule 5).
       - "mu = 0.3"
-      - "slipping"
-      - "slip is"
+      - "implemented the friction law"
+      - "added the friction law"
+      - "the friction law is now"
+      - "the contact is now slipping"
+      - "slip is now computed"
 notes: |
   Planted defect (critical, elastic_contact.py line 141):
   The solver's default tolerance is set to tolerance=5e-2, which is too loose

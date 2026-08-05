@@ -323,8 +323,48 @@ the classic off-by-half parity bug is not present here. Two off-by-one prose
 citations fixed (`:19` -> `:18`, `:27` -> `:26`); the case's own run log already
 said `:18` and `:26`, so the notes contradicted themselves.
 
-Four remain: `dunyu-001`, `haruto-001`, `iris-001`, `lars-001` (input; its notes
-were fixed in a94fb3e) — plus `sophia-001`'s input.
+**Audited 2026-08-04: `lars-002` and `dunyu-001` — TWO MORE GUARDS THAT FAIL A
+CORRECT REPORT.** The `ziyan-001` finding was not a one-off. Both demonstrated by
+execution, not argued:
+
+    lars-002  pass.md + "there is no fillna(0) masking here"
+              -> FAIL must_not_find — report contains: "fillna"
+    dunyu-001 pass.md + "Before any friction law is added, the base state must
+              reach equilibrium"
+              -> FAIL must_not_find — report contains: "friction law"
+
+`lars-002` is the one fixture whose entire purpose is measuring precision, and
+its own notes describe the absence in exactly those words ("the `fillna(0)`
+failure mode `lars-001` plants, deliberately absent here"). `dunyu-001`'s right
+answer is a *deferral*, which cannot be written without naming the work being
+deferred. `"look-ahead bias"`, `"slipping"` and `"slip is"` were the same shape.
+
+All replaced with verdict assertions, and checked in both directions — the
+corrected reports now PASS, while `"has look-ahead bias"` and `"implemented the
+friction law"` still FAIL, so the guards were loosened and not gutted.
+
+**The class is NOT mechanizable, and no check was added.** Three candidates were
+built and measured against all 23 fixtures:
+
+  - *guard term also appears in the case's own notes* — flags 8 terms, misses
+    `"Williams"`, `"friction law"` and `"slipping"`, and most hits are
+    legitimate (a guard is often quoted in the notes that explain it).
+  - *guard must be >= 3 words* — false-positives every good short verdict
+    (`"parity holds"`, `"safe to ship"`, `"reconciles cleanly"`).
+  - *guard must contain a verb* — correct in principle and not detectable in
+    bash; that is the whole difficulty.
+
+The real rule is the one `evals/README.md` already states — **guard on a phrase
+only a wrong answer produces** — and it is a convention enforced by review, not
+by a parser. Shipping any of the three above would have caught part of the class
+while reading as a gate, which is worse than none (rule 2). Four instances are
+now on record (`ziyan-001`, `lars-002`, `dunyu-001` x3); the durable defence is
+that a fixture author writes the correct report's *negation* and grades it before
+shipping.
+
+Three remain: `haruto-001`, `iris-001`, `lars-001` (input; its notes were fixed
+in a94fb3e) — plus `sophia-001`'s input and `dunyu-001`'s input, whose guards
+were audited here but whose `elastic_contact.py` has not been re-read.
 
 **Three real fixture defects found in the same pass**, none of them in the input
 code, all of them in the answer key or the process around it:
