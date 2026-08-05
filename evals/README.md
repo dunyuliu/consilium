@@ -265,6 +265,22 @@ four never run, three stale. A green smoke run means "these cases pass today",
 not "nothing regressed", because for seven of them there is nothing to have
 regressed from.
 
+## Staging refuses a symlinked input
+
+`stage` copies `input/` with `cp -R`, which copies a symlink **as a symlink**. An
+absolute link therefore resolves from the staged copy back to whatever it names —
+including the `case.yaml` one directory above `input/`. Demonstrated 2026-08-05:
+a staged `leak.md` printed the full `expected:` block, and a link to
+`/etc/hostname` read the host's name. Staging exists to make the answer key
+unreachable; one symlink makes it reachable again.
+
+Refusing beats dereferencing. `cp -RL` would inline the target's *content* into
+the staged copy, leaking the same bytes while looking clean. No fixture needs a
+symlink, so `stage` stops and Check 23 fails the suite at commit time.
+
+Filenames with spaces and filenames beginning with a dash were probed at the same
+time and stage handles both correctly.
+
 ## The leakage check is input-aware
 
 `grade` voids a report containing `case.yaml`, `must_not_find` or "planted

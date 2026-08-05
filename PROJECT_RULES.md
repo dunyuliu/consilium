@@ -68,6 +68,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 4 | Only fresh runs are evidence | judgment |
 | 5 | One definition of "pass" — `check.sh` exit 0, `evals/README.md` criteria | mechanical |
 | 5a | The answer key is never inside `input/` | mechanical — Check 18 |
+| 5b | The answer key is never LINKED into `input/` | mechanical — Check 23 |
 | 6 | *(dropped — see "Dropped starter rules")* | — |
 | 7 | `evals/cases/*/input/` is read-only fixture data | mechanical |
 | 8 | Never delete evidence: release notes archive, never vanish | mechanical |

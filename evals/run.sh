@@ -52,6 +52,22 @@ cmd_stage() {
     local id; id="$(basename "$dir")"
     [ -d "$dir/input" ] || die "$id has no input/ directory"
 
+    # A symlink defeats the whole mechanism. `cp -R` copies the link itself, so
+    # an ABSOLUTE symlink in input/ resolves from the staged copy straight back
+    # to whatever it names — including the case.yaml one directory above input/.
+    # Demonstrated 2026-08-05: a staged `leak.md` printed the full `expected:`
+    # block, and a link to /etc/hostname read the host's name. Staging exists to
+    # make the answer key unreachable; one symlink makes it reachable again.
+    #
+    # Refusing beats dereferencing. `cp -RL` would inline the target's CONTENT
+    # into the staged copy, which leaks the same bytes while looking clean. No
+    # fixture needs a symlink, so the honest answer is to stop.
+    local link
+    link=$(find "$dir/input" -type l -print -quit 2>/dev/null || true)
+    if [ -n "$link" ]; then
+        die "$id: input/ contains a symlink (${link#"$dir/input/"}) — staging copies links verbatim, so an absolute link reads straight back out of the isolated copy. Replace it with a real file."
+    fi
+
     local dest="$STAGE_ROOT/$id"
     rm -rf "$dest"; mkdir -p "$dest"
     cp -R "$dir/input/." "$dest/"

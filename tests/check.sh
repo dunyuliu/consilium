@@ -32,6 +32,7 @@
 #      agent without it does.
 #  21. No PATHWAY_FORWARD.md evidence command reaches the network.
 #  22. Every case `tier:` value is one the tooling actually consumes.
+#  23. No fixture input contains a symlink (it would read out of the staged copy).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -860,6 +861,31 @@ for case_dir in evals/cases/*/; do
         ok
     else
         fail "$id: tier '$tier' is not consumed by any tool — known tiers are: $KNOWN_TIERS"
+    fi
+done
+
+echo
+echo "Check 23: no fixture input contains a symlink"
+# Rule 5, and the companion to Check 18. Check 18 stops the answer key being
+# written INSIDE input/; this stops it being LINKED there.
+#
+# `evals/run.sh stage` copies input/ with `cp -R`, which copies a symlink as a
+# symlink. An absolute link therefore resolves from the staged copy back to
+# whatever it names — including the case.yaml one directory above input/.
+# Demonstrated 2026-08-05: a staged `leak.md` printed the full `expected:` block
+# and a link to /etc/hostname read the host's name. Staging exists to make the
+# answer key unreachable; one symlink makes it reachable again.
+#
+# `stage` now refuses such a case, but that is late — the author finds out when
+# somebody tries to run it. This fails at commit time instead.
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir")
+    [ -d "$case_dir/input" ] || continue
+    link=$(find "$case_dir/input" -type l -print -quit 2>/dev/null || true)
+    if [ -n "$link" ]; then
+        fail "$id: ${link#"$case_dir"} is a symlink — it would resolve out of the staged copy and defeat the isolation (rule 5)"
+    else
+        ok
     fi
 done
 
