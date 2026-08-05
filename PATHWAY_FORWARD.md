@@ -184,18 +184,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 570 passed, 0 failed
+# → Summary: 586 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 20 checks and 20 exist. This row is now
+The header comment documents 21 checks and 21 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 20
+# → 21
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -215,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 570 passed, 0 failed
+# → Summary: 586 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -831,10 +831,10 @@ which the autonomous loop does not do; it can only say precisely what is
 unverified, which is what this paragraph is for.
 
 ```bash
-grep -H '^model:' agents/*.md | sed 's|agents/||' | awk '{print $2}' | sort | uniq -c
-# →       3 haiku
-# →       5 opus
-# →      13 sonnet
+grep -h '^model:' agents/*.md | awk '{c[$2]++} END{for(k in c) printf "%d %s\n", c[k], k}' | sort -k2
+# → 3 haiku
+# → 5 opus
+# → 13 sonnet
 ```
 
 ### PF-014 — `agents/` — VERIFIED
@@ -900,7 +900,7 @@ last written, and none of them was still true.
 
 ```bash
 grep -c 'section=evidence' tests/check.sh
-# → 1
+# → 2
 ```
 
 ### PF-016 — `.github/workflows/` — VERIFIED
@@ -919,9 +919,12 @@ One real exposure found and fixed: five evidence commands ended in `wc -l`, whos
 output is **unpadded on GNU and padded on BSD**. On macOS every one of them would
 have printed `      26` against a recorded `26`, and Check 17 would have failed
 the whole suite for a developer whose only mistake was using a Mac. Each now ends
-`| wc -l | tr -d ' '`. `PF-013` still uses `uniq -c`, whose column width differs
-between implementations; it is recorded with the local padding and is the one row
-known to be GNU-specific.
+`| wc -l | tr -d ' '`. `PF-013` used `uniq -c`, whose column width differs between
+implementations, and was the last row known to be GNU-specific. Replaced with an
+`awk` tally that emits a single space by construction — `for (k in c)` has no
+defined order, so the output is sorted explicitly rather than left to chance. No
+evidence command is now known to depend on which implementation of a tool is
+installed.
 
 **Extent, read from the public API 2026-08-05 and larger than first reported.**
 The run history gives the exact boundaries: last green `420a4f7` at 01:09, first

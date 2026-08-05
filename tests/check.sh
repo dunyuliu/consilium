@@ -30,6 +30,7 @@
 #  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
 #  20. Every agent holding the Agent tool warns about dispatch cost, and no
 #      agent without it does.
+#  21. No PATHWAY_FORWARD.md evidence command reaches the network.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -802,6 +803,39 @@ for agent_file in agents/*.md; do
         ok
     fi
 done
+
+echo
+echo "Check 21: no evidence command reaches the network"
+# Rule 2. Check 17 executes every fenced evidence command on every suite run, so
+# an evidence command IS part of the gate. A gate that needs the network fails in
+# a clone behind a firewall, on a machine with no route out, or when a public API
+# rate-limits — and it fails for a reason that has nothing to do with the
+# repository being wrong. CI was red for twenty-two commits on exactly that kind
+# of environmental dependency (a shallow checkout, PF-016), which is why this one
+# is closed before it is ever opened rather than after.
+#
+# The temptation is concrete: CI status IS readable from this repository with
+# `curl` against the public API, and it was deliberately recorded as a MANUAL
+# procedure in PF-016 rather than as that row's evidence. This check is what
+# stops a later edit from quietly promoting it.
+#
+# WHAT THIS CHECKS, EXACTLY: that no evidence command names a network tool or a
+# URL scheme. It is complete for that, and it is not the general claim that every
+# evidence command is environment-independent — that is not mechanizable, and the
+# axes already tested by hand (working directory, locale, timezone, shallow
+# clone, GNU vs BSD padding) are recorded on PF-016 instead.
+NET_TOOLS='(^|[|;& ])(curl|wget|nc|ncat|telnet|ssh|scp|rsync|ftp|ping)([ |;&]|$)|https?://'
+for_each_evidence_net=0
+while IFS=$'\037' read -r ev_id ev_n ev_cmd _ev_res; do
+    [ -z "$ev_id" ] && continue
+    for_each_evidence_net=$((for_each_evidence_net + 1))
+    if printf '%s' "$ev_cmd" | grep -qE "$NET_TOOLS"; then
+        fail "$ev_id: evidence command reaches the network — Check 17 runs it on every suite pass, so the gate would need a route out (rule 2)"
+    else
+        ok
+    fi
+done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
+[ "$for_each_evidence_net" -gt 0 ] || fail "no evidence commands parsed for the network check"
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
