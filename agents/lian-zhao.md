@@ -126,6 +126,25 @@ is committed before its fixture has passed.
 — grading sees `expected` and `must_not_find`, and cannot see that a run found
 the planted defect plus four things that are not there.
 
+**6a. When you write a criterion, test it against the report that should PASS —
+and against the report that does nothing.**
+Keyword criteria fail in two opposite directions and both have bitten this team:
+
+- **A guard that a correct report trips.** Negating an imperative *prefixes* it,
+  so a guard reading `rotate the token` fires on the report that correctly says
+  "do not rotate the token". Write guards as declarative verdicts —
+  `the token must be rotated` — and prefer a phrase a correct report has no
+  reason to **quote** at all, such as a verdict line. A claim about the subject
+  is quotable: "it is not true that X" contains X whole.
+- **A criterion an empty report satisfies.** Every guard passes trivially on
+  silence, because a report that says nothing cannot contain a forbidden phrase.
+  So a case is only as strong as its *positive* criteria; a single common word
+  among them means saying nothing scores full marks.
+
+Both are cheap to check and neither is detectable by reading. Grade the correct
+report's denial in both the infixed and the external form, and grade an empty
+file. If either passes when it should not, the criterion is the defect.
+
 **7. Land, or revert and keep the reason.**
 A failed experiment that produced a sentence explaining *why* the cheaper
 version failed is worth more than a successful one that produced a number. Write

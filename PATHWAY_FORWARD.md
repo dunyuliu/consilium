@@ -355,6 +355,29 @@ Nothing red reached the remote: the `pre-push` hook re-runs the gate, and by the
 was not. Rule 3 says green before merge, and "it will be green in a moment" is
 the reasoning every skipped gate has.
 
+**Prompt-vs-check pass, 2026-08-05 — one real gap found.** Checks 17–29 all
+postdate most agent prompts, and `haruto-nakamura`'s cardinal rule turned out to
+contradict Check 27, so the other prompts were read the same way. Three
+candidate contradictions were checked and are **not** defects: `lian-zhao`'s
+`stage → dispatch → grade` sequence is current and its caveat that grading
+cannot see precision matches Check 24's stated limit; `zofia-kaminska`'s
+`docs/PATHWAY_FORWARD.md` is an example filename for another project;
+`wei-lin`'s `git status` is a state read, not the enforcement rule 7 used to
+lean on. No agent prompt carries a stale check number or suite count.
+
+**The gap is the other direction: the agents who WRITE fixtures carry none of
+the discipline that thirty-four defective guards paid for.** `lian-zhao` grows
+fixtures and dispatches `evals/run.sh`; `iris-vermeulen` designs tests;
+`nadia-hadid` recommends them. None mentions declarative guards, the negation
+test, or the empty-report test. Rules 25a and 25c exist only in
+`PROJECT_RULES.md`, which a dispatched agent does not necessarily read.
+
+Added to `lian-zhao` as step 6a, phrased as a principle rather than a rule
+number — the discipline is generic to keyword-matched criteria and these prompts
+are meant to be portable, so importing consilium's numbering would be the wrong
+fix. `iris-vermeulen` and `nadia-hadid` are candidates for the same block and
+are deliberately left for a decision rather than edited on momentum.
+
 **`haruto-002` written 2026-08-05 — the fixture rule 10 says should have come
 first.** Rule 10 requires an eval fixture before an agent-behaviour fix ships,
 and the ordering caveat below was written without one. The case is the incident
