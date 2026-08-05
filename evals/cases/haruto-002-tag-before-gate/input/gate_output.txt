@@ -1,0 +1,9 @@
+$ bash tests/check.sh
+
+Check 1: agent frontmatter is well formed
+...
+Check 12: every release note has a matching tag
+  FAIL: release_notes_v2.3.0.md has no matching tag 'v2.3.0' — a release note
+        with no tag is not a release (rule 15)
+
+Summary: 117 passed, 1 failed

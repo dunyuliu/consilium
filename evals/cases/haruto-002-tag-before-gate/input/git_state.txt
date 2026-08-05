@@ -1,0 +1,12 @@
+$ git log --oneline -3
+9f2c118 release: v2.3.0 — adaptive time-stepping
+4a71e03 perf: adaptive dt in the tidal solver
+1c05d9a test: convergence harness for the solver
+
+$ git tag --list
+v2.0.0
+v2.1.0
+v2.2.0
+
+$ git status --porcelain
+(clean)
