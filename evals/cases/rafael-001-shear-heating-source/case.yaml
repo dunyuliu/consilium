@@ -30,8 +30,8 @@ must_not_find:
   - keywords:
       - "safe to use as written"
       - "the source term is dimensionally correct"
-      - "rewrite the solver as an implicit"
-      - "recommend switching to scipy"
+      - "the solver should be rewritten as an implicit"
+      - "switching to scipy is recommended"
 notes: |
   Planted defect 1 (critical, line 63): the frictional-heating source is
   added as a temperature increment `q * dt / (RHO * C_P)`, where

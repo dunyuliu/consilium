@@ -27,6 +27,7 @@
 #  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
 #  17. Every PATHWAY_FORWARD.md evidence command still prints what is recorded.
 #  18. No fixture input contains fixture-authoring language (answer-key leak).
+#  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -714,6 +715,40 @@ for case_dir in evals/cases/*/; do
     if [ -n "$hit" ]; then
         phrase=$(grep -rIh -ioE "$LEAK_PHRASES" "$hit" 2>/dev/null | head -1 || true)
         fail "$id: ${hit#"$case_dir"} leaks the answer key to the staged copy (\"$phrase\")"
+    else
+        ok
+    fi
+done
+
+echo
+echo "Check 19: must_not_find guards are declarative, not imperative"
+# Rule 25. Negating an imperative PREFIXES it — "do not rotate the token"
+# contains "rotate the token" — so an imperative guard fires on a correct
+# report that declines to do the thing. Negating a declarative INFIXES the
+# negation: "must not be rotated" does not contain "must be rotated".
+#
+# The containment is definitional for the imperative form, not a heuristic:
+# prefixing anything to a string always leaves the string present.
+#
+# Found 2026-08-05 while authoring anya-002, whose own first draft had three
+# imperative guard families. A sweep then found 31 more across 15 cases.
+#
+# WHAT THIS CHECKS, EXACTLY: that no guard begins with one of the verbs below.
+# The list is finite, so a guard opening with a verb not on it passes — this is
+# named narrowly for that reason and is not the general claim that every guard
+# survives its negation, which is not mechanizable (see PF-011).
+#
+# `cutting` is deliberately absent: "cutting rina-solberg.md is safe" is
+# declarative and negates cleanly. An -ing form is a gerund, not an imperative.
+IMPERATIVES='rotate|remove|redact|delete|switch|rewrite|drop|add|commit|scrub|purge|revoke|change|update|fix|recommend|suggest|backfill|back-fill|merge|refactor|loosen|tighten|edit|implement|patch|apply|replace|ignore|skip|widen|restore|check|use|write'
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
+    [ -f "$cy" ] || continue
+    bad=$(awk -f evals/parse_case.awk -v section=must_not_find "$cy" \
+        | cut -d'|' -f5- | tr '\037' '\n' \
+        | grep -iE "^($IMPERATIVES)\b" | head -1 || true)
+    if [ -n "$bad" ]; then
+        fail "$id: must_not_find guard \"$bad\" is imperative — a correct report saying \"do not $bad\" would trip it. Rewrite declaratively (rule 25)."
     else
         ok
     fi

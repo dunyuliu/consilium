@@ -88,6 +88,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 22 | Every agent declares communication discipline | mechanical |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |
+| 25a | must_not_find guards are declarative, never imperative | mechanical — Check 19 |
 | 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical |
 
 ---
@@ -446,9 +447,13 @@ Corollaries, each paid for:
   *prefixes* it — "do not rotate the token" contains "rotate the token" — so an
   imperative guard fires on the correct report. Negating a declarative *infixes*
   the negation — "must **not** be rotated" does not contain "must be rotated".
-  Write `X must be rotated`, never `rotate X`. Found 2026-08-05 while authoring
-  `anya-002`: three of its five guard families were imperative in the first
-  draft and every one of them failed a correct report.
+  Write `X must be rotated`, never `rotate X`. The containment is definitional,
+  not a heuristic — prefixing anything to a string always leaves the string
+  present — which is why this is **mechanically checked (Check 19)** where the
+  broader question of whether a guard survives its negation is not checkable at
+  all. Found 2026-08-05 while authoring `anya-002`, whose first draft had three
+  imperative guard families; the sweep that followed found 31 more across 16 of
+  the other cases.
 - **Before shipping a guard, write the correct report's negation and grade
   it.** A `must_not_find` entry must be a phrase only a *wrong* answer
   produces. A bare noun never is, because the right answer's denial contains

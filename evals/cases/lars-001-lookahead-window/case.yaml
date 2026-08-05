@@ -24,8 +24,8 @@ expected:
       - "masking"
 must_not_find:
   - keywords:
-      - "switch to numpy"
-      - "rewrite using vectorized"
+      - "numpy should be used instead"
+      - "should be rewritten using vectorized"
 # Every real defect in input/, whether or not it is required for a pass.
 # Diagnostic only — see evals/README.md.
 declared_defects:

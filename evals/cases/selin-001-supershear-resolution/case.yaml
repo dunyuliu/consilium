@@ -86,7 +86,7 @@ must_not_find:
       - "no physical reason is given for the exclusion"
       - "the exclusion of KVK and DRB is post hoc"
       - "the excluded stations are not reported"
-      - "recommend including KVK and DRB in the"
+      - "including KVK and DRB is recommended"
       - "the two basin stations must be included in the"
   # (b) attacking the frequency-band CONTROL. 2600 m/s / (1 Hz x 250 m) =
   #     10.4 nodes per wavelength, twice the stated criterion, and the paper

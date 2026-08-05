@@ -164,18 +164,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 509 passed, 0 failed
+# → Summary: 533 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 18 checks and 18 exist. This row is now
+The header comment documents 19 checks and 19 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 18
+# → 19
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -195,7 +195,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 509 passed, 0 failed
+# → Summary: 533 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -517,6 +517,34 @@ Line 27 is `(prices / base) - 1.0 + r.fillna(0)`, a SUM. Neither docstring
 describes a sum: both describe one difference. Adding `r` to a relative
 deviation is a second term the documentation never mentions. Distinct from
 planted defect 2, which is about `fillna(0)` on the same line.
+
+**Rule-25 sweep, 2026-08-05 — 31 imperative guards across 16 cases, all fixed.**
+`anya-002` taught the shape; the sweep applied it. A guard beginning with a bare
+verb fires on the correct report, because negating an imperative *prefixes* it
+and prefixing anything to a string always leaves the string present. That is
+definitional, not a heuristic — which is why this one IS mechanizable where the
+broader "does a correct report trip this guard" question was not (see the three
+rejected candidates above).
+
+28 were rewritten in the first pass (`anya-001` 5, `sophia-002` 4, `mira-001` 4,
+`kai-001`, `lars-001`, `marco-001`, `ziyan-001` 2 each, and one each in
+`elena-001`, `ingrid-001`, `nadia-001`, `rafael-001` 2, `selin-001`,
+`zofia-001`). A second, properly-constructed pass found 3 more the first verb
+list had missed — `restore`, `widen`, `check` — and **one false positive that
+had to be kept out of the check**: `lian-001`'s `"cutting rina-solberg.md is
+safe"` is declarative, and an -ing form is a gerund, not an imperative.
+
+A methodological note worth keeping. The first automated test appended
+`"I do not <guard>"` to each pass sample and graded it. That is worthless: the
+sentence contains the guard verbatim whatever its shape, so every guard trips
+and the result carries no information. The real test negates *grammatically* —
+prefix for an imperative, infix for a declarative — and is a pure string
+containment question needing no grading at all. Under it: 161 guards safe, 95
+with no negatable auxiliary, 4 unsafe.
+
+**Check 19 landed** and negative-tested (restoring `"switch to numpy"` in
+`lars-001` produces the imperative failure). All eight touched fail-samples
+still FAIL, so the guards were made safe rather than gutted.
 
 **`anya-002` added 2026-08-05** and audited as it was written — its own guards
 were graded against the correct report's negation before shipping, and three of

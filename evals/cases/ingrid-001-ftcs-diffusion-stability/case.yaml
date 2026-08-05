@@ -35,7 +35,7 @@ must_not_find:
   - keywords:
       - "No mathematical issues found"
       - "the time step is stable as written"
-      - "recommend keeping cfl = 0.9"
+      - "keeping cfl = 0.9 is recommended"
       - "patched thermal_column.py"
       - "rewrote thermal_column.py"
 notes: |

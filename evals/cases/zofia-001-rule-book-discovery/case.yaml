@@ -67,7 +67,7 @@ must_not_find:
       - "docs/RULES.md is the project's rule book"
       - "docs/RULES.md is a binding rule book"
       - "docs/RULES.md defines binding constraints"
-      - "recommend enforcing docs/RULES.md"
+      - "enforcing docs/RULES.md is recommended"
 notes: |
   Planted situations, all under input/:
 

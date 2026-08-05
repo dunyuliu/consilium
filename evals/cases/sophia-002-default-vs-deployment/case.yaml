@@ -53,16 +53,16 @@ must_not_find:
       - "queue_name contradicts the documented default"
       - "documented default for queue_name is wrong"
       - "queue_name diverges from its documented default"
-      - "recommend updating the documented default for queue_name"
-      - "recommend changing queue_name's default"
+      - "the documented default for queue_name should be updated"
+      - "queue_name's default should be changed"
   - keywords:
       - "batch_size default mismatch"
       - "batch_size's default is wrong"
       - "batch_size contradicts the documented default"
       - "documented default for batch_size is wrong"
       - "batch_size diverges from its documented default"
-      - "recommend updating the documented default for batch_size"
-      - "recommend changing batch_size's default"
+      - "the documented default for batch_size should be updated"
+      - "batch_size's default should be changed"
 # Every real defect in input/, whether or not it is required for a pass.
 # Diagnostic only — `grade` reports how many were mentioned and never lets that
 # change the verdict (rule 5). See evals/README.md.

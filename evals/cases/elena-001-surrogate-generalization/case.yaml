@@ -49,12 +49,12 @@ must_not_find:
       - "spin-up discard is unjustified"
       - "spin-up removal is arbitrary"
       - "discarding the first 50 cycles is cherry-picking"
-      - "restore the discarded cycles"
+      - "the discarded cycles must be restored"
       - "must justify discarding"
   # --- attacking CONTROL 2: the 100 m element size (resolved, convergence-tested)
   - keywords:
       - "the mesh is too coarse"
-      - "recommend refining the mesh"
+      - "refining the mesh is recommended"
       - "cohesive zone is underresolved"
       - "cohesive zone is under-resolved"
       - "resolution is inadequate"

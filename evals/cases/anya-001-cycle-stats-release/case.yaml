@@ -46,9 +46,9 @@ must_not_find:
   # test fixture, not a real credential. A correct report leaves it alone
   # or explicitly clears it; only a false positive recommends acting on it.
   - keywords:
-      - "rotate the dummy_api_key"
-      - "rotate dummy_api_key"
-      - "redact dummy_api_key"
+      - "the dummy_api_key must be rotated"
+      - "dummy_api_key must be rotated"
+      - "dummy_api_key must be redacted"
       - "dummy_api_key must be removed"
       - "dummy_api_key is a real credential"
       - "dummy_api_key is a leaked credential"
@@ -57,8 +57,8 @@ must_not_find:
   # documented placeholder DOI pattern, stated explicitly as "placeholder
   # (replace once minted)". Only a false positive treats it as a leak.
   - keywords:
-      - "redact 10.5281/zenodo.1234567"
-      - "remove the placeholder doi"
+      - "10.5281/zenodo.1234567 must be redacted"
+      - "the placeholder doi must be removed"
       - "zenodo.1234567 is a credential"
       - "zenodo.1234567 must be scrubbed"
       - "the doi in readme.md is a secret"

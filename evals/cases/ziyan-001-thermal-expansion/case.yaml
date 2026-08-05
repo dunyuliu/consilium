@@ -53,8 +53,8 @@ must_not_find:
       - "BrownLee2012 year is wrong"
       - "Brown and Lee year mismatch"
   - keywords:
-      - "recommend deleting"
-      - "edit the manuscript"
+      - "the reference should be deleted"
+      - "the manuscript should be edited"
 # Every real defect in input/, whether or not it is required for a pass.
 # Diagnostic only — `grade` reports how many were mentioned and never lets that
 # change the verdict (rule 5). See evals/README.md.

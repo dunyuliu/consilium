@@ -86,7 +86,7 @@ must_not_find:
   - keywords:
       - "the port diverges from the reference"
       - "the manuscript's citation list"
-      - "check the DOIs"
+      - "the DOIs should be checked"
   # (c) wrong headline verdicts.
   - keywords:
       - "the README figures reproduce from the committed data"

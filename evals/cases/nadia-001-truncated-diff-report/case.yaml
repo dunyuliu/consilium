@@ -66,7 +66,7 @@ expected:
 must_not_find:
   - keywords:
       - "exceeds 1e-3 times the peak"
-      - "ignore differences smaller than"
+      - "differences smaller than"
       - "below 1e-3 are noise"
       - "231 nodes are noise"
       - "231 exceedances are numerical noise"

@@ -70,7 +70,7 @@ must_not_find:
   - keywords:
       - "the reference frame is the central weakness"
       - "the reference frame is the load-bearing weakness"
-      - "recommend reprocessing in ITRF2014"
+      - "reprocessing in ITRF2014 is recommended"
       - "the IGS14 realization biases the inferred trend"
       - "frame realization drives the result"
       - "reference-frame artifact explains the postseismic signal"
@@ -80,7 +80,7 @@ must_not_find:
       - "the fixed elastic thickness invalidates"
       - "H = 25 km is unjustified"
       - "the trade-off with elastic thickness is hidden"
-      - "recommend testing sensitivity to H"
+      - "testing sensitivity to H is recommended"
   # --- promoting a minor distractor to the central problem ------------------
   - keywords:
       - "load-bearing weakness is the missing uncertainty"

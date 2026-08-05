@@ -52,8 +52,8 @@ must_not_find:
       - "dropped the half-bin offset"
       - "the three loops are pure copy-paste"
       - "three-way duplication eliminated"
-      - "switch to numpy.histogram"
-      - "rewrite using numpy"
+      - "numpy.histogram should be used instead"
+      - "should be rewritten using numpy"
 notes: |
   Planted trap (line 59). Three counting loops that look like textbook
   copy-paste: bin_depths (line 23), bin_distances (line 38), bin_magnitudes
