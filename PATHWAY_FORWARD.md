@@ -33,7 +33,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
-| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | OPEN |  | 60 |
+| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | OPEN |  | 30 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
@@ -131,7 +131,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 479 passed, 0 failed
+# → Summary: 503 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -162,7 +162,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 479 passed, 0 failed
+# → Summary: 503 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -191,15 +191,36 @@ description claims.
 # → (no output)
 ```
 
-### PF-010 — `install.sh` — OPEN — never audited
+### PF-010 — `install.sh` — VERIFIED
 
-Every install to date has been a re-run on this machine, where the symlinks and hooks
-already existed. The clean-clone path — the one a new user takes — has never been
+Every install to date had been a re-run on this machine, where the symlinks and hooks
+already existed. The clean-clone path — the one a new user takes — had never been
 executed.
 
+**Executed 2026-08-05.** `git clone` to a scratch directory, then `install.sh`
+run under a sandboxed `HOME` so the real `~/.claude` was never touched — the
+installer hardcodes `CLAUDE=${HOME}/.claude` with no override, so overriding
+`HOME` is the only way to exercise the real code path safely.
+
+  gate on the fresh clone     502 passed, 0 failed
+  first install               21 agents, 18 commands
+  second install              identical — idempotent
+  broken symlinks             0
+  hooks written               post-merge, pre-commit, pre-push
+  hooks carrying v3 marker    3 of 3
+
+Both `pre-commit` guards were fired deliberately rather than assumed: a commit
+by a different `CONSILIUM_LOCK_OWNER` was refused with "repo is held by
+'someone-else'", and a commit by the holder staging a path outside the declared
+scope was refused with "staged files fall OUTSIDE the declared lock scope".
+
+One thing checked and NOT a defect: with no lock file present the hook exits 0
+and the commit proceeds. That is `[ -f "$LOCK" ] || exit 0` working as written —
+rule 18 governs concurrent writers, not every commit.
+
 ```bash
-# no command run
-# → (no output)
+grep -c 'CLAUDE=\${HOME}/.claude' install.sh
+# → 1
 ```
 
 ### PF-011 — `evals/cases/*/input/` — VERIFIED
