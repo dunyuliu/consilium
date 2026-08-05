@@ -35,6 +35,8 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | OPEN |  | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | BROKEN | 2026-08-04 | 30 |
+| PF-014 | `agents/` | no agent is missing the fixture its name implies | OPEN |  | 30 |
+| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
 
 ## Items
 
@@ -73,8 +75,8 @@ the 21st agent; `lian-001-no-fixture-no-cut` is a directory with no
 
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l
-# → 15
-#   → 14 of 21 agents covered
+# → 21
+#   → 21 of 21 agents have at least one fixture
 ```
 
 ### PF-003 — `evals/cases/` — BROKEN
@@ -88,14 +90,10 @@ as originally written. Route: the crash is a code bug in `evals/run.sh` →
 `lars-eriksson`; the missing fixture is a coverage gap → `iris-vermeulen`.
 
 ```bash
-for d in evals/cases/*/; do
-  [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }
-  grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"
-done
+for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → anya-001-cycle-stats-release: NEVER RUN
 # → lars-002-clean-control: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
-# → lian-001-no-fixture-no-cut: NO case.yaml
 ```
 
 ### PF-004 — `evals/` — OPEN
@@ -107,6 +105,7 @@ plus four things that are not there scores identically to a clean one. The
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh
 # → evals/README.md:1
+# → evals/run.sh:0
 ```
 
 ### PF-005 — `docs/release_notes_*` — BROKEN
@@ -132,18 +131,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 372 passed, 0 failed
+# → Summary: 479 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-Checks 12–14 landed since this row was last written; the header comment now
-documents 14 checks and 14 exist. Fixed, not just re-counted — re-check this on
-any future change to the number of checks.
+The header comment documents 17 checks and 17 exist. This row is now
+self-maintaining: Check 17 re-runs the command below on every suite run, so
+adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 14
+# → 17
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -163,7 +162,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 464 passed, 0 failed
+# → Summary: 479 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -275,7 +274,9 @@ challenged either way — the untested count grows by one, it does not shrink.
 
 ```bash
 grep -H '^model:' agents/*.md | sed 's|agents/||' | awk '{print $2}' | sort | uniq -c
-# → 3 haiku
+# →       3 haiku
+# →       5 opus
+# →      13 sonnet
 ```
 
 ### PF-014 — `agents/` — OPEN — never audited
@@ -289,7 +290,7 @@ for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | gr
 # → 0
 ```
 
-### PF-015 — `tests/check.sh` — BROKEN — never audited
+### PF-015 — `tests/check.sh` — VERIFIED
 
 Rule 21a (execute the board's evidence and diff it against the recorded
 output) was attempted on 2026-08-04 and REVERTED. The awk parser split
@@ -306,9 +307,30 @@ Neither is fatal — store commands as single lines, and exempt self-referential
 ones explicitly — but it is more than a small patch, and a half-working gate
 that swallows the rest of the suite is the exact failure mode rule 2 forbids.
 
+**Closed 2026-08-04.** Landed as Check 17, and the diagnosis above was wrong in
+its most important part. The awk parser was a real obstacle but not the fatal
+one: `check.sh` runs under `set -euo pipefail`, so the first evidence command to
+exit nonzero — `grep -c` finding nothing is routine — killed the run before the
+Summary line. The check did not block because it mis-parsed; it blocked because
+it was executed under errexit. Evidence commands now run with errexit suspended
+and their exit status ignored, because the contract is what a command *prints*.
+
+The multi-line obstacle is now a rule rather than a workaround: a fence with more
+than one command line fails the check outright. `PF-003` was rewritten as one
+line. The self-referential rows (`PF-006`, `PF-008`, whose command is
+`bash tests/check.sh`) are named and skipped in the output, not silently dropped.
+
+It reddened on landing, which is the point. Five rows had drifted since they were
+written — `PF-002` (15 -> 21), `PF-003` (a case.yaml that now exists), `PF-004`
+and `PF-013` (only the first line of multi-line output had been recorded, so the
+"literal stdout" claim was already false), `PF-007` (14 -> 16) — and `PF-007`
+drifted again during this very change, from 16 to 17, because adding Check 17
+changed the number of checks. Every one of those rows carried the date it was
+last written, and none of them was still true.
+
 ```bash
-# no command run — the check was reverted before it worked
-# → never audited
+grep -c 'section=evidence' tests/check.sh
+# → 1
 ```
 
 ## Deferral log

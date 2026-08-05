@@ -15,7 +15,7 @@ repo:
 - **`PROJECT_RULES.md`** — 25 binding rules, 16 of them enforced by a
   gate rather than by good intentions. Each carries the incident that
   paid for it.
-- **`tests/check.sh`** — 464 structural checks, every one negative-tested
+- **`tests/check.sh`** — 479 structural checks, every one negative-tested
   when it landed. A check that has never failed is not known to be a gate.
 - **`evals/cases/`** — 23 regression fixtures, one per agent, all executed.
   Prompt edits are measurable instead of vibe-checked.
@@ -593,6 +593,14 @@ interval. Deferring is legitimate and costs one line in the deferral log with
 a reason; letting an inspection lapse silently is not. The gate reddens on an
 undecided item, never on a date alone.
 
+Check 12 verifies that a `VERIFIED` claim *cites* a command. Check 17 runs it:
+every fenced evidence command is executed on every suite run and byte-diffed
+against its recorded `# →` output, so a row cannot be date-bumped without being
+re-derived. On its first run five of thirteen rows had drifted — including two
+whose recorded "literal stdout" was only the first line of a multi-line output.
+Commands must be one line; rows whose command is `bash tests/check.sh` are named
+and skipped rather than silently dropped (rule 21a).
+
 Add new structural checks to `tests/check.sh` when they cost less
 than the rule they enforce. `iris-vermeulen`'s default applies here
 too: write in-session, defer only when a new dependency is genuinely
@@ -609,11 +617,6 @@ required.
   wordings; nothing catches a report that finds the planted defect *plus four
   things that are not there*. `declared_defects:` is sketched in
   `evals/README.md`, unbuilt.
-- **Execute the inspection log's evidence.** Check 12 verifies a `VERIFIED`
-  claim cites a command, not that the recorded output is still true — four
-  rows drifted within a day of landing. Rule 21a proposes byte-diffing the
-  real stdout; the `# →` lines are now literal output, which was the
-  precondition.
 - `install.sh` idempotency / `--force` behaviour tests (the structural
   invariants are covered by `tests/check.sh`; the script itself isn't). A
   clean-clone install has never been executed — tracked as PF-010.

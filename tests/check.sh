@@ -25,6 +25,7 @@
 #  14. Every agent declares tool economy (section presence only).
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
 #  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
+#  17. Every PATHWAY_FORWARD.md evidence command still prints what is recorded.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -625,6 +626,57 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+
+echo
+echo "Check 17: PATHWAY_FORWARD.md evidence commands still print what is recorded"
+# Rule 21a. A VERIFIED claim is only as good as its last run; Check 12 verifies a
+# claim CITES a command, never that the command still says so.
+#
+# The first attempt at this check blocked the whole suite and was reverted. Root
+# cause was not the parser: check.sh runs under `set -e`, and an evidence command
+# exiting nonzero (grep finding nothing is routine) killed the run before the
+# Summary line printed. Evidence commands are therefore run with errexit
+# suspended and their exit status deliberately ignored — the contract is what a
+# command PRINTS, not whether it succeeded.
+#
+# Two exemptions, both reported rather than silent:
+#   * a fence with no command line records an absence of evidence (a never-audited
+#     row); the parser does not emit it, so there is nothing to run.
+#   * a command that invokes `bash tests/check.sh` would recurse into this check.
+# A fence with more than one command line FAILS: line-oriented parsing cannot
+# reconstruct multi-line shell, and joining fragments with `;` produces `do;`,
+# which is what broke attempt 1. One line per command is the contract.
+if [ ! -f "$BOARD" ]; then
+    fail "$BOARD missing — rule 21a has nothing to execute"
+else
+    ev_rows=0
+    while IFS=$'\037' read -r ev_id ev_n ev_cmd ev_res; do
+        [ -z "$ev_id" ] && continue
+        ev_rows=$((ev_rows + 1))
+        if [ "$ev_n" -gt 1 ]; then
+            fail "$ev_id: evidence command spans $ev_n lines — rule 21a requires one line so it can be re-run"
+            continue
+        fi
+        case "$ev_cmd" in
+            *"bash tests/check.sh"*)
+                echo "  self-referential, not re-run: $ev_id"
+                ok; continue ;;
+        esac
+        ev_expected=$(printf '%s' "$ev_res" | tr '\036' '\n')
+        set +e
+        ev_actual=$(bash -c "$ev_cmd" 2>&1)
+        set -e
+        if [ "$ev_actual" = "$ev_expected" ]; then
+            ok
+        else
+            fail "$ev_id: recorded evidence no longer reproduces — re-run and paste what it printed"
+            printf '        command:  %s\n' "$ev_cmd"
+            printf '        recorded: %s\n' "$(printf '%s' "$ev_expected" | tr '\n' '|')"
+            printf '        actual:   %s\n' "$(printf '%s' "$ev_actual" | tr '\n' '|')"
+        fi
+    done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
+    [ "$ev_rows" -gt 0 ] || fail "no evidence commands parsed from $BOARD — the parser or the format changed"
+fi
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

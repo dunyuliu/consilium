@@ -52,6 +52,27 @@ section == "items" && infence {
     next
 }
 
+# --- evidence: id \037 command-line-count \037 command \037 recorded-output
+# Emitted only for fences that carry a command. A fence of pure comments records
+# an absence of evidence (a never-audited row) and has nothing to re-run.
+# The line count is emitted rather than the joined command on purpose: multi-line
+# shell cannot be reconstructed by a line-oriented parser, and the first attempt
+# at rule 21a broke by joining `for ...; do` fragments with `;`. Check 17 fails
+# such a fence instead of guessing.
+section == "evidence" && /^### PF-[0-9]+/ {
+    match($0, /PF-[0-9]+/); ev_id = substr($0, RSTART, RLENGTH); next
+}
+section == "evidence" && /^```bash/ { ev = 1; ec = ""; en = 0; er = ""; next }
+section == "evidence" && /^```/ {
+    if (ev && en > 0) printf "%s\037%d\037%s\037%s\n", ev_id, en, ec, er
+    ev = 0; next
+}
+section == "evidence" && ev {
+    if ($0 ~ /^# → /) { e = $0; sub(/^# → /, "", e); er = (er == "" ? e : er "\036" e) }
+    else if ($0 !~ /^#/ && $0 !~ /^ *$/) { en++; if (ec == "") ec = $0 }
+    next
+}
+
 # --- deferral log: | 2026-08-04 | PF-003 | 2026-09-03 | reason |
 section == "defer" && /^\| *20[0-9][0-9]-/ {
     n = split($0, f, "|")

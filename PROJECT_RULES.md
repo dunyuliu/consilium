@@ -83,7 +83,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 19 | One owner per write surface | mechanical |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical |
-| 21a | *(Proposed)* Board `# →` lines are literal command stdout | proposed |
+| 21a | Board `# →` lines are literal command stdout, and the command is re-run | mechanical — Check 17 |
 | 22 | Every agent declares communication discipline | mechanical |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |
@@ -515,29 +515,42 @@ printed, set `last-checked` to today, append a dated note. `tests/check.sh`
 Check 12 enforces the shape; only you can enforce that the command was really
 run.
 
-## 21a. *(Proposed)* The board's `# →` line is the command's literal stdout
+## 21a. The board's `# →` line is the command's literal stdout, and the command is re-run
 
-**Proposed — not yet binding; awaiting the maintainer's decision.** Check 12
-verifies that a `VERIFIED` claim *cites* a command; it cannot tell whether the
-recorded `# →` line still matches what that command prints today, because
-several rows record a hand-written summary (`14 of 20 agents covered`)
-instead of the command's raw output (which is just `14`). A summary can be
-date-bumped without being re-derived and nothing catches it — four rows in
-`PATHWAY_FORWARD.md` did exactly that on a day their `last-checked` already
-read today (found 2026-08-04).
+Tier: mechanical (Check 17). Every fenced evidence command in
+`PATHWAY_FORWARD.md` is executed on every suite run and its output byte-diffed
+against the recorded `# →` lines. Narration belongs in the item's prose above
+the fence, never on a `# →` line.
 
-**The fix, if adopted**: require every `# →` line to be the command's exact
-stdout, with narration moved into the item's prose above the fence. Check 12
-can then execute the fenced command and byte-diff its output against the
-recorded line, failing on drift instead of only on absence.
+**Why it is not enough to cite a command.** Check 12 verifies a `VERIFIED` claim
+*cites* a command. It cannot tell whether the recorded output still matches what
+that command prints today, so a row can be date-bumped without being re-derived.
+Four rows did exactly that on a day their `last-checked` already read today
+(2026-08-04). When Check 17 first ran, **five of thirteen rows had drifted**,
+including two whose recorded "literal stdout" was only the first line of a
+multi-line output — the precondition for this rule had itself silently lapsed.
 
-**What it cannot fix**: a command whose true output is a derived tally from a
-larger listing (PF-002's fixture count, PF-013's tier breakdown) still needs a
-second, narrower command whose raw output *is* the number — this rule is
-upstream of the check, not a substitute for writing a checkable command.
+**One command per fence.** A fence carrying more than one command line fails.
+Line-oriented parsing cannot reconstruct multi-line shell: joining `for ...; do`
+fragments with `;` yields `do;`, a syntax error the check would then report as
+drift. The first attempt at this rule did exactly that and was reverted.
 
-**Route**: implementing the Check 12 diff is a `tests/check.sh` change —
-`iris-vermeulen`'s surface, not this file's.
+**Exit status is ignored; only stdout is the contract.** The first attempt
+blocked the entire suite, and the parser was not the cause: `tests/check.sh` runs
+under `set -euo pipefail`, so the first evidence command to exit nonzero — a
+`grep -c` that finds nothing is routine — killed the run before the Summary line.
+Evidence commands run with errexit suspended. A gate that stops the suite when it
+trips is worse than no gate (rule 2).
+
+**Self-referential rows are named, not dropped.** A command that invokes
+`bash tests/check.sh` would recurse; those rows print
+`self-referential, not re-run: <id>` and are exempt. An exemption that leaves no
+trace in the output is indistinguishable from a check that silently passed.
+
+**What it still cannot fix**: a command whose true output is a derived tally from
+a larger listing needs a second, narrower command whose raw output *is* the
+number. This rule is upstream of the check, not a substitute for writing a
+checkable command.
 
 ## 20. Every writer declares isolation first, and is evaluated at the merge
 
