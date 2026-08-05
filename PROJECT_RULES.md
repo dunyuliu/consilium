@@ -475,6 +475,15 @@ Corollaries, each paid for:
   evaluate that claim. Found 2026-08-05 in `zofia-002`, whose task is precisely
   "does a rule already cover this", making the false claim the natural thing to
   restate. Not mechanizable, and Check 19 does not attempt it.
+
+  **First person is not enough either, and the reliable shape is a verdict
+  line.** `nadia-002` shipped `"I score this an agent defect"` — declarative,
+  first-person, and still tripped by *"it is not true that I score this an agent
+  defect"*. What survives is a phrase the correct report has no reason to write
+  at all: `"verdict: agent defect"`, `"verdict: the run missed"`. A report
+  states its own verdict; it does not quote the opposite one to reject it. Three
+  layers, each paid for by a fixture: **imperative → declarative → verdict
+  line.**
 - **Before shipping a guard, write the correct report's negation and grade
   it** — both forms, infixed and external. A `must_not_find` entry must be a phrase only a *wrong* answer
   produces. A bare noun never is, because the right answer's denial contains
