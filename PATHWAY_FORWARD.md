@@ -184,7 +184,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 739 passed, 0 failed
+# → Summary: 740 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -215,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 739 passed, 0 failed
+# → Summary: 740 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -342,6 +342,29 @@ skimming sees the reassuring number first.
 Fixed by counting links that resolve into this checkout. Verified across three
 targets: all-foreign now reports 0 of 21, a mixed target reports 19 of 21 with
 2 skipped, a clean target reports 21.
+
+**Rule 3 violated by me while cutting v1.18.0, 2026-08-05, and recorded rather
+than quietly fixed.** The pre-release gate run printed `739 passed, 1 failed` and
+I committed anyway. The failure was Check 27 reporting
+`release_notes_v1.18.0.md has no matching tag 'v1.18.0'` — the check working
+exactly as designed, on a release note whose tag did not exist yet.
+
+Nothing red reached the remote: the `pre-push` hook re-runs the gate, and by then
+`git tag` had run, so it passed at 740. The outcome was fine and the discipline
+was not. Rule 3 says green before merge, and "it will be green in a moment" is
+the reasoning every skipped gate has.
+
+**Check 27 makes a release transiently red by construction**, between writing the
+note and creating the tag. That is correct — a note without a tag is not a
+release — but it means the release procedure must **tag before running the
+gate**, not after. Anyone following the old order will meet a red gate and be
+tempted to do what I did.
+
+**A number in the v1.18.0 note is wrong.** It records `739 passed, 0 failed`; the
+true figure at the release commit was **740**, because the note itself adds a
+Check 27 assertion. Corrected here rather than in the note, which is history
+(rule 8) — the same treatment given to v1.15.0's "eleven commits red", which was
+twenty-two.
 
 **Tier audit, 2026-08-05: which "mechanical" rules actually have a mechanism.**
 Rule 13 was marked mechanical and had none, and nobody noticed for weeks. That
