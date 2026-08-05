@@ -243,6 +243,28 @@ INCONCLUSIVE derived from a finding count that would itself be wrong. A verdict
 built on a bad measurement is worse than an honest absence of one (rule 2).
 **Precision is read, not computed.**
 
+## Tiers
+
+There is exactly one tier and `evals/run.sh smoke` is the only thing that reads
+it. `tier: smoke` means **fast, offline, single-file, and worth running after any
+prompt edit**; a case with no `tier:` is full-suite only. Check 22 rejects any
+other value, because metadata that reads as meaningful and is inert is worse than
+none — it invites the next author to write `tier: slow` and believe something
+will honour it. `dunyu-001` carried `tier: dev` from its authoring and nothing
+ever acted on it.
+
+Membership is **fixed**, not selected by staleness — a tier whose membership
+moves with history cannot be compared across edits. The nine members are the
+five original fast cases plus the three refusal controls and the clean control,
+which are the cases most likely to break when a prompt is edited: an edit that
+makes an agent keener breaks a refusal case before it breaks a detection one.
+
+`smoke` prints each member's baseline state, and that is not decoration. As of
+2026-08-05 **seven of the nine have no verdict against the current prompt** —
+four never run, three stale. A green smoke run means "these cases pass today",
+not "nothing regressed", because for seven of them there is nothing to have
+regressed from.
+
 ## The leakage check is input-aware
 
 `grade` voids a report containing `case.yaml`, `must_not_find` or "planted

@@ -31,6 +31,7 @@
 #  20. Every agent holding the Agent tool warns about dispatch cost, and no
 #      agent without it does.
 #  21. No PATHWAY_FORWARD.md evidence command reaches the network.
+#  22. Every case `tier:` value is one the tooling actually consumes.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -836,6 +837,31 @@ while IFS=$'\037' read -r ev_id ev_n ev_cmd _ev_res; do
     fi
 done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
 [ "$for_each_evidence_net" -gt 0 ] || fail "no evidence commands parsed for the network check"
+
+echo
+echo "Check 22: every case tier is a tier the tooling consumes"
+# `evals/run.sh smoke` selects on `^tier: smoke` and nothing reads any other
+# value. `dunyu-001` carried `tier: dev` with a considered justification beside
+# it, and nothing anywhere has ever acted on it — metadata that reads as
+# meaningful and is inert. That is worse than no metadata: it invites the next
+# author to add `tier: slow` and believe something will honour it.
+#
+# WHAT THIS CHECKS, EXACTLY: that every `tier:` value appears in KNOWN_TIERS
+# below. Adding a tier to the tooling means adding it here in the same change,
+# which is the point — the list is the contract between the cases and the runner.
+KNOWN_TIERS='smoke'
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
+    [ -f "$cy" ] || continue
+    tier=$(grep -m1 '^tier:' "$cy" 2>/dev/null | sed 's/^tier: *//; s/ *#.*$//; s/ *$//' || true)
+    if [ -z "$tier" ]; then
+        ok                      # no tier is fine: the case is full-suite only
+    elif printf '%s\n' $KNOWN_TIERS | grep -qxF -- "$tier"; then
+        ok
+    else
+        fail "$id: tier '$tier' is not consumed by any tool — known tiers are: $KNOWN_TIERS"
+    fi
+done
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

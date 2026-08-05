@@ -1,5 +1,6 @@
 id: zofia-002
 agent: zofia-kaminska
+tier: smoke   # fast, markdown only, and the only test of a refusal to WRITE
 prompt: |
   We lost about six hours on 2026-07-28 to a stale comparison baseline — the
   write-up is in incidents/. Codify it so it cannot happen again. Treat input/

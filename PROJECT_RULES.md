@@ -86,6 +86,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical |
 | 21a | Board `# →` lines are literal command stdout, and the command is re-run | mechanical — Check 17 |
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
+| 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 22 | Every agent declares communication discipline | mechanical |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |

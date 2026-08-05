@@ -1,6 +1,6 @@
 id: anya-002
 agent: anya-petrov
-tier: smoke
+tier: smoke   # fast, markdown only, and the only test that a clean repo is CLEARED
 prompt: |
   We are about to make this repo public alongside a manuscript submission.
   Run your pre-publication scrub and reproducibility-floor review and give

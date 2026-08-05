@@ -184,18 +184,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 586 passed, 0 failed
+# → Summary: 612 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 21 checks and 21 exist. This row is now
+The header comment documents 22 checks and 22 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 21
+# → 22
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -215,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 586 passed, 0 failed
+# → Summary: 612 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)

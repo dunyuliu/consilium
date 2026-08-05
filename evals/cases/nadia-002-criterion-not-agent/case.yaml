@@ -1,6 +1,6 @@
 id: nadia-002
 agent: nadia-hadid
-tier: smoke
+tier: smoke   # fast, markdown only, and the only test of a refusal to RECOMMEND
 prompt: |
   tomas-lindgren was dispatched on a dependency audit and the run graded FAIL.
   Review it: score the run against the agent's own contract and the task, work

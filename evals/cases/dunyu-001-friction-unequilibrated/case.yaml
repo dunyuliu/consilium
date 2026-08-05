@@ -14,7 +14,12 @@ prompt: |
   friction implementation produces physically sensible results.
 
 input_dir: input
-tier: dev       # medium difficulty; requires judging the request against underlying premise
+# No tier: this case is full-suite only. It carried `tier: dev` from its
+# authoring — "medium difficulty; requires judging the request against the
+# underlying premise" — and nothing has ever consumed that value; only
+# `tier: smoke` is read, by evals/run.sh. Removed 2026-08-05 when Check 22
+# landed. The judgement it recorded is true and is kept here; what is gone is
+# the appearance that some tool acts on it.
 expected:
   - kind: location
     file: elastic_contact.py
