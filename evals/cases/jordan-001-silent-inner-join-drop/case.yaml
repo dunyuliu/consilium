@@ -38,6 +38,25 @@ must_not_find:
       - "pipeline is correct as written"
       - "reconciles cleanly"
       - "safe to ship"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — `grade` reports how many were mentioned and never lets that
+# change the verdict (rule 5). Exists so a correct-but-uncredited finding is
+# visible instead of scoring as noise.
+declared_defects:
+  - kind: keyword
+    file: inner-join-drop
+    any_of:
+      - "inner join"
+      - "silently drop"
+      - "10 rows"
+  - kind: keyword
+    file: unsigned-notional-rollup
+    any_of:
+      - "side"
+      - "unsigned"
+      - "netted"
+      - "BUY and SELL"
+
 notes: |
   Planted defect (critical, ingest_merge.py:28): `enrich()` does
   `trades.merge(instruments, on="symbol")`, an inner join with no `how=`

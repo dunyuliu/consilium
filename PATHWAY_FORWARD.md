@@ -99,13 +99,31 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 ### PF-004 — `evals/` — OPEN
 
 `must_not_find` guards phrasings, not precision: a report finding the planted defect
-plus four things that are not there scores identically to a clean one. The
-`declared_defects:` mechanism is written up and not built.
+plus four things that are not there scores identically to a clean one.
+
+**Half built 2026-08-05, and the other half established as unbuildable.**
+`declared_defects:` now lists every real defect in a case's `input/`, including
+the ones nobody planted, and `grade` reports how many were mentioned as a
+diagnostic that cannot move the verdict (rule 5 admits one eval pass criterion).
+It makes a correct-but-uncredited finding visible; before this those defects
+lived in prose that nothing read. Landed on `jordan-001`, `mira-001`,
+`lars-001` — and each of their pass samples immediately scored short by exactly
+the defect that was undeclared before the PF-011 audit (1 of 2, 3 of 4, 2 of 3).
+
+The reverse direction — listing report findings that map to NO declared defect,
+and returning INCONCLUSIVE when any are unmapped — is **not buildable**. It
+requires enumerating findings from prose, where findings are not delimited.
+Counting rows counts non-findings, and that error has already been made twice
+here: `lars-002` and `sophia-002` both had a pass bar written in report rows and
+both had to be rewritten in distinct defects. `grade` therefore prints
+"NOT MEASURED" rather than an INCONCLUSIVE derived from a count that would
+itself be wrong. This row stays OPEN because precision is still not measured —
+what changed is that the gap is now quantified on one side and named on the
+other.
 
 ```bash
-grep -c 'declared_defects' evals/README.md evals/run.sh
-# → evals/README.md:1
-# → evals/run.sh:0
+grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l
+# → 5
 ```
 
 ### PF-005 — `docs/release_notes_*` — BROKEN

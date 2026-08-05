@@ -26,6 +26,28 @@ must_not_find:
   - keywords:
       - "switch to numpy"
       - "rewrite using vectorized"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — see evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: lookahead-window
+    any_of:
+      - "look-ahead"
+      - "lookahead"
+      - "future"
+  - kind: keyword
+    file: fillna-masking
+    any_of:
+      - "fillna"
+      - "masking"
+      - "silent"
+  - kind: keyword
+    file: formula-vs-docstring
+    any_of:
+      - "docstring"
+      - "sum of"
+      - "adds the"
+
 notes: |
   Planted defect 1 (critical, line 19): rolling_baseline uses
   prices.iloc[i : i + window] — the window of "prior" days actually contains

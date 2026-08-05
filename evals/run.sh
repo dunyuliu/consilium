@@ -175,6 +175,43 @@ cmd_grade() {
         fi
     done < <(awk -f "$SCRIPT_DIR/parse_case.awk" -v section=must_not_find "$dir/case.yaml")
 
+    # --- declared defects: diagnostic only, never part of the verdict --------
+    # Rule 5 admits exactly one eval pass criterion, so this cannot move it.
+    # What it CAN do is make an uncredited-but-correct finding visible. Several
+    # cases carry real defects that are not in `expected` — found while auditing
+    # the inputs (PF-011) and declared rather than deleted, because an
+    # undeclared true defect makes a thorough audit score no better than a
+    # shallow one. Before this block those defects were recorded in prose that
+    # nothing read.
+    local dd_total=0 dd_hit=0 dd_out=""
+    while IFS='|' read -r _k dfile _lo _hi dterms; do
+        [ -z "$dterms" ] && continue
+        dd_total=$((dd_total + 1))
+        local dmatch=""
+        while IFS= read -r term; do
+            [ -z "$term" ] && continue
+            if printf '%s' "$body" | grep -qF -- "$(printf '%s' "$term" | tr '[:upper:]' '[:lower:]')"; then
+                dmatch="$term"; break
+            fi
+        done < <(printf '%s\n' "$dterms" | tr '\037' '\n')
+        if [ -n "$dmatch" ]; then
+            dd_hit=$((dd_hit + 1))
+            dd_out="$dd_out  mentioned      ${dfile:-defect} (\"$dmatch\")"$'\n'
+        else
+            dd_out="$dd_out  NOT mentioned  ${dfile:-defect}"$'\n'
+        fi
+    done < <(awk -f "$SCRIPT_DIR/parse_case.awk" -v section=declared_defects "$dir/case.yaml")
+
+    if [ "$dd_total" -gt 0 ]; then
+        echo
+        echo "declared defects: $dd_hit of $dd_total mentioned  (diagnostic — not part of the verdict)"
+        printf '%s' "$dd_out"
+        echo "  NOT MEASURED: findings that match no declared defect. A report is prose;"
+        echo "  findings are not delimited, and counting rows counts non-findings — that"
+        echo "  exact error has already been made twice in this suite. Precision is read,"
+        echo "  not computed."
+    fi
+
     echo
     if [ "$checks" -eq 0 ]; then
         echo "INCONCLUSIVE — no criteria parsed from $id/case.yaml"

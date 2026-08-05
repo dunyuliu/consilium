@@ -193,18 +193,39 @@ which branch a finding falls into is exactly the judgement a human or an
 evaluator agent has to make. What *is* automatable is surfacing the ratio and
 refusing to let it pass unexamined.
 
-Proposed, not implemented:
+**Half of this is now built, and the other half is not buildable. Both halves
+matter, so read which is which.**
 
-- add `declared_defects:` to `case.yaml` — an id + one-line description per
-  real defect in `input/`, including ones that were not deliberately planted
-- `run.sh grade` reports `N findings / M declared` and lists report findings
-  it could not map to a declared defect
-- a case with unmapped findings is **INCONCLUSIVE**, never PASS, until a human
-  resolves each into "new defect, now declared" or "false positive"
+**Built (2026-08-05).** `declared_defects:` in `case.yaml` lists every real
+defect in `input/`, whether or not it is required for a pass — including the
+ones nobody planted, found while auditing the corpus (PF-011) and declared
+rather than deleted. `run.sh grade` reports how many were mentioned:
 
-This keeps the grader honest about its own limits: it would not judge
-precision, it would refuse to certify a run whose precision is unknown. The
-current `grade` output says so explicitly rather than implying a clean bill.
+```
+declared defects: 3 of 4 mentioned  (diagnostic — not part of the verdict)
+  mentioned      gaussian-substitution ("gaussian_filter")
+  mentioned      cubicspline-substitution ("CubicSpline")
+  mentioned      toy-grid-parity-claim ("64x64")
+  NOT mentioned  square-grid-reshape
+```
+
+It cannot move the verdict — rule 5 admits exactly one eval pass criterion.
+What it does is make a **correct but uncredited** finding visible. An
+undeclared true defect makes a thorough audit score no better than a shallow
+one; before this, the extra defects lived in prose that nothing read.
+
+**Not buildable: the other direction.** The original sketch also wanted
+`grade` to list report findings it could not map to a declared defect, and to
+return INCONCLUSIVE when any were unmapped. That requires enumerating findings
+from the report, and a report is prose — findings are not delimited. Counting
+rows counts non-findings, and **that exact error has already been made twice in
+this suite** (`lars-002` and `sophia-002` both had a pass bar written in report
+rows and had to be rewritten in distinct defects).
+
+So `grade` says plainly that precision is NOT MEASURED rather than returning an
+INCONCLUSIVE derived from a finding count that would itself be wrong. A verdict
+built on a bad measurement is worse than an honest absence of one (rule 2).
+**Precision is read, not computed.**
 
 ## Roadmap for the harness
 
