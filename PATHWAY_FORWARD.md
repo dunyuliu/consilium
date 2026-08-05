@@ -185,7 +185,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 751 passed, 0 failed
+# → Summary: 752 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -216,7 +216,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 751 passed, 0 failed
+# → Summary: 752 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
