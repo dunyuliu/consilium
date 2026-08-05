@@ -57,7 +57,17 @@ cmd_stage() {
     cp -R "$dir/input/." "$dest/"
 
     # Anything the agent must not see must not be reachable from the copy.
-    find "$dest" \( -name 'case.yaml' -o -name '__pycache__' \) -exec rm -rf {} + 2>/dev/null || true
+    #
+    # `case.yaml` is stripped only at the TOP of the staged tree. The answer key
+    # lives in the PARENT of input/ and is never copied here anyway, so this is
+    # belt-and-braces; matching at any depth is not. lian-001's input is a
+    # fixture ABOUT fixtures and ships a mock `evals/cases/tam-001/case.yaml`
+    # as scenery — an unbounded `find -name case.yaml` deleted it, silently
+    # handing the agent a different scenario than the author wrote, and one that
+    # happens to be exactly the "no fixture" condition the case turns on.
+    # Found 2026-08-04 by Check 18.
+    find "$dest" -maxdepth 1 -name 'case.yaml' -exec rm -rf {} + 2>/dev/null || true
+    find "$dest" -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
     echo "staged: $dest"
     echo

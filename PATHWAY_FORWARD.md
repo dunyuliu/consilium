@@ -136,13 +136,13 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 17 checks and 17 exist. This row is now
+The header comment documents 18 checks and 18 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 17
+# → 18
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -362,9 +362,59 @@ now on record (`ziyan-001`, `lars-002`, `dunyu-001` x3); the durable defence is
 that a fixture author writes the correct report's *negation* and grades it before
 shipping.
 
-Three remain: `haruto-001`, `iris-001`, `lars-001` (input; its notes were fixed
-in a94fb3e) — plus `sophia-001`'s input and `dunyu-001`'s input, whose guards
-were audited here but whose `elastic_contact.py` has not been re-read.
+**Audited 2026-08-04: `iris-001` and `sophia-001` — inputs clean.** `iris-001`'s
+three other markdown files each carry an H1 on line 1, so `reference.md`'s `##`
+is the only violation. `sophia-001`'s two defects — the dead `output_units` key
+with a hardcoded `* 1000.0`, and the symmetric spike filter documented as
+one-sided — are both already declared, and nothing else in `ingest.py` diverges
+from the README.
+
+**Audited 2026-08-04: `haruto-001` — THE ANSWER KEY WAS INSIDE `input/`.** Its
+`input/README.md` read: *"`release_notes_v0.2.0.md` is **deliberately absent** —
+v0.2.0 was tagged in git history but never got a notes file. This is the planted
+defect the agent is supposed to surface."*
+
+`evals/run.sh stage` exists because of this fixture's 2026-07-31 leak. Staging
+isolates `input/` from `case.yaml` and the case README — and copies `input/`
+verbatim, by definition, so it cannot help when the key is inside. The case's
+second run is recorded as *"scoped to `input/`, PASS"*. **Scoping to `input/` was
+the fix; the answer key was in `input/`.** That run's central finding is the one
+sentence its own input handed it, so under rule 5 it has no verdict. Its
+reasoning beyond the key (the Rule #2 archival analysis) was not available from
+the README, so the run was not merely parroting — but that is a mitigation, not
+a verdict.
+
+Sharper still: `evals/run.sh grade` VOIDs any report containing "planted
+defect". An agent that faithfully quoted this fixture's own input would have
+been VOIDed for reading what it was given.
+
+`input/README.md` rewritten as a neutral project README; the staged copy no
+longer contains any of the phrases.
+
+**Check 18 landed** — no fixture input may contain fixture-authoring language.
+Negative-tested (a reintroduced phrase in `iris-001/input/index.md` produces
+`leaks the answer key to the staged copy ("planted defect")`). Its `set -e`
+trap was hit and fixed before landing: `grep -rIl` exits 1 when it finds
+nothing, which is the normal case, and the assignment inherited that status and
+killed the suite — the same failure that blocked Check 17's first attempt.
+
+Two phrases were tried and REMOVED: `must_not_find` and `case.yaml`. `lian-001`
+is a fixture ABOUT fixtures and legitimately ships a mock `case.yaml`
+containing a `must_not_find` key. A check that fails on correct content is an
+obstacle, not a gate.
+
+**That false positive exposed a real bug in `evals/run.sh`.** Staging ran
+`find "$dest" -name 'case.yaml' -exec rm -rf`, unbounded by depth — so it
+**deleted `lian-001`'s mock `evals/cases/tam-001/case.yaml`**, silently handing
+the agent a different scenario than the author wrote, and one that happens to be
+exactly the "no fixture exists" condition the case turns on. The real answer key
+lives in the *parent* of `input/` and is never copied, so the deletion was
+belt-and-braces at depth 1 and destructive below it. Now `-maxdepth 1`; verified
+the mock survives staging.
+
+`lars-001`'s input was read in the a94fb3e pass (its notes' line numbers were
+corrected there) and `dunyu-001`'s `elastic_contact.py` has not been re-read;
+both are the remainder.
 
 **Three real fixture defects found in the same pass**, none of them in the input
 code, all of them in the answer key or the process around it:

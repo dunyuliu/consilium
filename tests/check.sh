@@ -26,6 +26,7 @@
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
 #  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
 #  17. Every PATHWAY_FORWARD.md evidence command still prints what is recorded.
+#  18. No fixture input contains fixture-authoring language (answer-key leak).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -677,6 +678,46 @@ else
     done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
     [ "$ev_rows" -gt 0 ] || fail "no evidence commands parsed from $BOARD — the parser or the format changed"
 fi
+
+echo
+echo "Check 18: no fixture input contains fixture-authoring language"
+# Rule 5. `evals/run.sh stage` isolates input/ from case.yaml and the case
+# README, because an agent that reads the answer key produces output in which
+# nothing looks wrong. It cannot help when the answer key is INSIDE input/:
+# staging copies input/ verbatim, by definition.
+#
+# haruto-001 — the fixture whose 2026-07-31 leak is the reason staging exists —
+# shipped an input/README.md reading "release_notes_v0.2.0.md is deliberately
+# absent ... This is the planted defect the agent is supposed to surface." Its
+# second run is recorded as "scoped to input/, PASS". Scoping to input/ was the
+# fix; the answer key was in input/.
+#
+# WHAT THIS CHECKS, EXACTLY: that no staged file contains a phrase only someone
+# writing ABOUT the fixture would write. It cannot detect a leak phrased in the
+# project's own voice — that stays a review responsibility, and the name of this
+# check is deliberately narrow so it is not mistaken for the broader guarantee.
+# The phrase list is deliberately only those an author writes ABOUT a fixture,
+# addressed at a reader. `must_not_find` and `case.yaml` were tried and removed:
+# lian-001's input is a fixture ABOUT fixtures and legitimately contains a mock
+# case.yaml with a must_not_find key. Flagging it was a false positive, and a
+# check that fails on correct content is not a gate, it is an obstacle.
+LEAK_PHRASES='planted defect|deliberately absent|answer key|the agent is supposed to|eval fixture|this eval|for the .*-00[0-9] eval'
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir")
+    [ -d "$case_dir/input" ] || continue
+    # `|| true` is load-bearing: grep exits 1 when it finds nothing, which is
+    # the NORMAL case here, and under `set -e` the assignment inherits that
+    # status and kills the suite before the Summary line. Same failure that
+    # blocked Check 17's first attempt.
+    hit=$(grep -rIl -iE "$LEAK_PHRASES" "$case_dir/input" 2>/dev/null || true)
+    hit=$(printf '%s\n' "$hit" | head -1)
+    if [ -n "$hit" ]; then
+        phrase=$(grep -rIh -ioE "$LEAK_PHRASES" "$hit" 2>/dev/null | head -1 || true)
+        fail "$id: ${hit#"$case_dir"} leaks the answer key to the staged copy (\"$phrase\")"
+    else
+        ok
+    fi
+done
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

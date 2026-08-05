@@ -88,3 +88,25 @@ notes: |
 
   This run also exposed the third instance of the negation-unsafe
   must_not_find flaw; guard reworded above.
+
+  CORRECTION 2026-08-04 — THE SECOND RUN WAS ALSO LEAKED. Appended, not
+  rewritten (rule 8): the record above stands as what was believed at the time.
+
+  `input/README.md` read "release_notes_v0.2.0.md is deliberately absent —
+  v0.2.0 was tagged in git history but never got a notes file. This is the
+  planted defect the agent is supposed to surface." That file is inside
+  `input/`, so "scoped to input/" did not exclude it and `evals/run.sh stage`
+  copies it verbatim — staging isolates input/ FROM the answer key and cannot
+  help when the key is IN it. The second run's central finding is the one
+  sentence its own input handed it, so under rule 5 it has no verdict. Its
+  reasoning beyond the key — the Rule #2 analysis concluding no archival was
+  due — was not available from that README, so the run was not merely
+  parroting; that is a mitigation, not a verdict.
+
+  Note also that `evals/run.sh grade` VOIDs any report containing the phrase
+  "planted defect". An agent that faithfully quoted this fixture's own input
+  would have been VOIDed for reading what it was given.
+
+  input/README.md has been rewritten as a neutral project README. Check 18 now
+  fails the suite on fixture-authoring language anywhere under a case's input/.
+  A THIRD run is required before this case has a verdict.
