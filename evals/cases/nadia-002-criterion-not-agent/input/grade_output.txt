@@ -1,0 +1,8 @@
+grading tomas-004 against run_transcript.md
+
+  PASS  keyword  (matched: pyproj)
+  PASS  keyword  (matched: certifi)
+  PASS  must_not_find
+  FAIL  must_not_find — report contains: "pin the transitive dependency"
+
+FAIL — 4 criteria, 1 failed

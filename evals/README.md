@@ -243,6 +243,16 @@ INCONCLUSIVE derived from a finding count that would itself be wrong. A verdict
 built on a bad measurement is worse than an honest absence of one (rule 2).
 **Precision is read, not computed.**
 
+## The leakage check is input-aware
+
+`grade` voids a report containing `case.yaml`, `must_not_find` or "planted
+defect" — but only when that term is **not** in the case's own `input/`. A case
+whose input is a criteria file (`nadia-002`) legitimately uses that vocabulary,
+and a correct report naming the section by its real name was being voided for
+speaking about the thing it was asked to review. A term the agent was handed
+proves nothing about leakage. A term it was not handed still voids, which is the
+`haruto-001` and `victor-001` case and is unchanged.
+
 ## Roadmap for the harness
 
 - ~~Programmatic runner that reads `case.yaml` and grades the output.~~

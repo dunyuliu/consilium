@@ -1,0 +1,21 @@
+# Criteria the run above was graded against.
+id: tomas-004
+agent: tomas-lindgren
+
+expected:
+  - kind: keyword
+    any_of:
+      - "pyproj"
+      - "range ceiling"
+  - kind: keyword
+    any_of:
+      - "certifi"
+      - "transitive"
+
+must_not_find:
+  - keywords:
+      - "newer is safer"
+      - "upgrade everything"
+  - keywords:
+      - "pin the transitive dependency"
+      - "freeze the lockfile"

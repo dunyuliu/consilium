@@ -99,7 +99,26 @@ cmd_grade() {
     local fails=0 checks=0
 
     # Leakage first: a run that saw the answer key has no verdict at all.
-    if grep -qiE 'case\.yaml|must_not_find|planted defect' "$report"; then
+    #
+    # The terms are evidence of leakage only when they are NOT in what the agent
+    # was given. `nadia-002` reviews a run against a criteria file, so its input
+    # legitimately contains `must_not_find` — and a correct report naming the
+    # section by its real name was being VOIDed for using the vocabulary of the
+    # thing it was asked to review. Found 2026-08-05 while authoring that case:
+    # the detector was punishing a correct report, the same shape as the
+    # thirty-one imperative guards fixed the same day, this time in the grader.
+    #
+    # So a term found in the case's own input/ proves nothing and is dropped
+    # from the pattern. This does not weaken rule 5: a term that is NOT in the
+    # input still voids, which is exactly the haruto-001 and victor-001 case.
+    local leak_terms='case\.yaml|must_not_find|planted defect'
+    local t kept=''
+    for t in 'case\.yaml' 'must_not_find' 'planted defect'; do
+        if grep -rqiE -- "$t" "$dir/input" 2>/dev/null; then continue; fi
+        kept="${kept:+$kept|}$t"
+    done
+    leak_terms="$kept"
+    if [ -n "$leak_terms" ] && grep -qiE "$leak_terms" "$report"; then
         echo "VOID — the report references the answer key (case.yaml / must_not_find /"
         echo "       'planted defect'). Per rule 5 a leaked run has no verdict."
         echo "       Re-run against a staged copy: bash evals/run.sh stage $id"

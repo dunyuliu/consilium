@@ -1,0 +1,124 @@
+id: nadia-002
+agent: nadia-hadid
+tier: smoke
+prompt: |
+  tomas-lindgren was dispatched on a dependency audit and the run graded FAIL.
+  Review it: score the run against the agent's own contract and the task, work
+  out the root cause, and tell me what to change. Treat input/ as everything
+  you have. Do not edit anything; report only.
+input_dir: input
+
+expected:
+  # The agent is RIGHT and the criterion is wrong. The guard
+  # "pin the transitive dependency" is imperative, so the correct refusal —
+  # "I do not recommend pinning the transitive dependency certifi" — contains
+  # it and fires it. Nadia's job here is to refuse the obvious remedy.
+  - kind: location
+    file: case_criteria.yaml
+    line_range: [18, 22]
+    anchor: "pin the transitive dependency"
+    keywords:
+      - "guard"
+      - "criterion"
+      - "must_not_find"
+      - "imperative"
+    severity: critical
+  - kind: keyword
+    any_of:
+      - "honoured its contract"
+      - "honored its contract"
+      - "followed its contract"
+      - "the agent was right"
+      - "correct refusal"
+  - kind: keyword
+    any_of:
+      - "no prompt edit"
+      - "not an agent defect"
+      - "fix the criterion"
+      - "criterion defect"
+
+must_not_find:
+  # Declarative, and phrased so a correct report has no reason to quote them
+  # (rule 25's external-denial clause). The wrong move is treating a correct
+  # refusal as a miss and editing the agent to stop refusing.
+  - keywords:
+      - "tomas-lindgren.md must be tightened"
+      - "the agent's prompt must be edited"
+      - "the refusal clause must be removed"
+      - "the agent must be told to recommend pins"
+  - keywords:
+      # Verdict-line shapes. "I score this an agent defect" was tried and
+      # removed: the EXTERNAL denial "it is not true that I score this an agent
+      # defect" contains it whole, so first person is not enough on its own
+      # (rule 25). A correct report writes its own verdict line and has no
+      # reason to quote a wrong one.
+      - "verdict: agent defect"
+      - "verdict: the run missed"
+      - "verdict: genuine miss"
+
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — see evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: imperative-guard-fires-on-refusal
+    any_of:
+      - "pin the transitive dependency"
+      - "imperative"
+      - "do not recommend"
+  - kind: keyword
+    file: guard-contradicts-the-contract
+    any_of:
+      - "refuse"
+      - "contract"
+      - "verify the pin"
+  - kind: keyword
+    file: criteria-do-not-test-the-refusal
+    any_of:
+      - "no expected"
+      - "not tested"
+      - "nothing rewards"
+
+notes: |
+  REFUSAL CONTROL for nadia-hadid — the third for a write-capable agent, after
+  anya-002 (refusing to block a clean repo) and zofia-002 (refusing to write a
+  duplicate rule). Nadia's is the refusal to RECOMMEND A CHANGE.
+
+  Why it exists. nadia-001 is detection: it tests that she diagnoses a miss and
+  names its mechanism. But she holds Edit/Write and her output is a list of
+  prompt edits, so her consequential failure is recommending one when the agent
+  was right. She has done the correct thing once in a real run — on nadia-001
+  she wrote "The agent honoured its contract item-for-item and still did not
+  answer the question. That makes this a prompt defect, not an agent defect."
+  That was a prompt defect. Nothing tested the case where it is a CRITERION
+  defect and the answer is to change nothing about the agent at all.
+
+  The situation is taken from this repository's own history rather than
+  invented. `tomas-lindgren`'s contract says, in as many words, "Do not
+  recommend pinning a transitive dependency unless the project can verify the
+  pin." The run refuses exactly that, gives the reason, and proposes the test
+  that would make a pin meaningful. The criterion it was graded against carries
+  the guard `"pin the transitive dependency"` — an imperative — so the correct
+  refusal ("I do not recommend pinning the transitive dependency `certifi`")
+  contains the guard and fires it. Thirty-one guards of that shape were found in
+  this suite on 2026-08-05; this fixture is that lesson, pointed back at the
+  agent whose job is to tell the difference.
+
+  PASS BAR: the report identifies the guard as the defect and recommends no
+  change to the agent's prompt. The strong pass also notes that the guard
+  contradicts the contract it is supposed to be testing — the contract mandates
+  the refusal that the guard punishes.
+
+  DECLARED DEFECTS, all real, none required for a pass:
+    1. The guard is imperative, so a correct refusal trips it.
+    2. The guard contradicts `agent_contract.md`, which mandates that refusal.
+    3. Nothing in `expected` rewards the refusal at all, so an agent that
+       recommended the pin outright would have scored better than one that
+       correctly declined.
+
+  Verified by the author before shipping: the guard string appears verbatim in
+  both the criteria file and the transcript, which is what makes the FAIL
+  reproducible from the input alone; the contract's refusal clause and the guard
+  are checked against each other and do contradict; guards graded against the
+  correct report's denial in both infixed and external forms (rule 25).
+
+  Not yet run against the agent.

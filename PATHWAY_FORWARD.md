@@ -94,6 +94,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 # → anya-001-cycle-stats-release: NEVER RUN
 # → anya-002-clean-publishable: NEVER RUN
 # → lars-002-clean-control: NEVER RUN
+# → nadia-002-criterion-not-agent: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
 # → zofia-002-rule-already-exists: NEVER RUN
 ```
@@ -139,7 +140,7 @@ other.
 
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l
-# → 11
+# → 12
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -182,7 +183,7 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 561 passed, 0 failed
+# → Summary: 568 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -213,7 +214,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 561 passed, 0 failed
+# → Summary: 568 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -581,6 +582,36 @@ with no negatable auxiliary, 4 unsafe.
 `lars-001` produces the imperative failure). All eight touched fail-samples
 still FAIL, so the guards were made safe rather than gutted.
 
+**`nadia-002` added 2026-08-05** — the third refusal control for a write-capable
+agent, and the one that closes the set: Anya refuses to block a clean repo,
+Zofia refuses to write a duplicate rule, Nadia refuses to recommend a change.
+Her output IS a list of prompt edits, so recommending one when the agent was
+right is her whole failure mode, and `nadia-001` only tested detection.
+
+The situation is this repository's own history rather than an invention: the
+agent under review correctly declines to recommend an unverifiable pin, exactly
+as its contract mandates, and the criterion it was graded against guards on the
+imperative `"pin the transitive dependency"` — so the correct refusal contains
+the guard and fires it. Thirty-one guards of that shape were fixed here on
+2026-08-05; this case points the lesson back at the agent whose job is to tell
+an agent defect from a criterion defect.
+
+**Authoring it found a defect in the grader.** `cmd_grade` voids any report
+containing `case.yaml`, `must_not_find` or "planted defect". For a case whose
+input legitimately IS a criteria file, those are the subject's own vocabulary,
+and a correct report naming the section by its real name was being VOIDed —
+the same shape as the imperative guards, this time in the tool that judges them.
+The detector now drops a term that appears in the case's own `input/`, which
+proves nothing, and keeps the rest. Rule 5 is unweakened and was re-verified:
+appending "The planted defect is on line 19" to `lars-001`'s pass sample still
+VOIDs, because that term is not in `lars-001`'s input.
+
+Two guards were caught and reworded before shipping. The second sharpens rule 25
+again: `"I score this an agent defect"` is declarative *and* first-person, and
+the external denial *"it is not true that I score this an agent defect"* still
+contains it. Replaced with verdict-line shapes, which a correct report has no
+reason to quote because it writes its own. Verified in all three directions.
+
 **`zofia-002` added 2026-08-05** — the second refusal control for a write-capable
 agent, and the first that tests a refusal to **write** rather than a refusal to
 clear. Zofia's write surface is the rule book, and the consequential failure for
@@ -650,7 +681,7 @@ the anchor; when prose must cite a line, expect it to rot.
 
 ```bash
 ls evals/cases | wc -l
-# → 25
+# → 26
 ```
 
 ### PF-012 — `agents/` — OPEN
