@@ -729,6 +729,21 @@ to catch. They stay STALE. The durable fix is upstream: **write the run record
 into the case at the time of the run**, and let the release note quote it rather
 than be its only home.
 
+**Smoke annotated, and the tier deliberately left fixed, 2026-08-05.** It was
+considered whether `smoke` should select the STALE cases instead of a fixed
+`tier: smoke` membership, so the cheapest re-run targets the verdicts that no
+longer describe the current prompts. It should not: a tier whose membership
+moves with history cannot be compared across edits — "smoke was green before my
+change and green after" only means something if it was the same smoke — and
+staleness grows, so selecting on it would make the fast tier thirteen cases wide.
+The reasoning is recorded in `evals/run.sh` beside the code rather than left to
+be re-derived.
+
+What smoke does now owe its user is the state of its own baselines, and printing
+them was worth it immediately: **five of the seven smoke members have no verdict
+against the current prompt** — three STALE, two NEVER RUN. The tier the project
+trusts most is the tier whose baselines are least current.
+
 **Surfaced at the point of use, 2026-08-05.** `evals/run.sh list` now compares
 each case's last recorded run against the last commit touching that agent's
 prompt and prints `STALE — ran <date>, prompt changed <date>`. Per-agent rather

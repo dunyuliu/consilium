@@ -229,6 +229,46 @@ cmd_grade() {
     [ "$fails" -eq 0 ]
 }
 
+# --- smoke ---------------------------------------------------------------
+# The tier to run after any prompt edit; the full suite before a release.
+#
+# MEMBERSHIP IS FIXED, by `tier: smoke` in the case, and deliberately so. It was
+# considered whether smoke should instead select the STALE cases, so the cheapest
+# re-run targets the verdicts that no longer describe the current prompts. It
+# should not:
+#
+#   * A tier whose membership moves with history cannot be compared across
+#     edits. "Smoke was green before my change and green after" only means
+#     something if it was the same smoke.
+#   * Staleness is a coverage question, not a speed one, and it grows: thirteen
+#     cases are stale today, which is not a fast tier.
+#
+# What smoke DOES owe the person about to run it is the state of its own
+# baselines, so the marker is printed beside each member. The id stays in column
+# one; `cut -d" " -f1` still works.
+cmd_smoke() {
+    local d id agent last touched mark
+    for d in "$CASES_DIR"/*/; do
+        grep -q '^tier: smoke' "$d/case.yaml" 2>/dev/null || continue
+        id="$(basename "$d")"
+        agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
+        last="$(grep -oiE 'run \(20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$d/case.yaml" 2>/dev/null \
+                | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | sort | tail -1 || true)"
+        if [ -z "$last" ]; then
+            mark="  (NEVER RUN — no baseline to compare against)"
+        else
+            touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
+                       -- "agents/${agent}.md" 2>/dev/null || true)"
+            if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
+                mark="  (STALE baseline — ran $last, prompt changed $touched)"
+            else
+                mark=""
+            fi
+        fi
+        printf '%s%s\n' "$id" "$mark"
+    done
+}
+
 # --- list ------------------------------------------------------------------
 # A verdict is only about the prompt that produced it. When an agent's file
 # changes after its last recorded run, the recorded PASS describes an agent that
@@ -267,9 +307,6 @@ case "${1:-}" in
     stage) [ $# -ge 2 ] || die "usage: run.sh stage <case-id>"; cmd_stage "$2" ;;
     grade) [ $# -ge 3 ] || die "usage: run.sh grade <case-id> <report-file>"; cmd_grade "$2" "$3" ;;
     list)  cmd_list ;;
-    smoke) # the tier to run after any prompt edit; full suite before a release
-           for d in "$CASES_DIR"/*/; do
-               grep -q '^tier: smoke' "$d/case.yaml" 2>/dev/null && basename "$d"
-           done ;;
+    smoke) cmd_smoke ;;
     *) echo "usage: run.sh {stage <case>|grade <case> <report>|list|smoke}" >&2; exit 2 ;;
 esac
