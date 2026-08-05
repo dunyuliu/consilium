@@ -29,8 +29,20 @@ expected:
       - "2018"
 must_not_find:
   - keywords:
-      - "Williams"
-      - "overclaimed"
+      # CORRECTED 2026-08-04. This entry used to be the bare tokens "Williams"
+      # and "overclaimed", OR'd — so ANY report mentioning Williams failed the
+      # case, including one that correctly reported declared defect 4, which is
+      # a Williams defect and cannot be stated without the name. The fixture
+      # forbade its own right answer; samples/pass.md contains zero mentions of
+      # Williams and could not have reported it. This is precisely the error the
+      # comment on the next entry describes, fixed there and missed here.
+      # Loosening only, so the recorded PASS stays valid (rule 5).
+      - "Williams2020 is overclaimed"
+      - "Williams et al. (2020) is overclaimed"
+      - "the Williams citation overclaims"
+      - "Williams does not support the claim"
+      - "Williams2020 does not support"
+      - "misrepresents Williams"
   - keywords:
       # must_not_find entries are OR'd, so pairing a control's NAME with a
       # generic defect word makes any correct use of that word trip the guard.

@@ -291,8 +291,40 @@ those pointed at the wrong line, this described code that is not there.
 documented as one-sided), found on its 2026-07-31 re-run. Its input has not been
 independently re-read; only the declaration was verified.
 
-Six remain: `dunyu-001`, `haruto-001`, `iris-001`, `lars-001` (input; its notes
-were fixed in a94fb3e), `mira-001`, `ziyan-001` — plus `sophia-001`'s input.
+**Audited 2026-08-04: `ziyan-001` — THE FIXTURE FORBADE ITS OWN RIGHT ANSWER.**
+Its declared defect 4 is *`manuscript.tex:34` uses "et al." for a two-author
+paper (Williams, Patricia and Davis, Andrew)* — verified against the bib. Its
+`must_not_find` guard was the bare tokens `"Williams"` and `"overclaimed"`, OR'd,
+so **any report containing the word Williams failed the case**, including one
+that correctly reported defect 4, which cannot be stated without the name.
+`samples/pass.md` contains zero mentions of Williams and could not have reported
+it. This is exactly the error the comment on the very next guard entry describes
+— fixed there when Check 15 caught it, missed one entry above.
+
+Demonstrated both ways rather than asserted: `samples/pass.md` plus one correct
+sentence naming the defect grades
+`FAIL must_not_find — report contains: "Williams"` against the old guard and
+`PASS — 5 criteria, 0 failed` against the new one. The guard was only loosened,
+so the recorded PASS stays valid (rule 5).
+
+**Audited 2026-08-04: `mira-001` — UNDECLARED REAL DEFECT.** `resample_file`
+(line 62) does `side = int(np.sqrt(raw.size))` and reshapes to `(side, side)`,
+assuming a square grid, while the C reference takes `nr` and `nc` explicitly.
+When the element count happens to be a perfect square the mis-reshape is
+**silent**: a 32x72 grid is 2304 = 48² elements, reshapes to 48x48 with no error,
+and the result differs from the correct reshape by 0.390 max abs. A port that
+silently changes the reference's calling contract is Mira's own subject matter,
+so an agent reporting it is right and earns nothing. Declared in the case notes,
+not added to `expected`.
+
+Also checked and NOT a defect: the sampling convention. The C uses
+`x = j*(nc-1)/(out_cols-1)`, which is exactly `np.linspace(0, nc-1, out_cols)` —
+the classic off-by-half parity bug is not present here. Two off-by-one prose
+citations fixed (`:19` -> `:18`, `:27` -> `:26`); the case's own run log already
+said `:18` and `:26`, so the notes contradicted themselves.
+
+Four remain: `dunyu-001`, `haruto-001`, `iris-001`, `lars-001` (input; its notes
+were fixed in a94fb3e) — plus `sophia-001`'s input.
 
 **Three real fixture defects found in the same pass**, none of them in the input
 code, all of them in the answer key or the process around it:
