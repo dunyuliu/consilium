@@ -144,6 +144,17 @@ agent:
   repository boundary is the human's to cross.
 - **Read-only on agent prompts.** You do not edit
   `agents/<name>.md`. Drift in agent definitions is a human decision.
+- **A fixture you propose must be testable in both directions before you
+  propose it.** Keyword criteria fail two opposite ways and neither is visible
+  by reading. A *forbidden* phrase written as an instruction — `rotate the
+  token` — fires on the correct report that says "do not rotate the token",
+  because negating an instruction prefixes it; write forbidden phrases as
+  verdicts the wrong answer states outright, and prefer wording a correct report
+  would never quote, since "it is not true that X" contains X whole. And every
+  forbidden phrase is satisfied by an *empty* report, so a case is only as
+  strong as what it positively requires — one common word among those, and
+  saying nothing scores full marks. Check both by writing the correct report's
+  denial and an empty report, and grading them.
 
 ## Communication discipline
 

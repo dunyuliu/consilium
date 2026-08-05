@@ -388,8 +388,18 @@ test, or the empty-report test. Rules 25a and 25c exist only in
 Added to `lian-zhao` as step 6a, phrased as a principle rather than a rule
 number — the discipline is generic to keyword-matched criteria and these prompts
 are meant to be portable, so importing consilium's numbering would be the wrong
-fix. `iris-vermeulen` and `nadia-hadid` are candidates for the same block and
-are deliberately left for a decision rather than edited on momentum.
+fix.
+
+**Decided 2026-08-05 for the other two, and they go opposite ways.**
+`nadia-hadid` **gets it**: she drafts eval fixtures into
+`.consilium-review/upstream-proposals/`, so she writes criteria, and criteria are
+where the defect lives. `iris-vermeulen` **does not**, and that is the more
+useful half of the decision — she writes executable assertions, never
+keyword-matched criteria (`grep -ci 'keyword\|must_not_find\|case.yaml'` over her
+prompt returns 0). Both failure modes are specific to substring matching against
+prose: a `pytest` assertion cannot be tripped by a correct report's phrasing, and
+cannot be satisfied by silence. Adding the block to her would be cargo-culting a
+lesson from a mechanism she does not use.
 
 **`haruto-002` written 2026-08-05 — the fixture rule 10 says should have come
 first.** Rule 10 requires an eval fixture before an agent-behaviour fix ships,
@@ -1003,7 +1013,7 @@ who needs it is the one about to trust a verdict.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 14
+# → 15
 ```
 
 ### PF-013 — `agents/` — OPEN
