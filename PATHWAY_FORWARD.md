@@ -31,7 +31,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-04 | 30 |
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-04 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
-| PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | BROKEN |  | 30 |
+| PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | OPEN |  | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | BROKEN | 2026-08-04 | 30 |
@@ -146,7 +146,27 @@ grep -c '^echo "Check' tests/check.sh
 # → 14
 ```
 
-### PF-008 — `tests/check.sh` — BROKEN — never audited
+### PF-008 — `tests/check.sh` — VERIFIED
+
+**Closed 2026-08-04.** Six mutations run, each producing the intended failure
+message, each restored:
+
+  bad model value          -> "model 'gpt4' not in {opus, sonnet, haiku}"
+  name != filename stem    -> "name 'wrong-name' does not match filename stem"
+  command invokes a ghost  -> "invokes nonexistent agent 'ghost-person'"
+  README command drift     -> "commands table out of sync with commands/ on disk"
+  agent unmentioned        -> "not mentioned in README"
+  stale backtick reference -> "references 'kai-fischerr' but no agents/... exists"
+
+Checks 1-5 are now known gates rather than assumed ones. They predated the
+negative-test convention by several releases and had never been shown to fail.
+
+```bash
+bash tests/check.sh | tail -1
+# → Summary: 464 passed, 0 failed
+```
+
+#### Prior record (2026-08-04, before the mutations were run)
 
 Checks 6–11 were each negative-tested at the moment they landed (a missing model-table
 row, a wrong model, a dropped roster line, a stale anchor, an unscoped writer, a
