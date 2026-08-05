@@ -254,8 +254,45 @@ deliberately **not** added to `expected`: the recorded PASS was graded against
 the criteria as they stood, and moving the bar afterwards leaves a verdict that
 corresponds to no run (rule 5).
 
-Ten remain: `dunyu-001`, `haruto-001`, `iris-001`, `lars-001`, `lars-002`,
-`mira-001`, `priya-001`, `sophia-001`, `sophia-002`, `ziyan-001`.
+**Audited 2026-08-04: `priya-001` — clean.** All seven declared figures
+re-derived from the committed CSV and every one reproduces: 9.6792% arithmetic,
+9.5937% geometric over 59 intervals, 9.4265% over 5.0 years, 56.8959% total
+return, worst −1.90% (2019-07), best +2.60% (2019-08). The run log's claim that
+the reported −1.5% is the third-worst month also holds (2020-11).
+
+**Audited 2026-08-04: `lars-002` — its one real defect is declared, so it passes
+this row.** `_STD_FLOOR = 1e-12` is absolute and still in the module by decision:
+run 2 found it, it is real, and the bar was revised rather than the code because
+a correct auditor should be able to report it. A pointer was added to the opening
+block, which listed five axes as "deliberately correct" thirty lines above the
+paragraph conceding the defect. The opposite failure direction was hypothesised
+and tested — a flat large-magnitude window slipping past the floor on rounding
+residue — and does **not** occur: seven flat windows from 0.1 to 3.3e15 all give
+std exactly 0.0 and all raise. Recorded so nobody re-derives it, and not reported
+as a defect, because it is not one.
+
+**Audited 2026-08-04: `sophia-002` — FALSE CLAIM ABOUT THE CODE, corrected.** Its
+notes and its `must_not_find` comment both stated that `worker.py:20-21` reads
+`queue_name` and `batch_size` "via bare `cfg[...]` subscripts with no `.get`, no
+signature default, no fallback of any kind anywhere in the file", and gave the
+ABSENCE of a fallback as the reason those keys are out of scope. The code reads
+`cfg.get("queue_name", "default")` and `cfg.get("batch_size", 50)`; grep returns
+three `cfg.get` calls and no bare subscript.
+
+The verdict survives and the criteria are unchanged — a fallback exists but
+*agrees* with the documented default, so there is still no doc-vs-code conflict.
+The stated mechanism did not survive, and it was load-bearing: an agent applying
+the prompt rule this fixture exists to lock ("cite a code-side fallback before
+calling it a default mismatch") would have found precisely the fallback the
+fixture claimed was absent. This is a worse class than the stale line numbers —
+those pointed at the wrong line, this described code that is not there.
+
+`sophia-001` already declares its own contaminant (a symmetric spike filter
+documented as one-sided), found on its 2026-07-31 re-run. Its input has not been
+independently re-read; only the declaration was verified.
+
+Six remain: `dunyu-001`, `haruto-001`, `iris-001`, `lars-001` (input; its notes
+were fixed in a94fb3e), `mira-001`, `ziyan-001` — plus `sophia-001`'s input.
 
 **Three real fixture defects found in the same pass**, none of them in the input
 code, all of them in the answer key or the process around it:

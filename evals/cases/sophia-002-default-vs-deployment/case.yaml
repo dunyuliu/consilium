@@ -38,10 +38,12 @@ expected:
       - "not read"
       - "no effect"
 must_not_find:
-  # (3) NEGATIVE — queue_name and batch_size are read via bare cfg["key"]
-  # subscripts with no fallback anywhere, and this deployment's config.yaml
-  # sets them away from the README defaults ("default" -> "priority",
-  # 50 -> 200). That is configuration working as intended, not drift.
+  # (3) NEGATIVE — worker.py:20-21 reads queue_name and batch_size via
+  # cfg.get("queue_name", "default") and cfg.get("batch_size", 50). A citable
+  # code-side fallback DOES exist for both, and it AGREES with the README
+  # default exactly, so there is no doc-vs-code conflict to report. The only
+  # difference is this deployment's config.yaml ("default" -> "priority",
+  # 50 -> 200), which is configuration working as intended, not drift.
   # Phrased as verdict/recommendation assertions per evals/README.md so a
   # correct report's negation ("not drift, no fallback exists") cannot
   # trip the guard.
@@ -87,11 +89,21 @@ notes: |
     but grep confirms worker.py never references the key at all — dead
     config, unconditionally a finding regardless of the fallback rule.
   - queue_name / batch_size: documented defaults ("default", 50); this
-    deployment's config.yaml sets "priority" / 200; worker.py:20-21 reads
-    both via bare `cfg["..."]` subscripts with no `.get`, no signature
-    default, no fallback of any kind anywhere in the file. No citable
-    code-side default exists, so under the fixed prompt these must NOT be
-    reported as default mismatches.
+    deployment's config.yaml sets "priority" / 200. worker.py:20-21 reads both
+    via `cfg.get("queue_name", "default")` and `cfg.get("batch_size", 50)`, so
+    a citable code-side fallback DOES exist for each — and it MATCHES the
+    documented default exactly. There is therefore no doc-vs-code default
+    conflict to report, and the only divergence is the deployment's own config,
+    which these must NOT be reported as.
+
+    CORRECTED 2026-08-04. Both this paragraph and the must_not_find comment
+    previously said the two keys were read "via bare `cfg[...]` subscripts with
+    no fallback of any kind anywhere in the file", and gave the ABSENCE of a
+    fallback as the reason they are out of scope. That is false about the code:
+    grep returns three `cfg.get` calls and no bare subscript. The verdict
+    survives, the stated mechanism did not — and an agent applying the fixed
+    prompt's "cite a code-side fallback first" rule would have found exactly the
+    fallback the fixture claimed was absent.
 
   Run record: not yet run.
 
