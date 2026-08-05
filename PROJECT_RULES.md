@@ -67,6 +67,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 3 | `bash tests/check.sh` is the gate; green before merge | mechanical |
 | 4 | Only fresh runs are evidence | judgment |
 | 5 | One definition of "pass" — `check.sh` exit 0, `evals/README.md` criteria | mechanical |
+| 5a | The answer key is never inside `input/` | mechanical — Check 18 |
 | 6 | *(dropped — see "Dropped starter rules")* | — |
 | 7 | `evals/cases/*/input/` is read-only fixture data | mechanical |
 | 8 | Never delete evidence: release notes archive, never vanish | mechanical |
@@ -186,11 +187,38 @@ Grading is necessary, not sufficient — it cannot see precision. See
 grader refuses to certify rather than pretending to judge.
 
 **A run that read the answer key does not have a verdict at all.** `case.yaml`
-and the case `README.md` sit one directory above `input/` and contain the
-expected findings. Scope every invocation to `input/`, then check the agent's
+and the case `README.md` normally sit one directory above `input/` and contain
+the expected findings — but see rule 5a: that "normally" was doing more work
+than anyone checked. Scope every invocation to `input/`, then check the agent's
 own file-reference list before scoring. Void the run if it touched either —
 leakage does not make the output look wrong, which is why it must be checked
 rather than noticed. Incident: the first `haruto-001` run, 2026-07-31.
+
+## 5a. The answer key is never inside `input/`
+
+Tier: mechanical (Check 18). No file under `evals/cases/*/input/` may contain
+fixture-authoring language — a phrase an author writes *about* a fixture,
+addressed at a reader.
+
+`evals/run.sh stage` isolates `input/` **from** the answer key. It copies
+`input/` verbatim, by definition, so it cannot help when the key is *in* it.
+
+*Incident (found 2026-08-05)*: `haruto-001` — the fixture whose 2026-07-31 leak
+is the reason staging exists — shipped an `input/README.md` reading
+*"`release_notes_v0.2.0.md` is **deliberately absent** … This is the planted
+defect the agent is supposed to surface."* Its second run is recorded as
+*"scoped to `input/`, PASS"*. Scoping to `input/` was the fix; the key was in
+`input/`. Rule 5 voids that run.
+
+Sharper: `evals/run.sh grade` voids any report containing "planted defect", so
+an agent that faithfully quoted this fixture's own input would have been voided
+for reading what it was given.
+
+**What Check 18 does not do.** It matches a fixed phrase list. A leak written in
+the project's own voice — a comment saying "this tolerance is deliberately too
+loose" — reads as ordinary code and passes. The check is named narrowly on
+purpose so it is not mistaken for the broader guarantee, which stays a review
+responsibility.
 
 ## 6. *(dropped)*
 
@@ -411,7 +439,22 @@ Corollaries, each paid for:
   A failing case is a hypothesis about who erred, not a verdict on the agent.
 - **Fix the criterion where the criterion is wrong, and never the reverse.**
   Weakening a case to make an agent pass destroys the only instrument that can
-  tell you whether the next prompt edit helped.
+  tell you whether the next prompt edit helped. Loosening a `must_not_find`
+  guard leaves earlier verdicts valid; tightening any criterion invalidates
+  every recorded run that was graded before it.
+- **Before shipping a guard, write the correct report's negation and grade
+  it.** A `must_not_find` entry must be a phrase only a *wrong* answer
+  produces. A bare noun never is, because the right answer's denial contains
+  it. Four instances, all found on 2026-08-04 and all demonstrated by
+  execution rather than argued: `ziyan-001` guarded `"Williams"` while
+  declaring a Williams defect, so no correct report could pass;
+  `lars-002` guarded `"fillna"` in the one fixture built to measure precision,
+  whose own notes describe the absence in that word; `dunyu-001` guarded
+  `"friction law"` and `"slipping"` when its right answer is a deferral that
+  must name the work being deferred. This is **not mechanizable** — three
+  candidate checks were built and measured across all 23 cases, and each
+  either missed known instances or failed correct content (see PF-011). The
+  test is one command, so run it.
 
 **Mechanically linted (Check 16)**: an `expected` term may not also be a
 `must_not_find` guard, and an `any_of` entry may not be sentence-length. Six of

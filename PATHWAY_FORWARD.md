@@ -34,7 +34,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN |  | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | OPEN |  | 60 |
-| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | BROKEN | 2026-08-04 | 30 |
+| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | OPEN |  | 30 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
 
@@ -202,7 +202,7 @@ executed.
 # → (no output)
 ```
 
-### PF-011 — `evals/cases/*/input/` — BROKEN
+### PF-011 — `evals/cases/*/input/` — VERIFIED
 
 Four fixtures shipped with undeclared real defects in regions documented as clean:
 `sophia-001` (an undeclared silent-failure return), `sophia-002` (negative keys
@@ -412,9 +412,38 @@ lives in the *parent* of `input/` and is never copied, so the deletion was
 belt-and-braces at depth 1 and destructive below it. Now `-maxdepth 1`; verified
 the mock survives staging.
 
-`lars-001`'s input was read in the a94fb3e pass (its notes' line numbers were
-corrected there) and `dunyu-001`'s `elastic_contact.py` has not been re-read;
-both are the remainder.
+**Audited 2026-08-05: `dunyu-001` — input clean, and its two declared
+corrections re-verified independently rather than trusted.** The residual
+history is `[1, 0.5, 0.25, 0.125, 0.0625, 0.03125]` — exactly `0.5ⁿ`, confirming
+that the fixture's headline "3.12% force imbalance from a loose tolerance" is an
+artifact of `u += 0.5*du` on a linear problem, not a tolerance defect. The
+unconstrained stiffness matrix has **0 zero eigenvalues** (min |λ| = 0.16) where
+3 rigid-body modes are required in 2-D, and a rigid x-translation produces a
+force of norm 14.4 instead of 0 — a bed of springs to ground, as declared. This
+is the most rigorously self-corrected case in the suite.
+
+**Audited 2026-08-05: `lars-001` — one undeclared inconsistency, now declared.**
+Line 27 is `(prices / base) - 1.0 + r.fillna(0)`, a SUM. Neither docstring
+describes a sum: both describe one difference. Adding `r` to a relative
+deviation is a second term the documentation never mentions. Distinct from
+planted defect 2, which is about `fillna(0)` on the same line.
+
+**PF-011 CLOSED.** All fourteen un-audited inputs read end to end. Nine real
+fixture defects found across seven cases, none of them in an agent:
+
+  haruto-001  answer key inside input/, surviving the anti-leak mechanism
+  ziyan-001   must_not_find forbade the case's own declared defect
+  lars-002    "fillna" guard fails a correct negation, in the precision fixture
+  dunyu-001   "friction law"/"slipping" guards fail a correct deferral
+  sophia-002  notes described code that is not there, load-bearingly
+  jordan-001  undeclared unsigned-notional rollup ("exposure" summed gross)
+  mira-001    undeclared silent square-grid reshape
+  lars-001    undeclared formula/docstring inconsistency
+  kai-001     stale prose line number (+ lars-001's three, + rafael-001's one)
+
+Two checks landed from the sweep (17, 18), one real bug fixed in
+`evals/run.sh` staging, and two rules grew sub-clauses (5a, 25's negation
+corollary). Gate 464 → 502.
 
 **Three real fixture defects found in the same pass**, none of them in the input
 code, all of them in the answer key or the process around it:

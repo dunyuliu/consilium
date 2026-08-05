@@ -33,6 +33,18 @@ notes: |
   docstring calls a trailing mean. The docstring on line 16 even claims
   "prior `window` days (exclusive of today)".
 
+  UNDECLARED, found 2026-08-05 re-reading this input under the
+  adversarial-self-pass rule. Line 27 is `(prices / base) - 1.0 + r.fillna(0)`
+  — a SUM of two quantities. Neither docstring describes a sum: line 4 says
+  "daily simple return minus a 5-day trailing mean" and line 24 says "Daily
+  return minus the rolling baseline, as a relative figure". Both describe one
+  difference. `prices / base - 1` is the relative deviation of price from
+  baseline; adding `r` on top is a second term the documentation never
+  mentions. An auditor reporting the formula as inconsistent with its own
+  docstrings is right, and earns nothing for it. Declared, not added to
+  `expected` (rule 5). Distinct from planted defect 2, which is about
+  `fillna(0)` masking a missing value on the same line.
+
   Planted defect 2 (medium, line 27): r.fillna(0) silently turns the first
   day's NaN return into zero, which masks a missing-data condition and lets
   the day-1 excess return appear well-defined when it isn't.
