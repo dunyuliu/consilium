@@ -75,7 +75,7 @@ the 21st agent; `lian-001-no-fixture-no-cut` is a directory with no
 `case.yaml`, so it does not count — see PF-003).
 
 ```bash
-for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l
+for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l | tr -d ' '
 # → 21
 #   → 21 of 21 agents have at least one fixture
 ```
@@ -140,7 +140,7 @@ what changed is that the gap is now quantified on one side and named on the
 other.
 
 ```bash
-grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l
+grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l | tr -d ' '
 # → 12
 ```
 
@@ -293,7 +293,7 @@ honoured in practice. Those need reading twenty-one prompts against their
 fixtures, not a command.
 
 ```bash
-for f in agents/*.md; do awk '/^## Communication discipline/{f=1;next} /^## /{f=0} f' "$f" | md5sum; done | sort -u | wc -l
+for f in agents/*.md; do awk '/^## Communication discipline/{f=1;next} /^## /{f=0} f' "$f" | md5sum; done | sort -u | wc -l | tr -d ' '
 # → 1
 ```
 
@@ -681,7 +681,7 @@ unvalidated duplicate of `anchor` + `line_range`, which are validated.** Prefer
 the anchor; when prose must cite a line, expect it to rot.
 
 ```bash
-ls evals/cases | wc -l
+ls evals/cases | wc -l | tr -d ' '
 # → 26
 ```
 
@@ -856,7 +856,7 @@ do today; if that changes, this command starts lying and the row should be
 reopened rather than trusted.
 
 ```bash
-for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l
+for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l | tr -d ' '
 # → 0
 ```
 
@@ -909,6 +909,27 @@ grep -c 'section=evidence' tests/check.sh
 not by anything here.** CI had been failing since Check 17 landed (`015485b`),
 and no row, check or command in this repository knew.
 
+**Portability swept 2026-08-05.** The shallow-clone incident was one axis; the
+others were tested rather than assumed. The suite gives 570 passed, 0 failed
+from a different working directory, under `LC_ALL=C`, under `LC_ALL=en_US.UTF-8`
+and under `TZ=Pacific/Kiritimati` — Check 12 already uses `date -u`, so the
+timezone result is by design rather than luck.
+
+One real exposure found and fixed: five evidence commands ended in `wc -l`, whose
+output is **unpadded on GNU and padded on BSD**. On macOS every one of them would
+have printed `      26` against a recorded `26`, and Check 17 would have failed
+the whole suite for a developer whose only mistake was using a Mac. Each now ends
+`| wc -l | tr -d ' '`. `PF-013` still uses `uniq -c`, whose column width differs
+between implementations; it is recorded with the local padding and is the one row
+known to be GNU-specific.
+
+**Extent, read from the public API 2026-08-05 and larger than first reported.**
+The run history gives the exact boundaries: last green `420a4f7` at 01:09, first
+failure `015485b` at 01:45, green again at `f992cc4`. **Twenty-two commits red**,
+not the eleven stated when the fix landed — that figure was estimated from the
+local commit count rather than read from the runs, and was wrong. `a21d671`
+(v1.15.0) is green.
+
 `actions/checkout@v4` defaults to a depth-1 checkout with no tags. Check 17
 executes the board's evidence commands and byte-diffs their output, and two of
 them read git history:
@@ -935,10 +956,19 @@ Verified in both environments: a full clone runs all 568 checks including those
 two commands; a `--depth 1 --no-tags` clone also reports 568 passed, naming the
 two it skipped.
 
-**What this row cannot do.** It checks that the workflow asks for full history.
-It cannot tell you whether the last CI run was green — that lives on GitHub, and
-this repository has no credentials to ask. The honest scope is the input to CI,
-not its result.
+**What this row cannot do, corrected.** It checks that the workflow asks for
+full history. It cannot tell you whether the last run was green — but the earlier
+claim that this repository "has no credentials to ask" was wrong in a way worth
+recording. `gh` is not installed, which is what was checked; the repository is
+**public**, so the unauthenticated GitHub API answers it and `curl` is present:
+
+    curl -s "https://api.github.com/repos/dunyuliu/consilium/actions/runs?per_page=5"
+
+That is a manual procedure, deliberately **not** this row's evidence command.
+Check 17 executes evidence on every suite run, and a gate that needs the network
+fails in a clone behind a firewall, on a plane, or when the API rate-limits — a
+gate that cannot run is worse than no gate (rule 2). The row's evidence stays
+local and its scope stays the input to CI; the result is checked by hand.
 
 ```bash
 grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
