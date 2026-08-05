@@ -35,7 +35,7 @@ find "$CLAUDE/agents" "$CLAUDE/commands" -maxdepth 1 -type l ! -exec test -e {} 
 # typed into the body: the heredocs are quoted, so a literal stamp silently
 # drifts from this variable — it did, and the hook then rewrote itself on every
 # run while never matching.
-HOOK_VERSION="consilium-hook-v3"
+HOOK_VERSION="consilium-hook-v4"
 
 skipped=0
 
@@ -91,11 +91,21 @@ if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PREPUSH" ] || ! grep -q "$HOOK_VERSIO
 # Auto-installed by consilium/install.sh — runs the structural gate before push.
 # Bypass deliberately with `git push --no-verify` (and say so in the release note).
 REPO=$(cd "$(dirname "$0")/../.." && pwd -P)
-if [ -f "$REPO/tests/check.sh" ]; then
-    if ! bash "$REPO/tests/check.sh"; then
-        echo "pre-push: tests/check.sh FAILED — push aborted." >&2
-        exit 1
-    fi
+# A MISSING gate is not a passing gate. This used to be wrapped in
+# `if [ -f ... ]`, so a working tree without tests/check.sh pushed silently with
+# exit 0 — and the change most certainly guaranteed to bypass the gate was a
+# commit that DELETED it. Demonstrated 2026-08-05: `mv tests/check.sh aside`,
+# commit, push, "main -> main", exit 0, no warning.
+# Rule 2: a gate that cannot run is worse than no gate, so say so and stop.
+if [ ! -f "$REPO/tests/check.sh" ]; then
+    echo "pre-push: tests/check.sh is missing from the working tree — refusing." >&2
+    echo "  A missing gate is not a passing gate. If you are deliberately pushing" >&2
+    echo "  a tree without it, use: git push --no-verify (and say so in the note)." >&2
+    exit 1
+fi
+if ! bash "$REPO/tests/check.sh"; then
+    echo "pre-push: tests/check.sh FAILED — push aborted." >&2
+    exit 1
 fi
 HOOK_EOF
     printf '# %s\n' "$HOOK_VERSION" >> "$PREPUSH"

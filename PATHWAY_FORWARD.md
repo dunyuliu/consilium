@@ -343,6 +343,26 @@ Fixed by counting links that resolve into this checkout. Verified across three
 targets: all-foreign now reports 0 of 21, a mixed target reports 19 of 21 with
 2 skipped, a clean target reports 21.
 
+**The `pre-push` hook failed open when the gate file was absent, 2026-08-05.**
+The body was `if [ -f "$REPO/tests/check.sh" ]; then ... fi`, so a working tree
+without the gate pushed silently with exit 0 — and **the one change most
+certainly guaranteed to bypass the gate was a commit that deleted it.**
+Demonstrated: `mv tests/check.sh aside`, commit, push, `main -> main`, exit 0,
+no warning.
+
+Now refuses, naming `--no-verify` as the deliberate bypass. `HOOK_VERSION` bumped
+to `consilium-hook-v4` so existing installs replace the old body rather than
+keeping it — the version marker exists for exactly this.
+
+Probed at the same time and correct: a failing gate aborts the push; a **tag-only**
+push runs the gate; a **ref deletion** runs the gate. The `post-merge` hook is
+`exec install.sh`, and git ignores a post-merge exit status, so a missing
+installer is noisy rather than damaging.
+
+This repository's own hook was updated by writing `.git/hooks/pre-push` directly
+rather than by running `install.sh`, which would have reconciled the real
+`~/.claude`. A clone picks up v4 on its next install.
+
 **`tests/lock.sh` probed 2026-08-05 — two defects, both failing OPEN.**
 
   1. **Re-acquiring your own lock with a different scope silently kept the old
