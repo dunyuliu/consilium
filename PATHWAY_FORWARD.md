@@ -693,8 +693,16 @@ fixtures and comparing verdicts, which needs actual agent dispatches; the
 autonomous loop does not do that. What it can do is state the size of the gap
 exactly, and now the command does.
 
+**Surfaced at the point of use, 2026-08-05.** `evals/run.sh list` now compares
+each case's last recorded run against the last commit touching that agent's
+prompt and prints `STALE — ran <date>, prompt changed <date>`. Per-agent rather
+than a global cutoff: an agent untouched since its run is not stale because a
+different one changed. Current split — **13 STALE, 5 NEVER RUN, 7 current**. The
+staleness was previously visible only here, which is the wrong place: the person
+who needs it is the one about to trust a verdict.
+
 ```bash
-for cy in evals/cases/*/case.yaml; do grep -oE 'run \(2026-[0-9]{2}-[0-9]{2}' "$cy" | grep -oE '2026-[0-9]{2}-[0-9]{2}' | sort | tail -1; done | grep -c '2026-07'
+bash evals/run.sh list | grep -c STALE
 # → 13
 ```
 

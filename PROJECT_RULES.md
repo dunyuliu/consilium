@@ -455,8 +455,19 @@ Corollaries, each paid for:
   all. Found 2026-08-05 while authoring `anya-002`, whose first draft had three
   imperative guard families; the sweep that followed found 31 more across 16 of
   the other cases.
+- **Declarative is necessary, not sufficient — guard on what a wrong report
+  RECOMMENDS or CONCLUDES, not on what it CLAIMS about the subject.** Infixing
+  a negation is safe (`must not be rotated`), but a claim can also be denied
+  *externally*: "it is not true that the rule book is silent on baselines"
+  contains "the rule book is silent on baselines" whole. Every string can be
+  externally denied, so no phrasing rule closes this — what closes it is
+  choosing a phrase a correct report would not **quote**. A recommendation is
+  rarely quoted; a claim about the subject is quoted whenever the task is to
+  evaluate that claim. Found 2026-08-05 in `zofia-002`, whose task is precisely
+  "does a rule already cover this", making the false claim the natural thing to
+  restate. Not mechanizable, and Check 19 does not attempt it.
 - **Before shipping a guard, write the correct report's negation and grade
-  it.** A `must_not_find` entry must be a phrase only a *wrong* answer
+  it** — both forms, infixed and external. A `must_not_find` entry must be a phrase only a *wrong* answer
   produces. A bare noun never is, because the right answer's denial contains
   it. Four instances, all found on 2026-08-04 and all demonstrated by
   execution rather than argued: `ziyan-001` guarded `"Williams"` while

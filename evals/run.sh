@@ -230,16 +230,34 @@ cmd_grade() {
 }
 
 # --- list ------------------------------------------------------------------
+# A verdict is only about the prompt that produced it. When an agent's file
+# changes after its last recorded run, the recorded PASS describes an agent that
+# no longer exists — and nothing said so at the point of use. The 2026-08-04
+# slimming pass left 13 of 25 cases in exactly that state and it was visible only
+# on the board (PF-012). Comparing per-agent beats a global cutoff: an agent
+# untouched since its run is not stale just because a different one changed.
 cmd_list() {
     printf '%-42s %-22s %s\n' CASE AGENT "RUN RECORD"
     for d in "$CASES_DIR"/*/; do
-        local id agent run
+        local id agent run last touched
         id="$(basename "$d")"
         agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
-        if grep -qiE 'first run \(|second run \(' "$d/case.yaml" 2>/dev/null; then
-            run="run"
-        else
+        last="$(grep -oiE 'run \(20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$d/case.yaml" 2>/dev/null \
+                | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | sort | tail -1 || true)"
+        # `|| true` is load-bearing: grep exits 1 for a case with no run record,
+        # which is the NORMAL case here, and under `set -euo pipefail` the
+        # assignment inherits that status and kills the loop after the header.
+        # Third time this trap has been hit in this file's family (Checks 17, 18).
+        if [ -z "$last" ]; then
             run="NEVER RUN"
+        else
+            touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
+                       -- "agents/${agent}.md" 2>/dev/null)"
+            if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
+                run="STALE — ran $last, prompt changed $touched"
+            else
+                run="run $last"
+            fi
         fi
         printf '%-42s %-22s %s\n' "$id" "${agent:-?}" "$run"
     done
