@@ -70,7 +70,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 5a | The answer key is never inside `input/` | mechanical — Check 18 |
 | 5b | The answer key is never LINKED into `input/` | mechanical — Check 23 |
 | 6 | *(dropped — see "Dropped starter rules")* | — |
-| 7 | `evals/cases/*/input/` is read-only fixture data | mechanical |
+| 7 | `evals/cases/*/input/` is read-only fixture data | mechanical — Check 26 |
 | 8 | Never delete evidence: release notes archive, never vanish | mechanical |
 | 9 | Run the cheap check locally before pushing | mechanical |
 | 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |

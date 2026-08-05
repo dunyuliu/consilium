@@ -35,6 +35,7 @@
 #  23. No fixture input contains a symlink (it would read out of the staged copy).
 #  24. An empty report fails every case (silence must not satisfy a case).
 #  25. Every agent has a fixture that names it exactly (rule 13).
+#  26. No generated artefact has been written into a fixture input (rule 7).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -942,6 +943,35 @@ for agent_file in agents/*.md; do
         ok
     else
         fail "$stem: no eval fixture declares 'agent: $stem' (rule 13). A fixture whose id merely starts with the same first name does not count."
+    fi
+done
+
+echo
+echo "Check 26: no generated artefact in a fixture input (rule 7)"
+# Rule 7 says `evals/cases/*/input/` is read-only fixture data and is marked
+# mechanical. Nothing mechanised it. Its stated procedure — "git status inside
+# evals/ must be clean after any eval run" — is a thing a human remembers to do,
+# which is the definition of not being a gate.
+#
+# The violation it names has already happened twice: `__pycache__` directories
+# were found inside `dunyu-001/input/` and `lars-002/input/` on 2026-08-05,
+# untracked and therefore invisible to `git status` on a clean tree. They were
+# spotted by eye while listing files for something else, and removed by hand.
+# They are proof that an agent was pointed at the case directory rather than the
+# staged copy — the read-only violation `evals/run.sh stage` exists to prevent.
+#
+# Untracked counts. A tracked artefact is a committed mistake; an untracked one
+# is the mistake still happening, on the machine where it happened.
+for case_dir in evals/cases/*/; do
+    id=$(basename "$case_dir")
+    [ -d "$case_dir/input" ] || continue
+    art=$(find "$case_dir/input" \( -name '__pycache__' -o -name '*.pyc' -o -name '*.pyo' \
+            -o -name '.pytest_cache' -o -name 'node_modules' -o -name '.ipynb_checkpoints' \
+            -o -name '*.egg-info' \) -print -quit 2>/dev/null || true)
+    if [ -n "$art" ]; then
+        fail "$id: ${art#"$case_dir"} is a generated artefact inside fixture input (rule 7) — something wrote through a read-only fixture, which means an agent ran against the case directory instead of a staged copy"
+    else
+        ok
     fi
 done
 

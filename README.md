@@ -15,7 +15,7 @@ repo:
 - **`PROJECT_RULES.md`** — 25 binding rules, 16 of them enforced by a
   gate rather than by good intentions. Each carries the incident that
   paid for it.
-- **`tests/check.sh`** — 685 structural checks, every one negative-tested
+- **`tests/check.sh`** — 711 structural checks, every one negative-tested
   when it landed. A check that has never failed is not known to be a gate.
 - **`evals/cases/`** — 23 regression fixtures, one per agent, all executed.
   Prompt edits are measurable instead of vibe-checked.

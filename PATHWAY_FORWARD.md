@@ -184,18 +184,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 685 passed, 0 failed
+# → Summary: 711 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 25 checks and 25 exist. This row is now
+The header comment documents 26 checks and 26 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 25
+# → 26
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -215,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 685 passed, 0 failed
+# → Summary: 711 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -342,6 +342,39 @@ skimming sees the reassuring number first.
 Fixed by counting links that resolve into this checkout. Verified across three
 targets: all-foreign now reports 0 of 21, a mixed target reports 19 of 21 with
 2 skipped, a clean target reports 21.
+
+**Tier audit, 2026-08-05: which "mechanical" rules actually have a mechanism.**
+Rule 13 was marked mechanical and had none, and nobody noticed for weeks. That
+prompted reading the whole index against the checks that exist. Result: of the
+27 rules and sub-rules marked mechanical, **four had no mechanism** — 7, 8, 14
+and 15. Rule 7 is fixed below; the other three are named here rather than
+quietly left.
+
+  rule 7   `input/` is read-only fixture data      -> Check 26, landed today
+  rule 8   never delete evidence                    -> nothing
+  rule 14  one installer, one canonical path        -> nothing
+  rule 15  a release is a note plus a matching tag  -> nothing
+
+Rule 15 is the sharpest of the three remaining, because its check is one command
+and **has been run by hand after every release this session** — the exact shape
+of a rule that is mechanical in name and habit in practice. Rule 8 is checkable
+against `git log --diff-filter=D`. Rule 14 is the vaguest and may not be
+mechanizable at all; that should be decided rather than assumed.
+
+**Rule 7 had no mechanism, and its violation had already happened twice.** The
+rule's stated procedure is "`git status` inside `evals/` must be clean after any
+eval run" — something a human remembers to do, which is the definition of not
+being a gate. `__pycache__` directories were found inside `dunyu-001/input/` and
+`lars-002/input/` on 2026-08-05, **untracked** and therefore invisible to
+`git status` on a clean tree. They were spotted by eye while listing files for
+something else, and removed by hand. They are proof that an agent was pointed at
+the case directory rather than the staged copy — the read-only violation
+`evals/run.sh stage` exists to prevent.
+
+Check 26 now fails on a generated artefact under any `input/`, tracked or not. A
+tracked artefact is a committed mistake; an untracked one is the mistake still
+happening, on the machine where it happened. Negative-tested by planting
+`__pycache__` in `kai-001/input/` and confirming the failure line appeared.
 
 **The `pre-push` hook failed open when the gate file was absent, 2026-08-05.**
 The body was `if [ -f "$REPO/tests/check.sh" ]; then ... fi`, so a working tree
