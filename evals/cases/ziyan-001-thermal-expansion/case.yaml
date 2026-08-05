@@ -55,6 +55,36 @@ must_not_find:
   - keywords:
       - "recommend deleting"
       - "edit the manuscript"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — `grade` reports how many were mentioned and never lets that
+# change the verdict (rule 5). See evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: smith-overclaim
+    any_of:
+      - "overclaim"
+      - "1 meter"
+      - "1 metre"
+      - "unsupported"
+  - kind: keyword
+    file: johnson-year
+    any_of:
+      - "2019"
+      - "wrong year"
+      - "year mismatch"
+  - kind: keyword
+    file: coefficient-value
+    any_of:
+      - "expansion coefficient"
+      - "coefficient"
+      - "no coefficient"
+  - kind: keyword
+    file: williams-two-authors
+    any_of:
+      - "et al"
+      - "two-author"
+      - "two author"
+
 notes: |
   DECLARED DEFECT SET (updated 2026-07-31 after two runs). The manuscript
   contains FOUR real defects, not two. The two beyond the original plant were

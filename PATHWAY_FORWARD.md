@@ -106,9 +106,23 @@ plus four things that are not there scores identically to a clean one.
 the ones nobody planted, and `grade` reports how many were mentioned as a
 diagnostic that cannot move the verdict (rule 5 admits one eval pass criterion).
 It makes a correct-but-uncredited finding visible; before this those defects
-lived in prose that nothing read. Landed on `jordan-001`, `mira-001`,
-`lars-001` — and each of their pass samples immediately scored short by exactly
-the defect that was undeclared before the PF-011 audit (1 of 2, 3 of 4, 2 of 3).
+lived in prose that nothing read. Landed on eight cases — `jordan-001`, `mira-001`,
+`lars-001`, `sophia-001`, `sophia-002`, `dunyu-001`, `ziyan-001`, `lars-002`.
+Each of the first three pass samples immediately scored short by exactly the
+defect that was undeclared before the PF-011 audit (1 of 2, 3 of 4, 2 of 3), and
+`sophia-001` reads 2 of 3, `ziyan-001` 2 of 4.
+
+A low ratio is not automatically bad: `dunyu-001` reads 0 of 4 and `lars-002`
+0 of 1, both correctly — a deferral does not enumerate the physics it defers,
+and a clean control's bar is "nothing false", not "report everything".
+
+Populating the eight surfaced one more defect of a familiar shape.
+`ziyan-001` shipped the term `"2 \\times 10"`: terms are matched literally with
+no unescaping, so the author's YAML-style escaping reached `grep -F` as a double
+backslash and **the criterion could never fire**. Swept all three criteria
+sections of all 23 cases for backslashes — it was the only one. No check added:
+the only complete test is "flag any `\\`", and a `ziyan` report quoting a LaTeX
+line break would trip it.
 
 The reverse direction — listing report findings that map to NO declared defect,
 and returning INCONCLUSIVE when any are unmapped — is **not buildable**. It
@@ -123,7 +137,7 @@ other.
 
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l
-# → 5
+# → 10
 ```
 
 ### PF-005 — `docs/release_notes_*` — BROKEN

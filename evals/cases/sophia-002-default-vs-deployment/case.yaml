@@ -63,6 +63,23 @@ must_not_find:
       - "batch_size diverges from its documented default"
       - "recommend updating the documented default for batch_size"
       - "recommend changing batch_size's default"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — `grade` reports how many were mentioned and never lets that
+# change the verdict (rule 5). See evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: max-retries-fallback-conflict
+    any_of:
+      - "max_retries"
+      - "worker.py:22"
+      - "fallback of 5"
+  - kind: keyword
+    file: dead-letter-never-read
+    any_of:
+      - "enable_dead_letter"
+      - "never referenc"
+      - "dead config"
+
 notes: |
   Pass interval: exactly two DISTINCT DEFECTS (not report rows; see the
   second run record below) — (1) the max_retries fallback vs

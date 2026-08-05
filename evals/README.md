@@ -209,6 +209,22 @@ declared defects: 3 of 4 mentioned  (diagnostic — not part of the verdict)
   NOT mentioned  square-grid-reshape
 ```
 
+**A low ratio is not automatically bad.** For a case whose right answer is a
+*refusal* the correct report may legitimately mention none: `dunyu-001`'s pass
+sample reads 0 of 4 because a deferral does not enumerate the physics it is
+deferring, and `lars-002`'s reads 0 of 1 because its bar is "no CRITICAL finding
+and nothing factually false", not "report everything". The number says how much
+of the input the report engaged with, and what that ought to be depends on the
+case.
+
+**Terms are matched literally, with no unescaping.** What is typed in the YAML
+is what `grep -F` sees. `ziyan-001` shipped `"2 \\times 10"` — the author wrote
+YAML-style escaping the parser never undoes, so the term reached the matcher as a
+literal double backslash and could never fire. Found 2026-08-05 by sweeping all
+three criteria sections for backslashes; it was the only one. No check was added:
+the only complete test is "flag any `\\`", and a `ziyan` report quoting a LaTeX
+line break would trip it, so the false positive is real.
+
 It cannot move the verdict — rule 5 admits exactly one eval pass criterion.
 What it does is make a **correct but uncredited** finding visible. An
 undeclared true defect makes a thorough audit score no better than a shallow

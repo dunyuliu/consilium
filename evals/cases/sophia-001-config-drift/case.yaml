@@ -45,6 +45,30 @@ must_not_find:
       - "defaults diverge"
       - "config contradicts the documented default"
       - "README default is contradicted"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — `grade` reports how many were mentioned and never lets that
+# change the verdict (rule 5). See evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: output-units-dead-config
+    any_of:
+      - "output_units"
+      - "never read"
+      - "dead"
+  - kind: keyword
+    file: hardcoded-millimetres
+    any_of:
+      - "1000.0"
+      - "millimetre"
+      - "millimeter"
+  - kind: keyword
+    file: symmetric-spike-filter
+    any_of:
+      - "symmetric"
+      - "both direction"
+      - "anomalously low"
+      - "abs()"
+
 notes: |
   ALSO PRESENT, now declared (found by the 2026-07-31 re-run, not planted
   deliberately): README.md:12 says spikes are rejected "above the rolling

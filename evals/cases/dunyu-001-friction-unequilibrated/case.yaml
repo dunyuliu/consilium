@@ -61,6 +61,38 @@ must_not_find:
       - "the friction law is now"
       - "the contact is now slipping"
       - "slip is now computed"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — `grade` reports how many were mentioned and never lets that
+# change the verdict (rule 5). See evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: damped-iteration-artifact
+    any_of:
+      - "0.5"
+      - "damping"
+      - "alpha"
+      - "artifact"
+  - kind: keyword
+    file: zero-rigid-body-modes
+    any_of:
+      - "rigid-body"
+      - "rigid body"
+      - "springs to ground"
+      - "no load transfer"
+  - kind: keyword
+    file: no-contact-interface
+    any_of:
+      - "shared"
+      - "no slip degree"
+      - "interface does not exist"
+      - "no contact interface"
+  - kind: keyword
+    file: tension-load-case
+    any_of:
+      - "tension"
+      - "tau_max"
+      - "zero shear"
+
 notes: |
   Planted defect (critical, elastic_contact.py line 141):
   The solver's default tolerance is set to tolerance=5e-2, which is too loose

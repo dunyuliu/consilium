@@ -46,6 +46,19 @@ must_not_find:
       - "fillna(0) masks"
       - "silently fills"
       - "masks a missing value"
+# Every real defect in input/, whether or not it is required for a pass.
+# Diagnostic only — `grade` reports how many were mentioned and never lets that
+# change the verdict (rule 5). See evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: absolute-std-floor
+    any_of:
+      - "_STD_FLOOR"
+      - "1e-12"
+      - "absolute threshold"
+      - "scale-dependent"
+      - "scale dependent"
+
 notes: |
   CLEAN CONTROL — the only case in the suite with no planted defect. Every
   other fixture rewards finding something, so nothing measured hallucination
