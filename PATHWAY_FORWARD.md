@@ -269,6 +269,28 @@ for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | gr
 # → 0
 ```
 
+### PF-015 — `tests/check.sh` — BROKEN — never audited
+
+Rule 21a (execute the board's evidence and diff it against the recorded
+output) was attempted on 2026-08-04 and REVERTED. The awk parser split
+multi-line commands into fragments, fed them to `bash -c`, and the check
+blocked — the suite stopped printing its Summary line, which is worse than
+not having the check at all.
+
+Two real obstacles, both underestimated:
+  - board commands are multi-line shell (`for d in ...; do ... done`), so a
+    line-oriented fence parser cannot recover them
+  - one row's command is `bash tests/check.sh` itself, which recurses
+
+Neither is fatal — store commands as single lines, and exempt self-referential
+ones explicitly — but it is more than a small patch, and a half-working gate
+that swallows the rest of the suite is the exact failure mode rule 2 forbids.
+
+```bash
+# no command run — the check was reverted before it worked
+# → never audited
+```
+
 ## Deferral log
 
 Append-only. A deferral not written here did not happen. An item may be deferred at
