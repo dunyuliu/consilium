@@ -433,6 +433,15 @@ nothing measured hallucination; `haruto-001` came from a deployment miss.
 
 Corollaries, each paid for:
 
+- **A run's record lives in the case, at the time of the run.** A verdict
+  written only into a release note or a board paragraph is invisible to
+  `evals/run.sh list`, which reads the case's run log because that is where
+  rule 4 points and the only place a verdict sits beside the criteria it was
+  graded against. Three post-change runs were found on 2026-08-05 claimed with
+  specific token counts in prose and absent from their cases (`ziyan-001`,
+  `mira-001`, `lars-001`); all three cases still read STALE, and correctly so.
+  They were **not** transcribed — copying a claim you did not verify into the
+  place the tooling trusts is manufacturing evidence, whatever its source.
 - **A fixture is never finished.** When a run finds something real the case
   did not declare, declare it — do not delete it to keep the case tidy. An
   undeclared true defect makes a thorough audit score worse than a shallow one.

@@ -693,6 +693,42 @@ fixtures and comparing verdicts, which needs actual agent dispatches; the
 autonomous loop does not do that. What it can do is state the size of the gap
 exactly, and now the command does.
 
+**Audited 2026-08-05: none of the thirteen is stale for a cosmetic reason, and
+three post-change runs exist only as prose.**
+
+Every one of the twelve agent files behind the thirteen stale cases changed in
+the same two commits — `d6f6dc9` (communication-discipline block) and `3d06c1e`
+(tool-economy section). The diffs are near-identical in size (+40/−39 for nine of
+them), which is what a shared boilerplate edit looks like. But it is **not**
+cosmetic: the tool-economy section instructs the agent to batch calls, avoid
+re-reading, and stop at the answer. Those are instructions about how much
+evidence to gather, and an agent that gathers less can find less. Two files moved
+further — `mira-volkov` −116 lines (the recipe-book cut) and `victor-reyes` −54.
+So no case can be cleared on the grounds that nothing behavioural changed.
+
+The sharper finding is about where runs get written. **Three post-change runs are
+claimed with specific numbers, and none is in the case's own run log:**
+
+    ziyan-001   "sonnet→haiku, PASS 5/5, 11.9k vs 14.4k"   (release note v1.11.0 §5)
+                case.yaml has two runs, both 2026-07-31
+    mira-001    "PASS 5/5 at 27k vs 34.7k, 4 calls vs 12"  (PF-013, this file)
+                case.yaml has one run, 2026-07-31
+    lars-001    "has been re-run (PASS)"                   (PF-012, this file)
+                case.yaml has one run, 2026-07-31
+
+`evals/run.sh list` reads the case's run log, because that is where rule 4 points
+and the only place a verdict sits beside the criteria it was graded against. A
+run recorded in a release note or a board paragraph is invisible to the tooling
+and, by rule 4, is not evidence — the same standard applied to `haruto-001`'s
+leaked PASS.
+
+**Deliberately not transcribed.** Copying those three claims into the case files
+would flip them to "current" on the strength of prose I did not verify and cannot
+re-derive, which is manufacturing evidence in the exact shape this board exists
+to catch. They stay STALE. The durable fix is upstream: **write the run record
+into the case at the time of the run**, and let the release note quote it rather
+than be its only home.
+
 **Surfaced at the point of use, 2026-08-05.** `evals/run.sh list` now compares
 each case's last recorded run against the last commit touching that agent's
 prompt and prints `STALE — ran <date>, prompt changed <date>`. Per-agent rather
