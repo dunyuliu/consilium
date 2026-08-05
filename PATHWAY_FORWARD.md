@@ -355,6 +355,19 @@ Nothing red reached the remote: the `pre-push` hook re-runs the gate, and by the
 was not. Rule 3 says green before merge, and "it will be green in a moment" is
 the reasoning every skipped gate has.
 
+**The staleness count moved 13 -> 14 the moment a prompt was edited, and the
+pre-push hook caught it.** Adding step 6a to `lian-zhao` made `lian-001`'s
+2026-08-04 verdict older than the prompt it was grading, so `evals/run.sh list`
+reclassified it STALE — which is precisely what that mechanism is for. The gate
+was green before the commit and red at push time; the `pre-push` hook aborted
+the push. **First time it has blocked anything this session**, and it was right
+to: the board would have shipped claiming 13.
+
+The lesson is small and worth keeping: editing an agent prompt invalidates its
+fixture's verdict, and the board records that count, so a prompt edit is also a
+board edit. Running the gate before the commit is not the same as running it
+before the push.
+
 **Prompt-vs-check pass, 2026-08-05 — one real gap found.** Checks 17–29 all
 postdate most agent prompts, and `haruto-nakamura`'s cardinal rule turned out to
 contradict Check 27, so the other prompts were read the same way. Three
@@ -990,7 +1003,7 @@ who needs it is the one about to trust a verdict.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 13
+# → 14
 ```
 
 ### PF-013 — `agents/` — OPEN
