@@ -27,13 +27,13 @@ must_not_find:
       - "switch to numpy"
       - "rewrite using vectorized"
 notes: |
-  Planted defect 1 (critical, line 17): rolling_baseline uses
+  Planted defect 1 (critical, line 19): rolling_baseline uses
   prices.iloc[i : i + window] — the window of "prior" days actually contains
   today plus the next four days, leaking future prices into a series the
-  docstring calls a trailing mean. The docstring on line 15 even claims
+  docstring calls a trailing mean. The docstring on line 16 even claims
   "prior `window` days (exclusive of today)".
 
-  Planted defect 2 (medium, line 24): r.fillna(0) silently turns the first
+  Planted defect 2 (medium, line 27): r.fillna(0) silently turns the first
   day's NaN return into zero, which masks a missing-data condition and lets
   the day-1 excess return appear well-defined when it isn't.
 

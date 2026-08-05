@@ -216,10 +216,49 @@ verifying a control as rigorously as the planted defect, and two authors (`victo
 `anya-001`) have since caught their own contaminants before shipping. The other nine
 cases have not been re-audited under that rule.
 
-Case count grew 15 → 17 since this row was last checked (`lars-002-clean-control`,
-`lian-001-no-fixture-no-cut` landed). Neither has been audited under the
-adversarial-self-pass rule yet, so the "2 authored / N predate it" split below
-is stale — re-derive it before citing it, do not just trust the new total.
+**Re-derived 2026-08-04.** The "nine that predate the rule" figure was stale and
+is retired. Derivation is now stated so it can be repeated: a case counts as
+audited under the rule if its `case.yaml` or `README.md` records the control
+being verified. Nine do — `elena-001`, `anya-001`, `selin-001`, `nadia-001`,
+`victor-001`, `wei-lin-001`, `lian-001`, `marco-001`, `zofia-001`. **Fourteen do
+not**: `dunyu-001`, `haruto-001`, `ingrid-001`, `iris-001`, `jordan-001`,
+`kai-001`, `lars-001`, `lars-002`, `mira-001`, `priya-001`, `rafael-001`,
+`sophia-001`, `sophia-002`, `ziyan-001`. Git dates cannot be used for this split
+— every case directory traces to one commit — so the record in the case is the
+only evidence there is.
+
+**Audited 2026-08-04: `kai-001`, `ingrid-001` — inputs clean.** Both were read
+end to end against their notes. `kai-001`'s uniform out-of-range clamping and
+`ingrid-001`'s `dx`-halving refinement schedule were each examined and are
+correct as written; calling either a defect would have been an invented finding,
+which is the failure this row exists to prevent. Twelve remain.
+
+**Three real fixture defects found in the same pass**, none of them in the input
+code, all of them in the answer key or the process around it:
+
+  1. `lars-001` notes cited three line numbers and **all three were wrong** —
+     15→16, 17→19, 24→27. Check 9 validates that a criterion's `anchor` sits
+     inside its `line_range`; nothing validates the prose. So the machine-read
+     answer key was right and the human-read one pointed at a blank assignment
+     and two docstrings. A human re-auditing the fixture — precisely what this
+     row asks for — is sent to the wrong lines.
+  2. `kai-001` cited `bin_distances (line 37)`; line 37 is blank, the `def` is
+     on 38.
+  3. Untracked `__pycache__` directories sat inside `dunyu-001/input/` and
+     `lars-002/input/`. Nothing was committed, so no clone is affected, but they
+     are proof that an agent was pointed at the case directory instead of the
+     staged copy — twice, unlogged. This is the `victor-001` read-only violation
+     recurring after `evals/run.sh stage` was built to make it impossible.
+     Removed.
+
+**No check was added for defect 1, deliberately.** The honest candidates all fail:
+requiring cited lines to be non-blank catches `kai-001` and misses `lars-001`;
+requiring them to fall inside a declared `line_range` fails on every narrative
+citation (`bin_depths (line 23)` is not a defect pointer). A gate that catches one
+of four known instances while reading as a gate is worse than no gate (rule 2).
+The durable statement is the finding itself: **a line number in `notes:` is an
+unvalidated duplicate of `anchor` + `line_range`, which are validated.** Prefer
+the anchor; when prose must cite a line, expect it to rot.
 
 ```bash
 ls evals/cases | wc -l

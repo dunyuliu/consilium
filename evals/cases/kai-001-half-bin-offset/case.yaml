@@ -56,7 +56,7 @@ must_not_find:
       - "rewrite using numpy"
 notes: |
   Planted trap (line 59). Three counting loops that look like textbook
-  copy-paste: bin_depths (line 23), bin_distances (line 37), bin_magnitudes
+  copy-paste: bin_depths (line 23), bin_distances (line 38), bin_magnitudes
   (line 53). Bodies are byte-identical apart from the two constants — EXCEPT
   that bin_magnitudes computes
 
