@@ -354,6 +354,26 @@ Nothing red reached the remote: the `pre-push` hook re-runs the gate, and by the
 was not. Rule 3 says green before merge, and "it will be green in a moment" is
 the reasoning every skipped gate has.
 
+**The contradiction is in `haruto-nakamura`'s prompt, not only in the procedure.**
+His cardinal rule 1 reads *"Tag the commit only when the full test suite is
+green"* — and Check 27 makes the suite green only once the tag exists. The two
+are mutually unsatisfiable as literally stated, which is why the gate went red
+mid-release and why the operator rationalised it away. A rule that cannot be
+followed literally gets followed loosely, and then so does every rule beside it.
+
+Resolved by adding an ordering caveat to that cardinal rule rather than by
+weakening Check 27: **commit the note, tag it, run the suite, then push.** The
+pre-push hook is what enforces green-before-anything-leaves-the-machine, and it
+runs after the tag. Rule 1 means "nothing red is ever pushed", not "the tag is
+the last step".
+
+Noted on ownership: `agents/*.md` belongs to `lian-zhao` under rule 19, whose
+text binds *agents* — "exactly one agent that may write it". The operator is
+governed by rule 18's lock instead, held on every commit of this session. The
+table's closing line, "everyone not listed is read-only", reads broader than the
+rule's own scope; that is a wording imprecision rather than a violation, and is
+recorded here rather than silently relied upon.
+
 **Check 27 makes a release transiently red by construction**, between writing the
 note and creating the tag. That is correct — a note without a tag is not a
 release — but it means the release procedure must **tag before running the

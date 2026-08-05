@@ -95,6 +95,20 @@ own the release-boundary gate, the final enforcement point where
 1. **No release while a test fails.** Tag the commit only when the
    full test suite — not just the affected subset — is green on the
    target platforms.
+
+   **Ordering caveat, added 2026-08-05.** In a project whose gate checks that
+   every release note has a matching tag, this rule and the gate are mutually
+   unsatisfiable as literally stated: the suite cannot go green until the tag
+   exists, and this rule says do not tag until it is green. The sequence that
+   satisfies both is **commit the note, tag it, run the suite, then push** —
+   the pre-push hook is what enforces green-before-anything-leaves-the-machine,
+   and it runs after the tag. Read this rule as "nothing red is ever pushed",
+   not as "the tag is the last step".
+
+   This is not hypothetical: the deadlock caught the operator cutting v1.18.0,
+   who saw a red gate, judged it transient, and committed anyway. A rule that
+   cannot be followed literally gets followed loosely, and then so does every
+   rule beside it.
 2. **No silent skips.** Every `@pytest.skip`, `xfail`, conditional
    skip, or "expected-failure" marker needs an inline justification
    citing the issue or PR it tracks. A skip with no link is a
