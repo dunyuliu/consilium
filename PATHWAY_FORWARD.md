@@ -343,6 +343,31 @@ Fixed by counting links that resolve into this checkout. Verified across three
 targets: all-foreign now reports 0 of 21, a mixed target reports 19 of 21 with
 2 skipped, a clean target reports 21.
 
+**`tests/lock.sh` probed 2026-08-05 — two defects, both failing OPEN.**
+
+  1. **Re-acquiring your own lock with a different scope silently kept the old
+     one.** It printed `already held by you (a) — first` and exited 0, which
+     reads as success, while discarding the scope just requested. The caller then
+     stages files in the scope it asked for and is refused by the hook citing a
+     scope it never chose. This cost time repeatedly during this session's own
+     work before it was recognised as a defect rather than as the rules being
+     strict. Rule 18 governs concurrent *writers*; one writer adjusting its own
+     scope is not a collision, so it now updates and says so:
+     `scope UPDATED / was: agents/ / now: tests/`.
+
+  2. **A scope path containing whitespace silently WIDENED the guard.** The scope
+     is stored as one space-separated line and the pre-commit hook splits on
+     whitespace, so `evals/cases/a b/` became the two prefixes `evals/cases/a`
+     and `b/`. Demonstrated: with that scope declared, committing `b/anything.txt`
+     — never in scope by any reading — **succeeded**. Such a path is now refused
+     at acquire time, because the ambiguity is in the storage format and a guard
+     that fails open is worse than one that refuses to start.
+
+Probed at the same time and correct: `release` with no lock held is a benign
+no-op; `release` by a non-holder is refused with "releasing another writer's lock
+mid-run is the collision itself"; `release --force` by a non-holder works and
+names whose lock it took; a foreign holder still blocks `acquire`.
+
 **The no-clobber claim itself holds**, which is why this was worth checking
 separately from the claim. A foreign symlink is skipped with `points to
 /etc/hostname; use --force`; a real file with `real file exists; refusing to

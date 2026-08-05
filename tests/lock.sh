@@ -62,9 +62,40 @@ acquire)
     fi
     shift 2 || true
     scope="$*"
+    # A path containing a space cannot be represented. The scope is stored as one
+    # space-separated line and the pre-commit hook splits it on whitespace, so
+    # `evals/cases/a b/` becomes the two prefixes `evals/cases/a` and `b/` — and
+    # the guard then ACCEPTS `b/anything`, which was never in scope. Demonstrated
+    # 2026-08-05: a commit of `b/anything.txt` under that scope succeeded. The
+    # guard fails OPEN, which is the wrong direction, so refuse the input rather
+    # than silently widen.
+    for p in "$@"; do
+        case "$p" in *[[:space:]]*)
+            echo "REFUSED: scope path '$p' contains whitespace." >&2
+            echo "  The scope is one space-separated line and the pre-commit hook splits on" >&2
+            echo "  whitespace, so such a path would silently widen the guard rather than" >&2
+            echo "  narrow it. Rename the path, or lock a parent directory instead." >&2
+            exit 2 ;;
+        esac
+    done
     if [ -f "$LOCK" ]; then
         holder=$(sed -n '1p' "$LOCK"); desc=$(sed -n '2p' "$LOCK"); when=$(sed -n '3p' "$LOCK")
         if [ "$holder" = "$OWNER" ]; then
+            # Re-acquiring your own lock used to print "already held by you" and
+            # exit 0 while DISCARDING the newly requested scope. Exit 0 plus that
+            # wording reads as success, so the caller stages files in the scope it
+            # asked for and is refused by the hook with a scope it never chose.
+            # Rule 18 governs concurrent WRITERS; one writer adjusting its own
+            # scope is not a collision, so update it and say so.
+            old_scope=$(sed -n '4p' "$LOCK")
+            if [ "$scope" != "$old_scope" ]; then
+                printf '%s\n%s\n%s\n%s\n' "$OWNER" "$what" \
+                    "$(sed -n '3p' "$LOCK")" "$scope" > "$LOCK"
+                echo "already held by you ($OWNER) — scope UPDATED"
+                echo "  was:  ${old_scope:-<unrestricted>}"
+                echo "  now:  ${scope:-<unrestricted>}"
+                exit 0
+            fi
             echo "already held by you ($OWNER) — $desc"
             exit 0
         fi
