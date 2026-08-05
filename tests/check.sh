@@ -28,6 +28,8 @@
 #  17. Every PATHWAY_FORWARD.md evidence command still prints what is recorded.
 #  18. No fixture input contains fixture-authoring language (answer-key leak).
 #  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
+#  20. Every agent holding the Agent tool warns about dispatch cost, and no
+#      agent without it does.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -749,6 +751,38 @@ for case_dir in evals/cases/*/; do
         | grep -iE "^($IMPERATIVES)\b" | head -1 || true)
     if [ -n "$bad" ]; then
         fail "$id: must_not_find guard \"$bad\" is imperative — a correct report saying \"do not $bad\" would trip it. Rewrite declaratively (rule 25)."
+    else
+        ok
+    fi
+done
+
+echo
+echo "Check 20: the dispatch-cost warning tracks the Agent tool exactly"
+# Rule 23. Checks 13 and 14 verify that the discipline sections EXIST. That was
+# noted as a limit during the PF-009 audit — `## Communication discipline` is
+# byte-identical across all 21 agents, so Check 13 proves 21 copies of a
+# paragraph exist rather than 21 considered declarations.
+#
+# Auditing the content settled it the other way: uniformity is correct here.
+# Reading files and reporting costs the same whoever is doing it. There is
+# exactly ONE axis on which the economics genuinely differ — whether the agent
+# spawns subagents, which costs ~10x doing the work itself — and the prompts
+# already differentiate on precisely that axis and nothing else.
+#
+# So the useful invariant is not "these sections differ per agent", it is that
+# the ONE real difference stays aligned with the capability that causes it. A
+# new Agent-holder that ships without the warning is the failure this catches;
+# an agent that carries the warning without the tool is documentation of a
+# capability it does not have.
+for agent_file in agents/*.md; do
+    stem=$(basename "$agent_file" .md)
+    has_tool=$(sed -n '1,/^---$/p' "$agent_file" | grep -m1 '^tools:' | grep -c 'Agent' || true)
+    has_warn=$(awk '/^## Tool economy/{f=1;next} /^## /{f=0} f' "$agent_file" \
+        | grep -c 'Dispatching multiplies this' || true)
+    if [ "$has_tool" = 1 ] && [ "$has_warn" = 0 ]; then
+        fail "$stem: holds the Agent tool but its tool-economy section carries no dispatch-cost warning (rule 23)"
+    elif [ "$has_tool" = 0 ] && [ "$has_warn" != 0 ]; then
+        fail "$stem: warns about dispatch cost but does not hold the Agent tool"
     else
         ok
     fi

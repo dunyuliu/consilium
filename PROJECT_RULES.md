@@ -90,6 +90,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |
 | 25a | must_not_find guards are declarative, never imperative | mechanical — Check 19 |
 | 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical |
+| 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
 
 ---
 

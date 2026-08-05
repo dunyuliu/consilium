@@ -181,18 +181,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 533 passed, 0 failed
+# → Summary: 554 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 19 checks and 19 exist. This row is now
+The header comment documents 20 checks and 20 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 19
+# → 20
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -212,7 +212,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 533 passed, 0 failed
+# → Summary: 554 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -257,7 +257,24 @@ rule book under rule 19; `nadia-hadid`'s hits were the dispatch language above.
 The agents that declare themselves purely read-only (`lars-eriksson`,
 `sophia-okafor`, `jordan-kim`, `priya-nair`, and the reviewers) carry no `Edit`.
 
-**Checked, and a real limit found — Checks 13 and 14 verify presence, not
+**SETTLED 2026-08-05, and the other way.** The paragraph below stands as what was
+observed; this is what auditing the *content* concluded. Uniformity is correct
+here. Reading files and reporting costs the same whoever does it, and there is
+exactly **one** axis on which the economics genuinely differ — whether the agent
+spawns subagents, which costs ~10x doing the work itself. The prompts already
+differentiate on precisely that axis and nothing else: the four `Agent`-holders
+carry a dispatch-cost paragraph the other sixteen do not, and `lian-zhao` carries
+a variant because dispatching is her main cost rather than an occasional one.
+Verified: the warning is present in exactly the agents holding the tool, with no
+mismatch in either direction.
+
+So the useful invariant was never "these sections differ per agent" — it is that
+the one real difference stays aligned with the capability that causes it.
+**Check 20** now enforces that, negative-tested both ways (stripping the warning
+from `victor-reyes`; adding it to `priya-nair`). This is no longer recorded as a
+gap.
+
+**Observed, and originally read as a limit — Checks 13 and 14 verify presence, not
 content.** `## Communication discipline` is **byte-identical in all 21 agents**:
 one distinct body. `## Tool economy` has three distinct bodies across 21 (16
 share one, the four `Agent`-holders share another, `lian-zhao` has its own). The
