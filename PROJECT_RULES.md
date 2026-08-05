@@ -71,14 +71,14 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 5b | The answer key is never LINKED into `input/` | mechanical — Check 23 |
 | 6 | *(dropped — see "Dropped starter rules")* | — |
 | 7 | `evals/cases/*/input/` is read-only fixture data | mechanical — Check 26 |
-| 8 | Never delete evidence: release notes archive, never vanish | mechanical |
+| 8 | Never delete evidence: release notes archive, never vanish | mechanical — Check 28 |
 | 9 | Run the cheap check locally before pushing | mechanical |
 | 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |
 | 11 | Docs move with the prompt, in the same change | judgment |
 | 12 | A new agent lands with README roster, model table, and Layout entry | mechanical |
 | 13 | A new agent lands with at least one `evals/cases/` fixture | mechanical |
-| 14 | One installer, one canonical path | mechanical |
-| 15 | A release is a note plus a matching tag, both pushed | mechanical |
+| 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
+| 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical |
 | 17 | Cross-references between agents must resolve | mechanical |
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical |

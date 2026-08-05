@@ -184,18 +184,18 @@ PF-008.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 711 passed, 0 failed
+# → Summary: 739 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 26 checks and 26 exist. This row is now
+The header comment documents 29 checks and 29 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 26
+# → 29
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -215,7 +215,7 @@ negative-test convention by several releases and had never been shown to fail.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 711 passed, 0 failed
+# → Summary: 739 passed, 0 failed
 ```
 
 #### Prior record (2026-08-04, before the mutations were run)
@@ -350,10 +350,28 @@ prompted reading the whole index against the checks that exist. Result: of the
 and 15. Rule 7 is fixed below; the other three are named here rather than
 quietly left.
 
-  rule 7   `input/` is read-only fixture data      -> Check 26, landed today
-  rule 8   never delete evidence                    -> nothing
-  rule 14  one installer, one canonical path        -> nothing
-  rule 15  a release is a note plus a matching tag  -> nothing
+  rule 7   `input/` is read-only fixture data      -> Check 26
+  rule 8   never delete evidence                    -> Check 28
+  rule 14  one installer, one canonical path        -> Check 29, IN PART
+  rule 15  a release is a note plus a matching tag  -> Check 27
+
+**All four closed 2026-08-05.** Rule 15's command had been run by hand after
+every release of this session; Check 27 now runs it. Rule 8 tests the BASENAME of
+every note ever deleted, so archiving root -> `docs/` is permitted and vanishing
+is not. Both skip, **by name**, in a clone with no tags or no history — the
+shallow-checkout mistake that cost twenty-two red commits is not repeated.
+
+Rule 14 is honest about being **partly** mechanizable: Check 29 enforces that no
+shell script other than `install.sh` touches the symlink directories, and the
+tier now reads "mechanical (in part)" rather than claiming more than it does. A
+second checkout competing for the same links, or a user wiring something by hand,
+remains judgment.
+
+Check 29's first two drafts flagged `tests/check.sh` itself — a checker matching
+its own comment, then its own grep pattern. Fixed by building the pattern from
+pieces so the literal appears nowhere in the file, rather than by exempting the
+file: an exemption would also have excused a genuine second installer that
+happened to live there.
 
 Rule 15 is the sharpest of the three remaining, because its check is one command
 and **has been run by hand after every release this session** — the exact shape

@@ -36,6 +36,9 @@
 #  24. An empty report fails every case (silence must not satisfy a case).
 #  25. Every agent has a fixture that names it exactly (rule 13).
 #  26. No generated artefact has been written into a fixture input (rule 7).
+#  27. Every release note has a matching tag (rule 15).
+#  28. No release note that once existed has vanished (rule 8).
+#  29. Only install.sh writes the Claude symlink directories (rule 14).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -970,6 +973,86 @@ for case_dir in evals/cases/*/; do
             -o -name '*.egg-info' \) -print -quit 2>/dev/null || true)
     if [ -n "$art" ]; then
         fail "$id: ${art#"$case_dir"} is a generated artefact inside fixture input (rule 7) — something wrote through a read-only fixture, which means an agent ran against the case directory instead of a staged copy"
+    else
+        ok
+    fi
+done
+
+echo
+echo "Check 27: every release note has a matching tag (rule 15)"
+# Rule 15 is marked mechanical and was enforced by a human running one command
+# after each release. That command was run by hand after every release of this
+# session — which is precisely a rule that is mechanical in name and habit in
+# practice, and habits lapse silently.
+#
+# SHALLOW/TAGLESS GUARD. `actions/checkout` fetches no tags by default, and a
+# check that needs them turned CI red for twenty-two commits when Check 17
+# landed. Skipping is NAMED, never silent.
+if [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
+    echo "  no tags in this clone — rule 15 not checkable here"
+    ok
+else
+    for note in release_notes_v*.md docs/release_notes_v*.md; do
+        [ -f "$note" ] || continue
+        ver=$(basename "$note" .md | sed 's/^release_notes_//')
+        if git rev-parse -q --verify "refs/tags/$ver" >/dev/null 2>&1; then
+            ok
+        else
+            fail "$note has no matching tag '$ver' — a release note with no tag is not a release (rule 15)"
+        fi
+    done
+fi
+
+echo
+echo "Check 28: no release note that once existed has vanished (rule 8)"
+# Rule 8 is marked mechanical and had no mechanism. Release notes are the only
+# history this project keeps outside git itself, and the rule says they are
+# archived to docs/, never deleted.
+#
+# A note moved from the root to docs/ appears in the log as a deletion, so the
+# test is on the BASENAME: a note may move, and must still exist somewhere.
+if [ "$(git rev-parse --is-shallow-repository 2>/dev/null || echo true)" = "true" ]; then
+    echo "  shallow clone — history not available, rule 8 not checkable here"
+    ok
+else
+    deleted=$(git log --diff-filter=D --name-only --format= -- '*release_notes_v*.md' 2>/dev/null | sort -u || true)
+    if [ -z "$deleted" ]; then
+        ok
+    else
+        while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            base=$(basename "$path")
+            if [ -f "$base" ] || [ -f "docs/$base" ]; then
+                ok
+            else
+                fail "$base was deleted and exists in neither the root nor docs/ — release notes are archived, never removed (rule 8)"
+            fi
+        done <<< "$deleted"
+    fi
+fi
+
+echo
+echo "Check 29: only install.sh writes the Claude symlink directories (rule 14)"
+# Rule 14 — "one installer, one canonical path" — was the last of the four rules
+# marked mechanical with no mechanism. It is only PARTLY mechanizable, and this
+# check is deliberately the part that is: no shell script other than install.sh
+# may reference the Claude symlink directories under ~/.claude.
+#
+# The pattern is not written literally anywhere above, because the first draft of
+# this check flagged tests/check.sh itself — a checker matching its own comment.
+# Removing the literal beats adding an exemption: an exemption would also have
+# excused a genuine second installer that happened to live in this file.
+#
+# It does NOT establish "one canonical path" in the broader sense — that a second
+# checkout is not competing for the same links, or that a user has not wired
+# something by hand. Those are judgment, and the rule now says so rather than
+# carrying a label it cannot support.
+for script in $(find . -name '*.sh' -not -path './.git/*' | sort); do
+    case "$script" in ./install.sh) continue ;; esac
+    # Built from pieces so the literal never appears in this file — see above.
+    _cd='claude/'
+    if grep -q "${_cd}agents\|${_cd}commands" "$script" 2>/dev/null; then
+        fail "$script references the Claude symlink directories — install.sh is the one installer (rule 14)"
     else
         ok
     fi
