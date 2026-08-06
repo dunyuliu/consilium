@@ -1013,7 +1013,7 @@ who needs it is the one about to trust a verdict.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 16
+# → 15
 ```
 
 ### PF-013 — `agents/` — OPEN

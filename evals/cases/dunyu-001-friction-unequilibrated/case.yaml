@@ -165,3 +165,40 @@ notes: |
   Ninth instance this session of the agent under test being right and the
   fixture author being wrong — and the most severe, since here the premise
   itself was a misdiagnosis.
+
+  Second run (2026-08-06, dispatched against a staged copy, model overridden to
+  FABLE after the maintainer promoted dunyu-liu opus -> fable on judgement):
+  **FAIL — 3 criteria, 2 failed.** The first tier change in this project made
+  without a run, tested immediately afterwards at the maintainer's request.
+
+  What failed, and both are the agent's own contract rather than fixture
+  brittleness:
+    - `location elastic_contact.py:141-155` -> file=0, line-in-range=0. The
+      report never names the file or any line. `agents/dunyu-liu.md:180` sets
+      the output schema as `- {file:line} — {what it does}`. It cited a scratch
+      file it wrote instead.
+    - The eight-way `any_of` on kill-criterion language matched nothing. The
+      report says "tighten before any friction work" — the right disposition in
+      the wrong vocabulary — while step 1 of his own method is "State the
+      hypothesis and the kill criterion". He stated the hypothesis and omitted
+      the criterion.
+
+  What it did instead, and this is the interesting part: **more science and less
+  compliance.** It built a split-node penalty Coulomb spike, verified slip onset
+  against an independent locked-interface solve (predicted 2.999e-3, measured
+  within one ramp step), checked exact positive-homogeneity (S_c(2P)/S_c(P) =
+  2.000), cross-checked on a hand-written Q4 plane-strain operator, and
+  quantified the contamination the case is built on (4.8% slip change at the
+  loose tolerance, 142% in another configuration). It independently rediscovered
+  three of the four declared defects including the rigid-body-mode failure.
+
+  The opus run refused to implement and stated the kill criterion; the fable run
+  implemented in scratch after verifying equilibrium first and never stated one.
+  Same criteria both times — `expected` has not changed since 2026-08-04; only
+  `declared_defects` was added and `must_not_find` loosened.
+
+  **Read this as a tier signal with one confound.** The dispatch inherited the
+  prompt unchanged, so the variable really was the tier — but a single run is a
+  single sample, and "wrote better physics, ignored two items of its own
+  contract" is a plausible signature of a stronger model given a research task,
+  not proof of one.
