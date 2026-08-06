@@ -5,7 +5,7 @@
 # Verifies:
 #   1. Every agents/*.md has well-formed frontmatter (name, description,
 #      tools, model), name matches the filename stem, and model is one
-#      of {opus, sonnet, haiku}.
+#      of {opus, fable, sonnet, haiku}.
 #   2. Every commands/*.md Invokes an agent that actually exists.
 #   3. The README commands table lists exactly the commands present on
 #      disk.
@@ -134,8 +134,8 @@ for stem in "${AGENTS[@]}"; do
 
     model_val=$(grep '^model: ' <<<"$fm" | head -1 | sed 's/^model: *//')
     case "$model_val" in
-        opus|sonnet|haiku) ok ;;
-        *) fail "$f: model '$model_val' not in {opus, sonnet, haiku}" ;;
+        opus|fable|sonnet|haiku) ok ;;
+        *) fail "$f: model '$model_val' not in {opus, fable, sonnet, haiku}" ;;
     esac
 done
 
@@ -221,7 +221,7 @@ table_dupes=0
 while IFS= read -r line; do
     model=$(printf '%s' "$line" | sed -E 's/^\| *([a-z0-9.-]+) *\|.*/\1/')
     case "$model" in
-        opus|sonnet|haiku) ;;
+        opus|fable|sonnet|haiku) ;;
         *) continue ;;
     esac
     for name in $(printf '%s' "$line" | grep -oE '`[a-z]+-[a-z]+`' | tr -d '`'); do
@@ -231,7 +231,7 @@ while IFS= read -r line; do
         fi
         readme_model[$name]="$model"
     done
-done < <(grep -E '^\| *(opus|sonnet|haiku) *\|' README.md)
+done < <(grep -E '^\| *(opus|fable|sonnet|haiku) *\|' README.md)
 
 if [ "${#readme_model[@]}" -eq 0 ]; then
     fail "README model table not found (expected rows like '| opus | \`agent-name\` |')"

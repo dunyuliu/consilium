@@ -1042,6 +1042,32 @@ Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged, pl
 `lian-zhao` (sonnet), who landed after this row was last written and has not been
 challenged either way — the untested count grows by one, it does not shrink.
 
+**`fable` permitted 2026-08-06, and nothing moved onto it.** The maintainer's
+plan includes Fable 5, so the gate now accepts `model: fable` — Check 1's allowed
+set and Check 6's README-table parser both hard-coded `{opus, sonnet, haiku}` in
+four places. Verified both ways: an agent declaring `fable` passes Check 1, and
+`gpt4` still fails with the updated message. Check 6 correctly refused the change
+until the README table agreed, which is rule 12 doing its job.
+
+**No agent was moved.** `dunyu-liu` was the candidate and stays on opus. Two
+reasons, and the second is the one that matters:
+
+  - **Where `fable` sits on the cost/capability axis is not recorded anywhere in
+    this repository, and I did not establish it.** This row's whole claim is
+    "the cheapest tier that passes its fixture", which is meaningless for a tier
+    whose position is unknown. Permitting a value is not the same as knowing what
+    it costs or what it can do.
+  - A tier change is a behavioural change and rule 13a's discipline applies:
+    verify by `model` override against the agent's own fixture before editing the
+    frontmatter. The one tier drop attempted without a run — `priya-nair` to
+    haiku — failed by marking a planted trap correct. `dunyu-001` would need a
+    run at the new tier, and this loop does not dispatch agents.
+
+`dunyu-liu`'s work is greenfield research implementation where the approach
+itself is open, which is the category this row's own dividing line — "does the
+job require refusing the source's framing" — argues hardest against cheapening
+without evidence.
+
 **Re-checked 2026-08-05, and the tally above omitted the two that matter most.**
 It counts untested opus and sonnet agents and says nothing about **haiku**.
 `lars-eriksson` and `sophia-okafor` have been on haiku since v1.0.2 and have
