@@ -1013,7 +1013,7 @@ who needs it is the one about to trust a verdict.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 15
+# → 16
 ```
 
 ### PF-013 — `agents/` — OPEN
@@ -1049,24 +1049,30 @@ four places. Verified both ways: an agent declaring `fable` passes Check 1, and
 `gpt4` still fails with the updated message. Check 6 correctly refused the change
 until the README table agreed, which is rule 12 doing its job.
 
-**No agent was moved.** `dunyu-liu` was the candidate and stays on opus. Two
-reasons, and the second is the one that matters:
+**`dunyu-liu` promoted opus -> fable on the maintainer's judgement, UNVERIFIED
+and labelled so.** He asked for it explicitly after being offered the choice
+between a fixture run and a judgement call. This is the first tier change in the
+project made without a run, and the first that is a **promotion** rather than a
+drop.
 
-  - **Where `fable` sits on the cost/capability axis is not recorded anywhere in
-    this repository, and I did not establish it.** This row's whole claim is
-    "the cheapest tier that passes its fixture", which is meaningless for a tier
-    whose position is unknown. Permitting a value is not the same as knowing what
-    it costs or what it can do.
-  - A tier change is a behavioural change and rule 13a's discipline applies:
-    verify by `model` override against the agent's own fixture before editing the
-    frontmatter. The one tier drop attempted without a run — `priya-nair` to
-    haiku — failed by marking a planted trap correct. `dunyu-001` would need a
-    run at the new tier, and this loop does not dispatch agents.
+That direction matters for how this row reads. Every previous tier decision was
+about spending less; `fable` sits above opus, so the risk inverts. A tier that is
+too cheap loses findings silently — the failure mode `priya-nair`'s haiku attempt
+demonstrated. A tier that is too expensive costs money and nothing else. Wrong in
+the safe direction is still wrong, and it is still unmeasured.
+
+**What is not established, stated plainly:** nothing in this repository records
+what `fable` costs or what it can do, and `dunyu-001` has not been run against
+it. The claim in this row's title — "the cheapest tier that passes its fixture" —
+now has an agent it cannot speak to at all. The honest count is **3 of 21 tiers
+established by execution, 17 by judgement, and 1 by explicit unverified
+decision.**
 
 `dunyu-liu`'s work is greenfield research implementation where the approach
 itself is open, which is the category this row's own dividing line — "does the
-job require refusing the source's framing" — argues hardest against cheapening
-without evidence.
+job require refusing the source's framing" — argues most strongly for the
+stronger tier. That is the reasoning behind the judgement; it is not evidence
+for it.
 
 **Re-checked 2026-08-05, and the tally above omitted the two that matter most.**
 It counts untested opus and sonnet agents and says nothing about **haiku**.
@@ -1085,8 +1091,9 @@ unverified, which is what this paragraph is for.
 
 ```bash
 grep -h '^model:' agents/*.md | awk '{c[$2]++} END{for(k in c) printf "%d %s\n", c[k], k}' | sort -k2
+# → 1 fable
 # → 3 haiku
-# → 5 opus
+# → 4 opus
 # → 13 sonnet
 ```
 

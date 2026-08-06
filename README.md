@@ -388,13 +388,16 @@ routes.
 
 ## Models
 
-Heaviest reasoning (orchestration, final verdicts, adversarial
-reviewing, meta-evaluation) runs on opus; deep-but-specific work runs
-on sonnet; pattern-match-heavy auditing runs on haiku.
+Open-ended research implementation — where the approach itself is the
+question — runs on fable; heaviest reasoning (orchestration, final
+verdicts, adversarial reviewing, meta-evaluation) runs on opus;
+deep-but-specific work runs on sonnet; pattern-match-heavy auditing
+runs on haiku.
 
 | Model | Agents |
 |---|---|
-| opus | `dunyu-liu`, `elena-hartmann`, `victor-reyes`, `marco-bianchi`, `nadia-hadid` |
+| fable | `dunyu-liu` |
+| opus | `elena-hartmann`, `victor-reyes`, `marco-bianchi`, `nadia-hadid` |
 | sonnet | `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin`, `lian-zhao` |
 | haiku | `lars-eriksson`, `sophia-okafor`, `ziyan-chen` |
 
