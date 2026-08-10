@@ -15,10 +15,14 @@ repo:
 - **`PROJECT_RULES.md`** — 25 binding rules, 16 of them enforced by a
   gate rather than by good intentions. Each carries the incident that
   paid for it.
-- **`tests/check.sh`** — 752 structural checks, every one negative-tested
-  when it landed. A check that has never failed is not known to be a gate.
-- **`evals/cases/`** — 23 regression fixtures, one per agent, all executed.
-  Prompt edits are measurable instead of vibe-checked.
+- **`tests/check.sh`** — 29 checks producing 752 assertions, every check
+  negative-tested by breaking the thing it guards and confirming the intended
+  message. A check that has never failed is not known to be a gate. Checks 1–5
+  are the exception worth naming: they predated that convention by several
+  releases and were negative-tested retroactively, six mutations on 2026-08-05.
+- **`evals/cases/`** — 27 regression fixtures covering all 21 agents. Prompt
+  edits are measurable instead of vibe-checked — but see the coverage figures
+  below: most verdicts are older than the prompt they graded.
 - **`PATHWAY_FORWARD.md`** — the inspection log: what is true *now*, by
   surface, with the date it was last checked and the command that checked
   it. A blank date means never audited, and stays blank.
@@ -542,12 +546,26 @@ miscited papers) with expected findings, so prompt changes can be
 measured rather than vibe-checked. See `evals/README.md` for the
 fixture format and how to run a case by hand.
 
-**Coverage: all 21 agents, 23 cases, every one executed at least once.**
+**Coverage, as of 2026-08-10 — read the second line before trusting the
+first.** All 21 agents have a fixture that names them exactly (Check 25), across
+27 cases.
 
-Roughly half test *detection* — can the agent find a planted defect. The
-other half test *refusal*: `lars-002` is correct code where any invented
-finding fails; `lian-001` makes the tempting cut the one with no fixture;
-`dunyu-001` poses a request that is implementable and meaningless.
+**5 of those 27 have a verdict against the prompt they currently grade.** Seven
+have never been run at all; fifteen carry a verdict recorded before their
+agent's prompt last changed. `bash evals/run.sh list` prints the state of each,
+and `smoke` prints it for the fast tier — where seven of nine members have no
+current verdict. That is the accumulated cost of editing prompts faster than
+fixtures can be re-run: each prompt edit stales its agent's cases, and running
+them needs real dispatches.
+
+Most test *detection* — can the agent find a planted defect. A smaller set
+tests *refusal*, which is the harder half to write and the easier half to get
+wrong: `lars-002` is correct code where any invented finding fails; `lian-001`
+makes the tempting cut the one with no fixture; `dunyu-001` poses a request that
+is implementable and meaningless. Three more exist for the agents whose wrong
+move is irreversible — `anya-002` refuses to block a clean repository,
+`zofia-002` refuses to write a rule that already exists, `nadia-002` refuses to
+recommend a change when the agent under review was right.
 
 Each case ships `samples/pass.md` and `samples/fail.md`, and Check 15
 grades both — a criterion that rejects a report written to satisfy it is a
@@ -616,13 +634,17 @@ required.
 - ~~Expand `evals/` coverage across every specialist.~~ **Done** — 21 of 21.
 - ~~Automated eval harness.~~ **Partly** — `evals/run.sh` stages and grades;
   invoking the agent needs API access and stays manual.
-- **Measure precision, not just phrasing.** `must_not_find` catches forbidden
-  wordings; nothing catches a report that finds the planted defect *plus four
-  things that are not there*. `declared_defects:` is sketched in
-  `evals/README.md`, unbuilt.
-- `install.sh` idempotency / `--force` behaviour tests (the structural
-  invariants are covered by `tests/check.sh`; the script itself isn't). A
-  clean-clone install has never been executed — tracked as PF-010.
+- **Measure precision, not just phrasing.** Half built. `declared_defects:`
+  lists every real defect in a case's input, including ones nobody planted, and
+  `grade` reports how many a run mentioned — so a correct-but-uncredited finding
+  is visible. The other half is not buildable: listing findings that map to *no*
+  declared defect needs findings enumerated from prose, where they are not
+  delimited, so `grade` prints `NOT MEASURED` rather than a number that would be
+  wrong. Precision is read, not computed.
+- `install.sh` has since been exercised by hand under a sandboxed `HOME` —
+  clean clone, dirty target, foreign symlink, real file, `--force`, second
+  install — and PF-010 is closed. It still has no automated test; the structural
+  invariants are covered by `tests/check.sh`, the script itself is not.
 - Statistics specialist for p-hacking, multiple comparisons, study
   design.
 - Security/privacy agent for credential leaks, PII, supply-chain risk.

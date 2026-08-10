@@ -1042,6 +1042,24 @@ Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged, pl
 `lian-zhao` (sonnet), who landed after this row was last written and has not been
 challenged either way — the untested count grows by one, it does not shrink.
 
+**README audited against reality 2026-08-10 — four false claims, in both
+directions.** The user-facing README both overstated coverage and understated
+completed work:
+
+  "23 cases, every one executed at least once"   27 cases; 7 never run, 15 stale
+  "declared_defects: sketched ... unbuilt"       built in v1.13.0, on 8 cases
+  "a clean-clone install has never been executed" done, PF-010 closed in v1.16.0
+  "752 structural checks, every one negative-    752 is the ASSERTION count; there
+   tested when it landed"                        are 29 checks, and 1-5 were
+                                                 tested retroactively, not at landing
+
+The coverage line is the one that matters: it claimed every case had been run,
+when **5 of 27 have a verdict against the prompt they currently grade.** A reader
+deciding whether to trust this suite was being told the opposite of the truth.
+Nothing in the gate checks the README's prose claims — Checks 3–7 bind its
+tables to disk, not its sentences — so this was found by reading, and will need
+finding by reading again.
+
 **`fable` permitted 2026-08-06, and nothing moved onto it.** The maintainer's
 plan includes Fable 5, so the gate now accepts `model: fable` — Check 1's allowed
 set and Check 6's README-table parser both hard-coded `{opus, sonnet, haiku}` in
