@@ -20,7 +20,7 @@ repo:
   2026-08-05 four of those 27 were mechanical in name only, with nothing
   enforcing them; that was found by reading the tier column against the checks
   that exist, and closed.
-- **`tests/check.sh`** — 29 checks producing 752 assertions, every check
+- **`tests/check.sh`** — 29 checks producing 764 assertions, every check
   negative-tested by breaking the thing it guards and confirming the intended
   message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several

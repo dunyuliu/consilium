@@ -1,0 +1,17 @@
+$ pwd
+/home/researcher/tidal-inversion
+
+$ git worktree list
+/home/researcher/tidal-inversion  9f2c118 [main]
+
+$ git branch --show-current
+main
+
+$ git status --porcelain
+ M pipeline/solver.py
+ M pipeline/io_netcdf.py
+?? notes/scratch-derivation.md
+
+$ git log --oneline -2
+9f2c118 wip: trying the adaptive dt idea, not finished
+4a71e03 test: convergence harness for the solver
