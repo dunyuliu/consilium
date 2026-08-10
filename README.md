@@ -24,7 +24,7 @@ repo:
   negative-tested by breaking the thing it guards and confirming the intended
   message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several
-  releases and were negative-tested retroactively, six mutations on 2026-08-05.
+  releases and were negative-tested retroactively, six mutations on 2026-08-04.
 - **`evals/cases/`** — 27 regression fixtures covering all 21 agents. Prompt
   edits are measurable instead of vibe-checked — but see the coverage figures
   below: most verdicts are older than the prompt they graded.
@@ -558,7 +558,7 @@ first.** All 21 agents have a fixture that names them exactly (Check 25), across
 **5 of those 27 have a verdict against the prompt they currently grade.** Seven
 have never been run at all; fifteen carry a verdict recorded before their
 agent's prompt last changed. `bash evals/run.sh list` prints the state of each,
-and `smoke` prints it for the fast tier — where seven of nine members have no
+and `smoke` prints it for the fast tier — where eight of ten members have no
 current verdict. That is the accumulated cost of editing prompts faster than
 fixtures can be re-run: each prompt edit stales its agent's cases, and running
 them needs real dispatches.

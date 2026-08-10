@@ -385,7 +385,7 @@ gap grow indefinitely.
 ## 16. Agent frontmatter is a contract, not a preamble
 
 Every `agents/*.md` carries `name`, `description`, `tools`, `model`;
-`name` equals the filename stem; `model` is one of `{opus, sonnet, haiku}`.
+`name` equals the filename stem; `model` is one of `{opus, fable, sonnet, haiku}`.
 The `description` field is load-bearing — `victor-reyes` and
 `elena-hartmann` route on it, so a vague description silently breaks
 routing.

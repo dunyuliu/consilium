@@ -204,7 +204,7 @@ grep -c '^echo "Check' tests/check.sh
 **Closed 2026-08-04.** Six mutations run, each producing the intended failure
 message, each restored:
 
-  bad model value          -> "model 'gpt4' not in {opus, sonnet, haiku}"
+  bad model value          -> "model 'gpt4' not in {opus, fable, sonnet, haiku}"
   name != filename stem    -> "name 'wrong-name' does not match filename stem"
   command invokes a ghost  -> "invokes nonexistent agent 'ghost-person'"
   README command drift     -> "commands table out of sync with commands/ on disk"
@@ -1079,7 +1079,7 @@ from before the tier audit and could not be checked against anything.
 
 That exposed a real inconsistency in the index itself: **only 13 of the 27
 mechanical rows name the check that enforces them.** The other 14 say
-"mechanical" and stop — rules 12, 16, 17, 19, 20, 21, 22, 23, 25 are each
+"mechanical" and stop — rules 12, 13, 16, 17, 19, 20, 21, 22, 23, 25 are each
 enforced by a check whose number is simply not written down, and 3, 5, 9, 18 are
 enforced by the gate, the grader, or a hook. Newer sub-rules (5a, 5b, 13a, 21a,
 21b, 23a, 25a–c) all name theirs. So the index is machine-readable for Check 10's
@@ -1092,7 +1092,8 @@ directions.** The user-facing README both overstated coverage and understated
 completed work:
 
   "23 cases, every one executed at least once"   27 cases; 7 never run, 15 stale
-  "declared_defects: sketched ... unbuilt"       built in v1.13.0, on 8 cases
+  "declared_defects: sketched ... unbuilt"       built in v1.13.0 on 8 cases,
+                                                 now populated on 11
   "a clean-clone install has never been executed" done, PF-010 closed in v1.16.0
   "752 structural checks, every one negative-    752 is the ASSERTION count; there
    tested when it landed"                        are 29 checks, and 1-5 were
