@@ -12,9 +12,12 @@ Claude Code; installs by symlink and follows you across machines.
 **And the machinery that keeps them honest**, which is now most of the
 repo:
 
-- **`PROJECT_RULES.md`** — 25 binding rules, 16 of them enforced by a
-  gate rather than by good intentions. Each carries the incident that
-  paid for it.
+- **`PROJECT_RULES.md`** — 34 binding rules and sub-rules, 27 of them
+  mechanical: enforced by a check, a git hook or the grader rather than by
+  good intentions. Each carries the incident that paid for it. Until
+  2026-08-05 four of those 27 were mechanical in name only, with nothing
+  enforcing them; that was found by reading the tier column against the checks
+  that exist, and closed.
 - **`tests/check.sh`** — 29 checks producing 752 assertions, every check
   negative-tested by breaking the thing it guards and confirming the intended
   message. A check that has never failed is not known to be a gate. Checks 1–5

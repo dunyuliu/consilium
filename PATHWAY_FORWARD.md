@@ -1042,6 +1042,21 @@ Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged, pl
 `lian-zhao` (sonnet), who landed after this row was last written and has not been
 challenged either way — the untested count grows by one, it does not shrink.
 
+**The README opening was stale too, 2026-08-10.** It said "25 binding rules, 16
+of them enforced by a gate". There are **35 index rows, one of them the dropped
+rule 6, so 34 live rules and sub-rules — 27 marked mechanical.** The "16" was
+from before the tier audit and could not be checked against anything.
+
+That exposed a real inconsistency in the index itself: **only 13 of the 27
+mechanical rows name the check that enforces them.** The other 14 say
+"mechanical" and stop — rules 12, 16, 17, 19, 20, 21, 22, 23, 25 are each
+enforced by a check whose number is simply not written down, and 3, 5, 9, 18 are
+enforced by the gate, the grader, or a hook. Newer sub-rules (5a, 5b, 13a, 21a,
+21b, 23a, 25a–c) all name theirs. So the index is machine-readable for Check 10's
+purposes and only half-legible for a reader asking "what actually stops this
+from breaking". Recorded rather than fixed: filling in fourteen mappings by hand
+is exactly the kind of edit that introduces a wrong one.
+
 **README audited against reality 2026-08-10 — four false claims, in both
 directions.** The user-facing README both overstated coverage and understated
 completed work:
