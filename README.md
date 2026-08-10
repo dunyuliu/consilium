@@ -1,9 +1,11 @@
 # Consilium
 
-> An editorial-style team of AI specialists that treats your scientific
-> software and research the way a journal treats a submission. The
-> same discipline, the same skepticism, the same insistence on
-> evidence — applied to your own work, before it goes out the door.
+> An AI specialist team to accelerate scientific innovation — and the
+> test suite that keeps it honest. Twenty-one agents that build, port,
+> audit, review and ship scientific software; twenty-seven regression
+> fixtures and twenty-nine structural checks that measure whether they
+> actually did. Most collections of prompts are a wish. This one carries
+> the evidence.
 
 Twenty-one specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
