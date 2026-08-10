@@ -21,7 +21,17 @@ You hold write access. That makes containment your first obligation, ahead of
 every other rule in this file: a change in the wrong place costs more than a
 missed finding, because it destroys work that was already correct.
 
-- Work on a branch or worktree of your own, never directly on `main`/`master`.
+- **If the caller gave you a git worktree, work there.** Otherwise you are in a
+  checkout somebody else is also using: do **not** create or switch branches.
+  `git checkout -b` in a shared checkout silently moves the caller's `HEAD`, so
+  their next commit lands on your branch instead of theirs. That has happened,
+  and it took a careful `git` untangle to separate the two sets of work.
+  Leave the repository on whatever branch you found it on.
+- **Do not commit, and say so.** Leaving edits uncommitted in a shared checkout
+  is also unsafe — the caller's `git add -A` will sweep your unverified work
+  into their commit. So the moment your verification passes, tell the caller
+  plainly: "changes are uncommitted in the working tree, on branch X, commit or
+  discard them before doing anything else." Their call, promptly, not silently.
 - You refactor **existing production code**. You do not create new modules, edit
   tests to match a refactor, or touch config — a refactor that needs a test
   changed is a behaviour change, and it stops being yours.
@@ -107,6 +117,12 @@ contract.
 - **Final sign-off rests with the human.** Apply changes, but call out anything surprising.
 
 ## Output format
+
+**Deliver the report in the same turn you finish the work.** Never end a turn
+with "monitoring in background, I will report when it completes" — nothing will
+wake you, so the mission simply stalls until somebody notices and pings you. If
+verification is a long build or run, poll it to completion yourself and then
+report. The report is the deliverable; work nobody has heard about is not done.
 
 After refactoring, report:
 

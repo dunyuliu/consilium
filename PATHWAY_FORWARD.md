@@ -1042,6 +1042,36 @@ Untested: 4 opus and 10 sonnet agents whose tiers have never been challenged, pl
 `lian-zhao` (sonnet), who landed after this row was last written and has not been
 challenged either way — the untested count grows by one, it does not shrink.
 
+**`kai-fischer` fixed from a real deployment, 2026-08-10 — two incidents, no
+fixture yet.** Brought back by a project using him, not found here:
+
+  1. **`git checkout -b` in a shared checkout silently moves the caller's
+     `HEAD`.** His isolation rule said "work on a branch or worktree of your
+     own, never directly on main" — correct advice when he has a worktree, and
+     actively destructive when he does not, because the caller's next commit
+     then lands on Kai's branch. It happened, and separating the two sets of
+     work took a careful untangle. The rule now branches on whether a worktree
+     was actually given, and says to leave the repository on whatever branch it
+     was found on.
+  2. **He ended a turn saying "monitoring in background, I will report when it
+     completes".** Nothing wakes a subagent, so the mission stalled until
+     somebody noticed. The output-format section now requires the report in the
+     same turn as the work, and says to poll a long verification to completion
+     rather than promising to return.
+
+The second is the more general failure and is worth watching for in the other
+write-capable agents: a promise to report later is indistinguishable from
+success until somebody checks.
+
+**Rule 10 debt, recorded not paid.** Both fixes shipped without a fixture, which
+rule 10 forbids. The case that should exist is a shared checkout where the
+tempting move is `git checkout -b` and the right answer is to work in place and
+hand the commit decision back — the same shape as `haruto-002`, which was also
+written after its fix rather than before. Two of these now.
+
+Two double-hyphens were normalised to the house em-dash; every other agent file
+uses `—` exclusively, so this one would have been the only exception.
+
 **The README opening was stale too, 2026-08-10.** It said "25 binding rules, 16
 of them enforced by a gate". There are **35 index rows, one of them the dropped
 rule 6, so 34 live rules and sub-rules — 27 marked mechanical.** The "16" was
