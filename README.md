@@ -215,13 +215,15 @@ and dispatches the right specialist(s) in parallel.
 
 ### Release & publication
 
-Two engineers for two different shipping problems: ongoing version
-releases versus one-shot publication staging.
+Three engineers for three different shipping problems: ongoing version
+releases, one-shot publication staging, and the figures that go in the
+manuscript itself.
 
 | Member | Role |
 |---|---|
 | `haruto-nakamura` | Release & maintenance engineer. Cuts versioned releases, keeps CI green, audits build reproducibility, manages dependency hygiene. Owns the test gate at the release boundary. |
 | `anya-petrov` | Publication-staging engineer. Prepares a project for GitHub release and Zenodo deposit — scrub, reproducibility floor, CITATION.cff, DOI. |
+| `marta-silva` | Publication-figure engineer. Makes and audits matplotlib figures for print — font scale (k = canvas/print), endpoint-labeled colorbars, shared scales, physical-unit axes, scripted regeneration. |
 
 ### Quality bench
 
@@ -323,6 +325,7 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | CI step exits 0 on failure | `haruto-nakamura` | — | — |
 | Dependency / Docker image floats by tag | `haruto-nakamura` | — | — |
 | Pre-publication scrub / CITATION.cff / Zenodo / DOI | `anya-petrov` | — | `iris-vermeulen` if test coverage is thin |
+| Figure font scale / colorbar endpoints / shared scales / axis units at print | `marta-silva` | — | — |
 
 ### Scientific verdict
 
@@ -407,7 +410,7 @@ runs on haiku.
 |---|---|
 | fable | `dunyu-liu` |
 | opus | `elena-hartmann`, `victor-reyes`, `marco-bianchi`, `nadia-hadid` |
-| sonnet | `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin`, `lian-zhao` |
+| sonnet | `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin`, `lian-zhao`, `marta-silva` |
 | haiku | `lars-eriksson`, `sophia-okafor`, `ziyan-chen` |
 
 ---
@@ -493,6 +496,7 @@ consilium/
 │   ├── mira-volkov.md      #   bit-identical porting, any language pair
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
+│   ├── marta-silva.md      #   publication-figure engineer — print-width scaling
 │   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
 │   ├── zofia-kaminska.md   #   project-rules enforcer — seed, audit, codify
 │   ├── lian-zhao.md        #   agent refinement — cheaper without worse

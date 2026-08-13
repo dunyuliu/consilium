@@ -1,0 +1,76 @@
+id: marta-001
+agent: marta-silva
+tier: smoke   # fast, single-file, worth running after any prompt edit
+prompt: |
+  This figure script is going into the manuscript. Audit input/make_fig1.py
+  for print-width consistency before we regenerate the figure — fonts,
+  colormap, colorbar, resolution. Treat input/ as the entire project. Do not
+  edit or write anything; this is a read-only review, report findings only.
+input_dir: input
+
+expected:
+  # The core finding: the canvas is styled at 10 pt on a 20-inch figure while
+  # the header comment declares a 146 mm print target, so every font collapses
+  # to roughly a third of its stated size once printed. Accept any of the
+  # standard phrasings of that one finding.
+  - kind: keyword
+    any_of:
+      - "far below print-readable"
+      - "well below print-readable"
+      - "3.5x"
+      - "3.48x"
+      - "~3 pt"
+      - "2.9 pt"
+      - "2.87 pt"
+
+must_not_find:
+  # EVERY GUARD HERE IS DECLARATIVE, NEVER IMPERATIVE (rule 25). Negating an
+  # imperative PREFIXES it -- "do not switch the colormap" contains "switch
+  # the colormap" -- so an imperative guard fires on a correct report that
+  # declines to do the thing. Negating a declarative INFIXES it -- "must not
+  # be changed" does not contain "must be changed". All guards below were
+  # checked against samples/pass.md's negation before shipping.
+  #
+  # Bait -- viridis is the correct choice for a scalar field (rule 4:
+  # perceptually uniform colormaps for fields). Flagging it is the wrong
+  # finding, not a missed one.
+  - keywords:
+      - "viridis is the wrong colormap"
+      - "the colormap must be changed"
+      - "the colormap is not appropriate"
+      - "viridis should be replaced"
+  # Wrong headline verdict -- the ~3.5x font collapse is the whole point of
+  # the case, and a report that clears the script has missed it.
+  - keywords:
+      - "the fonts are correctly sized"
+      - "no font-size problems"
+      - "the figure is publication-ready as-is"
+      - "the figure requires no changes"
+      - "fonts read cleanly at print"
+
+notes: |
+  Smoke case for marta-silva -- the fonts-scaled-to-canvas-not-print failure
+  mode her whole prompt exists to catch (rule 1 of the uniform figure rules:
+  "Always compute and state k = canvas_width / print_width").
+
+  The defect: make_fig1.py's header comment states the print target (146 mm,
+  inserted at \textwidth) but figsize=(20.0, 14.0) inches (508 mm wide) is
+  styled with font.size=10 and never divided by k. k = 508 / 146 ~= 3.48, so
+  every font on the page comes out at roughly 10 / 3.48 ~= 2.9 pt at print --
+  well under the 9-10 pt rule 2 requires for axis labels, on a figure whose
+  own header comment states the correct target.
+
+  Two baits, both realistic, both NOT defects:
+    1. cmap="viridis" on a scalar field is the textbook-correct choice
+       (rule 4). A report that flags it has invented a finding.
+    2. fig.colorbar(im, ax=ax) with no explicit ticks is a REAL secondary
+       finding (rule 4 wants endpoint ticks) but is declared here rather than
+       required -- the case's one pass criterion is the font-scale defect,
+       per rule 5's "one definition of pass" and the same reasoning anya-002
+       and lars-002 use for their own secondary observations.
+
+  PASS BAR: the report identifies the print-scale collapse (by k, by the
+  effective pt size, or both) and does not invent a colormap defect or clear
+  the figure as publication-ready.
+
+  Not yet run against the agent.

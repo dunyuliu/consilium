@@ -29,13 +29,13 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-08-05 | 30 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-05 | 30 |
-| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-05 | 60 |
+| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
-| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-08-05 | 30 |
+| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-08-13 | 30 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-08-05 | 14 |
 
@@ -74,10 +74,14 @@ Rule 13 requires a fixture per agent. Seven have none (`lian-zhao` landed as
 the 21st agent; `lian-001-no-fixture-no-cut` is a directory with no
 `case.yaml`, so it does not count — see PF-003).
 
+**Re-run 2026-08-13.** `marta-silva` landed as the 22nd agent with
+`marta-001-print-scale-audit` in the same change, so the count below moves
+21 -> 22 without reopening a gap.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l | tr -d ' '
-# → 21
-#   → 21 of 21 agents have at least one fixture
+# → 22
+#   → 22 of 22 agents have at least one fixture
 ```
 
 ### PF-003 — `evals/cases/` — BROKEN
@@ -97,6 +101,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 # → haruto-002-tag-before-gate: NEVER RUN
 # → kai-002-no-worktree-no-write: NEVER RUN
 # → lars-002-clean-control: NEVER RUN
+# → marta-001-print-scale-audit: NEVER RUN
 # → nadia-002-criterion-not-agent: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
 # → zofia-002-rule-already-exists: NEVER RUN
@@ -908,9 +913,13 @@ The durable statement is the finding itself: **a line number in `notes:` is an
 unvalidated duplicate of `anchor` + `line_range`, which are validated.** Prefer
 the anchor; when prose must cite a line, expect it to rot.
 
+**Count only, 2026-08-13**: `marta-001-print-scale-audit` landed with
+`marta-silva`, moving the count below 28 -> 29. Not a re-audit of the other
+28 — PF-011's CLOSED finding stands on what it already read.
+
 ```bash
 ls evals/cases | wc -l | tr -d ' '
-# → 28
+# → 29
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -1185,12 +1194,17 @@ whose whole job is finding things. Closing this row needs actual agent runs,
 which the autonomous loop does not do; it can only say precisely what is
 unverified, which is what this paragraph is for.
 
+**Re-run 2026-08-13 after `marta-silva` landed.** She is sonnet, so the count
+moves 13 -> 14; nothing else in this row's own claim (three tiers tested by
+override, the rest untested) changed, and she is one more untested sonnet
+agent added to that tally.
+
 ```bash
 grep -h '^model:' agents/*.md | awk '{c[$2]++} END{for(k in c) printf "%d %s\n", c[k], k}' | sort -k2
 # → 1 fable
 # → 3 haiku
 # → 4 opus
-# → 13 sonnet
+# → 14 sonnet
 ```
 
 ### PF-014 — `agents/` — VERIFIED
@@ -1232,6 +1246,12 @@ fixture to an agent by the stem before the first hyphen, so `wei-lin` is matched
 by `wei-lin-001` through `wei`. Two agents sharing a first name would both be
 satisfied by one fixture. Check 25 no longer has this weakness; the command
 does, and is now a secondary signal rather than the enforcement.
+
+**Re-checked 2026-08-13.** `marta-silva` landed with no fixture and briefly
+made this command print `1` (caught by Check 25, which enforces rule 13
+directly on the exact `agent:` field rather than through this row). Closed by
+adding `marta-001-print-scale-audit` with `agent: marta-silva`; the command
+below is back to `0`.
 
 ```bash
 for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l | tr -d ' '

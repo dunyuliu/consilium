@@ -706,6 +706,7 @@ the machine-readable source of truth, not documentation of one.
 | new production code (create) | `dunyu-liu` |
 | release notes, version files, tags | `haruto-nakamura` |
 | publication staging, citation files | `anya-petrov` |
+| figure-generation scripts + their rendered images | `marta-silva` |
 | campaign session log, merge decisions | `wei-lin` |
 | `.consilium-review/` in a deployed project | `nadia-hadid` |
 | `PATHWAY_FORWARD.md` (the inspection log) | `zofia-kaminska` |
