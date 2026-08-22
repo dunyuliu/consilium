@@ -24,10 +24,10 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-08-04 | 30 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-08-04 | 30 |
-| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-04 | 14 |
+| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-22 | 14 |
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-08-05 | 30 |
-| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-04 | 14 |
+| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-22 | 14 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-05 | 30 |
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
@@ -36,8 +36,8 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-08-13 | 30 |
-| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-04 | 14 |
-| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-08-05 | 14 |
+| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-22 | 14 |
+| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-08-22 | 14 |
 
 ## Items
 
@@ -93,6 +93,10 @@ Piping through `grep -c` hides the crash and quietly undercounts — this is why
 number below was found by bypassing `evals/run.sh list`, not by re-running the block
 as originally written. Route: the crash is a code bug in `evals/run.sh` →
 `lars-eriksson`; the missing fixture is a coverage gap → `iris-vermeulen`.
+
+**Re-run 2026-08-22.** Output unchanged: the same nine fixtures have never
+been executed. Stays BROKEN — the date records that the claim was re-checked,
+not that the gap closed.
 
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
@@ -189,9 +193,18 @@ what was dropped is only the demand that a past commit be other than what it is.
 Narrower than it looks: green means the checks pass, not that the repo is correct. See
 PF-008.
 
+**Re-run 2026-08-22.** The recorded line had gone stale twice over. The count moved
+764 → 789 as checks were added, and for four days the suite was not green at all:
+PF-003, PF-006, PF-015 and PF-016 all lapsed past their 14-day interval on
+2026-08-18, so Check 12 failed them and every branch opened after that date
+inherited a red gate it did not cause. Re-running the four rows' evidence cleared
+it. Note the circularity this row sits in — it cannot honestly record "green" while
+its own overdue entry is one of the things keeping the suite red, so the other three
+were refreshed first and this one last.
+
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 764 passed, 0 failed
+# → Summary: 789 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -1296,6 +1309,9 @@ drifted again during this very change, from 16 to 17, because adding Check 17
 changed the number of checks. Every one of those rows carried the date it was
 last written, and none of them was still true.
 
+**Re-run 2026-08-22.** Output unchanged (`2`). Check 17 is still wired to both
+evidence sections.
+
 ```bash
 grep -c 'section=evidence' tests/check.sh
 # → 2
@@ -1370,6 +1386,9 @@ Check 17 executes evidence on every suite run, and a gate that needs the network
 fails in a clone behind a firewall, on a plane, or when the API rate-limits — a
 gate that cannot run is worse than no gate (rule 2). The row's evidence stays
 local and its scope stays the input to CI; the result is checked by hand.
+
+**Re-run 2026-08-22.** Output unchanged (`1`). The workflow still asks for full
+history.
 
 ```bash
 grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
