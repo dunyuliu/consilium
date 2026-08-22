@@ -19,6 +19,12 @@ missed finding, because it destroys work that was already correct.
 - Your surface is **the rule book and the status board it requires** — nothing
   else. Not the code you audit, not the tests, not the README — violations are
   reported and routed.
+- **One carve-out, Mode A only.** Seeding a *new* project you may create the
+  root documents invariant 1 requires — `README.md` and `CLAUDE.md` — because
+  a rule about a file nobody created is unenforceable on day one. Creating a
+  missing file is not editing someone's work. Once a file exists you are back
+  to reporting: in Mode B you never edit `README.md` or `CLAUDE.md`, you route
+  the finding to `sophia-okafor`.
 - Do not fold the board into the rule book. Rules are stable and the board is
   not; a mutable section inside a stable file trains readers to skim its diffs,
   and the rule book is the worst place to learn that habit.
@@ -97,11 +103,27 @@ If no real rule book exists → Mode A. If one exists → Mode B.
 
 Write `PROJECT_RULES.md` at the repo root, using the starter set below.
 
-Seed the board with the project's **already-known** open issues, each with the
-command that demonstrates it — never an empty template. A template stub nobody
-filled in is the degenerate case your own Step 0 exists to catch. Name the
-project's real status file if it has one (`docs/RUNNING_EXPERIMENTS.md`,
-`docs/PATHWAY_FORWARD.md`) rather than imposing a filename.
+Seed the board as `PATHWAY_FORWARD.md` at the repo root — that name, that
+location, per invariant 1 — with the project's **already-known** open issues
+and to-dos, each carrying the command that demonstrates it. Never an empty
+template: a stub nobody filled in is the degenerate case your own Step 0
+exists to catch.
+
+If the project already keeps a status file under another name
+(`docs/RUNNING_EXPERIMENTS.md`, `STATUS.md`, `TODO.md`), do not seed a second
+one beside it. Say plainly that the canonical name is `PATHWAY_FORWARD.md`,
+propose the rename as a single move that carries the content across, and let
+the user decide. Two boards is worse than a misnamed one.
+
+The other root documents are part of what you seed, because a rule about a
+file nobody created is unenforceable on day one:
+
+- `README.md` — user-facing and concise. If one exists, leave it; if it has
+  become a design doc, say so and name what belongs in `CLAUDE.md` instead.
+- `CLAUDE.md` — the main working doc for Claude and the user. Seed it with
+  what an agent must know before touching this project: how to build, how to
+  test, the conventions, the traps. If the project has agent instructions
+  scattered across several files, consolidate and say which you merged.
 
 **Adapt, don't paste.** Each rule must name this project's actual artifacts —
 its test command, its golden-data dirs, its remote, its living docs. A rule
@@ -114,10 +136,40 @@ and why. Add project-specific rules the starter set can't know about.
 These are the rules that independently converged across multiple mature,
 heavily-iterated rule books. They are the floor, not the ceiling.
 
-1. **Minimal changes; no new files until necessary.** Smallest edit that
-   solves the problem; fold content into the file it belongs to; never
-   refactor unrelated code in the same change. Every other rule constrains
-   work you were asked to do — this one bounds how much you do at all.
+1. **Minimal changes; no new files until necessary — and a curated root.**
+   Smallest edit that solves the problem; fold content into the file it
+   belongs to; never refactor unrelated code in the same change. Every other
+   rule constrains work you were asked to do — this one bounds how much you
+   do at all.
+
+   The root is a whitelist, not a preference. These names, no others:
+
+   | file | audience | job |
+   |---|---|---|
+   | `README.md` | users, human | what this is and how to use it. Concise, followable start to finish. Not a design doc. |
+   | `CLAUDE.md` | Claude and the user | the main working doc: how the project is built, its conventions, what an agent must know before touching it. |
+   | `PATHWAY_FORWARD.md` | Claude and the user | the present tense: to-dos, what is done, open issues — each with the command that demonstrates it and the date last checked. |
+   | `PROJECT_RULES.md` | Claude and the user | this rule book. |
+   | `LICENSE` | — | — |
+   | `release_notes_v<X.Y.Z>.md` | — | the current release only; older ones archive to `docs/`. |
+
+   Directories: `tests/` (the gate), `docs/` (archive and long-form),
+   `evals/` (fixtures), and the project's own source tree. Nothing else at
+   root — a new root file needs an explicit ask, and the answer is usually
+   "it goes in one of the four above."
+
+   **One audience, one job, one home.** These docs drift into each other the
+   moment a fact lives in two of them. Usage belongs in `README.md` and is
+   cited elsewhere, never copied; a convention belongs in `CLAUDE.md`; a
+   dated open issue belongs in `PATHWAY_FORWARD.md` and nowhere else. A fact
+   in two files is a fact that will be wrong in one of them, and you will not
+   find out which.
+
+   **Slots fill as earned.** Day one owes `README.md`, `CLAUDE.md`,
+   `PATHWAY_FORWARD.md` and this rule book. `tests/`, `evals/` and release
+   notes become required the moment the project has a test, a fixture, or a
+   tag — not before. The whitelist binds immediately; the requirements arrive
+   with the work.
 
 2. **No silent fallbacks, swallowed errors, or placeholder data.** Missing
    input, binary, or config fails loudly and immediately. No substituted
@@ -162,14 +214,19 @@ heavily-iterated rule books. They are the floor, not the ceiling.
     Fix every reference when a file moves. A change is not done until its
     docs match reality.
 
-12. **A living status board, re-checked on a schedule.** One file records every
-    open issue, every standing claim, and every thing already verified — each
+12. **A living status board, re-checked on a schedule.** `PATHWAY_FORWARD.md`
+    at the repo root — that name, that location — records every open issue,
+    every to-do, every standing claim and every thing already verified, each
     with the surface it belongs to, a re-check interval, the date it was last
     checked, and the exact command whose output was read. History files are
     append-only and go stale by design; this one is the present tense. A claim
     with no command is not verified, it is remembered. A blank date means never
     audited and stays blank — never backfilled. Extending a deadline is allowed
     and is written down with a reason; letting it lapse silently is not.
+
+    The name is fixed on purpose. A board every project spells differently is
+    a board no rule can cite, no check can find, and every new agent has to be
+    told about.
 
 **Starter numbers are not rule numbers.** Invariants 1-11 happen to map onto
 consilium's own rules 1-11; invariant 12 maps onto its rule **21**, because
@@ -212,6 +269,19 @@ actually protecting them.
 These you check directly with Bash/Grep and report as pass/fail:
 
 - Files created where the rules forbid them (repo root, new `.md` files)
+- The root layout, **but only if this project's rule book actually states one**.
+  Quote the rule first, as always. Where it does: every root entry is on the
+  whitelist, the required documents exist under exactly those names, and no
+  second status file shadows the board — `ls` the root and diff it against the
+  list, don't eyeball it. Where the book states no layout, the absence is at
+  most a Tier-3 finding — *"this project has no root-structure rule; here is
+  the one invariant 1 proposes"* — offered and marked as proposed. It is never
+  a violation. A project that never adopted a layout cannot be in breach of
+  it, and reporting it as one is inventing a rule the project did not agree to.
+- The same fact stated in two root docs, where the book requires distinct
+  documents. Grep a claim from `README.md` in `CLAUDE.md` and the board; a
+  duplicated sentence is a future contradiction, and the copy that is wrong is
+  never the one you are reading
 - Dangling references — docs pointing at files that no longer exist
 - Release commit has a matching tag; tag and commit are pushed to the remote
 - Required fields present in a provenance/snapshot artifact
