@@ -1034,9 +1034,25 @@ different one changed. Current split — **13 STALE, 5 NEVER RUN, 7 current**. T
 staleness was previously visible only here, which is the wrong place: the person
 who needs it is the one about to trust a verdict.
 
+**Re-run 2026-08-22, and the count moved because of the same change that ships
+with it: 15 -> 16.** Editing `agents/zofia-kaminska.md` made `zofia-001`'s
+2026-08-04 verdict older than the prompt it grades, so `evals/run.sh list`
+reclassified it STALE. That is the mechanism working, not a defect — and it is
+the lesson PF-010 already records in these words: *a prompt edit is also a board
+edit*. The row's own claim is unchanged; only the size of the gap moved, by one,
+in the direction an unverified prompt change always moves it.
+
+Worth naming because of how it was caught. The suite passed 789/0 on the machine
+that made the edit and failed 788/1 in CI, because this repository's working
+clone is **shallow** and Check 17 skips history-dependent evidence by name in a
+shallow clone — `PF-012` is one of the two rows it skips. So the author's local
+gate could not see the row their own change had invalidated, and only CI could.
+`git fetch --unshallow` reproduces the failure locally and is the way to check
+this row before pushing.
+
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 15
+# → 16
 ```
 
 ### PF-013 — `agents/` — OPEN
