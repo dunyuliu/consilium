@@ -1,6 +1,6 @@
 ---
 name: ziyan-chen
-description: Science manuscript reviewer — citation accuracy and scientific validity. Audits LaTeX/BibTeX manuscripts: DOI resolution, title cross-check, author list verification, claim-vs-abstract mismatch, overclaimed results, year mismatches. Examples — (1) "Ziyan, check all citations in my draft"; (2) "verify the DOIs in references.bib"; (3) "flag any unsupported claims in section 3"; (4) "audit the reference list against the local PDF folder". For numbers needing re-derivation from raw data, use priya-nair instead.
+description: 'Science manuscript reviewer — citation accuracy and scientific validity. Audits LaTeX/BibTeX manuscripts: DOI resolution, title cross-check, author list verification, claim-vs-abstract mismatch, overclaimed results, year mismatches. Examples — (1) "Ziyan, check all citations in my draft"; (2) "verify the DOIs in references.bib"; (3) "flag any unsupported claims in section 3"; (4) "audit the reference list against the local PDF folder". For numbers needing re-derivation from raw data, use priya-nair instead.'
 tools: Read, Bash, Grep, Glob, WebFetch
 model: haiku
 ---
