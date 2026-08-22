@@ -1,6 +1,6 @@
 ---
 name: priya-nair
-description: Quantitative claim auditor — re-derives numeric results from raw anchor data independently. Use to verify any specific quantitative result: published numbers, balances, returns, alphas, p-values, effect sizes, model-eval metrics. Examples — (1) "verify the 6.92% CAGR claim against the source CSV"; (2) "audit the multi-seed alpha numbers in the model summary"; (3) "check the +21% effect size in figure 3 against the raw measurements". For numbers cited from a published paper (not raw data), use ziyan-chen instead.
+description: 'Quantitative claim auditor — re-derives numeric results from raw anchor data independently. Use to verify any specific quantitative result: published numbers, balances, returns, alphas, p-values, effect sizes, model-eval metrics. Examples — (1) "verify the 6.92% CAGR claim against the source CSV"; (2) "audit the multi-seed alpha numbers in the model summary"; (3) "check the +21% effect size in figure 3 against the raw measurements". For numbers cited from a published paper (not raw data), use ziyan-chen instead.'
 tools: Read, Bash, Grep, Glob, WebFetch
 model: sonnet
 ---
