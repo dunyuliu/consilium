@@ -8,9 +8,11 @@ tier: smoke   # fast, exercises the default-vs-deployment fix
 expected:
   - kind: keyword
     any_of:
+      # "mm" removed 2026-08-22 by Check 30: it is a substring of
+      # "recommended", so "no change is recommended" satisfied it. The
+      # remaining three all require the unit or the factor to be named.
       - "millimetres"
       - "millimeters"
-      - "mm"
       - "1000"
   - kind: keyword
     any_of:
@@ -34,7 +36,6 @@ expected:
     keywords:
       - "1000"
       - "millimetre"
-      - "mm"
       - "units"
 # Phrase guards so they can only appear in a wrong answer (see evals/README.md).
 # The originals ("spike_threshold_m default is wrong") were so specific that the
