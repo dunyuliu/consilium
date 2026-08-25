@@ -10,18 +10,24 @@ input_dir: input
 expected:
   - kind: keyword
     any_of:
+      # "sh" was here and was removed 2026-08-22 by Check 30. It is a substring
+      # of "should", so the sentence "the structure should be adequate" — which
+      # a report that did nothing writes — satisfied a criterion meant to prove
+      # a shell script was written. Demonstrated: a hollow report scored
+      # PASS, 4 criteria, 0 failed. The four remaining terms all name a tool.
       - "bash"
       - "shell"
       - "grep"
       - "awk"
-      - "sh"
     severity: critical
   - kind: keyword
     any_of:
+      # "# " removed 2026-08-22 by Check 30: every markdown report has a
+      # heading, so it was satisfied by the report's own formatting rather
+      # than by any statement about the input.
       - "title"
       - "heading"
       - "H1"
-      - "# "
     severity: critical
   - kind: keyword
     any_of:
@@ -59,9 +65,9 @@ notes: |
 
   Pass conditions:
   - Iris's report contains evidence of a pure-shell test (keywords:
-    bash / shell / grep / awk / sh).
+    bash / shell / grep / awk).
   - The invariant she tests is the H1-title rule (keywords: title /
-    heading / H1 / "# ").
+    heading / H1).
   - She specifically calls out reference.md as the failing case (or
     reports the test catching it).
 
