@@ -1085,9 +1085,21 @@ STALE now carry a verdict against the prompt they grade, and seven that had
 NEVER RUN now have one. `run.sh score` moved 4/29 to 14/29 (13% -> 48%). The
 remaining 13 are the non-smoke cases, which this round did not touch.
 
+**Re-run 2026-08-27: 13 -> 14, and again by the row's own mechanism.** Adding the
+loop rules to `agents/wei-lin.md` made `wei-lin-001`'s 2026-08-04 verdict older
+than the prompt it grades. Same lesson as the 15 -> 16 move above, same shape: the
+edit that ships a fix also invalidates the baseline that would have proved the fix
+did no harm. Recorded rather than repaired — closing it means re-dispatching
+`wei-lin-001`, which this change did not do.
+
+Caught locally this time. The clone is no longer shallow, so Check 17 ran the
+history-dependent evidence here instead of only in CI. The previous occurrence
+reached CI unseen for exactly the opposite reason, which is why the unshallow note
+above is worth keeping.
+
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 13
+# → 14
 ```
 
 ### PF-013 — `agents/` — OPEN
