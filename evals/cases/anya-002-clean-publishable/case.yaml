@@ -133,3 +133,14 @@ notes: |
   is the exact inversion this suite exists to prevent. Either declare both in the notes and keep the
   guards, or clean the input. Do NOT weaken the guards to make this pass — the refusal behaviour is what
   the case is for. NO VERDICT ON THE AGENT until the control is clean (rule 5).
+
+  Re-run (2026-08-27, after the input was cleaned): PASS — 6 criteria, 0 failed.
+  Verdict PUBLISH, 0 blockers. The refusal-to-block behaviour this case exists to
+  measure is now actually measured: on the contaminated input the same agent
+  returned DO-NOT-PUBLISH and was RIGHT to, so the earlier FAIL scored the
+  fixture, not the agent. With the three real defects removed — the missing
+  figure code, the truncated MIT text, the unpinned NetCDF backend — she clears
+  the repo and names the two checks she could not perform here (Zenodo
+  resolution and the fresh-clone reproduction, both needing network) as
+  unperformed rather than as defects. First verdict this case has ever had.
+
