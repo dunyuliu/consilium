@@ -148,3 +148,8 @@ notes: |
   that very fix is absolute, so [1e-14, 2e-14] raises "std is zero", which is
   false. Also verified true. Two runs, two real defects, both the author's.
   Bar rewritten (see PASS CONDITION above); run 2 PASSES under it.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): PASS — 3 criteria, 0 failed.
+  Clean control held. One Advisory finding only — the absolute `_STD_FLOOR` at rolling_stats.py:12/:80,
+  which this case's notes already declare as real and reportable — and zero invented bugs. Explicitly
+  stated no look-ahead, no off-by-one, no silent-failure mode.

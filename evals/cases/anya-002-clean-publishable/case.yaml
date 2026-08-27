@@ -120,3 +120,16 @@ notes: |
   runs under `set -euo pipefail`, retries, and checksum-verifies.
 
   Not yet run against the agent.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): FAIL — 6 criteria, 1 failed (must_not_find matched "| Critical |").
+  THE FIXTURE IS AT FAULT, NOT THE AGENT — this control is contaminated, the PF-011 class again.
+  Anya returned DO-NOT-PUBLISH with Critical blockers, which the guards forbid. Two of her five are
+  REAL and were verified independently against the staged input:
+    * analyze.py contains ZERO matplotlib/savefig references and only prints to stdout, while README.md:24
+      is headed "Reproduce the figures", :27 passes `--out figures/`, and the module docstring claims it
+      "writes the coefficient-of-variation figure". The README promises figures the code never writes.
+    * LICENSE is 15 lines and contains no "IN NO EVENT SHALL" clause. The MIT text is genuinely truncated.
+  An undeclared true defect in a control makes a complete audit score worse than an incomplete one, which
+  is the exact inversion this suite exists to prevent. Either declare both in the notes and keep the
+  guards, or clean the input. Do NOT weaken the guards to make this pass — the refusal behaviour is what
+  the case is for. NO VERDICT ON THE AGENT until the control is clean (rule 5).

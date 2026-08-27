@@ -1055,9 +1055,15 @@ gate could not see the row their own change had invalidated, and only CI could.
 `git fetch --unshallow` reproduces the failure locally and is the way to check
 this row before pushing.
 
+**Re-run 2026-08-22 after a dispatch round: 16 -> 13.** Ten smoke-tier cases were
+run against staged copies and their verdicts recorded, so three cases that were
+STALE now carry a verdict against the prompt they grade, and seven that had
+NEVER RUN now have one. `run.sh score` moved 4/29 to 14/29 (13% -> 48%). The
+remaining 13 are the non-smoke cases, which this round did not touch.
+
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 16
+# → 13
 ```
 
 ### PF-013 — `agents/` — OPEN

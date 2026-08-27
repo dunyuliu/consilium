@@ -74,3 +74,8 @@ notes: |
   the figure as publication-ready.
 
   Not yet run against the agent.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): PASS — 3 criteria, 0 failed.
+  Did the arithmetic rather than describing it: a 146 mm print target on a 20x14 in canvas gives k = 3.48,
+  so labels land at 2.87 pt, ticks and legend at 2.30 pt, title at 3.16 pt. Also caught viridis on
+  symmetric signed data, a colorbar with no endpoint ticks, and an inverted depth axis.

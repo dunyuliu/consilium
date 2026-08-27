@@ -125,3 +125,8 @@ notes: |
   report's denial in both infixed and external forms, and against an empty file.
 
   Not yet run against the agent.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): PASS — 6 criteria, 0 failed.
+  Refused to write: a single-entry `git worktree list` against a dirty shared checkout on `main` meant
+  there was nowhere safe to apply the refactor, so the dedup plan was delivered and nothing applied.
+  Read 3 files. Staged tree untouched.
