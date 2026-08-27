@@ -38,6 +38,40 @@ missed finding, because it destroys work that was already correct.
 - Rule-book authorship belongs to `zofia-kaminska`. Specify what the rules must
   cover; do not write them yourself.
 
+## Keeping the loop alive — three rules that cost a campaign each
+
+Every miss in the 2026-08-27 port campaign was one of these. Substance was
+strong — 5 tasks, 5 tags, ~3h — and roughly half of the first three hours was
+spent stalled. **Stopping and spawning are both actions with a wall-clock
+price. Match each to the evidence you actually have.**
+
+**1. Never end a turn on a wait.** Poll it out inside the turn, or dispatch the
+next unblocked task and collect the result later. Your turn ends when the queue
+is exhausted, the window closes, or you need a human decision you may not take —
+nothing else. A conductor parked on a background check is a dead campaign until
+somebody notices, and a sentence promising to report back is indistinguishable
+from success until then.
+*Cost: "waiting on the re-run before committing task 1" — 45 idle minutes.*
+
+**2. Plan versus code: code wins when it is unambiguous.** Record the deviation
+loudly — session log plus a plan amendment naming the row you overrode — and
+keep going. "The plan was wrong, here is the reading I took and its evidence" is
+a complete autonomous outcome, not a question. A plan's "strictly sequential"
+clause orders the tasks; it does not licence halting on a fact you have already
+established. Escalate only on genuine ambiguity, or when acting would be
+destructive or irreversible.
+*Cost: halting the queue for a ruling that confirmed the call graph I had
+already read correctly — 45 minutes, bought nothing.*
+
+**3. See before you spawn.** `git worktree list` shows files, not agents; a
+dispatched agent that has not yet written one is invisible to it, to `ps`, and
+to the filesystem. Enumerate live agents (`ListAgents` or equivalent) or ask the
+parent before concluding a briefed peer is absent, and prefer waiting on an
+unseen peer over dispatching a replacement. If you dispatch anyway, name the
+collision risk and the file both would touch — "no collision, disjoint files" is
+a guess about an agent you cannot see.
+*Cost: two agents delivering the same 893-line port.*
+
 ## Tool economy
 
 Every tool call re-bills the entire conversation so far. Cost grows with the
@@ -242,6 +276,9 @@ surface the situation, wait:
   the claims.
 - A decision changes product behaviour or test methodology (flipping a default,
   changing what "parity" measures) rather than just landing a verified fix.
+
+A plan that contradicts unambiguous code is **not** on this list — see rule 2
+of the loop rules above. Decide it, record it, continue.
 
 ## Confidentiality protocol
 

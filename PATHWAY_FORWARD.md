@@ -98,6 +98,22 @@ as originally written. Route: the crash is a code bug in `evals/run.sh` →
 been executed. Stays BROKEN — the date records that the claim was re-checked,
 not that the gap closed.
 
+**Re-run 2026-08-27, and THIS COMMAND UNDERCOUNTS — the finding is the command,
+not the gap.** Ten smoke-tier cases were dispatched and graded on 2026-08-27 and
+their verdicts written into their own `case.yaml`. Seven of them still print
+NEVER RUN below.
+
+The cause is the pattern. This row matches the ordinals `first run (` and
+`second run (`, while `evals/run.sh` matches `run \(<date>` — so a THIRD or later
+run, or any run recorded as `Run (2026-08-27, ...)` rather than as an ordinal, is
+invisible here and visible there. Two detectors, two answers, and this one is the
+narrower. `run.sh score` reads 14/30 current where this row implies 10 unrun.
+
+Not silently repaired: the recorded output below is what the command as written
+actually prints today, per rule 21a. Fixing the pattern changes what the row
+measures and belongs in its own change, with the new number established by a
+fresh run rather than inherited from this note.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → anya-001-cycle-stats-release: NEVER RUN
@@ -108,6 +124,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 # → marta-001-print-scale-audit: NEVER RUN
 # → nadia-002-criterion-not-agent: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
+# → wei-lin-002-plan-contradicts-code: NEVER RUN
 # → zofia-002-rule-already-exists: NEVER RUN
 ```
 
@@ -150,9 +167,12 @@ itself be wrong. This row stays OPEN because precision is still not measured —
 what changed is that the gap is now quantified on one side and named on the
 other.
 
+**Re-run 2026-08-27: 14 -> 15.** `wei-lin-002` declares its one planted defect.
+The row's claim is unchanged — precision is still not measured.
+
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l | tr -d ' '
-# → 14
+# → 15
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -935,9 +955,13 @@ the anchor; when prose must cite a line, expect it to rot.
 `marta-silva`, moving the count below 28 -> 29. Not a re-audit of the other
 28 — PF-011's CLOSED finding stands on what it already read.
 
+**Re-run 2026-08-27: 29 -> 30.** `wei-lin-002-plan-contradicts-code` landed with
+the wei-lin loop-liveness prompt fix (rule 10: the fixture ships with the fix).
+Not a re-audit of the other 29.
+
 ```bash
 ls evals/cases | wc -l | tr -d ' '
-# → 29
+# → 30
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -1061,9 +1085,21 @@ STALE now carry a verdict against the prompt they grade, and seven that had
 NEVER RUN now have one. `run.sh score` moved 4/29 to 14/29 (13% -> 48%). The
 remaining 13 are the non-smoke cases, which this round did not touch.
 
+**Re-run 2026-08-27: 13 -> 14, and again by the row's own mechanism.** Adding the
+loop rules to `agents/wei-lin.md` made `wei-lin-001`'s 2026-08-04 verdict older
+than the prompt it grades. Same lesson as the 15 -> 16 move above, same shape: the
+edit that ships a fix also invalidates the baseline that would have proved the fix
+did no harm. Recorded rather than repaired — closing it means re-dispatching
+`wei-lin-001`, which this change did not do.
+
+Caught locally this time. The clone is no longer shallow, so Check 17 ran the
+history-dependent evidence here instead of only in CI. The previous occurrence
+reached CI unseen for exactly the opposite reason, which is why the unshallow note
+above is worth keeping.
+
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 13
+# → 14
 ```
 
 ### PF-013 — `agents/` — OPEN
