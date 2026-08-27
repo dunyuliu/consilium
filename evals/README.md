@@ -299,9 +299,16 @@ human decision.
 deterministic, so a re-run replaces that commit's row rather than appending, and
 the delta is always measured against a row from a different commit. Without that
 rule, "delta vs last row" quietly means "delta since I last typed this command".
-Rows are appended to `evals/results.tsv`, which is tracked — the point is
-comparison across commits, and an untracked file cannot be compared with what an
-earlier commit recorded.
+Rows live in `evals/results.tsv`, which is tracked — the point is comparison
+across commits, and an untracked file cannot be compared with what an earlier
+commit recorded.
+
+**Measuring does not write.** `score` is read-only; `score --record` appends. The
+first version wrote on every invocation, which is a treadmill: running it on a
+new commit dirties the tree, committing that row creates another commit, and the
+next run dirties again, without end. A command whose only side effect is to make
+the next run necessary is not a measurement. Record deliberately, when there is a
+change worth comparing against.
 
 ## Staging refuses a symlinked input
 

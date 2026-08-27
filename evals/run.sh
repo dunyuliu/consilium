@@ -5,7 +5,7 @@
 #   bash evals/run.sh grade <case-id> <report.md>  # score a report against case.yaml
 #   bash evals/run.sh list                         # cases and whether they have run
 #   bash evals/run.sh smoke                        # the fast tier — run after any prompt edit
-#   bash evals/run.sh score                        # one number: how much of the suite still means anything
+#   bash evals/run.sh score [--record]             # one number: how much of the suite still means anything
 #
 # WHY STAGING EXISTS AT ALL — this is the load-bearing part, not the grading.
 #
@@ -365,7 +365,16 @@ cmd_list() {
 # The row is appended to evals/results.tsv, which is tracked: the point is
 # comparison across commits, and an untracked file cannot be compared with what
 # a previous commit recorded.
+#
+# MEASURING DOES NOT WRITE. `score` is read-only; `score --record` appends. The
+# first version wrote on every invocation and that is a treadmill: running it on
+# a new commit dirties the tree, committing the row creates another commit, and
+# the next run dirties again, forever. A command whose only side effect is to
+# make the next run necessary is not a measurement. Record deliberately, when
+# there is a change worth comparing against.
 cmd_score() {
+    local record=0
+    [ "${1:-}" = "--record" ] && record=1
     local d id agent last touched total=0 current=0 stale=0 never=0
     for d in "$CASES_DIR"/*/; do
         [ -f "$d/case.yaml" ] || continue
@@ -403,13 +412,17 @@ cmd_score() {
     if [ -f "$results" ]; then
         prev="$(grep -v '^#' "$results" | grep -v "$(printf '\t')${commit}$(printf '\t')" | tail -1 || true)"
         [ -n "$prev" ] && prev_pct="$(printf '%s' "$prev" | cut -f7)"
-        grep -v "$(printf '\t')${commit}$(printf '\t')" "$results" > "$results.tmp" || true
-        mv "$results.tmp" "$results"
-    else
+        if [ "$record" = 1 ]; then
+            grep -v "$(printf '\t')${commit}$(printf '\t')" "$results" > "$results.tmp" || true
+            mv "$results.tmp" "$results"
+        fi
+    elif [ "$record" = 1 ]; then
         printf '# date\tcommit\tcurrent\tstale\tnever_run\ttotal\tpct_current\n' > "$results"
     fi
-    printf '%s\t%s\t%d\t%d\t%d\t%d\t%d\n' \
-        "$today" "$commit" "$current" "$stale" "$never" "$total" "$pct" >> "$results"
+    if [ "$record" = 1 ]; then
+        printf '%s\t%s\t%d\t%d\t%d\t%d\t%d\n' \
+            "$today" "$commit" "$current" "$stale" "$never" "$total" "$pct" >> "$results"
+    fi
 
     echo "suite trustworthiness: $current/$total verdicts current (${pct}%)"
     echo "  stale (prompt changed since the run): $stale"
@@ -423,7 +436,11 @@ cmd_score() {
     else
         echo "  delta vs previous commit: (no earlier row)"
     fi
-    echo "recorded in evals/results.tsv"
+    if [ "$record" = 1 ]; then
+        echo "recorded in evals/results.tsv"
+    else
+        echo "(read-only; pass --record to append this row to evals/results.tsv)"
+    fi
 }
 
 case "${1:-}" in
@@ -431,6 +448,6 @@ case "${1:-}" in
     grade) [ $# -ge 3 ] || die "usage: run.sh grade <case-id> <report-file>"; cmd_grade "$2" "$3" ;;
     list)  cmd_list ;;
     smoke) cmd_smoke ;;
-    score) cmd_score ;;
-    *) echo "usage: run.sh {stage <case>|grade <case> <report>|list|smoke|score}" >&2; exit 2 ;;
+    score) shift; cmd_score "${1:-}" ;;
+    *) echo "usage: run.sh {stage <case>|grade <case> <report>|list|smoke|score [--record]}" >&2; exit 2 ;;
 esac
