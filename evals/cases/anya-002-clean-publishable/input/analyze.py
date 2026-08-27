@@ -8,6 +8,9 @@ manuscript.
 import argparse
 import pathlib
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
 
@@ -59,12 +62,26 @@ def main():
     ds = xr.open_dataset(args.input)
     args.out.mkdir(parents=True, exist_ok=True)
 
+    labels, covs, errs = [], [], []
     for segment in ds.segment.values:
         times = ds.rupture_time.sel(segment=segment).dropna("event").values
         intervals = inter_event_intervals(times)
         cov = coefficient_of_variation(intervals)
         lo, hi = bootstrap_ci(intervals, rng)
         print(f"{segment}: CoV = {cov:.3f}  95% CI [{lo:.3f}, {hi:.3f}]  n = {intervals.size}")
+        labels.append(str(segment))
+        covs.append(cov)
+        errs.append([cov - lo, hi - cov])
+
+    fig, ax = plt.subplots(figsize=(5.748, 3.5))
+    ax.errorbar(range(len(labels)), covs, yerr=np.array(errs).T, fmt="o", capsize=3)
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels, rotation=45, ha="right")
+    ax.set_ylabel("Coefficient of variation")
+    ax.set_title("Recurrence-interval CoV by segment")
+    fig.tight_layout()
+    fig.savefig(args.out / "fig1_cov_by_segment.pdf")
+    plt.close(fig)
 
 
 if __name__ == "__main__":

@@ -128,19 +128,40 @@ cmd_grade() {
     # So a term found in the case's own input/ proves nothing and is dropped
     # from the pattern. This does not weaken rule 5: a term that is NOT in the
     # input still voids, which is exactly the haruto-001 and victor-001 case.
+    # A FOREIGN case path is a recommendation, not a leak. `nadia-002` asks the
+    # agent to review a graded run and recommend criterion edits, and a
+    # recommendation cannot be written without naming the file the edit lands in
+    # — its report cited `evals/cases/tomas-004/case.yaml:20`, the canonical path
+    # of the FICTIONAL case in its own scenario, annotated "(staged here as
+    # case_criteria.yaml)". That VOIDed on 2026-08-27: the second instance of
+    # this detector punishing a correct report, on the same fixture as the first.
+    #
+    # The 2026-08-05 fix drops a term present in the case's own input/, which
+    # covered `must_not_find` (nadia-002's input contains it) and not
+    # `case.yaml` (it does not). So the distinction has to be made on the path:
+    # `<other-case>/case.yaml` is somebody else's file, while a BARE `case.yaml`
+    # or this case's own path is what an agent writes after reading the answer
+    # key. Foreign paths are scrubbed before the check; nothing else is.
+    local scrubbed; scrubbed="$(mktemp)"
+    sed -E "s#[A-Za-z0-9_.-]*${id}[A-Za-z0-9_.-]*/case\.yaml#SELF_CASE_YAML#g; \
+            s#[A-Za-z0-9_.-]+/case\.yaml#FOREIGN_CASE_REF#g" "$report" > "$scrubbed"
+
     local leak_terms='case\.yaml|must_not_find|planted defect'
     local t kept=''
     for t in 'case\.yaml' 'must_not_find' 'planted defect'; do
         if grep -rqiE -- "$t" "$dir/input" 2>/dev/null; then continue; fi
         kept="${kept:+$kept|}$t"
     done
+    kept="${kept:+$kept|}SELF_CASE_YAML"
     leak_terms="$kept"
-    if [ -n "$leak_terms" ] && grep -qiE "$leak_terms" "$report"; then
+    if [ -n "$leak_terms" ] && grep -qiE "$leak_terms" "$scrubbed"; then
+        rm -f "$scrubbed"
         echo "VOID — the report references the answer key (case.yaml / must_not_find /"
         echo "       'planted defect'). Per rule 5 a leaked run has no verdict."
         echo "       Re-run against a staged copy: bash evals/run.sh stage $id"
         exit 1
     fi
+    rm -f "$scrubbed"
 
     echo "grading $id against $(basename "$report")"
     echo
