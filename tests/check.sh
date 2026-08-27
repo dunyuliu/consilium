@@ -39,6 +39,7 @@
 #  27. Every release note has a matching tag (rule 15).
 #  28. No release note that once existed has vanished (rule 8).
 #  29. Only install.sh writes the Claude symlink directories (rule 14).
+#  30. No expected keyword appears in ordinary finding-free review prose.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -1057,6 +1058,80 @@ for script in $(find . -name '*.sh' -not -path './.git/*' | sort); do
         ok
     fi
 done
+
+echo
+echo "Check 30: no expected keyword appears in ordinary finding-free prose"
+# The mirror of Check 19, on the other side of the case. Check 19 stops a
+# `must_not_find` guard from firing on a CORRECT report. Nothing stopped an
+# `expected` keyword from being satisfied by an INCORRECT one.
+#
+# Grading is substring matching, so a criterion cannot tell a finding from a
+# mention — or from a denial. Two cases were passing reports that found nothing,
+# demonstrated 2026-08-22 by grading hand-written hollow reports:
+#
+#   haruto-001  "I found no gap ... nothing is missing"  -> PASS, 2 criteria, 0 failed
+#               the criterion hunting for "missing" was satisfied by the sentence
+#               saying nothing was missing
+#   iris-001    "the heading structure should be adequate, no action recommended"
+#               -> PASS, 4 criteria, 0 failed
+#               "sh" matched inside "should"; "reference.md" matched the file
+#               being named rather than found at fault
+#
+# `sophia-001` was degraded the same way ("mm" matches "recommended") but still
+# failed overall on its stronger criteria.
+#
+# This is not new to the project. `lars-002` carries a comment recording that the
+# bare word "correct" was removed from its expected terms on 2026-08-05 after a
+# report consisting of that single word scored 3 criteria, 0 failed. The fix was
+# applied to one fixture and never propagated; this check is the propagation.
+#
+# WHY TERM-LEVEL AND NOT WHOLE-CASE. Grading each case against one hollow report
+# catches only the most egregious, because a generic report cannot contain the
+# domain words a real finding-free report in that domain would use. Testing the
+# NEGATION of each term is worse than useless — PF-011 already records that dead
+# end: "the sentence contains the guard verbatim whatever its shape". What is
+# left, and is decidable, is whether the term is a word ordinary review prose
+# already contains.
+#
+# WHAT THIS CHECKS, EXACTLY: that no `expected` or `location` keyword appears in
+# the corpus below. It is complete for that. It does NOT establish that a
+# criterion requires the defect — a term absent from this corpus can still be
+# domain-natural in a finding-free report ("heading" for a docs review), and
+# `iris-001`'s second criterion was found by hand, not by this.
+hollow_corpus=$(mktemp)
+cat > "$hollow_corpus" <<'HOLLOW'
+# Review
+
+## Summary
+
+I read every file that was provided and compared them against one another.
+The structure is consistent, the naming is clear, and the implementation
+matches what the documentation describes. It should be adequate as it
+stands. Nothing is missing, nothing is absent, and I found no gap.
+
+## Files reviewed
+
+Each file was opened and read in full.
+
+## Verdict
+
+No issues found. No change is recommended and there is nothing further to
+report. This looks correct to me and I would not alter it.
+HOLLOW
+for case_file in evals/cases/*/case.yaml; do
+    id=$(basename "$(dirname "$case_file")")
+    terms=$(awk '/^expected:/{f=1} /^(must_not_find|declared_defects|notes):/{f=0} f&&/^ *- "/{gsub(/^ *- "|"$/,""); print}' "$case_file")
+    [ -z "$terms" ] && { ok; continue; }
+    while IFS= read -r term; do
+        [ -z "$term" ] && continue
+        if grep -qiF -- "$term" "$hollow_corpus" 2>/dev/null; then
+            fail "$id: expected keyword \"$term\" appears in ordinary finding-free review prose — this criterion can be satisfied by a report that found nothing (rule 25, expected side)"
+        else
+            ok
+        fi
+    done <<< "$terms"
+done
+rm -f "$hollow_corpus"
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
