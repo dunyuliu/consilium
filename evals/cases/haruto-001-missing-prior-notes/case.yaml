@@ -15,11 +15,17 @@ input_dir: input
 expected:
   - kind: keyword
     any_of:
+      # "missing", "gap" and "absent" were here and were removed 2026-08-22 by
+      # Check 30. All three are words a report writes when it found NOTHING, so
+      # the criterion was satisfied by its own denial: the report "I found no
+      # gap ... nothing is missing" scored PASS, 2 criteria, 0 failed. That is
+      # the expected-side twin of rule 25 — a guard that fires on a correct
+      # report, inverted into a criterion satisfied by a wrong one.
+      #
+      # The three that remain cannot be written by a report that did not look:
+      # each names the version or the file that is absent.
       - "v0.2.0"
-      - "missing"
-      - "gap"
       - "not found"
-      - "absent"
       - "no release_notes_v0.2"
     severity: minor
     rationale: |
