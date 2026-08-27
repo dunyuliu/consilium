@@ -122,3 +122,16 @@ notes: |
   correct report's denial in both infixed and external forms (rule 25).
 
   Not yet run against the agent.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): VOID — grader false positive, no verdict.
+  cmd_grade voided the report for containing "case.yaml". Nadia wrote
+  `evals/cases/tomas-004/case.yaml:20` in her recommended-changes table — the canonical path of the
+  FICTIONAL case she was asked to review — and annotated it "(staged here as `case_criteria.yaml:20`)",
+  showing she knew she was reading a staged copy. Recommending a criterion edit REQUIRES naming the file
+  the edit lands in, so a correct report cannot avoid the term.
+  This is the second instance of the class PF-011 already records for this fixture. The 2026-08-05 fix
+  drops a void-term that appears in the case's own input/; "must_not_find" appears there (2 files) and was
+  correctly dropped, but "case.yaml" does not, so it still fires. The detector needs to tolerate a path
+  ending in case.yaml that is not THIS case's own — or this fixture needs its scenario file renamed.
+  On the substance she reached the intended answer: Hit for the agent, criterion defect at
+  case_criteria.yaml:20, because the guard is an imperative the correct refusal necessarily contains.

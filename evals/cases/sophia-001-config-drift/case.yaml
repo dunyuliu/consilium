@@ -140,3 +140,8 @@ notes: |
   to match incidental mentions, so it passed without the silent-failure defect
   being found. Tightened. A criterion that passes without the defect being
   found is worse than no criterion.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): PASS — 5 criteria, 0 failed.
+  7 drifts. Top: `output_units` documented at README.md:15 and configured `centimetres` at config.yaml:4
+  is never read — ingest.py:32 hardcodes `* 1000.0`. Did NOT report the configured numeric values as
+  contradicted defaults, which is the false positive this case's must_not_find guards.

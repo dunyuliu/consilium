@@ -83,3 +83,9 @@ notes: |
   on a zero baseline, formula incoherence vs the docstring, and asymmetric
   window coverage at the series ends). Those are real properties of the
   fixture code, not hallucinations, so they are not scored against it.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): PASS — 3 criteria, 0 failed.
+  Cited compute_returns.py:19 for the look-ahead — `prices.iloc[i : i + window]` is a FORWARD window,
+  contradicting the line-16 docstring's "prior `window` days (exclusive of today)" — and hit the
+  fillna(0) silent-NaN keyword. 13 findings; no must_not_find entry appeared. First verdict against the
+  post-slimming prompt; the previous one dated 2026-07-31 and had been STALE since 2026-08-04.

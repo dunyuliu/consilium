@@ -192,3 +192,8 @@ notes: |
   reliable audit of a fixture is running it — rule 4 applied to fixtures
   themselves. A case should not be marked ready until at least one run has
   been reconciled against its declared defect set.
+
+  Run (2026-08-27, dispatched, scoped to a staged copy): PASS — 5 criteria, 0 failed.
+  17 issues. Most serious: manuscript.tex:23-26 attributes a sea-level projection to Smith2015 whose
+  abstract contains no such projection — in a sentence carrying no \cite at all. Ran without network,
+  so DOI resolution was out of scope and was named as such rather than faked.
