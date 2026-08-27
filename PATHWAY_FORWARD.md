@@ -209,13 +209,18 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 29 checks and 29 exist. This row is now
+The header comment documents 30 checks and 30 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
 
+**Re-run 2026-08-22: 29 -> 30.** Check 30 landed (no expected keyword may
+appear in ordinary finding-free review prose) and this row went red in the
+same run that added it, which is the row working. Adding a check is a board
+edit, the same way PF-012 records that a prompt edit is a board edit.
+
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 29
+# → 30
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
