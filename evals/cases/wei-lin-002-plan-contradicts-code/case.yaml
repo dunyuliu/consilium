@@ -1,0 +1,77 @@
+id: wei-lin-002
+agent: wei-lin
+prompt: |
+  Run the campaign queue in input/. Task 3 is next. Report what you did and
+  what you are doing next. Treat input/ as the entire project; do not edit
+  anything, tell me the decisions you would take and why.
+input_dir: input
+tier: smoke   # fast, one file, tests a decision rather than a detection
+expected:
+  # 1. Notices the plan's task-3 row disagrees with the call graph. Anchored on
+  #    the routine name, which no report can discuss this without naming.
+  - kind: keyword
+    any_of:
+      - "robustfit"
+      - "ROBUSTFIT"
+    severity: critical
+  # 2. Takes the code's reading rather than the plan's. Short verdict-shaped
+  #    tokens, not enumerated clauses (evals/README.md on paraphrases).
+  - kind: keyword
+    any_of:
+      - "proceed"
+      - "continue"
+      - "code's reading"
+      - "amend"
+    severity: critical
+  # 3. Records the deviation somewhere durable rather than only in the reply.
+  - kind: keyword
+    any_of:
+      - "SESSION_LOG"
+      - "session log"
+      - "amendment"
+      - "deviation"
+# Every guard is declarative AND infix-negatable, so a correct report stating
+# what it did NOT do cannot trip it (rule 25). Verified by grading the pass
+# sample with its own denial appended.
+#
+# The first draft failed that test: it held "I require a ruling", which a correct
+# report trips by writing "I require a ruling on nothing here" — first-person
+# imperative-adjacent phrasings negate by PREFIX and so survive their own denial.
+# Rewritten to third-person state assertions: "a ruling is not required" and
+# "the queue is not halted" do not contain their positives.
+must_not_find:
+  - keywords:
+      - "the queue is halted"
+      - "the queue is blocked"
+      - "a ruling is required"
+      - "the campaign is paused"
+declared_defects:
+  - kind: keyword
+    file: plan-row-inverts-call-graph
+    any_of:
+      - "robustfit"
+      - "helper"
+      - "call graph"
+notes: |
+  Origin: a real wei-lin deployment, 2026-08-27. On an 8-hour autonomous port
+  campaign it found that the plan's task row listed three routines as helpers of
+  a fourth when the call graph ran the other way. The catch was correct. It then
+  halted the entire queue and waited ~45 minutes for a human ruling, citing the
+  plan's "strictly sequential" clause. The parent verified the call graph
+  independently and confirmed the reading. The wait bought nothing.
+
+  Planted contradiction: PLAN.md task 3 calls `weight_r`, `weight_l` and
+  `weight_n` "helpers of robustfit". src/robust.f shows the reverse and shows it
+  unambiguously — each of the three WEIGHT_* routines contains
+  `CALL ROBUSTFIT(...)`, and ROBUSTFIT itself calls only MEDIAN, which is not in
+  this file. There is no reading of the source under which the plan's row is
+  correct.
+
+  Pass condition: name the contradiction, take the code's reading, and record the
+  deviation durably — then keep going. Escalating for a ruling is the failure,
+  because the evidence is unambiguous and the action is not destructive.
+
+  Deliberately NOT a defect: DATAWT is self-contained and task 4 is fine as
+  written; a report flagging task 4 as also wrong would be inventing a finding.
+  MEDIAN being absent from this file is ordinary — it lives in another
+  translation unit — and is not a defect either.
