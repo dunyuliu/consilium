@@ -5,6 +5,7 @@
 #   bash evals/run.sh grade <case-id> <report.md>  # score a report against case.yaml
 #   bash evals/run.sh list                         # cases and whether they have run
 #   bash evals/run.sh smoke                        # the fast tier — run after any prompt edit
+#   bash evals/run.sh score                        # one number: how much of the suite still means anything
 #
 # WHY STAGING EXISTS AT ALL — this is the load-bearing part, not the grading.
 #
@@ -338,10 +339,98 @@ cmd_list() {
     done
 }
 
+# --- score -----------------------------------------------------------------
+# ONE NUMBER for the whole suite, so a change to this repo can be compared with
+# the one before it instead of argued about.
+#
+# WHAT IT MEASURES, EXACTLY: the fraction of cases whose recorded verdict still
+# describes the prompt that case currently grades. Nothing else. It is a
+# TRUSTWORTHINESS score for the suite, not a quality score for the agents.
+#
+# WHAT IT CANNOT MEASURE, AND WHY. Scoring agent quality would need the agents
+# run, and this script deliberately does not invoke them (see the header: that
+# needs API access, cannot run in free CI, and a fake gate is worse than none).
+# There are no stored agent outputs to grade — samples/pass.md and fail.md are
+# synthetic reports written by the fixture author to prove the criteria execute,
+# so grading them measures the criteria, not the agent. Any "score" derived from
+# them would move only when someone edited a sample, which is the shape of a
+# number that looks like evidence and is not.
+#
+# NOT A GATE, deliberately. Rule 10 requires a fixture to land BEFORE the fix it
+# guards, so a new fixture is legitimately NEVER RUN on the commit that adds it
+# and correctly lowers this number. Failing the build on a drop would forbid the
+# ordering the rules require. It records and reports the delta; acting on it is
+# a human decision.
+#
+# The row is appended to evals/results.tsv, which is tracked: the point is
+# comparison across commits, and an untracked file cannot be compared with what
+# a previous commit recorded.
+cmd_score() {
+    local d id agent last touched total=0 current=0 stale=0 never=0
+    for d in "$CASES_DIR"/*/; do
+        [ -f "$d/case.yaml" ] || continue
+        total=$((total + 1))
+        id="$(basename "$d")"
+        agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
+        last="$(grep -oiE 'run \(20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$d/case.yaml" 2>/dev/null \
+                | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | sort | tail -1 || true)"
+        if [ -z "$last" ]; then
+            never=$((never + 1)); continue
+        fi
+        touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
+                   -- "agents/${agent}.md" 2>/dev/null || true)"
+        if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
+            stale=$((stale + 1))
+        else
+            current=$((current + 1))
+        fi
+    done
+
+    [ "$total" -gt 0 ] || die "no cases with a case.yaml under $CASES_DIR"
+    local pct=$(( current * 100 / total ))
+    local today commit results prev prev_pct delta
+    today="$(date -u +%Y-%m-%d)"
+    commit="$(git -C "$REPO_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+    results="$REPO_DIR/evals/results.tsv"
+
+    # ONE ROW PER COMMIT, not per invocation. The score for a given commit is
+    # deterministic, so a second run of this command must not add a second row —
+    # that would make "delta vs last recorded row" mean "delta since I last typed
+    # this", which is not the question anyone is asking. A re-run on the same
+    # commit replaces its row, and the delta is always measured against the last
+    # row belonging to a DIFFERENT commit.
+    prev_pct=""
+    if [ -f "$results" ]; then
+        prev="$(grep -v '^#' "$results" | grep -v "$(printf '\t')${commit}$(printf '\t')" | tail -1 || true)"
+        [ -n "$prev" ] && prev_pct="$(printf '%s' "$prev" | cut -f7)"
+        grep -v "$(printf '\t')${commit}$(printf '\t')" "$results" > "$results.tmp" || true
+        mv "$results.tmp" "$results"
+    else
+        printf '# date\tcommit\tcurrent\tstale\tnever_run\ttotal\tpct_current\n' > "$results"
+    fi
+    printf '%s\t%s\t%d\t%d\t%d\t%d\t%d\n' \
+        "$today" "$commit" "$current" "$stale" "$never" "$total" "$pct" >> "$results"
+
+    echo "suite trustworthiness: $current/$total verdicts current (${pct}%)"
+    echo "  stale (prompt changed since the run): $stale"
+    echo "  never run:                            $never"
+    if [ -n "$prev_pct" ]; then
+        delta=$(( pct - prev_pct ))
+        if   [ "$delta" -gt 0 ]; then echo "  delta vs previous commit: +${delta} points"
+        elif [ "$delta" -lt 0 ]; then echo "  delta vs previous commit: ${delta} points"
+        else                          echo "  delta vs previous commit: unchanged"
+        fi
+    else
+        echo "  delta vs previous commit: (no earlier row)"
+    fi
+    echo "recorded in evals/results.tsv"
+}
+
 case "${1:-}" in
     stage) [ $# -ge 2 ] || die "usage: run.sh stage <case-id>"; cmd_stage "$2" ;;
     grade) [ $# -ge 3 ] || die "usage: run.sh grade <case-id> <report-file>"; cmd_grade "$2" "$3" ;;
     list)  cmd_list ;;
     smoke) cmd_smoke ;;
-    *) echo "usage: run.sh {stage <case>|grade <case> <report>|list|smoke}" >&2; exit 2 ;;
+    score) cmd_score ;;
+    *) echo "usage: run.sh {stage <case>|grade <case> <report>|list|smoke|score}" >&2; exit 2 ;;
 esac
