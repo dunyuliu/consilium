@@ -135,3 +135,32 @@ notes: |
   ending in case.yaml that is not THIS case's own — or this fixture needs its scenario file renamed.
   On the substance she reached the intended answer: Hit for the agent, criterion defect at
   case_criteria.yaml:20, because the guard is an imperative the correct refusal necessarily contains.
+
+  Re-graded (2026-08-27) after the VOID was diagnosed as a grader false positive
+  and fixed: FAIL — 5 criteria, 1 failed. Criteria 2 and 4 both PASS (matched
+  "guard" and "not an agent defect"); the location criterion on
+  case_criteria.yaml:18-22 PASSES. The single failure is criterion 3, whose
+  any_of is "honoured its contract" / "honored its contract" / "followed its
+  contract" / "the agent was right" / "correct refusal".
+
+  The report SAYS this, in different words: verdict "Hit", and "tomas-lindgren
+  covered 8 of 8 contract items with 0 cardinal-rule violations". So criterion 3
+  is the ENUMERATED-PARAPHRASE defect evals/README.md names — an any_of list of
+  full clauses that cannot be exhaustive — and it is the fifth recorded instance
+  of that class.
+
+  NOT PATCHED HERE, deliberately. Rule 25 warns against weakening a bar so it
+  passes, and this fixture's entire subject is distinguishing an agent defect
+  from a criterion defect; quietly loosening its own criterion while it is the
+  thing under test would be the exact error it exists to catch. Two options for
+  whoever takes it:
+    a. criterion 3 is redundant with criterion 4, which already requires the
+       report to absolve the agent, and could be dropped; or
+    b. it is re-anchored on the shortest distinctive token a correct verdict
+       must contain. Note that the obvious candidate, the bare word "hit" from
+       her Outcome line, is UNSAFE: "hit" is a substring of "white" and
+       "architect", so Check 30's sibling failure mode applies.
+  The agent's substantive answer was correct either way: Hit for the agent,
+  criterion defect at case_criteria.yaml:20, because the guard is an imperative
+  a correct refusal necessarily contains.
+
