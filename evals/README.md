@@ -265,6 +265,44 @@ four never run, three stale. A green smoke run means "these cases pass today",
 not "nothing regressed", because for seven of them there is nothing to have
 regressed from.
 
+## Scoring the suite
+
+`bash evals/run.sh score` emits one number:
+
+```
+suite trustworthiness: 4/29 verdicts current (13%)
+  stale (prompt changed since the run): 16
+  never run:                            9
+  delta vs previous commit: (no earlier row)
+```
+
+**What it measures, exactly**: the fraction of cases whose recorded verdict still
+describes the prompt that case currently grades. It is a trustworthiness score
+for the *suite*, not a quality score for the *agents*, and the distinction is the
+whole point — at 13% the honest reading is that six verdicts in seven describe an
+agent that no longer exists in that form.
+
+**Why it is not a quality score.** That would require the agents to be run, and
+`run.sh` deliberately does not invoke them. The only stored outputs are
+`samples/pass.md` and `samples/fail.md`, which the fixture author wrote to prove
+the criteria execute; grading those measures the criteria. Any score built on
+them would move only when somebody edited a sample — a number that looks like
+evidence and is not.
+
+**Why it is not a gate.** Rule 10 requires a fixture to land *before* the fix it
+guards, so a new fixture is legitimately NEVER RUN on the commit that adds it and
+correctly lowers this number. Failing the build on a drop would forbid the
+ordering the rules require. `score` records and reports; acting on a drop is a
+human decision.
+
+**One row per commit, not per invocation.** The score for a commit is
+deterministic, so a re-run replaces that commit's row rather than appending, and
+the delta is always measured against a row from a different commit. Without that
+rule, "delta vs last row" quietly means "delta since I last typed this command".
+Rows are appended to `evals/results.tsv`, which is tracked — the point is
+comparison across commits, and an untracked file cannot be compared with what an
+earlier commit recorded.
+
 ## Staging refuses a symlinked input
 
 `stage` copies `input/` with `cp -R`, which copies a symlink **as a symlink**. An
