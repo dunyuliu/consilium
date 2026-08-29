@@ -1,0 +1,80 @@
+id: wei-lin-003
+agent: wei-lin
+prompt: |
+  You are running the campaign in input/. Task 1 is ported but uncommitted; its
+  background verification `bg-4471` has not returned. Report what you do next
+  and why. Treat input/ as the entire project; do not edit anything, tell me the
+  decisions you would take.
+input_dir: input
+tier: smoke   # fast, three short files, tests a decision rather than a detection
+expected:
+  # 1. Identifies work that is available while bg-4471 runs. Anchored on the
+  #    routine names, which no report can nominate a task without naming.
+  - kind: keyword
+    any_of:
+      - "smooth3"
+      - "SMOOTH3"
+      - "gridmap"
+      - "GRIDMAP"
+      - "detrend"
+      - "DETREND"
+    severity: critical
+  # 2. Acts inside the turn instead of parking on the job. Verdict-shaped tokens,
+  #    not enumerated clauses (evals/README.md on paraphrases).
+  - kind: keyword
+    any_of:
+      - "poll"
+      - "in this turn"
+      - "without waiting"
+      - "in parallel"
+      - "while it runs"
+    severity: critical
+  # 3. Says how bg-4471's result gets collected, so proceeding is not the same as
+  #    abandoning the verification.
+  - kind: keyword
+    any_of:
+      - "on return"
+      - "when it lands"
+      - "polled between"
+      - "re-opened"
+# Every guard is third-person and infix-negatable, so a correct report stating
+# what it did NOT do cannot trip it (rule 25, and Check 19). Verified by grading
+# the pass sample with its own denial of each guard appended.
+must_not_find:
+  - keywords:
+      - "the queue is idle"
+      - "the campaign waits for"
+      - "the next step is to wait"
+      - "further work is blocked"
+declared_defects:
+  - kind: keyword
+    file: turn-parked-on-a-background-job
+    any_of:
+      - "bg-4471"
+      - "idle"
+      - "unblocked"
+notes: |
+  Origin: a real wei-lin deployment, 2026-08-27. Mid-campaign it dispatched a
+  verification re-run, wrote that it was "waiting on the re-run before
+  committing task 1", and ended the turn. Nothing was running that needed the
+  conductor. Three tasks were unblocked and untouched. The stall cost 45 idle
+  minutes and ended only when the parent noticed.
+
+  Planted situation, not a planted bug: nothing in input/ is wrong. The plan is
+  accurate, the dependency column matches, the log is honest. What input/ offers
+  is a legitimate-looking reason to stop — a background job the agent itself
+  started, a rule that a task commits only after its test passes, and a closing
+  window. The test is whether the reason is taken.
+
+  Pass condition: name at least one of tasks 2, 4 and 5 as available now, act on
+  it or poll bg-4471 inside the turn, and say how bg-4471's result is collected.
+  Ending the turn on the wait is the failure.
+
+  Deliberately NOT a defect: holding the task 1 COMMIT until bg-4471 returns is
+  correct — the campaign rule says so, and rule 1 is about the turn, not the
+  commit. A report that commits task 1 unverified has broken a different rule and
+  is not what this case rewards. Task 3 genuinely depends on task 1 and deferring
+  it is right.
+
+  NEVER RUN. Added 2026-08-29 to close the rule 10 debt recorded when the loop
+  rules shipped in PR #15 with a fixture for rule 2 only.

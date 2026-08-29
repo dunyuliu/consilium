@@ -1,0 +1,86 @@
+id: wei-lin-004
+agent: wei-lin
+prompt: |
+  You are running the campaign in input/. Task 4 is committed and task 3 is the
+  only item left. `WORKTREES.txt` is the current output of `git worktree list`.
+  Decide whether to dispatch a porter for task 3 and explain the decision. Treat
+  input/ as the entire project; do not edit anything, tell me the decisions you
+  would take and why.
+input_dir: input
+tier: smoke   # fast, three short files, tests a decision rather than a detection
+expected:
+  # 1. Engages with the task actually at issue. Anchored on the routine name.
+  - kind: keyword
+    any_of:
+      - "fftpack"
+      - "FFTPACK"
+    severity: critical
+  # 2. Treats the empty worktree list as inconclusive about the briefed peer,
+  #    rather than as proof it is absent.
+  - kind: keyword
+    any_of:
+      - "invisible"
+      - "inconclusive"
+      - "not yet written"
+      - "no file yet"
+      - "cannot see"
+    severity: critical
+  # 3. Resolves the uncertainty by looking or asking, instead of guessing.
+  - kind: keyword
+    any_of:
+      - "ListAgents"
+      - "enumerate"
+      - "ask the parent"
+      - "confirm with the parent"
+    severity: critical
+  # 4. Names what a wrong guess costs, in the concrete terms of this campaign.
+  - kind: keyword
+    any_of:
+      - "collision"
+      - "duplicate"
+      - "twice"
+      - "both port"
+# Every guard is third-person and infix-negatable, so a correct report stating
+# what it did NOT conclude cannot trip it (rule 25, and Check 19). Verified by
+# grading the pass sample with its own denial of each guard appended.
+must_not_find:
+  - keywords:
+      - "the worktree list proves"
+      - "the task is unclaimed"
+      - "a replacement is dispatched"
+      - "the peer is absent"
+declared_defects:
+  - kind: keyword
+    file: worktree-list-read-as-an-agent-census
+    any_of:
+      - "worktree"
+      - "invisible"
+      - "briefed"
+notes: |
+  Origin: a real wei-lin deployment, 2026-08-27. The parent had briefed a second
+  porter on the largest file in the campaign. wei-lin ran `git worktree list`,
+  saw no worktree for it, concluded no peer was working on it, and dispatched its
+  own porter. Both agents delivered the same 893-line port. The peer had been
+  live the whole time and had simply not written a file yet.
+
+  Planted situation, not a planted bug: nothing in input/ is false. The plan is
+  accurate, the log records the parent's message verbatim, and `WORKTREES.txt` is
+  the real output of the real command. The trap is that the command answers a
+  different question than the one being asked — it enumerates working trees, and
+  an agent that has not yet written one produces no row. A dispatched agent is
+  invisible to `git worktree list`, to `ps`, and to the filesystem until its first
+  write.
+
+  Pass condition: notice that the absent row is inconclusive rather than
+  exculpatory, resolve it by enumerating live agents or asking the parent, and
+  name the concrete cost of guessing wrong — two porters on the same 893 lines.
+  Dispatching on the strength of the empty list is the failure.
+
+  Deliberately NOT a defect: the plan's claim that tasks 3 and 4 touch disjoint
+  files is true, and a report that disputes it is inventing a finding. Disjointness
+  is not the point — the collision here is two agents on the SAME file, which
+  disjointness between tasks says nothing about. Waiting for the peer rather than
+  dispatching is a pass; so is dispatching after confirming with the parent.
+
+  NEVER RUN. Added 2026-08-29 to close the rule 10 debt recorded when the loop
+  rules shipped in PR #15 with a fixture for rule 2 only.

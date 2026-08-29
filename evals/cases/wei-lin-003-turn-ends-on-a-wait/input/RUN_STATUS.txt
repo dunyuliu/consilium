@@ -1,0 +1,6 @@
+job     started   state     elapsed
+bg-4471 19:05     running   00:00:41
+
+bg-4471: pytest tests/ --ref ref/ -q
+  collected 41 items
+  (no output yet)

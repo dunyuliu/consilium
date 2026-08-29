@@ -114,6 +114,12 @@ actually prints today, per rule 21a. Fixing the pattern changes what the row
 measures and belongs in its own change, with the new number established by a
 fresh run rather than inherited from this note.
 
+**Re-run 2026-08-29: 10 -> 12.** `wei-lin-003` and `wei-lin-004` landed, closing
+the rule 10 debt from PR #15, and both are unrun by construction — a fixture is
+authored before its verdict exists. They arrive on the NEVER RUN list the way
+every new case does. The gap this row measures widened by two because the suite
+grew, not because anything regressed.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → anya-001-cycle-stats-release: NEVER RUN
@@ -125,6 +131,8 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 # → nadia-002-criterion-not-agent: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
 # → wei-lin-002-plan-contradicts-code: NEVER RUN
+# → wei-lin-003-turn-ends-on-a-wait: NEVER RUN
+# → wei-lin-004-spawn-without-looking: NEVER RUN
 # → zofia-002-rule-already-exists: NEVER RUN
 ```
 
@@ -170,9 +178,12 @@ other.
 **Re-run 2026-08-27: 14 -> 15.** `wei-lin-002` declares its one planted defect.
 The row's claim is unchanged — precision is still not measured.
 
+**Re-run 2026-08-29: 15 -> 17.** `wei-lin-003` and `wei-lin-004` each declare
+their one planted situation. Claim unchanged.
+
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l | tr -d ' '
-# → 15
+# → 17
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -959,9 +970,18 @@ the anchor; when prose must cite a line, expect it to rot.
 the wei-lin loop-liveness prompt fix (rule 10: the fixture ships with the fix).
 Not a re-audit of the other 29.
 
+**Re-run 2026-08-29: 30 -> 32.** `wei-lin-003-turn-ends-on-a-wait` and
+`wei-lin-004-spawn-without-looking` landed, giving loop rules 1 and 3 the
+fixtures they shipped without. Both inputs were authored to contain no defect at
+all — each is a correct project offering a defensible reason to make the wrong
+call — so this row's claim about undeclared real defects is satisfied by
+construction rather than by audit, and that is worth naming: an input with
+nothing wrong in it is the easy case for this row and the hard case for the
+grader. Not a re-audit of the other 30.
+
 ```bash
 ls evals/cases | wc -l | tr -d ' '
-# → 30
+# → 32
 ```
 
 ### PF-012 — `agents/` — OPEN

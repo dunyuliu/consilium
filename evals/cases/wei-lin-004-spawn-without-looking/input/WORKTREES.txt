@@ -1,0 +1,3 @@
+$ git worktree list
+/work/pytr                    a91c4e2 [campaign/main]
+/work/pytr-task4              7d20b18 [campaign/task4]
