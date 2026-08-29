@@ -120,6 +120,19 @@ authored before its verdict exists. They arrive on the NEVER RUN list the way
 every new case does. The gap this row measures widened by two because the suite
 grew, not because anything regressed.
 
+**The undercount above is no longer inferred — it is demonstrated, 2026-08-29.**
+`wei-lin-002`, `-003` and `-004` were dispatched, graded and had their verdicts
+written into their own `notes:` in the same round. All three still print NEVER
+RUN, and the output below is unchanged as a result. The runs are recorded as
+`Run (2026-08-29, ...)`, which the detector's `first run (` / `second run (`
+ordinal pattern cannot match. So this row now overstates the gap by three cases
+it can be shown to be wrong about, rather than by an unknown number.
+
+Still not repaired here, for the reason already given: fixing the pattern changes
+what the row measures. What changed is the standing of the claim — it has a
+counterexample with names attached, which is the form a repair request should
+take.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → anya-001-cycle-stats-release: NEVER RUN
@@ -1117,9 +1130,21 @@ history-dependent evidence here instead of only in CI. The previous occurrence
 reached CI unseen for exactly the opposite reason, which is why the unshallow note
 above is worth keeping.
 
+**Re-run 2026-08-29: 14 -> 13.** `wei-lin-001` was dispatched against a staged
+copy and passed (6 criteria, 0 failed), so its verdict now postdates the prompt
+that ships the loop rules. This is the first time in this row's history that the
+count moved DOWN because the baseline the change invalidated was actually
+re-established, rather than because a batch of unrelated cases was run. The debt
+the 13 -> 14 entry above recorded is paid.
+
+Three further cases were run in the same round — `wei-lin-002`, `-003`, `-004` —
+and none of them moves this count, because a case with no prior verdict was never
+STALE. They move PF-003 instead, or would if its detector could see them; see
+that row.
+
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 14
+# → 13
 ```
 
 ### PF-013 — `agents/` — OPEN

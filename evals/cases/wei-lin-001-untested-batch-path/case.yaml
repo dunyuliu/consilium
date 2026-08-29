@@ -108,3 +108,17 @@ notes: |
   and cited its pre-approval. One criterion broadened first — the verdict list
   had "do not merge" and "send it back" against his "does not merge as
   reported" and "send back".
+
+  Run (2026-08-29, dispatched, scoped to a staged copy): PASS — 6 criteria, 0 failed.
+  First verdict against the prompt carrying the loop rules; the previous one dated
+  2026-08-04 and had been STALE since 2026-08-27.
+
+  Went past the planted set and did it by measurement rather than by reading:
+  instrumented `_compute_stats_batch` to count invocations for the cited test's
+  exact input and got 0, which is the planted defect stated as a number instead of
+  an inference. Then ran both paths against `statistics.fmean`/`pstdev` as an
+  independent oracle on 250 items — the legacy path matched to 1e-15 and the batch
+  path raised `ModuleNotFoundError: numpy`, establishing that the function-scoped
+  import at stats.py:29 lets the whole suite pass with the dependency absent. Also
+  flagged the unbacked "~40x faster" claim and the uncovered `ddof` signature
+  change. Read-only verified: staged tree byte-identical to input/ afterwards.

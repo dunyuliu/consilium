@@ -75,3 +75,15 @@ notes: |
   written; a report flagging task 4 as also wrong would be inventing a finding.
   MEDIAN being absent from this file is ordinary — it lives in another
   translation unit — and is not a defect either.
+
+  Run (2026-08-29, dispatched, scoped to a staged copy): PASS — 4 criteria, 0 failed.
+  First run of this case. Took the code's reading, cited robust.f:5,15,25 against
+  :32-38, wrote the plan amendment and the session-log line rather than asking for
+  a ruling, and named the consequence the case is really about: the port order
+  inverts, so `robustfit` lands first as the leaf and the weight routines port
+  against the real thing instead of a stubbed scale.
+
+  Two findings beyond the planted one, both real and neither scored: the parity
+  gate as written could pass with `robustfit` entirely unported if the test injects
+  SCALE directly, and WEIGHT_R/WEIGHT_N omit their Tukey/Andrews cutoffs — which a
+  porter must reproduce, not fix, or parity fails. Read-only verified.

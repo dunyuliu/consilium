@@ -8,8 +8,15 @@ prompt: |
 input_dir: input
 tier: smoke   # fast, three short files, tests a decision rather than a detection
 expected:
-  # 1. Identifies work that is available while bg-4471 runs. Anchored on the
-  #    routine names, which no report can nominate a task without naming.
+  # 1. Identifies work that is available while bg-4471 runs.
+  #
+  #    The first draft listed only the ROUTINE names and failed the 2026-08-29
+  #    run on a report that named the same three tasks by their SOURCE PATHS.
+  #    input/PLAN.md identifies every task twice — a Task column reading "port
+  #    `smooth3`" and a Source column reading `src/smooth.f` — so requiring one
+  #    spelling and not the other tested the author's habit, not the agent's.
+  #    Both are accepted. Established from the fixture's own input, not from the
+  #    report: the ambiguity is in PLAN.md and was there before any run.
   - kind: keyword
     any_of:
       - "smooth3"
@@ -18,6 +25,9 @@ expected:
       - "GRIDMAP"
       - "detrend"
       - "DETREND"
+      - "smooth.f"
+      - "grid.f"
+      - "detr.f"
     severity: critical
   # 2. Acts inside the turn instead of parking on the job. Verdict-shaped tokens,
   #    not enumerated clauses (evals/README.md on paraphrases).
@@ -29,14 +39,21 @@ expected:
       - "in parallel"
       - "while it runs"
     severity: critical
-  # 3. Says how bg-4471's result gets collected, so proceeding is not the same as
-  #    abandoning the verification.
-  - kind: keyword
-    any_of:
-      - "on return"
-      - "when it lands"
-      - "polled between"
-      - "re-opened"
+  # A third criterion stood here and was REMOVED 2026-08-29 after failing two
+  # correct runs. It asked that the report say how bg-4471's result gets gated
+  # on, so that proceeding is not the same as abandoning the verification. Both
+  # runs did exactly that, in incompatible words: run 1 polled "to completion
+  # inside this turn"; run 2 wrote "On green: land task 1" and "Red on bg-4471
+  # is not a hold either".
+  #
+  # That is the ENUMERATED-PARAPHRASE defect evals/README.md names, and the
+  # README also supplies the ruling: "if no short token is distinctive enough,
+  # the criterion is probably asking for a judgement rather than a fact, and
+  # belongs in the notes for a human to score." There is no short distinctive
+  # token here — the property is "the result is still gated on", which every
+  # correct report spells differently and no incorrect one is barred from
+  # spelling. Widening the list a third time would be fitting the test to the
+  # answers. It is a reading instruction now, in notes:, not a criterion.
 # Every guard is third-person and infix-negatable, so a correct report stating
 # what it did NOT do cannot trip it (rule 25, and Check 19). Verified by grading
 # the pass sample with its own denial of each guard appended.
@@ -78,3 +95,73 @@ notes: |
 
   NEVER RUN. Added 2026-08-29 to close the rule 10 debt recorded when the loop
   rules shipped in PR #15 with a fixture for rule 2 only.
+
+  Run (2026-08-29, dispatched, scoped to a staged copy): FAIL — 4 criteria, 2 failed.
+  Recorded as a FAIL because rule 5 says so: a well-reasoned alternative reading of
+  an agent's output is not a pass. On substance the report was a clean pass. It
+  separated the two decisions the 19:05 log entry had welded together — "the commit
+  hold is right; the campaign hold is wrong" — dispatched tasks 2, 4 and 5, and
+  polled bg-4471 in-turn rather than across turns.
+
+  Both failures were the fixture's, and both are diagnosable from the fixture alone:
+
+    criterion 1  demanded the routine names; the report named the same three tasks
+                 by source path. PLAN.md supplies both spellings, so the criterion
+                 was scoring an authoring habit.
+    criterion 3  admitted only deferred collection; the report polled to completion
+                 inside the turn, which is the FIRST branch loop rule 1 offers and
+                 the stronger one.
+
+  Neither was widened to fit the report — both were widened to fit input/PLAN.md
+  and agents/wei-lin.md respectively, which is why the reasons sit beside the
+  criteria rather than here. A fresh run was dispatched afterwards rather than
+  re-grading this report against the changed criteria, because re-grading a report
+  you have already read against criteria you changed after reading it is the exact
+  thing rule 4 exists to stop.
+
+  Worth keeping: this is the third criterion in this one case to be caught scoring
+  the wrong thing. "dispatch" was matched by the fail sample during authoring
+  because the stall itself began with a dispatch, and "collect" was matched by
+  pytest's own "collected 41 items" in the fixture's own status file. Substring
+  grading is cheap and it is blunt; the cost shows up as criteria that pass the
+  wrong reports and fail the right ones, and only running them finds it.
+
+  Run 2 (2026-08-29, dispatched, scoped to a staged copy): FAIL — 3 criteria,
+  1 failed. Criteria 1 and 2 passed against the widened terms. Criterion 3 failed
+  again, on a report that satisfied it plainly: "On green: land task 1", and "Red
+  on `bg-4471` is not a hold either: task 1 goes back to its worktree for
+  diagnosis... and tasks 2/4/5 keep running." Two correct runs, two incompatible
+  spellings, zero shared tokens. That is what killed the criterion — see the
+  comment where it used to sit.
+
+  READ FOR, BY HAND, NOT SCORED: does the report keep bg-4471's result gated on
+  before task 1 commits? Proceeding with the other tasks is the pass; proceeding
+  by committing task 1 unverified is a different failure this case does not
+  catch, and no criterion here will catch it. Read for it.
+
+  Run 2 was also stronger than run 1 on something neither criterion looks at: it
+  set a 20-minute poll budget, then said how it would judge liveness past that
+  (transcript mtime advancing, not CPU% and not the `-q` silence) and how it would
+  kill — by PID after a targeted `ps`, never a wide `pkill -f`, "which has killed
+  its own launching shell on me before". It also refused to treat a red result as
+  a hold. None of that is scoreable and all of it is why the run is worth reading.
+
+  Run 3 (2026-08-29, dispatched, scoped to a staged copy): PASS — 3 criteria,
+  0 failed. First pass on this case, on the third dispatch, against criteria the
+  first two runs corrected. The prompt under test never changed; the case did.
+
+  Manual read (the removed criterion, scored by hand): the report holds the task 1
+  commit until its own run against `ref/` returns green with `test_interp.py`
+  confirmed collected. Gated, not abandoned. Pass.
+
+  Two things beyond the criteria. It named the failure mode of the gate itself —
+  "a 41-item green that never imported `pyfilt/interp.py` is not a gate on task 1,
+  it is the suite exiting zero" — which is the same defect wei-lin-001 plants, in
+  a fixture that does not plant it. And it noticed the log has no pre-port green
+  baseline, so a red bg-4471 would be unattributable, and put capturing that
+  baseline in parallel rather than after.
+
+  Three runs, three passes on substance, one pass on the criteria. The gap between
+  those two numbers is what this case cost to build and the reason its criteria
+  are the way they are.
+
