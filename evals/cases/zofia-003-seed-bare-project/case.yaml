@@ -2,7 +2,9 @@ id: zofia-003
 agent: zofia-kaminska
 tier: smoke   # fast, markdown only, and the only test of Mode A — seeding
 prompt: |
-  This project has no rules yet. Seed a rule book for it. Treat input/ as the
+  This project has no rules yet. Seed a rule book for it. Report the seed you
+  would write: name every file you would create, every rule you would adapt to
+  this project, and every starter rule you would drop. Treat input/ as the
   entire project; the paths you have are the paths there are.
 input_dir: input
 
@@ -48,13 +50,17 @@ expected:
       - "how-to"
 
 must_not_find:
-  # The observed failure, stated as only a wrong answer would state it. A
-  # correct Mode A run creates two files and says which; "no files were
-  # created" negates by infix ("no files were not created" is not English), so
-  # a report declining to write cannot escape it by phrasing.
-  - keywords:
-      - "no files were created"
-      - "I created nothing"
+  # NOTE, 2026-09-16: "no files were created" and "I created nothing" were
+  # guards here and were REMOVED before the first run, because they punished
+  # the correct answer. `evals/run.sh stage` appends "STRICT: read-only — do
+  # not create, edit, or delete anything there" to every staged brief,
+  # unconditionally (run.sh:96). Under that clause a correct run cannot create
+  # anything and may well say so, so the guard fired on exactly the behaviour
+  # the harness demands. The case prompt now asks for the seed as a report.
+  #
+  # This is the class of defect PF-003 exists to find: the fixture was wrong
+  # and only attempting to run it showed that. Restore those guards only
+  # alongside writable staging (evals/README.md roadmap).
   # Wrong classification at Step 0. Declarative, and subject-first so a denial
   # ("CONTRIBUTING.md is not the rule book") does not contain it.
   - keywords:
@@ -122,12 +128,13 @@ notes: |
   leaving it as "run the test suite". The strong pass also says which starter
   invariants it dropped and why.
 
-  WHAT THIS CASE DOES NOT TEST. Grading reads the report, so it cannot see the
-  filesystem: a run that claims to have created CLAUDE.md and did not will pass
-  this case. That gap is structural to the harness, not to this fixture — the
-  same limit applies to every case where the deliverable is a file. Checking it
-  needs the harness to stage a writable copy and diff it afterwards, which is
-  on evals/README.md's roadmap and is not built.
+  WHAT THIS CASE DOES NOT TEST. The harness stages read-only and grades the
+  report, so it cannot see the filesystem — and cannot let the agent touch one.
+  A run that says it would create CLAUDE.md is indistinguishable here from one
+  that would actually do it. That limit is the harness's and applies to every
+  case whose deliverable is a file; writable staging is on evals/README.md's
+  roadmap and is not built. Two guards were removed for colliding with it, and
+  the collision is recorded above them.
 
   Verified by the author before shipping, per evals/README.md: "CLAUDE.md",
   "PROJECT_RULES.md" and "PATHWAY_FORWARD.md" appear nowhere in input/, so no
