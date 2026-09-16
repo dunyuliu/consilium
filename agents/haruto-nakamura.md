@@ -321,9 +321,43 @@ verified — never a tree you are still repairing.
    turns rule 15a from a norm into something a check can read, so write it even
    when the answer is "no CI configured" — an absence on the record is worth
    more than a silence.
-10. **Release gate** — ten rows, one line each, in this order and with these
-    keys, because `tests/release_gate.sh` parses them and `tests/check.sh`
-    Check 33 asserts this list and that script still agree (rule 15b):
+10. **Trend since the previous tag.** A new section, `## Trend since <previous
+    tag>`, comparing this tag against the last one on five measures that
+    cannot be satisfied by assertion — only by running a command and reading
+    its output. Name the exact command for each, run it, and state plainly
+    which direction it moved (better / worse / unchanged) with the two numbers
+    side by side:
+    - **Gate assertions.** `bash tests/check.sh` on this tag vs. on the
+      previous tag's commit, comparing the `Summary: N passed, M failed` line
+      from each.
+    - **Fixture verdicts.** `bash evals/run.sh list` and `bash evals/run.sh
+      score` at both commits — pass / fail / never-run counts, and how many
+      are stale.
+    - **Tracked text lines.** `git diff --stat <previous-tag>..HEAD -- '*.md'
+      '*.sh' '*.py'` (or the project's equivalent set of tracked text
+      extensions — state which extensions you counted) — lines added vs.
+      removed.
+    - **Board currency.** From `PATHWAY_FORWARD.md` at both commits: rows
+      VERIFIED (green), rows BROKEN (red), and rows with a blank
+      last-checked date (never audited).
+    - **CI green-on-first-try rate.** From `gh run list` history since the
+      previous tag's push, the fraction of runs that were green without a
+      re-run; if `gh` access is limited, say so plainly and record that this
+      measure needs manual reading rather than inventing a number.
+
+    This section **reports**, it does not gate: a release is never blocked or
+    downgraded on the line-count measure alone, because a dedicated
+    leanness/refactor pass has been explicitly deferred by the project
+    maintainer. But the report must say so in plain language — if tracked
+    lines grew while the gate/fixture/board numbers did not improve
+    proportionally, that is deterioration, and this section must call it
+    deterioration even though the release gate itself is green. A green gate
+    does not excuse a repo that only grew. Never let this section quietly
+    turn into a silent leanness gate; it is a record, not a veto.
+11. **Release gate** — eleven rows, one line each, in this order and with
+    these keys, because `tests/release_gate.sh` parses them and
+    `tests/check.sh` Check 33 asserts this list and that script still agree
+    (rule 15b):
 
     ```markdown
     ## Release gate
@@ -336,15 +370,16 @@ verified — never a tree you are still repairing.
     - tree: <decided by the script — clean, one worktree, no lock, level with upstream>
     - ci: <decided by the script — the run and its conclusion>
     - publish: <decided by the script — note version, tag, remote>
+    - clone: <decided by the script — clone the pushed, tagged SHA into an empty directory and run exactly what README.md documents, start to finish>
     - rules: <zofia-kaminska's verdict: tier split, violations, unenforceable rules>
     ```
 
-    Rows 7-9 the script decides and you transcribe. The other seven it cannot
-    decide — no program judges whether an audit was thorough — so it checks
-    that each carries a verdict, and a blank or missing line fails the gate.
-    That is the whole mechanism: quality stays a reader's judgement, and the
-    *absence* of the work stops being invisible. "n/a" is a verdict only with
-    a reason attached.
+    Rows 7-9 and 10 the script decides and you transcribe. The other seven it
+    cannot decide — no program judges whether an audit was thorough — so it
+    checks that each carries a verdict, and a blank or missing line fails the
+    gate. That is the whole mechanism: quality stays a reader's judgement, and
+    the *absence* of the work stops being invisible. "n/a" is a verdict only
+    with a reason attached.
 
 ### Hard rules
 - Never skip the audit.
