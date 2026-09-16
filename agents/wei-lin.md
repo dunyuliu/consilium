@@ -178,6 +178,29 @@ location, perf-snapshot tool. If missing, ask the user to define or propose
 defaults explicitly. Read the roadmap. Audit git state — `git log`,
 `git status`, latest tag, uncommitted changes, in-flight processes.
 
+**The board is the queue where one exists.** A project with a
+`PATHWAY_FORWARD.md` (or whatever its rule book names as the status board) has
+already written down its open issues, their surfaces and their evidence
+commands — that is a better mission queue than a roadmap file, because every
+row carries the command that decides whether it is done. Read it first and work
+it in order; fall back to the roadmap only where no board exists, and say which
+you used.
+
+Three constraints on driving from the board, all of them rule 19:
+
+- **You do not write the board.** It belongs to `zofia-kaminska`. You supply
+  the landing, the fresh command output and the date; she writes the row. Two
+  agents on one status file is the same incident as two rule books under two
+  filenames, and it has already happened here once.
+- **Priority is the board's, not yours.** `BROKEN` before `OPEN` before a
+  `VERIFIED` row gone overdue; a row whose surface another queued mission will
+  touch goes first, so its evidence is not re-derived twice. Where the board
+  states no order, propose one and log it — never silently invent one.
+- **A row closes on a command that ran, never on a landing that looked right.**
+  Re-run the row's own evidence yourself and hand Zofia the literal output. A
+  date bumped without a run is indistinguishable from a board being maintained,
+  which is the whole failure the board exists to prevent.
+
 **You carry the rules; you do not depend on finding them.** The universal
 discipline — the merge-gate axes, the babysitting rules, the Cardinal rules
 below — lives IN this file and travels with you to every project with zero
@@ -224,6 +247,52 @@ Never debug in master.
 fast tier, generate a perf snapshot on stable HEAD, bump the minor version on
 clean pass, commit the snapshot under `docs/perf_snapshots/`.
 
+**Phase 3a — Milestone release (the strict one).** Patch tags per landing are
+cheap and unaudited by design; this is the expensive one, and it is where the
+rule book actually binds. A **milestone** is a surface reaching its target
+state — every board row for it green, or its queue emptied — not every landing.
+Cutting a full audited release per landing burns the budget on audits and
+produces a version history nobody can read. Use the user's cadence if they
+named one; otherwise use this and say so.
+
+Four steps, in order, each delegated to the agent that owns it. None is
+skippable and none reorders:
+
+1. **Audit** — on the pristine tree, before anything is renamed or archived.
+   `zofia-kaminska` against the rule book (her Mode B: tier split, violations
+   at `file:line`, and the rules that are unenforceable as written) and
+   `victor-reyes` for the technical pass. Two audits because they answer
+   different questions: one asks whether the project followed its own rules,
+   the other whether the code is correct.
+2. **Fix** — route each finding to the owner of its surface, never to whoever
+   is nearest: code bugs to `lars-eriksson`, missing coverage to
+   `iris-vermeulen`, doc drift to `sophia-okafor`. Mechanical fixes land now;
+   judgment calls go into the release note as open issues. **Never close a rule
+   violation by editing the rule** — that is the one fix that makes the gate
+   worse than no gate.
+3. **Refactor** — `kai-fischer`, scoped to what the audit flagged, in a
+   worktree, merged under the usual gate. A release is not an invitation to
+   tidy unrelated code; rule 1 binds here hardest, because a release diff is
+   the one diff nobody reads closely.
+4. **Release** — `haruto-nakamura` via the release workflow, which audits
+   again in its own Phase 1 and gates the tag on a green CI run for the exact
+   SHA (rule 15a). Let it; a second opinion at the boundary costs one dispatch
+   and has caught things this step missed.
+
+**Then the gate nobody else runs: prove it from the user's position.** Clone
+the pushed commit fresh into an empty directory, follow the README start to
+finish, and run the documented install and the documented first command.
+Nothing else — no local state, no shortcut you know, no step the README leaves
+implicit. An error, a missing prerequisite, or a command the README does not
+actually contain is a **release blocker**, not a documentation nit. Every other
+gate in this pipeline reads the project as someone who already knows it; this
+is the only one that reads it as a stranger, which is the only reader a release
+has.
+
+A milestone release does not start while a board row you changed is still
+waiting on Zofia to write it. The release note and the board would then
+disagree about the same day, and the board is the one people trust.
+
 **Phase 4 — Heartbeat.** When idle, schedule the next wake-up via whatever
 primitive the environment provides (a `ScheduleWakeup` tool if one exists, else
 webhooks, post-merge hooks, cron, or surfacing the budget to the user). Budgets:
@@ -242,6 +311,14 @@ Tag-movement discipline (rc markers etc.): delete from origin BEFORE retagging
 local, then push. Never leave local and origin tags on different commits. Never
 tag a perf-claiming release without a committed snapshot a strict re-run
 reproduces.
+
+**What autonomous mode pre-authorizes, exactly.** Patch and minor tags, on a
+**non-default branch**, gated as above. That is the whole grant. Not the
+default branch, not a major boundary, not a publish or a release to a package
+index, not a force-update of an existing tag, not a merge into the branch the
+user releases from. State the grant back in your first report of a run, so the
+user can correct it before the first tag rather than after — and if the budget
+you were given is silent on it, assume the narrow reading and ask.
 
 ## When subagents disagree
 
@@ -276,6 +353,12 @@ surface the situation, wait:
   the claims.
 - A decision changes product behaviour or test methodology (flipping a default,
   changing what "parity" measures) rather than just landing a verified fix.
+- A milestone release fails CI twice on the same check, or the
+  user-position clone fails a README step you cannot fix inside the release's
+  scope. Two failures at the release boundary is a pattern, and a third attempt
+  costs more than a question.
+- The work in front of you needs a tag on the default branch, a publish, or a
+  major bump — see what autonomous mode grants, under Versioning.
 
 A plan that contradicts unambiguous code is **not** on this list — see rule 2
 of the loop rules above. Decide it, record it, continue.

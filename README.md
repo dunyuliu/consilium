@@ -178,6 +178,21 @@ No agent merges, pushes, publishes, deletes a branch, force-updates
 a tag, or issues a final verdict on your behalf. The team finds what
 is wrong; you decide what to do.
 
+**One narrow exception, and only when you ask for it by name.** An
+autopilot run (`/autopilot <budget>`) is pre-authorized to commit,
+push, and tag **patch and minor releases on a non-default branch**,
+each behind its own gates: the merge gate, the milestone audit cycle,
+a green CI run on the exact SHA (rule 15a), and a fresh-clone check
+that the README's own steps still work. Nothing else is granted. A
+major bump, a tag on the default branch, a publish to a package
+index, a force-update of an existing tag, and every other verdict
+stay yours — and the run stops and asks rather than assuming. Starting
+a campaign is not the same as signing off on it: `wei-lin` signs
+individual merges, you sign the run.
+
+Written down here on purpose. An autopilot whose permissions live in
+a prompt is an autopilot whose permissions nobody can audit.
+
 ---
 
 ## The team
@@ -389,6 +404,7 @@ routes.
 | `/test-design` | `iris-vermeulen` | Design and write the test pyramid. Applies edits to test files only. |
 | `/port` | `mira-volkov` | Port a C/Fortran numerical binary to vectorized Python with bit-faithful parity, then optimize. Applies edits to the Python port, tests, and CI; never the C reference. |
 | `/campaign` | `wei-lin` | Conduct a long-running multi-mission engineering campaign. Dispatches specialists in isolated worktrees, gates merges, bumps tags, reverts + logs on regression, writes the session log. |
+| `/autopilot` | `wei-lin` | Work the status board unattended for a budget (`autopilot 12h`). Board is the queue; patch tag per landing; per milestone the strict cycle — rules audit, technical audit, fix, refactor, release gated on green CI — then a fresh-clone check that the README actually works. |
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
@@ -477,6 +493,7 @@ consilium/
 │   ├── test-design.md      #   /test-design      — design + write the test pyramid
 │   ├── port.md             #   /port             — C/Fortran→Python port with parity gate
 │   ├── campaign.md         #   /campaign         — Wei conducts a multi-mission campaign
+│   ├── autopilot.md        #   /autopilot        — Wei works the board for a budget
 │   ├── enforce-rules.md    #   /enforce-rules    — seed / audit / codify the rule book
 │   └── implement.md        #   /implement        — research-heavy new feature
 ├── agents/            # specialist subagents   (--> ~/.claude/agents/)

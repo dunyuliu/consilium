@@ -240,23 +240,30 @@ it. Note the circularity this row sits in — it cannot honestly record "green" 
 its own overdue entry is one of the things keeping the suite red, so the other three
 were refreshed first and this one last.
 
-**Re-run 2026-09-16: 789 -> 1252.** The same lapse, wider: ten rows were overdue
+**Re-run 2026-09-16: 789 -> 1259.** The same lapse, wider: ten rows were overdue
 by 4 to 13 days, so Check 12 had the suite red on a branch that did not cause it
 — the second occurrence of the failure mode this row already records. The nine
 others were re-run and dated first and this one last, for the circularity
 described above: it cannot record green while its own entry is part of what is
 red.
 
-Two things moved the count besides the dates. Check 31 landed (the root-document
-whitelist), and the clone was unshallowed mid-pass, which brings Checks 27 and 28
-and two Check 17 rows back from their named skips — roughly 20 of the added
-assertions are the shallow exemption ending, not new coverage. A count from a
-shallow clone and a count from a full one are not comparable, which is why the
-README now quotes a floor rather than a figure.
+Three things moved the count besides the dates. Check 31 landed (the
+root-document whitelist, +17); the clone was unshallowed mid-pass, bringing
+Checks 27 and 28 and two Check 17 rows back from their named skips (+22); and
+`commands/autopilot.md` arrived, which every command-scanning check re-counts
+(+7). So most of the jump is the shallow exemption ending rather than new
+coverage. A count from a shallow clone and a count from a full one are not
+comparable, which is why the README now quotes a floor rather than a figure.
+
+This row's own number is the one thing on the board no check can hold: Check 17
+names and skips it to avoid recursing into itself, so it drifts on every change
+that adds an assertion and only a reader catches it. It read `1252` for the
+first half of this session's work and was corrected by hand, which is precisely
+the maintenance-shaped work the rest of the board exists to avoid needing.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 1252 passed, 0 failed
+# → Summary: 1259 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -1138,14 +1145,25 @@ history-dependent evidence here instead of only in CI. The previous occurrence
 reached CI unseen for exactly the opposite reason, which is why the unshallow note
 above is worth keeping.
 
-**Re-run 2026-09-16.** Output unchanged (`14`), and the row stays OPEN. No agent
-prompt changed in this session's work — the edits were `CLAUDE.md`, rule 1, the
-README, this board and `tests/check.sh` — so nothing went stale that was not
-already. Re-derived on a full clone, for the reason PF-005 now records.
+**Re-run 2026-09-16: 14 -> 15.** The row stays OPEN and got worse in the same
+session that re-dated it. The first re-run of the day read `14` unchanged —
+accurate then, because that work touched `CLAUDE.md`, rule 1, the README, this
+board and `tests/check.sh` and no prompt at all. Then the release workflow
+gained the CI gate (rule 15a) and the autopilot landed, editing
+`agents/haruto-nakamura.md` and `agents/wei-lin.md`, which staled
+`haruto-001-missing-prior-notes` on the spot. This row is the standing cost of
+editing prompts faster than fixtures can be re-run, and it is not paid by
+noting it.
+
+Worth naming: `haruto-002-tag-before-gate` covers precisely the behaviour the
+CI gate just changed, and it is in PF-003's never-run list. The case that would
+grade this change exists and has never been executed.
+
+Re-derived on a full clone, for the reason PF-005 now records.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 14
+# → 15
 ```
 
 ### PF-013 — `agents/` — OPEN
