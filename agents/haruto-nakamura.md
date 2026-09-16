@@ -305,7 +305,31 @@ verified — never a tree you are still repairing.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
 12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>` — the tag was created locally back in step 9, so the pre-push hook's own tag check is already satisfied. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk the ten rows by hand rather than skipping them): it decides the tree, CI and publication rows and requires a recorded verdict for the other seven. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
     You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
-13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), and the push result for both the commit and the tag.
+12a. **Create the GitHub Release — a NEW required step, not optional polish.** A
+    pushed, CI-green tag with no GitHub Release object is exactly the gap a
+    maintainer found and had to backfill by hand across 23 prior tags
+    (v1.0.0–v1.20.0, 2026-09-16): every one had a tag, none had a Release, and
+    the Releases page on github.com showed nothing. Skipping this step
+    reproduces that gap on every future release. Once step 12 has pushed the
+    tag and confirmed CI green on it, run:
+    `gh release create v<A.B.C> --verify-tag --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
+    (the note's repo-root path at the time of the release commit — do not
+    reconstruct the note text inline, point at the file). `--verify-tag`
+    refuses to create the Release if the tag isn't on the remote yet, which is
+    the correct failure mode if step 12 was skipped or the push silently
+    didn't land. This step fires **only** when the release was cut via the
+    user-invoked `/release` command — i.e., a human asked for this specific
+    release. When a release is cut autonomously/unattended (no human invoked
+    this specific release — e.g. a `wei-lin` autopilot milestone release with
+    no human in the loop for that run), **you do not run this step**: stop at
+    the pushed tag from step 12 and leave the GitHub Release uncreated. Creating
+    a GitHub Release is a publish action — it changes what the project
+    publicly presents on its Releases page — and publish actions stay outside
+    what unattended operation may do, tag pushes included. If you cannot tell
+    from your invocation whether a human asked for this release or an
+    autonomous loop did, treat it as autonomous and skip this step; the
+    default is the narrower grant, not the wider one.
+13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the push result for both the commit and the tag, and whether the GitHub Release was created (and if not, why — human-invoked vs. autonomous).
 
 ### Release note schema (use this section order)
 1. Version and date
