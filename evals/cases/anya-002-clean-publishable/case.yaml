@@ -144,3 +144,6 @@ notes: |
   resolution and the fresh-clone reproduction, both needing network) as
   unperformed rather than as defects. First verdict this case has ever had.
 
+  Run (2026-09-16, via anya-petrov): PASS — 6 criteria, 0 failed. Verdict
+  PUBLISH, 0 blockers, on the cleaned input; no invented Critical finding.
+

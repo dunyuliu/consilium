@@ -153,3 +153,7 @@ notes: |
   Clean control held. One Advisory finding only — the absolute `_STD_FLOOR` at rolling_stats.py:12/:80,
   which this case's notes already declare as real and reportable — and zero invented bugs. Explicitly
   stated no look-ahead, no off-by-one, no silent-failure mode.
+
+  Run (2026-09-16, via lars-eriksson): PASS — 3 criteria, 0 failed. Clean control
+  held again: the Advisory `_STD_FLOOR` finding this case declares as real and
+  reportable was flagged, and no invented defect tripped a must_not_find guard.

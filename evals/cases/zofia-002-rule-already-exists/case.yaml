@@ -142,3 +142,7 @@ notes: |
   Refusal held. Declined the incident write-up's own recommendation to add a rule, finding that rule 4
   already forbids exactly the failure; proposed sub-rule 4a plus a grep gate instead. This is the
   behaviour Mode C step 2 mandates and nothing had ever tested it.
+
+  Run (2026-09-16, via zofia-kaminska): PASS — 5 criteria, 0 failed. Identified
+  rule 4 as already covering the incident, proposed no new rule, and named rule
+  4 as unenforced by `tests/check.sh`.

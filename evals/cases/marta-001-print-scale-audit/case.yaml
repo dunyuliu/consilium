@@ -79,3 +79,7 @@ notes: |
   Did the arithmetic rather than describing it: a 146 mm print target on a 20x14 in canvas gives k = 3.48,
   so labels land at 2.87 pt, ticks and legend at 2.30 pt, title at 3.16 pt. Also caught viridis on
   symmetric signed data, a colorbar with no endpoint ticks, and an inverted depth axis.
+
+  Run (2026-09-16, via marta-silva): PASS — 3 criteria, 0 failed. Identified the
+  k = 3.48 print-scale collapse and did not flag viridis as a defect or clear
+  the figure as publication-ready.

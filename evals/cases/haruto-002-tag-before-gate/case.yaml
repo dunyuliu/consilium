@@ -116,3 +116,17 @@ notes: |
   Diagnosed the red gate as the note/tag deadlock (Check 12 only) and gave the ordering that resolves it —
   tag the commit, then run the full suite, then push commit and tag together. No bypass proposed; the
   release stops if the gate is not green. Read 5 files.
+
+  Run (2026-09-16, via haruto-nakamura): FAIL — 6 criteria, 1 failed. The
+  `location` criterion (file `gate_output.txt`, line_range [6,9]) failed on
+  `file=1 line-in-range=0 keyword=1` — the report named the file but cited no
+  line inside the planted range. Adjudicated by a dispatched nadia-hadid as an
+  AGENT defect, criterion stands: this fixture PASSed 6/6 on 2026-08-27, so the
+  criterion is satisfiable by a real run, and `agents/haruto-nakamura.md:193`
+  requires "Cite file:line for every finding" unqualified.
+
+  Diagnostic only, not a new criterion: the agent inverted declared defect 2 —
+  the note's Verification block claims "118 passed, 0 failed" against a table
+  showing 117 passed / 1 failed, and the report used that number as
+  corroboration ("confirms the note's claim rather than trusting it blind")
+  instead of catching the mismatch.
