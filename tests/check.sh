@@ -41,6 +41,7 @@
 #  29. Only install.sh writes the Claude symlink directories (rule 14).
 #  30. No expected keyword appears in ordinary finding-free review prose.
 #  31. The repo root holds exactly the documents rule 1 whitelists.
+#  32. The README and CLAUDE questions blocks exist and share no question.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -1213,6 +1214,60 @@ else
                 ;;
         esac
     done
+fi
+
+echo
+echo "Check 32: the two questions blocks exist and share no question"
+# PROJECT_RULES.md rule 1, "one audience, one job, one home" — the clause that
+# was prose until the questions blocks landed and gave it something to hold.
+#
+# README.md carries the standing set (what this project keeps asking, and what
+# asks it); CLAUDE.md carries the working form (what a change must answer, and
+# when). The same question in both is the failure the clause names: it gets
+# answered differently in each, and the copy that is wrong is never the one you
+# are reading.
+#
+# WHAT THIS CHECKS, EXACTLY: that both blocks are present, neither is empty,
+# and no question line appears verbatim in both after normalising case,
+# markdown and trailing punctuation. It cannot see a paraphrase — two questions
+# meaning one thing in different words pass, and that stays a reader's job.
+# Named narrowly for that reason.
+#
+# The `|| true` on both assignments is load-bearing, and its absence is how
+# this check's first draft behaved: under `pipefail` the trailing grep exits 1
+# when a block is missing — the exact case this check exists to report — so the
+# assignment inherited 1 and `set -e` killed the suite after printing this
+# check's heading and before the Summary line. Silent death instead of a
+# finding, which is rule 2 turned on the checker. Caught by the negative test,
+# not by reading: the same mechanism already has comments on Checks 17 and 18.
+q_extract() {  # file, heading-regex -> normalised question lines
+    awk -v h="$2" '
+        $0 ~ h {inblock=1; next}
+        inblock && /^## / {inblock=0}
+        inblock && /\?/ {print}
+    ' "$1" \
+    | sed 's/^[-* ]*//; s/^|//; s/|.*$//; s/\*\*//g; s/`//g; s/^ *//; s/ *$//' \
+    | tr '[:upper:]' '[:lower:]' \
+    | grep '?' | sort -u
+}
+readme_qs=$(q_extract README.md '^## The questions' || true)
+claude_qs=$(q_extract CLAUDE.md '^## Questions a change here must answer' || true)
+
+if [ -z "$readme_qs" ]; then
+    fail "README.md has no questions block, or it carries no question — rule 1 gives that document the standing set"
+elif [ -z "$claude_qs" ]; then
+    fail "CLAUDE.md has no questions block, or it carries no question — rule 1 gives that document the working form"
+else
+    ok
+    shared=$(comm -12 <(printf '%s\n' "$readme_qs") <(printf '%s\n' "$claude_qs"))
+    if [ -n "$shared" ]; then
+        while IFS= read -r q; do
+            [ -z "$q" ] && continue
+            fail "\"$q\" is in both questions blocks — one audience, one job, one home (rule 1)"
+        done <<< "$shared"
+    else
+        ok
+    fi
 fi
 
 echo

@@ -3,7 +3,7 @@
 > An AI specialist team to accelerate scientific innovation — and the
 > test suite that keeps it honest. Twenty-one agents that build, port,
 > audit, review and ship scientific software; thirty regression
-> fixtures and thirty-one structural checks that measure whether they
+> fixtures and thirty-two structural checks that measure whether they
 > actually did. Most collections of prompts are a wish. This one carries
 > the evidence.
 
@@ -20,7 +20,7 @@ repo:
   2026-08-05 four of those 27 were mechanical in name only, with nothing
   enforcing them; that was found by reading the tier column against the checks
   that exist, and closed.
-- **`tests/check.sh`** — 31 checks producing upwards of 1,200 assertions, every
+- **`tests/check.sh`** — 32 checks producing upwards of 1,200 assertions, every
   check negative-tested by breaking the thing it guards and confirming the
   intended message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several
@@ -83,12 +83,44 @@ tools could not perform — including a release engineer who could not
 write a release note.
 
 **Final sign-off rests with the human.** The team finds what is wrong
-and recommends what to do. You decide. No agent merges, pushes,
-publishes, deletes, or issues a verdict on your behalf.
+and recommends what to do. You decide. What no agent does on your
+behalf — and the single narrow exception you have to ask for by name —
+is spelled out under *Human sign-off* below, in one place rather than
+two.
 
 **Evidence over vibes.** Regression fixtures in `evals/cases/` test
 agents on planted defects so prompt changes can be measured rather
 than vibe-checked. New behaviours land with new eval cases.
+
+---
+
+## The questions
+
+Every agent, rule and check in this repo exists to force one of these
+questions at the moment it is still cheap to answer. They are the
+standing set — the questions a project has to keep re-asking, not a
+checklist that completes. Each one is here because a project paid for
+not asking it.
+
+| Question | What asks it for you |
+|---|---|
+| Is this number from a run, or from a memory? | rule 4; the board's requirement that every claim cite the command whose output was read |
+| Which check catches this if I am wrong? | Zofia's tier split — a rule no check enforces is reported as a finding about the rule, every time |
+| Who owns this file? | rule 19, mechanically, via Check 10 |
+| What did this change make stale? | rule 11; `bash evals/run.sh list` for the fixtures a prompt edit just aged |
+| Is the gate green where it matters, or only here? | rule 15a — the local hook proves one machine, CI proves the rest, and a tag waits for the second |
+| Can a stranger follow this release? | the autopilot's last gate: clone the pushed commit, follow the README, run what it documents |
+| What is the smallest version of this change? | rule 1, including the root whitelist Check 31 enforces |
+| What would this tool find if aimed at us? | rule 0, which is why the other rules get checked at all |
+
+The working form of these — what an agent must answer at each stage of
+a change to this repo, with the rule that decides each — is in
+`CLAUDE.md`. The two lists are deliberately disjoint, and Check 32
+keeps them that way: a question answered in two places gets answered
+differently in each.
+
+Refining this list is a deliberate act, and the human's. An agent adds
+a question when a session pays for one, and says what it cost.
 
 ---
 
@@ -608,7 +640,7 @@ they disagree, the fixture is the more likely defendant.
 
 ## Tests
 
-Thirty-one structural invariants of consilium itself — agent frontmatter,
+Thirty-two structural invariants of consilium itself — agent frontmatter,
 command-to-agent references, README/filesystem sync, stale-reference
 detection, README completeness per agent, write-surface ownership,
 isolation-first prompts, tool-economy and communication declarations, the

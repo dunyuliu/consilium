@@ -107,6 +107,48 @@ None of them read a prompt for sense. Specifically uncovered:
   one of the four root documents, or under `docs/`, `tests/`, `evals/`,
   `agents/` or `commands/`.
 
+## Questions a change here must answer
+
+`README.md` carries the standing set — the questions this project exists to
+keep asking. These are their working form: what you must be able to answer
+about the change in front of you, at the stage where the answer is still cheap.
+The two lists are disjoint on purpose and Check 32 holds them apart, because a
+question answered in two documents gets answered differently in each.
+
+**Before you edit**
+
+- Which surface is this, and who owns it? (rule 19)
+- What is the smallest edit that solves it — and what am I folding in that
+  deserves its own change? (rule 1)
+- Has this already been decided in a rule, a board row, or a fixture?
+  Sharpening what exists beats adding beside it.
+
+**While you work**
+
+- Which of my claims come from a command I ran in this session, and which did I
+  inherit from a doc, a note, or a previous run? (rule 4 — and say which.)
+- What did I not check, and would a reader guess that from what I wrote?
+- If I am wrong about this, which check fails? If none does, the check may be
+  the change.
+
+**Before you commit**
+
+- What did this just make stale — a count, a doc line, a board row, a fixture
+  verdict? (rule 11; `bash evals/run.sh list` for the last of those.)
+- Did I re-run the board row's command, or only its date? (rule 21a)
+- Would this be green on a full clone and in CI, not only in this checkout?
+- Does each root document still do only its own job? (rule 1's table)
+
+**Before you call it done**
+
+- What am I claiming that nothing proved? Write that down rather than leaving
+  it implied — an unmarked assumption reads as a finding.
+- What have I left that the next session cannot reconstruct: a worktree, a held
+  lock, an unpushed tag, a decision made and never written?
+
+This list is the human's to refine. Add a question when a session pays for one,
+and say in a sentence what it cost — same standard as a rule.
+
 ## This file
 
 No agent owns it. Rule 19's table covers agent write surfaces and `CLAUDE.md`

@@ -278,9 +278,13 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 31 checks and 31 exist. This row is now
+The header comment documents 32 checks and 32 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
+
+**Re-run 2026-09-16: 31 -> 32.** Check 32 landed (the two questions blocks
+exist and share no question) and reddened this row in its own run, the third
+time this row has caught its own file growing.
 
 **Re-run 2026-09-16: 30 -> 31.** Check 31 landed (the repo root holds exactly
 the documents rule 1 whitelists) and this row went red in the same run that
@@ -293,7 +297,7 @@ edit, the same way PF-012 records that a prompt edit is a board edit.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 31
+# → 32
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
