@@ -40,9 +40,16 @@ expected:
       - "at the next free number"
   # README.md and CLAUDE.md are PRESENT with real content; the correct move is
   # to leave them alone, not regenerate them from the starter set. A
-  # table-format report states this per-file ("leave content untouched" /
-  # "leave the three sections untouched" in a CLAUDE.md row) rather than as
-  # the standalone sentences below -- both phrasings mean the same thing.
+  # table-format report states this per-file, filename and verdict landing in
+  # separate cells of the same row -- so the table terms below reproduce the
+  # literal row text (filename + the "present" status the other criterion
+  # above already established + the leave-alone action), not a bare
+  # "leave content untouched" that names no file and would pass anywhere in
+  # the report. grep -F is plain-substring, so it cannot express "these two
+  # facts, same row, whatever sits between them" -- only the exact phrasing a
+  # correct table happens to use. That is a named limit, not a design goal:
+  # a two-column table, or one that skips the word "present", will miss this
+  # criterion and is not covered here.
   - kind: keyword
     any_of:
       - "README.md is left alone"
@@ -53,8 +60,14 @@ expected:
       - "leave CLAUDE.md as is"
       - "CLAUDE.md untouched"
       - "CLAUDE.md stays as is"
-      - "leave content untouched"
-      - "leave the three sections untouched"
+      - "README.md` | **present** | leave"
+      - "README.md | present | leave"
+      - "README.md** | present | leave"
+      - "README.md: present | leave"
+      - "CLAUDE.md` | **present** | leave"
+      - "CLAUDE.md | present | leave"
+      - "CLAUDE.md** | present | leave"
+      - "CLAUDE.md: present | leave"
   # The board is genuinely absent and gets created -- but never as an empty
   # template. It must be seeded from the project's ALREADY-KNOWN open issues,
   # which live in README.md's "Known issues" section, not invented.
@@ -150,3 +163,30 @@ notes: |
   standing pass/fail claim against the criteria as they now read. The case
   must be re-dispatched against the corrected criteria before it has a live
   verdict again; this entry is kept, not deleted, per rule 5.
+
+  RETURNED 2026-09-16 (gate review): the SUPERSEDED fix above landed two
+  terms in the third `expected` block that name no file --
+  "leave content untouched" and "leave the three sections untouched" -- so
+  any sentence anywhere in a report containing either phrase satisfies the
+  criterion, including one that also states "README.md is rewritten" /
+  "PROJECT_RULES.md is rewritten" (demonstrated: `samples/fail.md` plus the
+  single appended sentence "I will leave content untouched." dropped the
+  case from 8 failed to 6 failed). "leave the three sections untouched" had
+  a second defect independent of the coupling: "three sections" is a detail
+  of the one sample graded, not an invariant of a correct answer.
+
+  FIXED 2026-09-16 (Iris Vermeulen): both terms replaced with table-row
+  literals that couple the filename to the leave-alone verdict the way
+  `samples/pass.md`'s actual row reads ("README.md\` | **present** | leave
+  content untouched", plus plain-pipe/bold-only/colon variants, and the
+  CLAUDE.md equivalents). `grep -F` is plain-substring matching -- it cannot
+  express "filename and verdict in the same row, whatever sits between
+  them" -- so these terms reproduce the specific "present"-then-action
+  phrasing this fixture's own samples use rather than a wildcard. Named
+  limit, not silently patched: a two-column table, or one that states the
+  status without the word "present", will not match this block. Verified:
+  `samples/fail.md` + the hollow sentence above is FAIL again (7 failed,
+  matching fail.md unmodified); `samples/pass.md` is PASS 8/8;
+  `samples/fail.md` unmodified is FAIL 7 failed. Still SUPERSEDED pending
+  re-dispatch per rule 5 -- this change moves where the criteria will be
+  re-dispatched against, not the dispatch itself.
