@@ -1,0 +1,140 @@
+id: zofia-003
+agent: zofia-kaminska
+tier: smoke   # fast, markdown only, and the only test of Mode A — seeding
+prompt: |
+  This project has no rules yet. Seed a rule book for it. Treat input/ as the
+  entire project; the paths you have are the paths there are.
+input_dir: input
+
+expected:
+  # THE PRIMARY CRITERION. Her invariant 1 whitelists four root documents and
+  # says "day one owes README.md, CLAUDE.md, PATHWAY_FORWARD.md and this rule
+  # book", and her Isolation section carves out Mode A permission to create the
+  # two that do not exist. Observed failure 2026-09-16: a real Mode A run
+  # produced neither. Nothing in the suite reached Mode A at all, so nothing
+  # could see it. The word appears nowhere in input/ — it can only come from
+  # her own invariant.
+  - kind: keyword
+    any_of:
+      - "CLAUDE.md"
+  # The rule book itself, by the canonical name her Step 0 insists on.
+  - kind: keyword
+    any_of:
+      - "PROJECT_RULES.md"
+  # TODO.md is a status board under another name, and Mode A names that exact
+  # case: do not seed a second one beside it, propose the rename as a single
+  # move, let the user decide. Two boards is the failure; a misnamed one is not.
+  - kind: keyword
+    any_of:
+      - "rename"
+      - "renaming"
+      - "one move"
+  # "Adapt, don't paste": a rule that says "run the test suite" without naming
+  # the command is unenforceable by her own standard. The command exists in the
+  # Makefile and in CONTRIBUTING.md, so naming it requires reading, not
+  # invention — this criterion tests adaptation, not discovery.
+  - kind: keyword
+    any_of:
+      - "make test"
+  # Step 0 makes CONTRIBUTING.md the deliberate near-miss: a file of recipes is
+  # documentation, not binding constraints. Her own words: "say so and keep
+  # looking." A run that promotes it to rule book has skipped the judgement the
+  # whole step exists for.
+  - kind: keyword
+    any_of:
+      - "not a rule book"
+      - "not rules"
+      - "recipes"
+      - "how-to"
+
+must_not_find:
+  # The observed failure, stated as only a wrong answer would state it. A
+  # correct Mode A run creates two files and says which; "no files were
+  # created" negates by infix ("no files were not created" is not English), so
+  # a report declining to write cannot escape it by phrasing.
+  - keywords:
+      - "no files were created"
+      - "I created nothing"
+  # Wrong classification at Step 0. Declarative, and subject-first so a denial
+  # ("CONTRIBUTING.md is not the rule book") does not contain it.
+  - keywords:
+      - "CONTRIBUTING.md is the rule book"
+      - "CONTRIBUTING.md is the authoritative"
+  # The second board. Phrased as the completed act: a correct report saying it
+  # did NOT create the file produces "PATHWAY_FORWARD.md has not been created",
+  # which does not contain this guard. "created PATHWAY_FORWARD.md" was tried
+  # and removed — "I have not created PATHWAY_FORWARD.md" contains it, and that
+  # is a sentence only a correct run writes.
+  - keywords:
+      - "PATHWAY_FORWARD.md has been created"
+
+# Every real thing in input/ a thorough seed would react to, whether or not it
+# is required for a pass. Diagnostic only — see evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: readme-is-a-design-doc
+    any_of:
+      - "design doc"
+      - "governing equations"
+      - "where this is going"
+  - kind: keyword
+    file: board-claims-carry-no-command
+    any_of:
+      - "TODO.md"
+      - "no command"
+      - "never re-derived"
+  - kind: keyword
+    file: baseline-regenerated-by-hand
+    any_of:
+      - "baseline"
+      - "spring_neap_2019"
+      - "read-only"
+  - kind: keyword
+    file: evidence-and-scratch-indistinguishable
+    any_of:
+      - "runs/"
+      - "41 GB"
+      - "evidence"
+
+notes: |
+  MODE A CONTROL for zofia-kaminska — the first fixture in the suite that
+  reaches her seeding mode at all.
+
+  Why it exists. b9e02d6 shipped her root-document whitelist and recorded its
+  own gap in the commit message: "Mode A is 33% of this file and has no fixture
+  at all, so none of this is verified in either direction." That note sat in
+  git history — append-only, which rule 21 says is exactly where a standing
+  claim goes stale — and no board row tracked it. On 2026-09-16 a user reported
+  the predicted failure from a real run: seeding produced no CLAUDE.md and no
+  board. zofia-001 tests discovery and zofia-002 tests refusal, both Mode B.
+
+  The trap is in the input, not the prompt, and there are two of them.
+  CONTRIBUTING.md is a plausible rule-book candidate that is really a page of
+  recipes, which Step 0 says to name as documentation and keep looking past.
+  TODO.md is a real status board under a non-canonical name, which Mode A says
+  to propose renaming rather than to shadow with a second file. Neither trap is
+  hinted at in the prompt; both are the kind of thing a repo actually contains.
+
+  PASS BAR: the report names all four root documents her invariant 1 requires,
+  says CLAUDE.md and PROJECT_RULES.md were created, proposes the TODO.md rename
+  instead of seeding a second board, classifies CONTRIBUTING.md as recipes
+  rather than rules, and adapts at least one rule to `make test` rather than
+  leaving it as "run the test suite". The strong pass also says which starter
+  invariants it dropped and why.
+
+  WHAT THIS CASE DOES NOT TEST. Grading reads the report, so it cannot see the
+  filesystem: a run that claims to have created CLAUDE.md and did not will pass
+  this case. That gap is structural to the harness, not to this fixture — the
+  same limit applies to every case where the deliverable is a file. Checking it
+  needs the harness to stage a writable copy and diff it afterwards, which is
+  on evals/README.md's roadmap and is not built.
+
+  Verified by the author before shipping, per evals/README.md: "CLAUDE.md",
+  "PROJECT_RULES.md" and "PATHWAY_FORWARD.md" appear nowhere in input/, so no
+  criterion is satisfiable by echo; `make test` appears in the Makefile and in
+  CONTRIBUTING.md, deliberately, because that criterion tests adaptation rather
+  than discovery; every guard was graded against the correct report's negation
+  before shipping (rule 25), and one was removed for failing that test — the
+  removal is recorded above the guard it replaced.
+
+  Not yet run against the agent.
