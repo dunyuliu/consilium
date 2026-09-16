@@ -3,7 +3,7 @@
 > An AI specialist team to accelerate scientific innovation — and the
 > test suite that keeps it honest. Twenty-one agents that build, port,
 > audit, review and ship scientific software; thirty regression
-> fixtures and thirty-two structural checks that measure whether they
+> fixtures and thirty-three structural checks that measure whether they
 > actually did. Most collections of prompts are a wish. This one carries
 > the evidence.
 
@@ -20,7 +20,7 @@ repo:
   2026-08-05 four of those 27 were mechanical in name only, with nothing
   enforcing them; that was found by reading the tier column against the checks
   that exist, and closed.
-- **`tests/check.sh`** — 32 checks producing upwards of 1,200 assertions, every
+- **`tests/check.sh`** — 33 checks producing upwards of 1,200 assertions, every
   check negative-tested by breaking the thing it guards and confirming the
   intended message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several
@@ -96,11 +96,65 @@ than vibe-checked. New behaviours land with new eval cases.
 
 ## The questions
 
+This section is where the questions live. Three of them are the
+project's own — the ones this repo is built to keep answering — and
+each says plainly what answers it today and what does not yet.
+
+### 1. Seeding: does a new project come out with four documents doing four jobs?
+
+`/enforce-rules seed` should leave `CLAUDE.md` for agents, `README.md`
+for users, `PATHWAY_FORWARD.md` as a living prioritized board, and
+`PROJECT_RULES.md` to anchor the work.
+
+- **Enforced**: all four are on invariant 1's whitelist in
+  `agents/zofia-kaminska.md`, Mode A creates the two that do not
+  exist, and `evals/cases/zofia-003-seed-bare-project/` grades whether
+  a real run says it did.
+- **Not yet**: the board has no **priority** field — its columns are
+  state, date and interval, so "priorities constantly adjusted" cannot
+  be expressed, seeded, or followed. And nothing holds a seeded README
+  to being *credible*; concise is asked for, evidence-backed is not.
+
+### 2. Release: does it cover all ten things a release owes?
+
+Audit the changes, correctness, conciseness, fix, document, refactor
+for leanness, a clean tree with no wandering work dirs, CI green, the
+published release and version control, and the rule book followed.
+
+- **Enforced**: all ten are rows in `tests/release_gate.sh`, which
+  refuses a tag when any fails (rule 15b). It decides the tree, CI and
+  publication rows itself; the other seven must carry a recorded
+  verdict in the release note, and a blank line fails the gate.
+- **Not yet**: no GitHub Release object is created — the publish row
+  checks the note, the tag and the remote, not a published release
+  page. And a recorded verdict proves the pass happened, never that it
+  was any good.
+
+### 3. Autopilot: how is any of that enforced strictly, rather than hoped for?
+
+- **Enforced**: by the only three tiers that bind. A **gate that
+  refuses** (`tests/release_gate.sh`, `tests/check.sh`), a **recorded
+  verdict a check asserts exists** (the note's ten rows; rule 15a's CI
+  field), and for what neither can reach, **an owner who is not the
+  author** — the gate is `iris-vermeulen`'s file, the rule-book verdict
+  is `zofia-kaminska`'s, the refactor is `kai-fischer`'s. Prompt prose
+  is not a tier: a step described only in prose is satisfied by an
+  agent believing it did the step.
+- **Not yet**: 11 of 31 fixtures have never been run, so what an agent
+  *does* under these rules is less measured than the rules themselves.
+  `PATHWAY_FORWARD.md` is where that gap is tracked, PF-003.
+
+Refining these three is the point of them, and that is the human's
+call. An agent proposes a change to them; it does not make one.
+
+---
+
+### The standing set
+
 Every agent, rule and check in this repo exists to force one of these
 questions at the moment it is still cheap to answer. They are the
-standing set — the questions a project has to keep re-asking, not a
-checklist that completes. Each one is here because a project paid for
-not asking it.
+questions a project has to keep re-asking, not a checklist that
+completes. Each one is here because a project paid for not asking it.
 
 | Question | What asks it for you |
 |---|---|
@@ -559,6 +613,7 @@ consilium/
 │   └── cases/              # one directory per planted-bug case
 ├── tests/             # structural-invariant checks for consilium itself
 │   ├── check.sh            # pure-bash; runs in CI on every push/PR
+│   ├── release_gate.sh     # the ten rows a release must satisfy (rule 15b)
 │   └── lock.sh             # one-writer-per-repo lock (rule 18)
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
@@ -640,7 +695,7 @@ they disagree, the fixture is the more likely defendant.
 
 ## Tests
 
-Thirty-two structural invariants of consilium itself — agent frontmatter,
+Thirty-three structural invariants of consilium itself — agent frontmatter,
 command-to-agent references, README/filesystem sync, stale-reference
 detection, README completeness per agent, write-surface ownership,
 isolation-first prompts, tool-economy and communication declarations, the

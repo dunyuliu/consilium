@@ -42,6 +42,7 @@
 #  30. No expected keyword appears in ordinary finding-free review prose.
 #  31. The repo root holds exactly the documents rule 1 whitelists.
 #  32. The README and CLAUDE questions blocks exist and share no question.
+#  33. The release gate's rows and the documented note schema agree.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -1267,6 +1268,45 @@ else
         done <<< "$shared"
     else
         ok
+    fi
+fi
+
+echo
+echo "Check 33: the release gate's rows and the documented note schema agree"
+# PROJECT_RULES.md rule 15b. The gate parses ten row keys out of a release note
+# and the note schema in agents/haruto-nakamura.md tells whoever writes the note
+# what those keys are. Two lists, one contract: a row added to the script and
+# not the schema is a gate nobody was told about, and a row in the schema that
+# the script does not parse is a promise nothing enforces.
+#
+# Order matters as well as membership — the schema is what a release note is
+# written from, and a reader filling rows top to bottom should produce the
+# order the gate reads.
+#
+# This does NOT check that the gate's rows are the right rows, or that the
+# seven recorded ones were done well. It checks that the two documents cannot
+# drift apart, which is the failure mode a second copy always has.
+if [ ! -f tests/release_gate.sh ]; then
+    fail "tests/release_gate.sh is missing — rule 15b names it as the gate every release runs"
+else
+    gate_rows=$(grep -E '^ROWS=\(' tests/release_gate.sh \
+        | sed 's/^ROWS=(//; s/).*$//' | tr ' ' '\n' | grep -E '^[a-z]+$' || true)
+    # The heading is indented: the schema lives in a fenced block inside a
+    # numbered list item, so an anchored /^## / never matches it. The first
+    # draft of this check did exactly that and reported the schema missing.
+    schema_rows=$(awk '/^ *## Release gate *$/{f=1; next} f && /^ *```/{exit} f' \
+        agents/haruto-nakamura.md \
+        | sed -n 's/^ *- \([a-z][a-z]*\):.*/\1/p' || true)
+    if [ -z "$gate_rows" ]; then
+        fail "no ROWS=( ... ) list parsed from tests/release_gate.sh — the gate's contract is unreadable"
+    elif [ -z "$schema_rows" ]; then
+        fail "no release-gate rows parsed from agents/haruto-nakamura.md's note schema (rule 15b)"
+    elif [ "$gate_rows" = "$schema_rows" ]; then
+        ok
+    else
+        fail "release-gate rows differ between tests/release_gate.sh and haruto's note schema (rule 15b)"
+        printf '        gate:   %s\n' "$(printf '%s' "$gate_rows" | tr '\n' ' ')"
+        printf '        schema: %s\n' "$(printf '%s' "$schema_rows" | tr '\n' ' ')"
     fi
 fi
 

@@ -80,6 +80,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
 | 15a | A tag never reaches the remote ahead of a green CI run on its commit | judgment — see the rule for what would make it mechanical |
+| 15b | Every release records its gate, row by row; the gate refuses what it can decide | mechanical — `tests/release_gate.sh`, held to the schema by Check 33 |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical |
 | 17 | Cross-references between agents must resolve | mechanical |
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical |
@@ -449,6 +450,44 @@ a release note records the run it passed: add the run URL and its conclusion for
 the release SHA to the note's schema, and a check can then assert every note at
 the root carries one. That check is not written yet, and this rule is judgment
 until it is.
+
+## 15b. Every release records its gate, row by row, and the gate refuses what it can decide
+
+Ten rows, named in `agents/haruto-nakamura.md`'s note schema and parsed by
+`tests/release_gate.sh`: audit, correctness, conciseness, fixes, docs,
+refactor, tree, ci, publish, rules. No tag is pushed until that script exits 0.
+
+Three of the ten it decides itself — the tree is clean with one worktree, no
+held lock and nothing unpushed; CI is green on the exact SHA; the note version,
+the tag and the remote agree. Those are readable, so they are never taken on
+trust.
+
+The other seven it cannot decide, and does not pretend to. No program judges
+whether an audit was thorough or a refactor left the system leaner. What is
+decidable is whether the pass happened and produced a verdict, so each owes one
+line in the note and a missing or empty line fails the gate. **Quality stays a
+reader's judgement; the absence of the work stops being invisible.** That is
+the whole claim — do not read it as a guarantee that the seven were done well.
+
+The gate is `iris-vermeulen`'s surface (rule 19), not the release engineer's.
+A gate owned by the agent it judges is not a gate, for the same reason rule 20
+has the merge judged by someone other than the author. `haruto-nakamura` runs
+it and reads it; a row he believes is wrong is routed to her, never edited past.
+
+**Rationale**: ten things had accumulated as release duties written only in
+prompt prose, and exactly three of them were checked by anything. A step
+described only in prose is satisfied by an agent believing it did the step,
+and nothing downstream can tell the difference.
+
+**Incident (2026-09-16)**: asked what the release covers, the honest answer was
+six of ten — no conciseness pass, no refactor step outside the autopilot, no
+published GitHub release, and the rule book audited by whoever was cutting the
+release rather than by the agent that owns it. All four had been "in the
+workflow" for releases.
+
+**How to apply**: `bash tests/release_gate.sh <note>` before the tag, every
+time. Check 33 holds the script's row list and the documented schema together,
+so a row cannot be quietly dropped from one side.
 
 ## 16. Agent frontmatter is a contract, not a preamble
 

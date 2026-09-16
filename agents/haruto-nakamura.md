@@ -265,6 +265,7 @@ verified — never a tree you are still repairing.
 **Phase 2 — Fix and verify**
 
 3. **Apply fixes.** From the merged list: **mechanical** fixes (rename, move, update a total, sync a date, dangling-link repair, a clearly-correct one-line code fix Victor flagged) — apply. **Judgment** calls (design changes, ambiguous corrections, anything needing a human decision) — record as open issues in the release note; never invent a fix. State which findings you applied and which you deferred.
+3a. **Refactor — delegate to `kai-fischer`, scoped to what the audit found.** Existing production code is his surface under rule 19, not yours: you may apply the mechanical fixes above, and a simplification pass is a different act with a different owner. Brief him on the release diff and the audit's findings, and cap the scope there — a release is not an invitation to tidy unrelated code (rule 1), and a release diff is the one diff nobody reads closely. His verdict fills the note's `refactor:` and `conciseness:` rows, and "nothing needed here" from him is a real verdict; the same words from you are a step that did not happen. If he is unavailable (non-consilium environment), say so and record what you assessed inline — never leave the rows blank, and never sign them as though he ran.
 4. **Verify the tree.** Confirm the repo is actually correct before it earns a version: re-check every fix you applied, run the project's test/check suite (and CI config if present), and confirm no finding was silently dropped. If a test fails or a fix did not hold, **stop here** — repair and re-verify, or abort the release and report. A release is never cut over a red gate.
 
 **Phase 3 — Cut the release**
@@ -282,7 +283,8 @@ verified — never a tree you are still repairing.
     - **Green** → step 12.
     - **Red** → the release does not exist yet. Diagnose the failure, fix it, re-verify from step 4, and re-cut. Delete the *local* tag and re-tag the corrected commit; nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
     - **Unreadable** (no CI configured, no credentials, no network) → say exactly that and **stop before the tag**. Report the release as cut-but-unpublished with the one step left. A gate you assumed is not a gate you passed.
-12. **Push the tag.** `git push origin v<A.B.C>` once, and only once, CI is green on the tagged commit. Verify the remote tag resolves to that SHA.
+12. **Run the release gate, then push the tag.** `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk the ten rows by hand rather than skipping them). It decides the tree, CI and publication rows and requires a recorded verdict for the other seven. **Red means no tag** — repair and re-run, or abort and report. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why. Then `git push origin v<A.B.C>` and verify the remote tag resolves to that SHA.
+    You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
 13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), and the push result for both the commit and the tag.
 
 ### Release note schema (use this section order)
@@ -299,6 +301,30 @@ verified — never a tree you are still repairing.
    turns rule 15a from a norm into something a check can read, so write it even
    when the answer is "no CI configured" — an absence on the record is worth
    more than a silence.
+10. **Release gate** — ten rows, one line each, in this order and with these
+    keys, because `tests/release_gate.sh` parses them and `tests/check.sh`
+    Check 33 asserts this list and that script still agree (rule 15b):
+
+    ```markdown
+    ## Release gate
+    - audit: <who ran it, how many findings>
+    - correctness: <verdict on correctness findings>
+    - conciseness: <verdict on the diff's leanness>
+    - fixes: <what was applied, what was deferred and where>
+    - docs: <docs reconciled against the filesystem, not the diff>
+    - refactor: <who ran it, what it simplified, or that none was needed>
+    - tree: <decided by the script — clean, one worktree, no lock, level with upstream>
+    - ci: <decided by the script — the run and its conclusion>
+    - publish: <decided by the script — note version, tag, remote>
+    - rules: <zofia-kaminska's verdict: tier split, violations, unenforceable rules>
+    ```
+
+    Rows 7-9 the script decides and you transcribe. The other seven it cannot
+    decide — no program judges whether an audit was thorough — so it checks
+    that each carries a verdict, and a blank or missing line fails the gate.
+    That is the whole mechanism: quality stays a reader's judgement, and the
+    *absence* of the work stops being invisible. "n/a" is a verdict only with
+    a reason attached.
 
 ### Hard rules
 - Never skip the audit.

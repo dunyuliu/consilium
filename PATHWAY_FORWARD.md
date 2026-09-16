@@ -278,9 +278,14 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 32 checks and 32 exist. This row is now
+The header comment documents 33 checks and 33 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
+
+**Re-run 2026-09-16: 32 -> 33.** Check 33 landed (the release gate's rows and
+the documented note schema agree), reddening this row a fourth time in one day.
+Four checks in one session is unusual and the row held every time, which is the
+only claim it makes.
 
 **Re-run 2026-09-16: 31 -> 32.** Check 32 landed (the two questions blocks
 exist and share no question) and reddened this row in its own run, the third
@@ -297,7 +302,7 @@ edit, the same way PF-012 records that a prompt edit is a board edit.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 32
+# → 33
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
