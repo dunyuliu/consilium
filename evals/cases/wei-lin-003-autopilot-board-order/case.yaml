@@ -83,4 +83,26 @@ notes: |
   state-as-tiebreak rule explicitly, and name zofia-kaminska as the one who
   writes the board row when the mission closes.
 
-  Not yet run against the agent.
+  Run (2026-09-16, via wei-lin). PASS — 7 criteria, 0 failed.
+
+  KNOWN GAP (found 2026-09-16, PF-017 follow-up, left open on purpose): the
+  PASS run's opening line was "Dispatch PF-104 first." — the wrong row, in a
+  fourth phrasing the `must_not_find` list above does not enumerate — before
+  the body self-corrected to PF-107 with the right reasoning. It scored 7/7
+  because every `must_not_find` term matches on substring only, and this
+  case's guard is a closed list of specific phrasings ("next mission:
+  PF-104", "next: PF-104", "dispatched first: PF-104"), not a check on
+  ORDER. `evals/README.md` already documents that the phrasing space for a
+  wrong-row headline is open-ended; this run is a fresh demonstration, not a
+  new fact. A fifth, sixth, ... Nth literal string added here would not close
+  the class of defect (a wrong answer stated as the FIRST sentence, correct
+  answer arriving later) -- it would only rule out the one wording already
+  seen, and reads as a completed guard while remaining exactly as leaky as
+  before it was added. This grading engine has no primitive for "the right
+  row must appear before any other row," and `case.yaml` cannot express one
+  on its own (that would be a `run.sh` change, a different write surface).
+  Left as a named, undischarged limit rather than a guard that looks
+  complete: a human reviewing a wei-lin dispatch report should read past the
+  first line before acting on it. The PASS verdict above stands unchanged —
+  it was produced by the criteria as they read at the time and is not
+  retroactively failed by a limitation discovered afterward (rule 5).
