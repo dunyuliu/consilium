@@ -1,0 +1,16 @@
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean
+
+$ git log --oneline -1
+a4f9c21 release: v3.4.0 -- config-loader schema validation
+
+$ git tag --points-at HEAD
+v3.4.0
+
+$ git ls-remote --tags origin | grep v3.4.0
+(no output -- the tag has not been pushed to origin yet)
+
+$ git rev-parse HEAD
+a4f9c21e6b3d0f7c8a91d2e4f5061728394a5b6c
