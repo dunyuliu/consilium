@@ -22,22 +22,22 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 
 | id | area | what is claimed | state | last-checked | interval |
 |---|---|---|---|---|---|
-| PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-08-04 | 30 |
-| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-08-04 | 30 |
-| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-08-22 | 14 |
+| PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 |
+| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 |
+| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-09-16 | 14 |
 | PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
-| PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-08-05 | 30 |
-| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-22 | 14 |
-| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-05 | 30 |
+| PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 |
+| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 |
+| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-09-16 | 30 |
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-09-16 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
-| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-08-05 | 30 |
-| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-08-13 | 30 |
-| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-08-22 | 14 |
-| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-08-22 | 14 |
+| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-16 | 30 |
+| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 |
+| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-09-16 | 14 |
+| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 |
 
 ## Items
 
@@ -53,6 +53,10 @@ Root cause: the *effect* was verified (marker present in `.git/hooks/`, a second
 writer's commit observed being blocked) and the *source being committed* never was.
 Rule 4 was applied to the artifact, not to the claim. Nothing re-checked it for four
 days because nothing existed whose job was to re-check — which is why this file exists.
+
+**Re-run 2026-09-16.** Output unchanged (`10`). The hook source and its version
+marker are still tracked in `install.sh` rather than living only in a local
+`.git/hooks/`, which is the whole of what this row claims.
 
 ```bash
 grep -c 'PRECOMMIT\|HOOK_VERSION' install.sh
@@ -77,6 +81,10 @@ the 21st agent; `lian-001-no-fixture-no-cut` is a directory with no
 **Re-run 2026-08-13.** `marta-silva` landed as the 22nd agent with
 `marta-001-print-scale-audit` in the same change, so the count below moves
 21 -> 22 without reopening a gap.
+
+**Re-run 2026-09-16.** Output unchanged (`22`). No agent landed since, and this
+row is only the count — Check 25 is what asserts per-agent, on the exact
+`agent:` field, every run.
 
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l | tr -d ' '
@@ -113,6 +121,10 @@ Not silently repaired: the recorded output below is what the command as written
 actually prints today, per rule 21a. Fixing the pattern changes what the row
 measures and belongs in its own change, with the new number established by a
 fresh run rather than inherited from this note.
+
+**Re-run 2026-09-16.** The same ten cases, byte-identical, and the row stays
+BROKEN. Closing it needs real dispatches against real prompts, so a date here
+records that the gap was re-measured — never that it narrowed.
 
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
@@ -186,6 +198,12 @@ about the holder's own `git add -A`. Guarding *who may commit* is not guarding *
 be committed*. Not corrected by rewriting the pushed tag — rule 8 forbids destroying
 evidence. This row is the correction.
 
+**Re-run 2026-09-16.** Output unchanged (`6`), and re-derived against real tags
+for once. This session's clone arrived shallow, where the command prints `0`
+because `v1.10.0` does not exist locally — a number that would have read as a
+regression and was an artifact of the checkout. `git fetch --unshallow --tags`
+before closing this row, or do not close it; see PF-015.
+
 ```bash
 git show --stat v1.10.0 --name-only | grep -c anya-001
 # → 6
@@ -222,9 +240,23 @@ it. Note the circularity this row sits in — it cannot honestly record "green" 
 its own overdue entry is one of the things keeping the suite red, so the other three
 were refreshed first and this one last.
 
+**Re-run 2026-09-16: 789 -> 1252.** The same lapse, wider: ten rows were overdue
+by 4 to 13 days, so Check 12 had the suite red on a branch that did not cause it
+— the second occurrence of the failure mode this row already records. The nine
+others were re-run and dated first and this one last, for the circularity
+described above: it cannot record green while its own entry is part of what is
+red.
+
+Two things moved the count besides the dates. Check 31 landed (the root-document
+whitelist), and the clone was unshallowed mid-pass, which brings Checks 27 and 28
+and two Check 17 rows back from their named skips — roughly 20 of the added
+assertions are the shallow exemption ending, not new coverage. A count from a
+shallow clone and a count from a full one are not comparable, which is why the
+README now quotes a floor rather than a figure.
+
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 789 passed, 0 failed
+# → Summary: 1252 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -963,6 +995,11 @@ the anchor; when prose must cite a line, expect it to rot.
 the wei-lin loop-liveness prompt fix (rule 10: the fixture ships with the fix).
 Not a re-audit of the other 29.
 
+**Re-run 2026-09-16.** Output unchanged (`30`). Nothing under
+`evals/cases/*/input/` was touched by this change, so the CLOSED finding stands
+on what it already read; the count is the tripwire for a new input arriving,
+not a re-audit of the thirty that are there.
+
 ```bash
 ls evals/cases | wc -l | tr -d ' '
 # → 30
@@ -1100,6 +1137,11 @@ Caught locally this time. The clone is no longer shallow, so Check 17 ran the
 history-dependent evidence here instead of only in CI. The previous occurrence
 reached CI unseen for exactly the opposite reason, which is why the unshallow note
 above is worth keeping.
+
+**Re-run 2026-09-16.** Output unchanged (`14`), and the row stays OPEN. No agent
+prompt changed in this session's work — the edits were `CLAUDE.md`, rule 1, the
+README, this board and `tests/check.sh` — so nothing went stale that was not
+already. Re-derived on a full clone, for the reason PF-005 now records.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
@@ -1333,6 +1375,9 @@ directly on the exact `agent:` field rather than through this row). Closed by
 adding `marta-001-print-scale-audit` with `agent: marta-silva`; the command
 below is back to `0`.
 
+**Re-run 2026-09-16.** Output unchanged (`0`). No agent landed since, so no
+agent can be missing the fixture its name implies.
+
 ```bash
 for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l | tr -d ' '
 # → 0
@@ -1378,6 +1423,18 @@ last written, and none of them was still true.
 
 **Re-run 2026-08-22.** Output unchanged (`2`). Check 17 is still wired to both
 evidence sections.
+
+**Re-run 2026-09-16, and the exemption has a measured cost now.** Output
+unchanged (`2`), but this session's clone arrived shallow, so Check 17 named and
+skipped PF-005's and PF-012's history-dependent evidence: 2 of 16 rows went
+un-re-executed while this row's claim — "the board's recorded evidence is
+re-executed, not just cited" — still read as satisfied. Both rows re-ran clean
+after `git fetch --unshallow --tags`, and one of them (PF-005) prints a
+plausible-looking `0` while shallow rather than an error. The skip is loud by
+design (rule 2), but loud only reaches a reader who is looking, and Check 12
+will happily let a row be closed on evidence Check 17 declined to run. Unshallow
+first in any fresh session; the sharper fix — Check 12 refusing to treat a
+skipped row as closable — is not in this change.
 
 ```bash
 grep -c 'section=evidence' tests/check.sh
@@ -1456,6 +1513,11 @@ local and its scope stays the input to CI; the result is checked by hand.
 
 **Re-run 2026-08-22.** Output unchanged (`1`). The workflow still asks for full
 history.
+
+**Re-run 2026-09-16.** Output unchanged (`1`). CI still asks for full history,
+which is exactly why the shallow-clone exemption PF-015 now measures bites local
+and sandboxed sessions and never CI — the environment that would notice is the
+one that cannot hit it.
 
 ```bash
 grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
