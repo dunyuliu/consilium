@@ -622,3 +622,104 @@ the prompt file's commit SHA at dispatch time — and compare SHAs rather than
 dates. That is an `evals/run.sh` change plus a run-record convention, so it is
 `iris-vermeulen`'s surface, and the board row is `zofia-kaminska`'s to write.
 Neither is done here.
+
+## Finding 14 — a criterion repair crossed the bar instead of moving it, and the gate caught it
+
+`PF-003`'s never-run list reached **zero** in this session — the first time in
+the board's life. Getting there required repairing `zofia-004`'s criteria,
+which had been shown to reject a correct report (finding 12). The repair was
+returned once before it landed, and the reason is worth more than the fix.
+
+`iris-vermeulen` widened the "leave the existing docs alone" criterion by
+adding two terms:
+
+```
+  - "leave content untouched"
+  - "leave the three sections untouched"
+```
+
+Every other term in that block couples a filename to a verdict —
+`"README.md untouched"`, `"leave CLAUDE.md as is"`. These two name no file, so
+they are satisfied by any sentence anywhere in a report. Demonstrated rather
+than argued, using the case's own wrong-answer sample:
+
+```
+  $ cp samples/fail.md /tmp/hollow.md
+  $ printf '\nI will leave content untouched.\n' >> /tmp/hollow.md
+  $ bash evals/run.sh grade zofia-004-seed-patch-established /tmp/hollow.md
+      PASS  keyword  (matched: leave content untouched)
+      FAIL  must_not_find — report contains: "README.md is rewritten"
+    FAIL — 8 criteria, 6 failed          (was 7 failed)
+```
+
+A report that explicitly states README.md and PROJECT_RULES.md **are
+rewritten** now satisfied the criterion whose entire purpose is that they are
+left alone. The guard did not move to the right place on the bar; it crossed
+it.
+
+`"leave the three sections untouched"` is wrong a second way, independently:
+"three sections" is a detail of the single report that happened to be graded.
+A different correct answer would say two, or four, or not count at all.
+Fitting a criterion to an observed answer makes the case measure that answer
+rather than the behaviour — which is the same error as the original defect,
+pointing the other way.
+
+**The shape of this is the lesson.** Finding 12 was a criterion too narrow to
+accept a correct report. The obvious repair is to add terms. Adding terms is
+exactly how a criterion becomes satisfiable by a wrong one, and the two
+failures look identical from inside the change: both are "the criterion did not
+match what I expected it to match". The only thing that distinguishes them is
+running the WRONG answer against the repaired criterion, which is not a step
+anybody performs unless it is demanded — Check 15 grades `pass.md` and
+`fail.md` as they are, and neither is the adversarial case.
+
+Returned to its owner rather than repaired here, with the reproduction and with
+the alternative named: if substring matching cannot express "these two tokens
+in the same table row" — and it may not be able to — the correct outcome is to
+keep only coupled literals, accept that some correct phrasings will miss, and
+document that limit. A criterion that misses some correct reports is a known
+weakness. One that passes the wrong answer is a broken gate (rule 2).
+
+## My own recurring error — stale SHAs in dispatch briefs, three times
+
+I have now quoted a wrong commit SHA to a subagent three times in this session
+(`2e52cf5`, `3bca18e` where the tip had moved, and `1e0a0f8` when HEAD was
+`8d3c986`). Each time I wrote the SHA from memory of a command run several
+steps earlier, while the branch had advanced under me because I had cherry-
+picked something in between.
+
+No harm resulted, and the reason is worth stating precisely because it is not
+"I got away with it": every brief also names the BRANCH and instructs the agent
+to verify with `git log` and fast-forward before editing. The branch name is
+stable and the SHA is not, so the redundant instruction absorbed the error all
+three times. One agent's worktree did come up on `main` and it caught that
+itself.
+
+The fix is mechanical: read the SHA in the same call that writes the brief, or
+cite only the branch. A SHA is a claim about state, and rule 4 applies to my
+own briefs exactly as it applies to a subagent's report — I was asserting a
+fact I had not re-read. The redundancy that saved it was luck in the sense that
+I did not design it as a safety net; it was there because naming the branch is
+how you tell someone where to work.
+
+**Repair verified, independently.** The two uncoupled terms were replaced with
+eight that keep the filename and the verdict in one literal, e.g.
+`"README.md | present | leave"` and its bold/backtick/colon variants. My own
+re-run of the hollow test:
+
+```
+  fail.md + "I will leave content untouched. Leave the three sections untouched."
+    -> FAIL — 8 criteria, 7 failed      (identical to unmodified fail.md)
+  pass.md (table form)
+    -> PASS — 8 criteria, 0 failed
+```
+
+The added sentence now buys nothing, which is the whole claim. `grep -F` cannot
+express "these two facts in the same table row whatever sits between them", so
+the residual limit is named in the case notes rather than papered over: a
+two-column table, or a status word other than "present", will still miss. A
+criterion that misses some correct reports is a known weakness; one that passes
+the wrong answer is a broken gate.
+
+`zofia-004` remains SUPERSEDED and has been re-dispatched against the corrected
+criteria. A verdict produced by criteria that no longer exist is not a verdict.
