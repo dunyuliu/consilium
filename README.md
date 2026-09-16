@@ -151,30 +151,14 @@ call. An agent proposes a change to them; it does not make one.
 
 ### The standing set
 
-Every agent, rule and check in this repo exists to force one of these
-questions at the moment it is still cheap to answer. They are the
-questions a project has to keep re-asking, not a checklist that
-completes. Each one is here because a project paid for not asking it.
+Under each question above, *Enforced* already names what holds it.
+Two more the project keeps asking, and what asks them for you:
 
-| Question | What asks it for you |
-|---|---|
-| Is this number from a run, or from a memory? | rule 4; the board's requirement that every claim cite the command whose output was read |
-| Which check catches this if I am wrong? | Zofia's tier split — a rule no check enforces is reported as a finding about the rule, every time |
-| Who owns this file? | rule 19, mechanically, via Check 10 |
-| What did this change make stale? | rule 11; `bash evals/run.sh list` for the fixtures a prompt edit just aged |
-| Is the gate green where it matters, or only here? | rule 15a — the local hook proves one machine, CI proves the rest, and a tag waits for the second |
-| Can a stranger follow this release? | the autopilot's last gate: clone the pushed commit, follow the README, run what it documents |
-| What is the smallest version of this change? | rule 1, including the root whitelist Check 31 enforces |
-| What would this tool find if aimed at us? | rule 0, which is why the other rules get checked at all |
-
-The working form of these — what an agent must answer at each stage of
-a change to this repo, with the rule that decides each — is in
-`CLAUDE.md`. The two lists are deliberately disjoint, and Check 32
-keeps them that way: a question answered in two places gets answered
-differently in each.
-
-Refining this list is a deliberate act, and the human's. An agent adds
-a question when a session pays for one, and says what it cost.
+- Is this number from a run, or from a memory? — rule 4, and the
+  board's requirement that a claim cite the command whose output was
+  read.
+- What would this tool find if aimed at us? — rule 0, which is why the
+  rest get checked at all.
 
 ---
 

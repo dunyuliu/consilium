@@ -131,11 +131,9 @@ question answered in two documents gets answered differently in each.
 - If I am wrong about this, which check fails? If none does, the check may be
   the change.
 
-**Before you commit**
+**Before you commit** — the mechanics are steps 4-6 above; these are the two
+they cannot tell you.
 
-- What did this just make stale — a count, a doc line, a board row, a fixture
-  verdict? (rule 11; `bash evals/run.sh list` for the last of those.)
-- Did I re-run the board row's command, or only its date? (rule 21a)
 - Would this be green on a full clone and in CI, not only in this checkout?
 - Does each root document still do only its own job? (rule 1's table)
 

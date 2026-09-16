@@ -423,33 +423,25 @@ once it is green. A red CI at that point means the release does not exist yet:
 fix, re-verify, re-cut. Nothing to unpublish, because the tag never left.
 
 "Flake" is not a conclusion. Re-run a CI job only for a named infrastructure
-cause — checkout, install, runner loss, a job that died before a test body ran
-— at most once, and treat the second failure as real. Never delete or force a
-tag to make this work out (rule 8, and `haruto-nakamura`'s hard rules).
+cause, at most once, and treat the second failure as real. If CI's status
+cannot be read at all, say so and stop before the tag: a release that assumes
+a gate it could not see is rule 2's silent fallback wearing a version number.
 
-If CI's status cannot be read at all — no remote CI, no credentials, no
-network — say so and stop before the tag. A release that assumes a gate it
-could not see is rule 2's silent fallback wearing a version number.
+**Rationale**: rule 15's sequence is *commit, tag, run the suite, push* — the
+2026-08-05 ordering caveat in `agents/haruto-nakamura.md`, which escapes a real
+deadlock. It enforces green-before-push via the pre-push hook, and the hook is
+not CI: the other platform, the clean-clone install, and the full-history
+checks a shallow clone skips are all first seen after the push that already
+carries the tag.
 
-**Rationale**: rule 15's sequence is *commit, tag, run the suite, push*, which
-the 2026-08-05 ordering caveat in `agents/haruto-nakamura.md` adopted to escape
-a real deadlock — the suite cannot be green about a tag that does not exist
-yet. That sequence enforces green-before-push via the pre-push hook, and CI is
-not the pre-push hook. Everything the hook cannot see — the other platform, the
-clean-clone install, the full-history checks that a shallow local clone skips —
-is seen for the first time after the push that already carries the tag.
+**Incident (2026-09-16)**: this repo's gate runs 29 of its 31 checks in a
+shallow clone, and two board rows' evidence went un-re-executed for that
+reason. The local run was green and incomplete at once — the shape of the gap
+this rule closes.
 
-**Incident (2026-09-16)**: this repo's own gate can only run 29 of its 31
-checks in a shallow clone, and two board rows' evidence silently went
-un-re-executed for exactly that reason. The local run was green and incomplete
-at the same time, which is the precise shape of the gap this rule closes.
-
-**How to apply**: `tests/check.sh` cannot check this — the conclusion lives on
-a network CI does not lend to an offline gate. It becomes mechanical the moment
-a release note records the run it passed: add the run URL and its conclusion for
-the release SHA to the note's schema, and a check can then assert every note at
-the root carries one. That check is not written yet, and this rule is judgment
-until it is.
+**How to apply**: no offline check can read a network conclusion, so the note
+records the run instead (schema item 9). This is judgment until a check asserts
+that field on every root note.
 
 ## 15b. Every release records its gate, row by row, and the gate refuses what it can decide
 
@@ -457,27 +449,22 @@ Ten rows, named in `agents/haruto-nakamura.md`'s note schema and parsed by
 `tests/release_gate.sh`: audit, correctness, conciseness, fixes, docs,
 refactor, tree, ci, publish, rules. No tag is pushed until that script exits 0.
 
-Three of the ten it decides itself — the tree is clean with one worktree, no
-held lock and nothing unpushed; CI is green on the exact SHA; the note version,
-the tag and the remote agree. Those are readable, so they are never taken on
-trust.
+Three it decides itself (tree, ci, publish) because they are readable. The
+other seven it cannot: no program judges whether an audit was thorough or a
+refactor left the system leaner. What is decidable is whether the pass happened
+and produced a verdict, so each owes one line in the note and a blank line
+fails the gate. **Quality stays a reader's judgement; the absence of the work
+stops being invisible** — do not read it as a guarantee the seven were done
+well. The script's header carries the mechanism; this rule carries the
+obligation.
 
-The other seven it cannot decide, and does not pretend to. No program judges
-whether an audit was thorough or a refactor left the system leaner. What is
-decidable is whether the pass happened and produced a verdict, so each owes one
-line in the note and a missing or empty line fails the gate. **Quality stays a
-reader's judgement; the absence of the work stops being invisible.** That is
-the whole claim — do not read it as a guarantee that the seven were done well.
+The gate is `iris-vermeulen`'s surface (rule 19), not the release engineer's:
+a gate owned by the agent it judges is not a gate, for the same reason rule 20
+has the merge judged by someone other than the author.
 
-The gate is `iris-vermeulen`'s surface (rule 19), not the release engineer's.
-A gate owned by the agent it judges is not a gate, for the same reason rule 20
-has the merge judged by someone other than the author. `haruto-nakamura` runs
-it and reads it; a row he believes is wrong is routed to her, never edited past.
-
-**Rationale**: ten things had accumulated as release duties written only in
-prompt prose, and exactly three of them were checked by anything. A step
-described only in prose is satisfied by an agent believing it did the step,
-and nothing downstream can tell the difference.
+**Rationale**: ten release duties had accumulated in prompt prose and three
+were checked by anything. A step described only in prose is satisfied by an
+agent believing it did the step, and nothing downstream can tell.
 
 **Incident (2026-09-16)**: asked what the release covers, the honest answer was
 six of ten — no conciseness pass, no refactor step outside the autopilot, no
