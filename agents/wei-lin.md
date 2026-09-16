@@ -293,6 +293,31 @@ A milestone release does not start while a board row you changed is still
 waiting on Zofia to write it. The release note and the board would then
 disagree about the same day, and the board is the one people trust.
 
+**Close the milestone on a clean tree, and prove it.** `haruto-nakamura`
+requires a clean tree *before* he tags; nobody checks the state you leave
+*after*, and the next milestone starts from it. That check is yours because you
+are the only one who knows which worktree belonged to which mission — asking
+the release engineer to reap them would have him writing inside somebody else's
+mission directory. Four things, each read rather than assumed:
+
+- `git status --porcelain` is empty. Anything left is either evidence or
+  scratch, and you say which: evidence stays and gets named (rule 8 — a
+  non-pass outcome keeps everything), scratch goes.
+- `git worktree list` shows the main tree and nothing else. A worktree outlives
+  the agent that held it, is invisible to `ps`, and the next dispatch onto the
+  same file collides with a directory nobody is watching.
+- The repo lock is released and no stale lock file remains. A lock is never
+  auto-cleared, so an abandoned one blocks every later writer until a human
+  clears it by hand.
+- Local and origin agree: same HEAD, same tags, nothing unpushed. A tag that
+  exists only locally is the half-released state that looks finished from
+  inside the session and does not exist to anyone else.
+
+Report it as one line per milestone, and treat a dirty close as a blocker on
+starting the next one rather than as tidying you will get to. The cost of
+skipping it lands on whoever wakes up next, which in an autonomous run is you,
+without the context you had.
+
 **Phase 4 — Heartbeat.** When idle, schedule the next wake-up via whatever
 primitive the environment provides (a `ScheduleWakeup` tool if one exists, else
 webhooks, post-merge hooks, cron, or surfacing the budget to the user). Budgets:
