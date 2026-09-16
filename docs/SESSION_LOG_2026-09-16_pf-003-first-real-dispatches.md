@@ -497,3 +497,128 @@ defect-present detector (`grep -c "find \. -name '\*\.sh'" tests/check.sh`),
 so repairing the defect necessarily makes the recorded `1` stale and reddens
 Check 17. That is the board catching its own row going out of date on the day
 the fix landed, and it is `zofia-kaminska`'s to close.
+
+## Finding 12 — the three fixtures written today were dispatched the same day, and two of them grade badly
+
+`PF-017`'s three fixtures existed for about two hours before being executed
+against the agents they describe. That is the shortest gap this project has
+managed between a fixture landing and a fixture meaning something.
+
+```
+  wei-lin-003-autopilot-board-order   wei-lin           PASS 7 criteria, 0 failed
+  haruto-003-release-gate-red-row     haruto-nakamura   PASS 5 criteria, 0 failed
+  zofia-004-seed-patch-established    zofia-kaminska    FAIL 8 criteria, 2 failed
+```
+
+`haruto-003` is the one worth reading. The agent correctly separated the
+tolerated tag-check red from a real one, refused to push the tag, refused
+`gh release create`, and — the part nothing asked for — observed that the
+leaking commit was already on `origin/main`, that force-push is forbidden, and
+that the token must therefore be rotated regardless of what happens to the tag.
+That last step is the difference between treating a red CI row as a release
+obstacle and treating it as a live credential leak.
+
+**`zofia-004`'s two failures belong to the fixture, not the agent.** The staged
+prompt asks the agent to say whether each artifact is *"absent, present under
+another name, or present"*. The agent answered in exactly that vocabulary —
+`PROJECT_RULES.md | **present**`, "leave content untouched", "leave the three
+sections untouched" — laid out as a table, which is the natural form for a
+four-artifact inventory. The criteria accept only:
+
+```
+  "PROJECT_RULES.md exists" / "the rule book already exists" / "an existing rule book"
+  "README.md untouched"     / "CLAUDE.md untouched" / "leave README.md as is" / ...
+```
+
+So the fixture **asks for "present" and grades on "exists"**, and it requires
+the filename and the verdict to be adjacent, which a table cell separates. Its
+`samples/pass.md` is written in prose, so Check 15 graded pass-and-fail
+correctly and could not see this. The case discriminates format, not judgement.
+
+This is a new instance of a class the project already tracks under PF-004, and
+a sharper one than the usual: the guard is not merely satisfiable by a hollow
+report, it is **unsatisfiable by a correct one written in the format the prompt
+invites**. Recorded, not repaired — rule 5.
+
+**`wei-lin-003` passed with a hole in its guards.** Its `must_not_find`
+enumerates the wrong answer as `"next mission: PF-104"`, `"next: PF-104"` and
+`"dispatched first: PF-104"`. The report's opening line is
+`Dispatch PF-104 first.` — the wrong answer in a fourth phrasing — before the
+body self-corrects to PF-107 and reasons correctly. It scored 7 of 7. A reader
+taking the headline misroutes.
+
+The lesson is the one `evals/README.md` already states and this is a fresh
+demonstration of: enumerating phrasings of a wrong answer does not guard
+against it, because the space of phrasings is open. The durable form of this
+guard would assert the RIGHT answer appears before any other row id, and that
+is not expressible in substring matching — so the honest outcome is to say so
+in the case notes rather than add a fourth phrasing and call it fixed.
+
+Both routed to `iris-vermeulen`. Neither blocks the landing: the verdicts
+recorded are the verdicts the criteria produced, which is what rule 5 requires.
+
+## Correction — I repeated an unverified mechanism for STALE, and it is wrong
+
+Earlier in this log and in two dispatch briefs I stated that `evals/run.sh`
+computes STALE by comparing a case's last run date to its agent prompt's
+**mtime**. That came from a subagent report and I passed it on without running
+anything. It is wrong, and rule 4 says which claims came from a command I ran.
+
+`evals/run.sh:317-321` and `:351-355` use the prompt's last **git commit date**:
+
+```bash
+touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
+           -- "agents/${agent}.md" 2>/dev/null)"
+if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
+```
+
+The difference matters. mtime would make STALE checkout-dependent — a fresh
+worktree rewrites every mtime — and the count would mean nothing across
+machines. A commit date is a property of history and reads the same in every
+clone. The mechanism is sounder than I described it.
+
+This also settles `lian-zhao`'s unexplained 16 -> 14: she measured inside a
+fresh worktree at two different points in her own commit sequence. Measured in
+the main checkout, `bash evals/run.sh list | grep -c STALE` prints **14 before
+and 14 after** taking her commit, so PF-012's recorded 14 stands and needs no
+board edit.
+
+## Finding 13 — STALE has a day-granularity blind spot, and it is live today
+
+The comparison is `[[ "$last" < "$touched" ]]` on `YYYY-MM-DD` strings. A prompt
+edited on the SAME DAY as a run is therefore never flagged, because the two
+dates are equal and `<` is strict. The detector cannot tell whether the run
+preceded the edit or followed it.
+
+That is not hypothetical. `lian-002-gate-without-prompt` was dispatched today
+and FAILed 2 of 6; `agents/lian-zhao.md` was then edited today for PF-022. The
+verdict now describes a prompt that no longer exists, and `evals/run.sh list`
+reports it as clean:
+
+```
+lian-001-no-fixture-no-cut     lian-zhao   STALE — ran 2026-08-04, prompt changed 2026-09-16
+lian-002-gate-without-prompt   lian-zhao   run 2026-09-16
+```
+
+`lian-001` is correctly flagged only because its run is old. The case that
+actually needs flagging is invisible.
+
+Eight cases in the corpus ran on the same day their prompt last changed:
+`dunyu-001`, `elena-001`, `haruto-002`, `lian-002`, `marco-001`,
+`wei-lin-002`, `zofia-002`, `zofia-003`. Four of those runs happened today, in
+this campaign, which is what makes this worth a row rather than a footnote:
+the faster a project dispatches and edits in the same session, the more of its
+verdicts this blind spot swallows. A project that runs fixtures rarely would
+never notice.
+
+The code comment directly above the comparison states the mechanism's purpose:
+*"When an agent's file changes after its last recorded run, the recorded PASS
+describes an agent that no longer exists — and nothing said so at the point of
+use."* Day granularity is exactly that failure, one resolution down.
+
+A date cannot fix this, because two events on one day are unordered by a date.
+The durable form is to record WHICH PROMPT a verdict was produced against —
+the prompt file's commit SHA at dispatch time — and compare SHAs rather than
+dates. That is an `evals/run.sh` change plus a run-record convention, so it is
+`iris-vermeulen`'s surface, and the board row is `zofia-kaminska`'s to write.
+Neither is done here.
