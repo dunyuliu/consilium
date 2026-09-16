@@ -62,7 +62,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | # | Rule | Tier |
 |---|---|---|
 | 0 | **Always eat what you cook** — apply every discipline here first | judgment |
-| 1 | Minimal changes; no new files until necessary | judgment |
+| 1 | Minimal changes; no new files; the root is a whitelist | judgment; root table mechanical — Check 31 |
 | 2 | No silent fallbacks or swallowed errors | judgment |
 | 3 | `bash tests/check.sh` is the gate; green before merge | mechanical |
 | 4 | Only fresh runs are evidence | judgment |
@@ -103,12 +103,43 @@ Read this list first; jump to a rule only when it is load-bearing.
 
 Prefer the smallest edit that solves the problem. Fold new content into the
 file it belongs to — a new top-level file needs an explicit ask. Never
-refactor unrelated agents in the same change. The repo root stays curated:
-`README.md`, `LICENSE`, `install.sh`, `PROJECT_RULES.md`, and exactly one
-`release_notes_v*.md`, and `PATHWAY_FORWARD.md`. Nothing else.
+refactor unrelated agents in the same change.
+
+**The root is a whitelist, not a preference.** These names, no others.
+`tests/check.sh` Check 31 parses this table, so it is the machine-readable
+source of truth, not documentation of one.
+
+| file | audience | job |
+|---|---|---|
+| `README.md` | users, human | what consilium is, who is on the team, how to install and invoke it. Concise and followable start to finish; not a design doc. |
+| `CLAUDE.md` | Claude and the user | the working doc for *editing* this repo: the order a change goes in, what the gate does and does not cover, the traps. |
+| `PATHWAY_FORWARD.md` | Claude and the user | the present tense — every surface, its state, the command that demonstrates it, the date it was last audited. |
+| `PROJECT_RULES.md` | Claude and the user | this rule book. |
+| `install.sh` | users | the one installer (rule 14) — the delivery mechanism, not a document. |
+| `LICENSE` | — | — |
+| `release_notes_v*.md` | — | the current release only; older ones archive to `docs/` (rule 8). |
+
+Directories: `agents/` and `commands/` (the product), `tests/` (the gate),
+`evals/` (fixtures), `docs/` (archive). Nothing else at root.
+
+**One audience, one job, one home.** These four documents drift into each
+other the moment a fact lives in two of them. Usage belongs in `README.md`
+and is cited elsewhere, never copied; a convention for working on this repo
+belongs in `CLAUDE.md`; a dated open issue belongs in `PATHWAY_FORWARD.md`
+and nowhere else. A fact in two files is a fact that will be wrong in one of
+them, and you will not find out which.
 
 **Rationale**: this repo's product is prose. Prose sprawls silently — a
 second file that half-covers the same ground is not caught by any compiler.
+
+**Incident (2026-09-16)**: `CLAUDE.md` is on the root whitelist
+`zofia-kaminska` hands every project she seeds — `agents/zofia-kaminska.md`
+invariant 1, "day one owes `README.md`, `CLAUDE.md`, `PATHWAY_FORWARD.md` and
+this rule book" — and had never existed here, on any branch. Nothing could
+have caught it: her audit mode deliberately checks only the layout a
+project's own book states, this book stated a different one, and no check
+read the root at all. Rule 0, found by asking what her own rule would say
+about this repo.
 
 **How to apply**: before creating a file at the root, name the existing file
 it should have gone into and say why it could not.

@@ -16,7 +16,7 @@
 #   6. The README model table lists every agent exactly once, under the
 #      model its own frontmatter declares, with no stale rows.
 #   7. Every agent has a README roster-table row and a Layout-tree line.
-#   8. Agent references inside agents/*.md and commands/*.md bodies resolve.
+#   8. Agent references inside agents/*.md, commands/*.md and CLAUDE.md resolve.
 #   9. Every eval fixture's line_range still brackets its declared anchor.
 #  10. The rule-19 write-surface ownership table is complete and exclusive.
 #  11. Every write-surface owner declares isolation as its first section.
@@ -40,6 +40,7 @@
 #  28. No release note that once existed has vanished (rule 8).
 #  29. Only install.sh writes the Claude symlink directories (rule 14).
 #  30. No expected keyword appears in ordinary finding-free review prose.
+#  31. The repo root holds exactly the documents rule 1 whitelists.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -295,8 +296,15 @@ done
 # backticked hyphen-tokens across all prompt bodies, exactly one was neither
 # an agent nor a command, so the naive scan is accurate enough to be a gate
 # without a large allowlist.
-echo "Check 8: agent references inside agents/ and commands/ bodies resolve"
-for f in agents/*.md commands/*.md; do
+#
+# CLAUDE.md joined the list when it landed (2026-09-16). A root document that
+# names agents — who owns which surface, who to route a finding to — is the
+# same hole as a prompt that does, and Check 5 reads README.md only. Its
+# absence is Check 31's finding, not this one's, so it is skipped rather than
+# erroring here.
+echo "Check 8: agent references inside agents/, commands/ and CLAUDE.md resolve"
+for f in agents/*.md commands/*.md CLAUDE.md; do
+    [ -e "$f" ] || continue
     mapfile -t body_refs < <(grep -oE '`[a-z]+-[a-z]+`' "$f" \
         | sed 's/^`//; s/`$//' \
         | sort -u)
@@ -1132,6 +1140,80 @@ for case_file in evals/cases/*/case.yaml; do
     done <<< "$terms"
 done
 rm -f "$hollow_corpus"
+
+echo
+echo "Check 31: the repo root holds exactly the documents rule 1 whitelists"
+# PROJECT_RULES.md rule 1. The root list was prose for twenty releases and no
+# check ever read the root, so the one thing it existed to catch went unnoticed
+# for the life of the project: CLAUDE.md sat on the root whitelist
+# `zofia-kaminska` hands every project she seeds and had never existed here.
+# Her audit mode could not find it either — it checks the layout a project's
+# own book states, and this book stated a different one (2026-09-16, rule 0).
+#
+# Parses the rule-1 table — first column, backticked — and compares it against
+# the TRACKED files at the root. Three failure modes, all mechanical:
+#   a. a tracked root file that is on no whitelist entry (sprawl)
+#   b. a whitelisted document that does not exist (a rule about a file nobody
+#      created is unenforceable, which is how this check came to be written)
+#   c. anything other than exactly one release note at the root (rule 8
+#      archives the older ones to docs/, it does not leave them here)
+#
+# Tracked, not present on disk: an untracked scratch file at the root is a
+# developer's business, and failing the gate on one would teach people to
+# ignore this check. Dotfiles are excluded because .gitignore and .github/ are
+# tool configuration, not documents, and rule 1 governs documents half-covering
+# each other's ground. Directories are excluded for the same reason the rule
+# lists them in prose rather than in the table.
+mapfile -t ROOT_WHITELIST < <(sed -n '/^## 1\. /,/^## 2\. /p' PROJECT_RULES.md \
+    | grep -E '^\| `[^`]+` *\|' \
+    | awk -F'|' '{print $2}' \
+    | tr -d ' `')
+
+if [ "${#ROOT_WHITELIST[@]}" -eq 0 ]; then
+    fail "rule 1's root whitelist table is missing or unparseable in PROJECT_RULES.md — the check cannot be run, which is a finding, not a pass"
+elif ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "  not a git checkout — the tracked root file list is unavailable here"
+    ok
+else
+    mapfile -t ROOT_FILES < <(git ls-files | grep -v '/' | grep -v '^\.' | sort)
+
+    for f in "${ROOT_FILES[@]:-}"; do
+        [ -z "$f" ] && continue
+        matched=0
+        for entry in "${ROOT_WHITELIST[@]}"; do
+            # $entry is deliberately unquoted: the release-note row is a glob.
+            case "$f" in $entry) matched=1; break ;; esac
+        done
+        if [ "$matched" -eq 1 ]; then
+            ok
+        else
+            fail "$f is tracked at the repo root and matches no entry in rule 1's whitelist — a new root file needs an explicit ask (rule 1)"
+        fi
+    done
+
+    for entry in "${ROOT_WHITELIST[@]}"; do
+        case "$entry" in
+            *'*'*)
+                count=0
+                for f in "${ROOT_FILES[@]:-}"; do
+                    case "$f" in $entry) count=$((count + 1)) ;; esac
+                done
+                if [ "$count" -eq 1 ]; then
+                    ok
+                else
+                    fail "rule 1 allows exactly one '$entry' at the root and $count are tracked there (rule 8 archives the rest to docs/)"
+                fi
+                ;;
+            *)
+                if [ -f "$entry" ]; then
+                    ok
+                else
+                    fail "rule 1's whitelist names '$entry' at the root and it does not exist — a rule about a file nobody created is unenforceable (rule 1)"
+                fi
+                ;;
+        esac
+    done
+fi
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

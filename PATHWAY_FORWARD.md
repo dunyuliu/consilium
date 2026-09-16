@@ -30,7 +30,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-08-22 | 14 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-08-05 | 30 |
 | PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 |
-| PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-08-04 | 30 |
+| PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-09-16 | 30 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
 | PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
@@ -229,9 +229,13 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 30 checks and 30 exist. This row is now
+The header comment documents 31 checks and 31 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
+
+**Re-run 2026-09-16: 30 -> 31.** Check 31 landed (the repo root holds exactly
+the documents rule 1 whitelists) and this row went red in the same run that
+added it, for the second time — the row working, twice.
 
 **Re-run 2026-08-22: 29 -> 30.** Check 30 landed (no expected keyword may
 appear in ordinary finding-free review prose) and this row went red in the
@@ -240,7 +244,7 @@ edit, the same way PF-012 records that a prompt edit is a board edit.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 30
+# → 31
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED

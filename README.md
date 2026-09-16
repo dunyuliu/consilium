@@ -2,8 +2,8 @@
 
 > An AI specialist team to accelerate scientific innovation — and the
 > test suite that keeps it honest. Twenty-one agents that build, port,
-> audit, review and ship scientific software; twenty-seven regression
-> fixtures and twenty-nine structural checks that measure whether they
+> audit, review and ship scientific software; thirty regression
+> fixtures and thirty-one structural checks that measure whether they
 > actually did. Most collections of prompts are a wish. This one carries
 > the evidence.
 
@@ -20,12 +20,12 @@ repo:
   2026-08-05 four of those 27 were mechanical in name only, with nothing
   enforcing them; that was found by reading the tier column against the checks
   that exist, and closed.
-- **`tests/check.sh`** — 29 checks producing 764 assertions, every check
-  negative-tested by breaking the thing it guards and confirming the intended
-  message. A check that has never failed is not known to be a gate. Checks 1–5
+- **`tests/check.sh`** — 31 checks producing upwards of 1,200 assertions, every
+  check negative-tested by breaking the thing it guards and confirming the
+  intended message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several
   releases and were negative-tested retroactively, six mutations on 2026-08-04.
-- **`evals/cases/`** — 27 regression fixtures covering all 21 agents. Prompt
+- **`evals/cases/`** — 30 regression fixtures covering all 21 agents. Prompt
   edits are measurable instead of vibe-checked — but see the coverage figures
   below: most verdicts are older than the prompt they graded.
 - **`PATHWAY_FORWARD.md`** — the inspection log: what is true *now*, by
@@ -513,6 +513,8 @@ consilium/
 │   └── lock.sh             # one-writer-per-repo lock (rule 18)
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
+├── CLAUDE.md          # working doc for editing this repo — order of operations,
+│                      #   what the gate misses, the traps
 ├── PATHWAY_FORWARD.md # inspection log — what is audited, when, with what evidence
 ├── install.sh         # the canonical installer — symlinks into ~/.claude
 │                      #   and wires the post-merge hook
@@ -589,12 +591,12 @@ they disagree, the fixture is the more likely defendant.
 
 ## Tests
 
-Sixteen structural invariants of consilium itself — agent frontmatter,
+Thirty-one structural invariants of consilium itself — agent frontmatter,
 command-to-agent references, README/filesystem sync, stale-reference
 detection, README completeness per agent, write-surface ownership,
 isolation-first prompts, tool-economy and communication declarations, the
-inspection log's currency, and the eval suite's own criteria (executable,
-non-contradictory, token-anchored) — are checked by:
+inspection log's currency, the root-document whitelist, and the eval suite's
+own criteria (executable, non-contradictory, token-anchored) — are checked by:
 
 ```bash
 bash tests/check.sh
