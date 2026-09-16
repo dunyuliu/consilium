@@ -1095,8 +1095,8 @@ echo "Check 29: only install.sh writes the Claude symlink directories (rule 14)"
 # checkout is not competing for the same links, or that a user has not wired
 # something by hand. Those are judgment, and the rule now says so rather than
 # carrying a label it cannot support.
-for script in $(find . -name '*.sh' -not -path './.git/*' | sort); do
-    case "$script" in ./install.sh) continue ;; esac
+for script in $(git ls-files '*.sh' | sort); do
+    case "$script" in install.sh) continue ;; esac
     # Built from pieces so the literal never appears in this file — see above.
     _cd='claude/'
     if grep -q "${_cd}agents\|${_cd}commands" "$script" 2>/dev/null; then
