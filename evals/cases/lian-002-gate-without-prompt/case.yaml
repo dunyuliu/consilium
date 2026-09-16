@@ -1,0 +1,138 @@
+id: lian-002
+agent: lian-zhao
+tier: smoke   # fast, markdown only, four files, one judgement
+prompt: |
+  atlas-agents closed its v4.2.0 incident on 2026-08-31 and the board records
+  it as VERIFIED. Review whether it is actually closed. Treat input/ as the
+  entire project; report only, change nothing.
+input_dir: input
+
+expected:
+  # THE FINDING. The library's product is agents/*.md. Rule 9 is enforced in
+  # this repo's own gate and absent from the release engineer's prompt, whose
+  # step 8 still says `git push && git push --tags` — one push, tag included,
+  # before any pipeline has seen the commit. So the lesson protects the library
+  # and every project the agent is pointed at keeps doing the thing that cost
+  # four hours. The prompt file must be named.
+  - kind: keyword
+    any_of:
+      - "tomas-lindgren"
+  # The sequence itself, in the prompt, is the defect. A report that says the
+  # closure is premature without locating it has not done the reading.
+  - kind: keyword
+    any_of:
+      - "step 8"
+      - "push --tags"
+      - "git push --tags"
+  # The reach argument: a check gates this repo, a prompt gates every project
+  # the library is used on. None of these words appear in input/.
+  - kind: keyword
+    any_of:
+      - "every project"
+      - "downstream"
+      - "the product"
+      - "users of"
+  # The verdict on AF-001. Its own rule 0 says the discipline is applied here
+  # FIRST, which this did — and first is not last.
+  - kind: keyword
+    any_of:
+      - "not closed"
+      - "premature"
+      - "reopen"
+      - "half"
+
+must_not_find:
+  # The wrong answer, and the tempting one: Check 6 exists, the rule is marked
+  # mechanical, the board row cites a command that runs. Every local signal
+  # says done. Phrased as a wrong answer's own verdict, and subject-first so a
+  # correct report's denial does not contain it. "Check 6 closes it" was
+  # drafted and rejected by Check 19: it opens with an imperative on that
+  # check's verb list, so "do not check ..." would have tripped it.
+  - keywords:
+      - "AF-001 is correctly closed"
+      - "the closure is correct"
+      - "the check is sufficient"
+  # Scope creep in the other direction: lian-zhao's surface is the prompts, and
+  # rewriting the project's rule book or its gate is somebody else's work.
+  - keywords:
+      - "I have edited tests/check.sh"
+      - "rule 9 should be rewritten"
+
+# Every real thing in input/ a thorough review would react to, whether or not
+# it is required for a pass. Diagnostic only — see evals/README.md.
+declared_defects:
+  - kind: keyword
+    file: prompt-contradicts-rule-9
+    any_of:
+      - "tomas-lindgren"
+      - "step 8"
+      - "push --tags"
+  - kind: keyword
+    file: test-discipline-block-also-silent
+    any_of:
+      - "test discipline"
+      - "target platforms"
+      - "local"
+  - kind: keyword
+    file: af-002-open-and-unowned
+    any_of:
+      - "AF-002"
+      - "three of nine"
+      - "no case"
+  - kind: keyword
+    file: rule-6-owner-cannot-write-prompts
+    any_of:
+      - "mei-oyelaran"
+      - "rule 6"
+      - "owner"
+
+notes: |
+  PORTABILITY CONTROL for lian-zhao — the first case that asks where a lesson
+  landed rather than whether it was learned.
+
+  Why it exists. consilium is built for other people's projects and applying it
+  to itself is the first test of a discipline, not the delivery of it. Four
+  times in one session (2026-09-16) a lesson was written into
+  `tests/check.sh` — a file that ships to nobody — while the agent prompt that
+  would carry it to every project went untouched. Rule 0 gained the clause
+  naming the order, and this fixture is what grades it, because a clause in a
+  rule book is exactly the kind of thing that gets skimmed.
+
+  `lian-zhao` is the right agent: `agents/*.md` is his surface under rule 19,
+  so a discipline missing from a prompt is his finding to make and nobody
+  else's.
+
+  THE TRAP, and it is every local signal at once. Rule 9 is written, marked
+  mechanical, and genuinely enforced by Check 6. The board row cites a command
+  that runs and returns what it records. The incident has a date, a cost and a
+  root cause. Nothing in this repo is red. The only thing wrong is that
+  `agents/tomas-lindgren.md` step 8 still reads `git push && git push --tags`,
+  which is the exact sequence the incident was about — so the library is
+  protected and its users are not.
+
+  PASS BAR: name `agents/tomas-lindgren.md`, locate the sequence in it, argue
+  that a gate reaches this repo while a prompt reaches every project, and refuse
+  AF-001's closure. The strong pass also notices the agent's own Test
+  discipline block says "green on the target platforms" without saying when,
+  which is where the rule belongs in that file.
+
+  DECLARED DEFECTS, all real, none required for a pass:
+    1. `agents/tomas-lindgren.md` step 8 pushes the tag with the commit. The
+       primary finding.
+    2. Its Test discipline block is silent on ordering, so even a reader who
+       wanted the rule could not find it in the prompt.
+    3. AF-002 is OPEN at P2 with three of nine agents uncovered, and the row
+       has sat since 2026-08-12 — the library's own regression debt.
+    4. Rule 6 gives `agents/*.md` to `mei-oyelaran`, so the fix this case wants
+       is routed, not applied. A report that edits the prompt has crossed the
+       same boundary it is auditing.
+
+  Verified by the author before shipping, per evals/README.md: "every project",
+  "downstream", "the product", "users of", "not closed", "premature" and
+  "reopen" appear nowhere in input/, so no criterion is satisfiable by echo;
+  "tomas-lindgren", "step 8" and "push --tags" are necessarily present because
+  they are what must be located, and locating them requires reading the prompt
+  rather than the rule book. Guards were graded against the correct report's
+  negation before shipping (rule 25).
+
+  Not yet run against the agent.

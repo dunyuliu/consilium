@@ -43,6 +43,7 @@
 #  31. The repo root holds exactly the documents rule 1 whitelists.
 #  32. The README and CLAUDE questions blocks exist and share no question.
 #  33. The release gate's rows and the documented note schema agree.
+#  34. Exactly one board carries the project forward (rule 21).
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -1312,6 +1313,53 @@ else
         printf '        gate:   %s\n' "$(printf '%s' "$gate_rows" | tr '\n' ' ')"
         printf '        schema: %s\n' "$(printf '%s' "$schema_rows" | tr '\n' ' ')"
     fi
+fi
+
+echo
+echo "Check 34: exactly one board carries the project forward"
+# PROJECT_RULES.md rule 21. Check 31 keeps the ROOT clean, so a TODO.md beside
+# the board already fails — and a docs/STATUS.md or a BACKLOG.md one directory
+# down passed everything. A second to-do file does not announce itself: both
+# get written to, each becomes right about different things, and the one you
+# read is the one that is wrong.
+#
+# The 2026-07-31 incident this repo already carries is the same failure on the
+# rule book (project_rules.md beside PROJECT_RULES.md, each invisible to the
+# other writer). The board is likelier to attract a rival than the rule book
+# was, because everyone has a favourite name for their to-do list.
+#
+# Two exemptions, both narrow and both named in the output:
+#   * evals/cases/** — fixture inputs contain boards on purpose (zofia-003's
+#     TODO.md is the trap that case exists to set). They are unreachable from
+#     this repo's tooling.
+#   * docs/SESSION_LOG_*.md — a campaign log is append-only history, like a
+#     release note. It records what happened, never what is next.
+BOARD_SHAPED='^(TODO|TODOS|STATUS|ROADMAP|BACKLOG|TASKS|TASKLIST|KANBAN|PLAN|NEXT_STEPS|BOARD|PATHWAY_FORWARD)\.(md|txt|org|rst)$'
+board_files=""
+while IFS= read -r f; do
+    case "$f" in
+        evals/cases/*) continue ;;
+        docs/SESSION_LOG_*) continue ;;
+    esac
+    base=$(basename "$f")
+    if printf '%s' "$base" | grep -qiE "$BOARD_SHAPED"; then
+        board_files="${board_files}${f}"$'\n'
+    fi
+done < <(git ls-files 2>/dev/null || true)
+
+board_files=$(printf '%s' "$board_files" | grep -v '^$' || true)
+if [ -z "$board_files" ]; then
+    fail "no board found — rule 21 requires PATHWAY_FORWARD.md at the root"
+elif [ "$board_files" = "PATHWAY_FORWARD.md" ]; then
+    ok
+else
+    while IFS= read -r f; do
+        [ -z "$f" ] && continue
+        [ "$f" = "PATHWAY_FORWARD.md" ] && continue
+        fail "$f is a second board — PATHWAY_FORWARD.md is the one that carries the project forward (rule 21); fold it in or rename it to something that is not a to-do list"
+    done <<< "$board_files"
+    printf '%s\n' "$board_files" | grep -qx 'PATHWAY_FORWARD.md' \
+        || fail "PATHWAY_FORWARD.md is not at the repo root — that name, that location (rule 21)"
 fi
 
 echo

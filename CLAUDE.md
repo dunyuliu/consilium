@@ -130,6 +130,8 @@ question answered in two documents gets answered differently in each.
 - What did I not check, and would a reader guess that from what I wrote?
 - If I am wrong about this, which check fails? If none does, the check may be
   the change.
+- Does this lesson land where it ships, or only in our gate? A check reaches
+  this repo; a prompt reaches every project the team is pointed at (rule 0).
 
 **Before you commit** — the mechanics are steps 4-6 above; these are the two
 they cannot tell you.

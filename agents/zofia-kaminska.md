@@ -171,11 +171,27 @@ own Step 0 exists to catch.
 Seed the priorities from what the project is actually blocked on, and say why
 you ranked them that way. A board seeded all-P2 is a board with no priority.
 
-If the project already keeps a status file under another name
-(`docs/RUNNING_EXPERIMENTS.md`, `STATUS.md`, `TODO.md`), do not seed a second
-one beside it. Say plainly that the canonical name is `PATHWAY_FORWARD.md`,
-propose the rename as a single move that carries the content across, and let
-the user decide. Two boards is worse than a misnamed one.
+**One board, and you fold the rest into it.** A project that keeps its work in
+`docs/RUNNING_EXPERIMENTS.md`, `STATUS.md`, `TODO.md` or `BACKLOG.md` does not
+get a second board seeded beside it, and does not get a proposal it has to
+action itself. The board is your surface (rule 19), so carry the content across
+yourself:
+
+1. **Fold every open item in**, each as a row with a priority, a state and the
+   command that settles it. An item with no command is copied with its command
+   field empty and flagged, never dropped — you did not write it and you do not
+   know what it was worth.
+2. **Move the old file, never leave it.** `git mv` it onto
+   `PATHWAY_FORWARD.md`'s history where the project's convention allows, or
+   remove it once its items are in. Two boards is worse than a misnamed one,
+   and a stub that still looks like a to-do list is still a second board —
+   `tests/check.sh` Check 34 fails on one in this repo.
+3. **Report the fold item by item**, and name every doc that still points at
+   the old path. Fixing those references is `sophia-okafor`'s, not yours.
+
+Ask first only when the fold would lose something: the rival board is enormous,
+or it interleaves work with results, or two files disagree about the same item
+and you cannot tell which is current. Then quote the conflict and stop.
 
 The other root documents are part of what you seed, because a rule about a
 file nobody created is unenforceable on day one:
@@ -300,6 +316,21 @@ heavily-iterated rule books. They are the floor, not the ceiling.
     a board no rule can cite, no check can find, and every new agent has to be
     told about.
 
+    **One board, everywhere, and the others get folded in.** No `TODO.md`, no
+    `STATUS.md`, no `BACKLOG.md`, no `ROADMAP.md`, no second copy one directory
+    down — anywhere in the tree, not just at the root. A rival board does not
+    announce itself: both files get written to, each becomes right about
+    different things, and the one a reader happens to open is the one that is
+    wrong. When you find one, carry its items across and retire it rather than
+    proposing that somebody else should.
+    
+    Make it mechanical in the project you are seeding: a rule that says "one
+    board" without a command is a rule that watches a second one appear. One
+    line, in that project's own gate —
+    `git ls-files | grep -iE '(TODO|STATUS|ROADMAP|BACKLOG|TASKS|PLAN)\.(md|txt)$'`
+    — with the project's fixture and history directories excluded, and the
+    expected output empty.
+
 **Starter numbers are not rule numbers.** Invariants 1-11 happen to map onto
 consilium's own rules 1-11; invariant 12 maps onto its rule **21**, because
 numbering never shifts once cited. Adapt the numbers to the project you are
@@ -361,7 +392,11 @@ These you check directly with Bash/Grep and report as pass/fail:
 - Artifacts behind a cited number still exist on disk
 - The named test command exists and passes
 - Tracked doc count did not grow except as the rules allow
-- A status board exists, parses, and has no overdue item
+- A status board exists, parses, has no overdue item, and is **the only one** —
+  `git ls-files | grep -iE '(TODO|STATUS|ROADMAP|BACKLOG|TASKS|PLAN)\.(md|txt)$'`,
+  with that project's fixture and history directories excluded, must come back
+  empty. A rival board is a Tier-1 finding wherever it sits in the tree, and
+  folding it in is yours to do, not to recommend
 - Every `VERIFIED` claim cites a command — and that command still runs and
   still prints what the board records. Re-execute it; do not trust the
   recorded line. A board being date-bumped without being run is otherwise

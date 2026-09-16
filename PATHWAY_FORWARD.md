@@ -141,6 +141,12 @@ actually prints today, per rule 21a. Fixing the pattern changes what the row
 measures and belongs in its own change, with the new number established by a
 fresh run rather than inherited from this note.
 
+**Re-run 2026-09-16: 10 -> 12 across the day.** `lian-002-gate-without-prompt`
+joined the list too — the case that grades whether a lesson landed in the
+product or only in this repo's gate, which is the discipline rule 0 gained a
+clause for the same day. Two cases written today to grade this session's own
+failures, neither executed.
+
 **Re-run 2026-09-16: 10 -> 11, then 11 unrun.** The ten stood byte-identical,
 and `zofia-003-seed-bare-project` joined them the same day it landed: a Mode A
 fixture written because a real seeding run produced no `CLAUDE.md`, and it
@@ -157,6 +163,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 # → haruto-002-tag-before-gate: NEVER RUN
 # → kai-002-no-worktree-no-write: NEVER RUN
 # → lars-002-clean-control: NEVER RUN
+# → lian-002-gate-without-prompt: NEVER RUN
 # → marta-001-print-scale-audit: NEVER RUN
 # → nadia-002-criterion-not-agent: NEVER RUN
 # → selin-001-supershear-resolution: NEVER RUN
@@ -207,13 +214,13 @@ other.
 **Re-run 2026-08-27: 14 -> 15.** `wei-lin-002` declares its one planted defect.
 The row's claim is unchanged — precision is still not measured.
 
-**Re-run 2026-09-16: 15 -> 16.** `zofia-003` declares four. The row's claim is
-still unchanged, and this row is the reason: declaring what is in a fixture
-input is not the same as scoring how much of it a run found.
+**Re-run 2026-09-16: 15 -> 17.** `zofia-003` and `lian-002` declare four each.
+The row's claim is still unchanged, and this row is the reason: declaring what
+is in a fixture input is not the same as scoring how much of it a run found.
 
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l | tr -d ' '
-# → 16
+# → 17
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -297,9 +304,14 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 33 checks and 33 exist. This row is now
+The header comment documents 34 checks and 34 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
+
+**Re-run 2026-09-16: 33 -> 34.** Check 34 landed (exactly one board carries the
+project forward), the fifth check in a day. The portable half of that rule is
+in zofia's invariant 12, which is the half that reaches other projects — this
+one is the first dose, per rule 0's new clause.
 
 **Re-run 2026-09-16: 32 -> 33.** Check 33 landed (the release gate's rows and
 the documented note schema agree), reddening this row a fourth time in one day.
@@ -321,7 +333,7 @@ edit, the same way PF-012 records that a prompt edit is a board edit.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 33
+# → 34
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -1040,6 +1052,12 @@ the anchor; when prose must cite a line, expect it to rot.
 the wei-lin loop-liveness prompt fix (rule 10: the fixture ships with the fix).
 Not a re-audit of the other 29.
 
+**Re-run 2026-09-16: 30 -> 32.** `lian-002-gate-without-prompt` arrived as
+well, four files describing a nine-agent library whose every local signal says
+an incident is closed. Its declared defects name all four, and its clean
+regions are clean only as far as its author checked — the same caveat as below,
+and the same tripwire.
+
 **Re-run 2026-09-16: 30 -> 31.** `zofia-003-seed-bare-project` arrived, and its
 input is the one this row has not read: five files describing a tidal-channel
 solver, whose "clean" regions are clean only as far as its author checked. Its
@@ -1051,7 +1069,7 @@ The CLOSED finding stands on the thirty it already read.
 
 ```bash
 ls evals/cases | wc -l | tr -d ' '
-# → 31
+# → 32
 ```
 
 ### PF-012 — `agents/` — OPEN

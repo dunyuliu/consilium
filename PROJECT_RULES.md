@@ -23,6 +23,15 @@ someone else's project and never at this one is a claim, not a practice.
 Numbered 0 because it is not one rule among the others — it is the reason the
 others get checked. Numbering starts at 1 below and never shifts (see rule 6).
 
+**And the order matters: the discipline goes in the agent first, this repo's
+gate second.** consilium is built for other people's projects; applying it here
+is the first test of a discipline, never the delivery of it. A lesson that
+lands only in `tests/check.sh` has been learned by one repo — the one that
+needed it least, because it already knew. The same lesson in an `agents/*.md`
+prompt or in `zofia-kaminska`'s starter set travels to every project the team
+is pointed at. So when a session finds something: write it where it ships, then
+prove it here. A check with no prompt behind it is a fix that reached nobody.
+
 **Concretely**: before shipping a discipline, run it here. Before claiming a
 gate works, watch it fail. Before recommending a fixture, run the ones we
 have. Before telling a user their docs have drifted, check ours.
@@ -86,7 +95,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical in name only — the pre-commit hook exists only where install.sh ran; nothing in the repo checks it |
 | 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
-| 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Check 12 |
+| 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Checks 12, 34 |
 | 21a | Board `# →` lines are literal command stdout, and the command is re-run | mechanical — Check 17 |
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
@@ -688,6 +697,11 @@ the current view, and must not be used as one.
   writing one line in the deferral log with a reason. Letting it lapse silently
   may not. The gate reddens on an undecided item, never on a date alone.
 - **Items are never deleted.** The board only grows (rule 8).
+- **One board, and the others get folded into it.** No `TODO.md`, `STATUS.md`,
+  `BACKLOG.md` or second copy anywhere in the tree — Check 34, with
+  `evals/cases/**` and `docs/SESSION_LOG_*` exempt as fixture data and history.
+  The portable half of this lives in `zofia-kaminska`'s invariant 12, which is
+  what reaches other projects; Check 34 is this repo taking the first dose.
 - **Every row carries a priority — P1, P2 or P3 — and the work is taken in
   that order.** Check 12 fails a row without one. The board is a queue, not an
   archive: it holds what is open, what is done and what is claimed, and `prio`
