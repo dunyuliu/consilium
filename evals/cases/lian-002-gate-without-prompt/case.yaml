@@ -135,4 +135,17 @@ notes: |
   rather than the rule book. Guards were graded against the correct report's
   negation before shipping (rule 25).
 
-  Not yet run against the agent.
+  Run (2026-09-16, via lian-zhao). FAIL 3/6 (`bash evals/run.sh grade
+  lian-002-gate-without-prompt <report>`): only criterion 1 (named
+  "tomas-lindgren") and both must_not_find guards passed. The run reviewed
+  `agents/tomas-lindgren.md` (listed among files read) but reasoned to a
+  different, also-real defect — "Check 6 runs against zero files and passes
+  vacuously" — rather than the planted push-order sequence in step 8. It did
+  conclude "NOT actually closed" and "should not be VERIFIED", but the exact
+  substrings required by criterion 4 ("not closed", "premature", "reopen",
+  "half") are not present as contiguous strings ("NOT actually closed" does
+  not contain "not closed"), and criteria 2/3 (step 8 / push --tags / "every
+  project" / "downstream") were never reached because the report never
+  located the tag-push-with-commit line. Genuine miss of the designed trap,
+  not a criteria-quality false negative on the substance — the report never
+  named step 8 or the tag/commit sequence at all.
