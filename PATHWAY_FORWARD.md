@@ -305,9 +305,14 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 34 checks and 34 exist. This row is now
+The header comment documents 35 checks and 35 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
+
+**Re-run 2026-09-16: 34 -> 35.** Check 35 landed (every tagged release has both
+a release note and a GitHub Release), the header comment updated in the same
+commit — confirmed at line 47, "35. Every tagged release has both a release
+note and a GitHub Release" — so the row stays VERIFIED.
 
 **Re-run 2026-09-16: 33 -> 34.** Check 34 landed (exactly one board carries the
 project forward), the fifth check in a day. The portable half of that rule is
@@ -334,7 +339,7 @@ edit, the same way PF-012 records that a prompt edit is a board edit.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 34
+# → 35
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
