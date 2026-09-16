@@ -109,6 +109,15 @@ own the release-boundary gate, the final enforcement point where
    who saw a red gate, judged it transient, and committed anyway. A rule that
    cannot be followed literally gets followed loosely, and then so does every
    rule beside it.
+
+   **The local gate is not CI (rule 15a).** The pre-push hook proves green on
+   one machine, one platform, one checkout — often a shallow one, where checks
+   that read history or tags skip themselves rather than run. CI sees the rest,
+   and it sees it only after a push. So the push splits: **commit and tag
+   locally, push the commit alone, read CI's conclusion for that exact SHA,
+   push the tag only on green.** A tag that never left the machine costs
+   nothing to re-cut; a tag on the remote pointing at a red commit is a
+   published release you cannot withdraw without destroying evidence (rule 8).
 2. **No silent skips.** Every `@pytest.skip`, `xfail`, conditional
    skip, or "expected-failure" marker needs an inline justification
    citing the issue or PR it tracks. A skip with no link is a
@@ -266,10 +275,15 @@ verified — never a tree you are still repairing.
 8. **Re-verify the note.** Re-read it; spot-check every claim against actual filesystem and master documents. Fix any drift.
 9. **Commit and tag.** Stage all changes and commit: `release: v<A.B.C> — <one-line summary>`. Then tag the release commit `v<A.B.C>` — the tag must match the release-note version exactly, and the tree must be clean before tagging.
 
-**Phase 4 — Publish**
+**Phase 4 — Publish (the commit and the tag go separately)**
 
-10. **Push to remote.** Push the release commit and the tag to the branch's upstream (`git push && git push --tags`, or `git push -u origin <branch>` if no upstream is set). If there is no remote, say so and stop — the release is still valid locally. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
-11. **Report.** State the new version, what the audit found, what you fixed, what you deferred, and the push result.
+10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. The pre-push hook runs the local gate here; that is the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
+11. **Gate on CI, for that exact SHA (rule 15a).** Read the run for the commit you just pushed — `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Poll it out; do not end the turn on a wait and do not proceed on a run that is still in progress.
+    - **Green** → step 12.
+    - **Red** → the release does not exist yet. Diagnose the failure, fix it, re-verify from step 4, and re-cut. Delete the *local* tag and re-tag the corrected commit; nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
+    - **Unreadable** (no CI configured, no credentials, no network) → say exactly that and **stop before the tag**. Report the release as cut-but-unpublished with the one step left. A gate you assumed is not a gate you passed.
+12. **Push the tag.** `git push origin v<A.B.C>` once, and only once, CI is green on the tagged commit. Verify the remote tag resolves to that SHA.
+13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), and the push result for both the commit and the tag.
 
 ### Release note schema (use this section order)
 1. Version and date
@@ -280,6 +294,11 @@ verified — never a tree you are still repairing.
 6. Remaining open issues or pending items
 7. Totals or cost changes
 8. Assumptions used
+9. **The CI run this release was gated on** — run URL or id, its conclusion,
+   and the SHA it ran against (rule 15a). One line. This is the field that
+   turns rule 15a from a norm into something a check can read, so write it even
+   when the answer is "no CI configured" — an absence on the record is worth
+   more than a silence.
 
 ### Hard rules
 - Never skip the audit.
@@ -289,3 +308,7 @@ verified — never a tree you are still repairing.
 - Never delete old release notes; only move to `docs/`.
 - Never invent fixes for findings that need human judgment; list as open issues.
 - New release notes go at repo root; archived to `docs/` on next release run.
+- Never push a tag with its commit, and never to a commit CI has not passed
+  green (rule 15a). Commit first, CI second, tag last.
+- Never call a red CI transient without naming the infrastructure cause; never
+  re-run a job more than once to get past one.
