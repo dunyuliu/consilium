@@ -58,8 +58,9 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
 | PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
-| PF-021 | `tests/check.sh` | Check 29's script selector uses `find .`, not `git ls-files` — reddens for any worktree-isolated dispatch | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description contradicts her own body on the fixture write surface | OPEN | 2026-09-16 | 30 | P2 |
+| PF-023 | `tests/lock.sh` | the lock resolves to the SAME shared file from a main checkout and from any linked worktree | VERIFIED | 2026-09-16 | 14 | P2 |
 
 ## Items
 
@@ -1826,26 +1827,35 @@ checkouts. The row stays BROKEN: the tag genuinely is not on the remote, and
 nothing about the underlying blocker changed, only the recorded number was
 corrected to match a real re-run.
 
-### PF-021 — `tests/check.sh` — BROKEN
+### PF-021 — `tests/check.sh` — VERIFIED
 
-Check 29's script selector at `tests/check.sh:1098` is
-`find . -name '*.sh' -not -path './.git/*'`, which walks the working
-directory rather than the tracked tree. The harness places agent worktrees at
-`./.claude/worktrees/<agent-id>/`, excluded only via a local, uncommitted
-`.git/info/exclude:11` — invisible to `git status` and to any clone, and fully
-visible to `find`. Check 29 then reports the worktree's own `install.sh` as a
-second installer and fails rule 14: the gate reddens for the duration of any
-worktree-isolated dispatch, and reddened a `pre-push` hook twice today on two
-different agent ids. It is the only bare `find .` selector in the file — every
-other file-selecting check already uses `git ls-files`.
+**Fixed by `iris-vermeulen`, closed 2026-09-16.** `tests/check.sh:1098` now
+reads `for script in $(git ls-files '*.sh' | sort); do`, with the skip case
+`install.sh)` rather than `./install.sh)`. Tracked-tree selection, not a
+working-directory walk — a worktree's own `install.sh` no longer reads as a
+second installer.
 
-Not fixed here: `tests/check.sh` is `iris-vermeulen`'s surface, not mine.
-Routed there. Fix is mechanical — swap the selector for
-`git ls-files '*.sh'` — and negative-testable the same way Check 8's
-mutations already are.
+Independently re-verified, not taken on the fix report alone (rule 4):
+`bash tests/check.sh` from this worktree — the exact environment the defect
+only manifested in — passes clean, and Check 29 fires correctly against a
+genuine violation. A tracked `tests/wl_negtest.sh` containing
+`ln -s "$PWD/agents" "$HOME/.claude/agents"` was added and staged; the gate
+produced exactly one new failure line naming that file and rule 14, and
+removing it returned the suite to green. The selector was narrowed to the
+tracked tree, not gutted.
+
+The row's own command was a defect-PRESENT detector
+(`grep -c "find \. -name '\*\.sh'" ... # → 1`), so closing the defect
+necessarily makes that exact command read `0` — that is the row's mechanism
+working, not new staleness (Check 12 flagged it as such, correctly). Rather
+than leave a closed row pointing at a command that must forever print the
+absence of a thing, this row now carries a claim-HOLDS command: it stays `1`
+while the fix is in place and would go red the moment anyone reintroduces the
+`find .`-style selector, without needing to be reworded every time the old
+defect's ghost is checked for.
 
 ```bash
-grep -c "find \. -name '\*\.sh'" tests/check.sh
+grep -c "git ls-files '\*\.sh'" tests/check.sh
 # → 1
 ```
 
@@ -1869,6 +1879,64 @@ Not fixed here: `agents/*.md` is `lian-zhao`'s surface. Routed there.
 sed -n '3p' agents/lian-zhao.md | grep -c 'Grows the fixture'; sed -n '52p' agents/lian-zhao.md
 # → 1
 # → - Your surface is `agents/*.md` and nothing else. Not fixtures
+```
+
+### PF-023 — `tests/lock.sh` — VERIFIED
+
+**A STANDING CLAIM, not a closed task** — every previous test of this script
+ran from the one environment where the bug could not show, so "fixed" here
+means "held under both environments today", not "will never regress". A
+linked worktree's `.git` is a FILE holding a gitdir pointer, not a directory:
+`LOCK="$REPO_DIR/.git/consilium.lock"` used to resolve to
+`<file>/consilium.lock`, failing "Not a directory" — from EVERY
+worktree-isolated dispatch, which is every agent dispatched in this project,
+by policy. `tests/lock.sh` now resolves `LOCK` via
+`git rev-parse --git-common-dir`, evaluated inside `$REPO_DIR` and made
+absolute when git returns a relative path — the one form that resolves to the
+SAME shared `.git` from a main checkout and from a linked worktree.
+
+**The cost was not hypothetical.** Earlier the same day, `iris-vermeulen`
+reported "the lock was already clear, no lock left behind". It was not: her
+`release` had silently failed from inside her own worktree, `status` read
+free from where she stood, the `pre-commit` hook was refusing commits citing
+her as the holder, and the lock had to be force-released by hand. A broken
+lock makes an honest agent file a false report, and rule 18 is the only
+barrier between two writers and a corrupted tree.
+
+**Re-verified independently this session, not on the fix report alone (rule
+4).** From THIS worktree — the environment the defect only manifested in —
+`bash tests/lock.sh acquire "close PF-021, add lock-worktree row"
+PATHWAY_FORWARD.md` succeeded (it failed with "Not a directory" before the
+fix), and `bash /home/utig5/dliu/consilium/tests/lock.sh status`, run against
+the MAIN checkout's copy of the script while the lock was still held from
+here, printed the same holder, description and scope — one lock file, seen
+identically from both sides:
+
+    acquire, from this worktree      -> acquired by 'zofia-kaminska', scope PATHWAY_FORWARD.md
+    status, from the main checkout   -> HELD by 'zofia-kaminska' ... scope: PATHWAY_FORWARD.md
+
+This also independently reproduces `wei-lin`'s own throwaway-worktree
+transcript (acquire / status / refuse-a-foreign-owner / release, all
+consistent across a main checkout and a linked worktree) rather than
+resting on it.
+
+**The board command is deliberately NOT `acquire`/`release`.** Those mutate
+the real lock, and Check 17 re-runs every board command on every suite run —
+wiring a mutating command into an automated re-run would make every gate
+invocation fight over the one lock this project has. A presence grep alone
+(`grep -c 'git rev-parse --git-common-dir' tests/lock.sh`) would prove only
+that the string exists, not that resolution behaves — so the command below
+combines both: it holds the source still routes through
+`git-common-dir` AND exercises that resolution live, asserting the result is
+a real directory. It is honest about what it does NOT re-prove: it does not
+re-run `acquire`/`status`/`release` end to end, so it would not catch every
+regression this row cares about (only a session doing exactly what this one
+did would); it is what could be made to run on every gate invocation without
+side effects.
+
+```bash
+grep -q 'git rev-parse --git-common-dir' tests/lock.sh && test -d "$(git rev-parse --git-common-dir)" && echo "OK: lock.sh routes LOCK through git-common-dir, and it resolves to a real directory here"
+# → OK: lock.sh routes LOCK through git-common-dir, and it resolves to a real directory here
 ```
 
 ## Deferral log
