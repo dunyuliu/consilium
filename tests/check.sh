@@ -1425,6 +1425,22 @@ elif [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
     echo "  no tags in this clone — rule 15 not checkable here"
     ok
 else
+    # RELEASE-LEG GRACE, same shape and same reason as Check 27's fix. Without
+    # it this check is PF-020 again under a different name: haruto's own
+    # workflow (agents/haruto-nakamura.md step 12a) deliberately withholds the
+    # GitHub Release on an autonomous/unattended tag, so the newest tag has NO
+    # Release the moment it lands — on every machine where `gh` happens to be
+    # authenticated, forever, until a human runs `gh release create` for it.
+    # No code change could fix that; only a grace window keeps a correct
+    # requirement from becoming a permanent local block the first time the
+    # exact workflow this project just adopted does what it says.
+    #
+    # Grace is keyed to tree state, not wall-clock (same reasoning as Check
+    # 27's second draft): the newest tag gets a pass on the RELEASE object
+    # only, until a later tag supersedes it. The NOTE requirement gets no
+    # grace — every one of the 23 existing tags already has a note the moment
+    # it's cut, so there is no equivalent lag to protect against there.
+    newest_tag=$(git tag --list 'v*' | sort -V | tail -1)
     while IFS= read -r tag; do
         [ -z "$tag" ] && continue
         if [ -f "release_notes_${tag}.md" ] || [ -f "docs/release_notes_${tag}.md" ]; then
@@ -1433,6 +1449,9 @@ else
             fail "$tag has a git tag but no release_notes_${tag}.md in the root or docs/ (rule 15)"
         fi
         if gh release view "$tag" >/dev/null 2>&1; then
+            ok
+        elif [ "$tag" = "$newest_tag" ]; then
+            echo "  $tag has no GitHub Release yet, but it is the newest tag and not yet superseded — grace for an autonomous cut that deliberately withholds the Release (agents/haruto-nakamura.md step 12a)"
             ok
         else
             fail "$tag has a git tag but no GitHub Release — a pushed tag with no Release object is not a published release (rule 15)"
