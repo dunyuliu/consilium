@@ -88,7 +88,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 13 | A new agent lands with at least one `evals/cases/` fixture | mechanical — Check 25 |
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
-| 15a | A tag never reaches the remote ahead of a green CI run on its commit | judgment — see the rule for what would make it mechanical |
+| 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — the pre-push hook enforces the local half; see the rule |
 | 15b | Every release records its gate, row by row; the gate refuses what it can decide | mechanical — `tests/release_gate.sh`, held to the schema by Check 33 |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 |
 | 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
@@ -424,33 +424,54 @@ note is not either.
 unreleased commit count makes the last note misleading — do not let the
 gap grow indefinitely.
 
-## 15a. A tag never reaches the remote ahead of a green CI run on its commit
+## 15a. Nothing red is ever pushed, and the tag is pushed last
 
-The local gate and CI are two gates, not one. Push the release commit **first
-and alone**, read CI's conclusion for that exact SHA, and push the tag only
-once it is green. A red CI at that point means the release does not exist yet:
-fix, re-verify, re-cut. Nothing to unpublish, because the tag never left.
+Create the tag **locally, before any push**, so the local gate sees it: Check
+27 reads `refs/tags/<version>` in the working clone, and the pre-push hook is
+what enforces green-before-anything-leaves-the-machine. Then push in two
+commands — the commit, then the tag. Never `--tags`, never `--follow-tags`: a
+tag must not ride along on a push that could be rejected.
 
-"Flake" is not a conclusion. Re-run a CI job only for a named infrastructure
-cause, at most once, and treat the second failure as real. If CI's status
-cannot be read at all, say so and stop before the tag: a release that assumes
-a gate it could not see is rule 2's silent fallback wearing a version number.
+**The one failure CI is allowed to show between those two pushes** is Check 27
+naming the note being released, and nothing else. CI reads only tags that are
+already on the remote, so that single assertion *cannot* be green until the tag
+push lands — it is the expected intermediate state, not a defect. Any other red
+assertion means the release does not exist yet: delete the local tag, fix,
+re-verify, re-cut. The tag has not been pushed at that point, so nothing needs
+unpublishing.
 
-**Rationale**: rule 15's sequence is *commit, tag, run the suite, push* — the
-2026-08-05 ordering caveat in `agents/haruto-nakamura.md`, which escapes a real
-deadlock. It enforces green-before-push via the pre-push hook, and the hook is
-not CI: the other platform, the clean-clone install, and the full-history
-checks a shallow clone skips are all first seen after the push that already
-carries the tag.
+**After the tag push, CI must be green on the released commit.** A red run
+*then* is a real failure and is answered with a follow-up fix commit — never an
+unpublish, never a force-push, never deleting a tag from the remote (rule 8).
 
-**Incident (2026-09-16)**: this repo's gate runs 29 of its 31 checks in a
-shallow clone, and two board rows' evidence went un-re-executed for that
-reason. The local run was green and incomplete at once — the shape of the gap
-this rule closes.
+"Flake" is not a conclusion. Re-run a job only for a named infrastructure
+cause, at most once, and treat the second failure as real. If CI cannot be read
+at all, say so and record it: a release that assumes a gate it could not see is
+rule 2's silent fallback wearing a version number.
 
-**How to apply**: no offline check can read a network conclusion, so the note
-records the run instead (schema item 9). This is judgment until a check asserts
-that field on every root note.
+**Rationale**: the local hook proves one machine, one platform, one checkout —
+often a shallow one, where checks that read history or tags skip themselves.
+CI sees the rest, and only after a push. Both gates are real; only one of them
+can run before the push exists.
+
+**Incident (2026-09-16), and this rule caused it.** The first version of 15a
+read "push the commit alone, wait for CI green on that SHA, then tag." That is
+unsatisfiable here, and `agents/haruto-nakamura.md` had said so since
+2026-08-05 — its ordering caveat names the deadlock between "do not tag until
+green" and a gate that requires every note to have a tag. 15a was written
+directly above that caveat and overrode it without noticing. Cutting v1.21.0
+found it the only way it could be found: by running the sequence. CI came back
+`failure` on 1 of 1319 assertions — Check 27, the missing tag — and every route
+out was blocked. Leave the note untagged and Check 27 stays red on `main`; tag
+it and the rule forbade it; revert the note and Check 28 fires, because a
+release note that once existed may not vanish (rule 8). The release engineer
+refused to break the hard rule, correctly, and stopped. **A rule that cannot be
+obeyed does not get obeyed loosely — it gets obeyed until the work stops.**
+
+**How to apply**: tag locally, push commit, push tag, then require green. No
+offline check can read a network conclusion, so the note records the run
+(schema item 9) — including the pre-tag run and its single permitted failure.
+Judgment until a check asserts that field on every root note.
 
 ## 15b. Every release records its gate, row by row, and the gate refuses what it can decide
 

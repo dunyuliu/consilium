@@ -57,6 +57,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | BROKEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
+| PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
 
 ## Items
 
@@ -1688,6 +1689,35 @@ SKIP without them, the way `ci` already does.
 ```bash
 grep -c 'gh release' tests/release_gate.sh
 # → 0
+```
+
+### PF-020 — `release_notes_v1.21.0.md` — BROKEN
+
+`main` carries a release note with no tag on the remote, so Check 27 fails in
+CI and will keep failing for everyone until the tag is pushed. Rule 15's
+sequence is satisfied locally — the tag exists in this clone and the gate is
+green at 1319 — but `git push origin refs/tags/v1.21.0` returns
+`RPC failed; HTTP 403` from this environment. Branch pushes are permitted here
+and tag pushes are not, which is a platform policy, not a repo fault: the proxy
+guidance says report a 403 rather than retry it, and Haruto's hard rules say a
+rejected push is reported, not defeated.
+
+One command closes this, from a machine with tag rights:
+
+    git push origin v1.21.0
+
+Then CI on `main` goes green, because the only failing assertion is the one the
+tag satisfies (run 35112672757 failed 1 of 1319, and that one was Check 27).
+
+**This row's evidence is local by necessity.** Rule 21b forbids a board command
+that reaches the network, so nothing here can prove the remote state — the
+command below only shows the tag exists in this clone. Closing the row needs a
+human to confirm the push landed and CI went green, and the 7-day interval is
+deliberately short because an untagged note reddens the gate for every clone.
+
+```bash
+git tag --list 'v1.21.0' | wc -l | tr -d ' '
+# → 1
 ```
 
 ## Deferral log
