@@ -59,7 +59,15 @@ fi
 # agents/haruto-nakamura.md exactly, in this order. A row added here and not
 # there is a gate nobody documented; a row there and not here is a promise
 # nothing enforces.
-ROWS=(audit correctness conciseness fixes docs refactor tree ci publish rules)
+#
+# `clone` sits right after `publish`, not at the end: it extends the same
+# "is the published artifact real" question one step further than `publish`
+# does. `publish` only checks that a tag exists, points at HEAD, and is on
+# the remote; `clone` is what a brand-new user actually experiences once that
+# is true, so it belongs beside the row it depends on rather than after
+# `rules`, which is a human-judgement row about the project as a whole and has
+# nothing to do with the published artifact.
+ROWS=(audit correctness conciseness fixes docs refactor tree ci publish clone rules)
 
 pass=0; failed=0; skipped=0
 row() { printf '%-5s %-11s %s\n' "$1" "$2" "$3"; }
@@ -85,7 +93,46 @@ recorded() {
     fi
 }
 
-for key in audit correctness conciseness fixes docs refactor; do recorded "$key"; done
+# The `correctness` row gets a stricter check than the other six recorded
+# rows. "audit: two findings, both fixed" is a verdict a reader can act on
+# even though nothing forces it to be true; "correctness: looks fine" is
+# worse than that, because a correctness pass is specifically a claim that
+# something was RUN and checked, and "looks fine" is exactly as consistent
+# with a pass that ran nothing as with one that ran everything. The other six
+# rows describe judgement calls (was the audit thorough, did the refactor
+# leave the system leaner) that have no artifact to cite even when done well;
+# `correctness` is different because a real correctness pass almost always
+# runs something with a name — a test command, a script, a query — and can
+# name it. So: require, in addition to the 12-character floor `recorded()`
+# already enforces, a backtick-delimited span of at least 3 characters inside
+# the verdict, the shape of an inline code citation for the command that ran.
+# This is a heuristic, not a proof — a verdict can fake a backtick span, and a
+# real check can still be run against the wrong thing. It only closes the one
+# gap this row exists to close: a verdict that cites nothing to run is
+# indistinguishable from one that never ran anything, and now fails instead of
+# passing on word count alone.
+correctness_recorded() {
+    local key="correctness" line
+    line=$(grep -iE "^[-*] *${key}:" "$NOTE" 2>/dev/null | head -1 || true)
+    if [ -z "$line" ]; then
+        row_fail "$key" "no '${key}:' line in $(basename "$NOTE") — the pass is unrecorded, which is indistinguishable from unperformed"
+        return
+    fi
+    local verdict; verdict=$(printf '%s' "$line" | sed "s/^[-*] *${key}: *//I; s/ *$//")
+    if [ ${#verdict} -lt 12 ]; then
+        row_fail "$key" "'${key}:' carries no verdict worth reading (\"$verdict\")"
+        return
+    fi
+    if ! printf '%s' "$verdict" | grep -qE '`[^`]{3,}`'; then
+        row_fail "$key" "'${key}:' does not cite a command it ran (\"$verdict\") — a correctness pass with nothing to point at is indistinguishable from one that checked nothing"
+        return
+    fi
+    row_pass "$key" "$verdict"
+}
+
+recorded audit
+correctness_recorded
+for key in conciseness fixes docs refactor; do recorded "$key"; done
 
 # --- row 7: tree — the anchor the next milestone starts from ----------------
 tree_problems=()
@@ -129,11 +176,142 @@ elif [ "$(git rev-parse "v$ver^{commit}")" != "$sha" ]; then
     row_fail publish "tag v$ver does not point at HEAD — the note describes a tree the tag does not"
 elif ! git ls-remote --tags origin "refs/tags/v$ver" 2>/dev/null | grep -q .; then
     row_skip publish "v$ver is local only — push it after row ci is green, then re-run"
+    publish_result=SKIP
 else
     row_pass publish "v$ver pushed and pointing at ${sha:0:8}"
+    publish_result=PASS
 fi
+: "${publish_result:=FAIL}"
 
-# --- row 10: rules — the rule book's own owner audited it -------------------
+# --- row 10: clone — the gate nobody else runs -------------------------------
+# Depends on row 9/publish: there is nothing to clone until a tag is pushed,
+# so this SKIPs (never fails, never passes silently) when publish did not
+# pass — same pattern row 8/ci and row 9/publish already use for a
+# prerequisite that does not exist yet (rule 2).
+#
+# When it can run: clone the pushed tag into a fresh, empty scratch HOME (not
+# the real one — README's own install command targets ~/consilium, and
+# running that literally against the operator's real home would clobber
+# whatever is already there) and execute exactly what README.md documents:
+# the fenced ```bash block under "## Install", then the next fenced ```bash
+# block that follows it in the file, whatever that turns out to contain. Both
+# are read from the README at runtime, never assumed, so a README edit changes
+# what this row runs without anyone touching this script.
+extract_readme_blocks() {
+    # $1 = README path, $2 = output file for the Install section's bash block,
+    # $3 = output file for the next bash-tagged block after it (skipping any
+    # non-bash fenced blocks, e.g. the Layout tree, in between).
+    awk -v oi="$2" -v of="$3" '
+        BEGIN { state = 0 }
+        state == 0 && /^## Install/          { state = 1; next }
+        state == 1 && /^```bash/             { state = 2; next }
+        state == 1                            { next }
+        state == 2 && /^```/                 { state = 3; next }
+        state == 2                            { print > oi; next }
+        state == 3 && /^```bash/             { state = 4; next }
+        state == 3 && /^```/                 { state = 5; next }
+        state == 3                            { next }
+        state == 4 && /^```/                 { state = 6; next }
+        state == 4                            { print > of; next }
+        state == 5 && /^```/                 { state = 3; next }
+        state == 5                            { next }
+        state == 6                            { next }
+    ' "$1"
+}
+
+run_clone_row() {
+    if [ "$publish_result" != "PASS" ]; then
+        row_skip clone "row publish did not pass ($publish_result) — there is no pushed tag yet for a new user to clone"
+        return
+    fi
+
+    local scratch
+    scratch=$(mktemp -d) || { row_fail clone "could not create a scratch directory to clone into"; return; }
+    trap 'rm -rf "$scratch"' RETURN
+
+    local origin_url
+    origin_url=$(git remote get-url origin 2>/dev/null || true)
+    if [ -z "$origin_url" ]; then
+        row_fail clone "no 'origin' remote configured — cannot resolve what publish claims is pushed"
+        return
+    fi
+
+    local fake_home="$scratch/home"
+    mkdir -p "$fake_home"
+
+    local install_script="$scratch/install.sh" first_script="$scratch/first.sh"
+    : > "$install_script"; : > "$first_script"
+    # Pull the two blocks from THIS checkout's README first, only to find out
+    # what commands to run — the commands themselves execute against the
+    # cloned tag once we know the checkout dir, in case a future README moves
+    # or renames its Install section between tags.
+    extract_readme_blocks "$REPO_DIR/README.md" "$install_script" "$first_script"
+    if [ ! -s "$install_script" ]; then
+        row_fail clone "README.md's '## Install' section has no fenced \`\`\`bash block — nothing documented to run"
+        return
+    fi
+
+    local install_log="$scratch/install.log"
+    if ! ( cd "$fake_home" && HOME="$fake_home" bash -e "$install_script" ) >"$install_log" 2>&1; then
+        row_fail clone "README's install block failed on a fresh clone of v$ver: $(tail -3 "$install_log" | tr '\n' ' ')"
+        return
+    fi
+
+    # Locate the checkout the install block just produced. `git clone <url>
+    # [dir]` is the only structural assumption made — the destination is
+    # either the explicit last argument or git's own default (the URL's
+    # basename, minus ".git"), never a hardcoded path.
+    local clone_line target repo_dir
+    clone_line=$(grep -m1 '^git clone' "$install_script" || true)
+    if [ -z "$clone_line" ]; then
+        row_fail clone "README's install block has no 'git clone' line — cannot locate the resulting checkout"
+        return
+    fi
+    target=$(printf '%s' "$clone_line" | awk '{print $NF}')
+    if printf '%s' "$target" | grep -qE '^([a-zA-Z]+://|[^/[:space:]]+@)'; then
+        repo_dir="$fake_home/$(basename "$target" .git)"
+    else
+        case "$target" in
+            "~"*) repo_dir="${fake_home}${target#\~}" ;;
+            /*)   repo_dir="$target" ;;
+            *)    repo_dir="$fake_home/$target" ;;
+        esac
+    fi
+    if [ ! -d "$repo_dir" ]; then
+        row_fail clone "README's install block ran clean but no checkout appeared at the expected path ($repo_dir)"
+        return
+    fi
+
+    # README's own install command clones whatever branch is default on the
+    # remote, not the tag by name — this row's job is "the pushed tag", so
+    # confirm the two agree rather than assuming a default-branch clone is
+    # the same commit. row `tree` and row `publish` already require HEAD to
+    # be level with upstream and the tag to point at HEAD; if this still
+    # disagrees, the default branch and the tag have diverged on the remote,
+    # which is exactly the seam this row exists to catch.
+    local cloned_sha
+    cloned_sha=$(git -C "$repo_dir" rev-parse HEAD 2>/dev/null || true)
+    if [ "$cloned_sha" != "$sha" ]; then
+        row_fail clone "README's install clones ${cloned_sha:-<unreadable>} but tag v$ver points at ${sha:0:8} — the remote's default branch and its tag disagree"
+        return
+    fi
+
+    if [ ! -s "$first_script" ]; then
+        row_fail clone "no fenced \`\`\`bash block follows the Install section — no documented 'first command' to run"
+        return
+    fi
+
+    local first_log="$scratch/first.log"
+    if ! ( cd "$repo_dir" && HOME="$fake_home" bash -e "$first_script" ) >"$first_log" 2>&1; then
+        row_fail clone "README's first documented command failed on a fresh clone of v$ver: $(tail -3 "$first_log" | tr '\n' ' ')"
+        return
+    fi
+
+    row_pass clone "fresh clone of v$ver — README's install block and its first following command both exited 0"
+}
+run_clone_row
+
+# --- row 11: rules — the rule book's own owner audited it -------------------
 recorded rules
 
 echo

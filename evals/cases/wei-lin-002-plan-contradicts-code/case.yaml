@@ -75,3 +75,18 @@ notes: |
   written; a report flagging task 4 as also wrong would be inventing a finding.
   MEDIAN being absent from this file is ordinary — it lives in another
   translation unit — and is not a defect either.
+
+  Run (2026-09-16, via a fresh wei-lin dispatch). PASS 4/4 mechanically
+  (`bash evals/run.sh grade wei-lin-002-plan-contradicts-code <report>`):
+  named the robustfit/weight_* call-graph inversion, took the code's
+  reading, recorded the deviation as a plan amendment rather than halting,
+  and did not trip any must_not_find guard.
+
+  Read-before-recording note (grading is necessary, not sufficient, per the
+  tool's own caveat): the report went further and treated MEDIAN's absence
+  as an undeclared in-scope dependency requiring a "minimal median port"
+  folded into task 3 -- this case's own notes above say that is explicitly
+  NOT a defect. That is a real precision miss, an invented finding that
+  trips no must_not_find guard and so is invisible to the mechanical score
+  -- worth feeding back to whoever tunes wei-lin (rule 19: agents/*.md is
+  lian-zhao's surface), not something this row can act on.

@@ -849,9 +849,24 @@ the machine-readable source of truth, not documentation of one.
 | `.consilium-review/` in a deployed project | `nadia-hadid` |
 | `PATHWAY_FORWARD.md` (the inspection log) | `zofia-kaminska` |
 | `agents/*.md` (the prompts themselves) | `lian-zhao` |
+| `commands/*.md` (trigger wrappers invoking those prompts) | `lian-zhao` |
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
+
+**`commands/*.md` is `lian-zhao`'s, not `wei-lin`'s.** Each command file is a
+short trigger wrapper — argument parsing and mode selection for one `agents/*.md`
+invocation, not a runtime artifact of any single agent's campaign. That a file
+like `commands/autopilot.md` documents `wei-lin`'s own workflow doesn't make it
+hers to hold, any more than `agents/wei-lin.md` itself is — both are prompt
+content describing an agent, authored by the agent whose surface is prompts.
+Splitting ownership by which agent a command happens to invoke would give every
+command a different owner and leave nobody who can keep the trigger-to-mode
+mapping consistent across the whole set; one writer for the whole directory,
+same as `agents/*.md`, is what a directory-wide surface means (rule 19's own
+header). Gap found 2026-09-16: a dispatched `lian-zhao` correctly refused to
+edit `commands/autopilot.md` because this table had no row for `commands/*.md`
+at all — a whole directory with no enforced owner, invisible to Check 10.
 
 **Human-owned surfaces.** `README.md` and `CLAUDE.md` have no agent owner and
 are not an oversight: they are maintained by hand. An agent proposes a change

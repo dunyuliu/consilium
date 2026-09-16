@@ -305,9 +305,14 @@ bash tests/check.sh | tail -1
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 
-The header comment documents 34 checks and 34 exist. This row is now
+The header comment documents 35 checks and 35 exist. This row is now
 self-maintaining: Check 17 re-runs the command below on every suite run, so
 adding a check without updating the header reddens the gate the same day.
+
+**Re-run 2026-09-16: 34 -> 35.** Check 35 landed (every tagged release has both
+a release note and a GitHub Release), the header comment updated in the same
+commit — confirmed at line 47, "35. Every tagged release has both a release
+note and a GitHub Release" — so the row stays VERIFIED.
 
 **Re-run 2026-09-16: 33 -> 34.** Check 34 landed (exactly one board carries the
 project forward), the fifth check in a day. The portable half of that rule is
@@ -334,7 +339,7 @@ edit, the same way PF-012 records that a prompt edit is a board edit.
 
 ```bash
 grep -c '^echo "Check' tests/check.sh
-# → 34
+# → 35
 ```
 
 ### PF-008 — `tests/check.sh` — VERIFIED
@@ -1717,8 +1722,20 @@ deliberately short because an untagged note reddens the gate for every clone.
 
 ```bash
 git tag --list 'v1.21.0' | wc -l | tr -d ' '
-# → 1
+# → 0
 ```
+
+**2026-09-16**: Re-ran the evidence command in this checkout — it printed `0`,
+not the `1` previously recorded (Check 17 was failing on the stale value).
+Root cause: the `1` was recorded from a session/machine where `v1.21.0` was
+created as a **local, never-pushed** tag; that tag was never shared, so any
+other clone or worktree reproduces `0` for this same command. That makes this
+evidence command inherently clone-dependent, not just network-blind — rule
+21b already forbids reaching the network here, but the deeper issue is that
+"tag exists" is being asserted from local repo state that isn't shared across
+checkouts. The row stays BROKEN: the tag genuinely is not on the remote, and
+nothing about the underlying blocker changed, only the recorded number was
+corrected to match a real re-run.
 
 ## Deferral log
 

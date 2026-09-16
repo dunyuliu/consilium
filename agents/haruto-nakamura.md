@@ -305,7 +305,31 @@ verified — never a tree you are still repairing.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
 12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>` — the tag was created locally back in step 9, so the pre-push hook's own tag check is already satisfied. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk the ten rows by hand rather than skipping them): it decides the tree, CI and publication rows and requires a recorded verdict for the other seven. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
     You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
-13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), and the push result for both the commit and the tag.
+12a. **Create the GitHub Release — a NEW required step, not optional polish.** A
+    pushed, CI-green tag with no GitHub Release object is exactly the gap a
+    maintainer found and had to backfill by hand across 23 prior tags
+    (v1.0.0–v1.20.0, 2026-09-16): every one had a tag, none had a Release, and
+    the Releases page on github.com showed nothing. Skipping this step
+    reproduces that gap on every future release. Once step 12 has pushed the
+    tag and confirmed CI green on it, run:
+    `gh release create v<A.B.C> --verify-tag --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
+    (the note's repo-root path at the time of the release commit — do not
+    reconstruct the note text inline, point at the file). `--verify-tag`
+    refuses to create the Release if the tag isn't on the remote yet, which is
+    the correct failure mode if step 12 was skipped or the push silently
+    didn't land. This step fires **only** when the release was cut via the
+    user-invoked `/release` command — i.e., a human asked for this specific
+    release. When a release is cut autonomously/unattended (no human invoked
+    this specific release — e.g. a `wei-lin` autopilot milestone release with
+    no human in the loop for that run), **you do not run this step**: stop at
+    the pushed tag from step 12 and leave the GitHub Release uncreated. Creating
+    a GitHub Release is a publish action — it changes what the project
+    publicly presents on its Releases page — and publish actions stay outside
+    what unattended operation may do, tag pushes included. If you cannot tell
+    from your invocation whether a human asked for this release or an
+    autonomous loop did, treat it as autonomous and skip this step; the
+    default is the narrower grant, not the wider one.
+13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the push result for both the commit and the tag, and whether the GitHub Release was created (and if not, why — human-invoked vs. autonomous).
 
 ### Release note schema (use this section order)
 1. Version and date
@@ -321,9 +345,43 @@ verified — never a tree you are still repairing.
    turns rule 15a from a norm into something a check can read, so write it even
    when the answer is "no CI configured" — an absence on the record is worth
    more than a silence.
-10. **Release gate** — ten rows, one line each, in this order and with these
-    keys, because `tests/release_gate.sh` parses them and `tests/check.sh`
-    Check 33 asserts this list and that script still agree (rule 15b):
+10. **Trend since the previous tag.** A new section, `## Trend since <previous
+    tag>`, comparing this tag against the last one on five measures that
+    cannot be satisfied by assertion — only by running a command and reading
+    its output. Name the exact command for each, run it, and state plainly
+    which direction it moved (better / worse / unchanged) with the two numbers
+    side by side:
+    - **Gate assertions.** `bash tests/check.sh` on this tag vs. on the
+      previous tag's commit, comparing the `Summary: N passed, M failed` line
+      from each.
+    - **Fixture verdicts.** `bash evals/run.sh list` and `bash evals/run.sh
+      score` at both commits — pass / fail / never-run counts, and how many
+      are stale.
+    - **Tracked text lines.** `git diff --stat <previous-tag>..HEAD -- '*.md'
+      '*.sh' '*.py'` (or the project's equivalent set of tracked text
+      extensions — state which extensions you counted) — lines added vs.
+      removed.
+    - **Board currency.** From `PATHWAY_FORWARD.md` at both commits: rows
+      VERIFIED (green), rows BROKEN (red), and rows with a blank
+      last-checked date (never audited).
+    - **CI green-on-first-try rate.** From `gh run list` history since the
+      previous tag's push, the fraction of runs that were green without a
+      re-run; if `gh` access is limited, say so plainly and record that this
+      measure needs manual reading rather than inventing a number.
+
+    This section **reports**, it does not gate: a release is never blocked or
+    downgraded on the line-count measure alone, because a dedicated
+    leanness/refactor pass has been explicitly deferred by the project
+    maintainer. But the report must say so in plain language — if tracked
+    lines grew while the gate/fixture/board numbers did not improve
+    proportionally, that is deterioration, and this section must call it
+    deterioration even though the release gate itself is green. A green gate
+    does not excuse a repo that only grew. Never let this section quietly
+    turn into a silent leanness gate; it is a record, not a veto.
+11. **Release gate** — eleven rows, one line each, in this order and with
+    these keys, because `tests/release_gate.sh` parses them and
+    `tests/check.sh` Check 33 asserts this list and that script still agree
+    (rule 15b):
 
     ```markdown
     ## Release gate
@@ -336,15 +394,16 @@ verified — never a tree you are still repairing.
     - tree: <decided by the script — clean, one worktree, no lock, level with upstream>
     - ci: <decided by the script — the run and its conclusion>
     - publish: <decided by the script — note version, tag, remote>
+    - clone: <decided by the script — clone the pushed, tagged SHA into an empty directory and run exactly what README.md documents, start to finish>
     - rules: <zofia-kaminska's verdict: tier split, violations, unenforceable rules>
     ```
 
-    Rows 7-9 the script decides and you transcribe. The other seven it cannot
-    decide — no program judges whether an audit was thorough — so it checks
-    that each carries a verdict, and a blank or missing line fails the gate.
-    That is the whole mechanism: quality stays a reader's judgement, and the
-    *absence* of the work stops being invisible. "n/a" is a verdict only with
-    a reason attached.
+    Rows 7-9 and 10 the script decides and you transcribe. The other seven it
+    cannot decide — no program judges whether an audit was thorough — so it
+    checks that each carries a verdict, and a blank or missing line fails the
+    gate. That is the whole mechanism: quality stays a reader's judgement, and
+    the *absence* of the work stops being invisible. "n/a" is a verdict only
+    with a reason attached.
 
 ### Hard rules
 - Never skip the audit.

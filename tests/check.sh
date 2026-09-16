@@ -44,6 +44,10 @@
 #  32. The README and CLAUDE questions blocks exist and share no question.
 #  33. The release gate's rows and the documented note schema agree.
 #  34. Exactly one board carries the project forward (rule 21).
+#  35. Every tagged release has both a release note and a GitHub Release
+#      (rule 15) — haruto's workflow tags and pushes but does not itself
+#      run `gh release create`, so this closes the gap that let 23 tagged
+#      releases exist with no Release object behind them.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -1008,13 +1012,41 @@ if [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
     echo "  no tags in this clone — rule 15 not checkable here"
     ok
 else
+    # RULE 15a PRE-TAG GRACE, STATE-BASED. An earlier version of this grace
+    # window was wall-clock (7 days from the note's first-add commit), which
+    # made the gate non-deterministic — the same commit passed today and
+    # would fail next week with no code change. Replaced with a rule keyed
+    # only to tree state: the grace applies ONLY to the single NEWEST
+    # release note present (by version), and ONLY until a newer one
+    # supersedes it. An older, superseded, untagged note has no excuse left
+    # and fails hard — this is what keeps "a note that never gets tagged
+    # must still fail eventually" true.
+    #
+    # Deliberately NOT "grace only while the note's adding commit is HEAD":
+    # that reading was tried first and rejected because it does not survive
+    # ordinary autopilot operation — any commit landing on top of the
+    # release-note commit (a test fix, a board update, exactly what this
+    # session did three times) would expire the grace immediately and
+    # re-fail Check 27 on the very note this window exists to protect,
+    # recreating the deadlock rather than resolving it.
+    newest_ver=$(
+        for f in release_notes_v*.md docs/release_notes_v*.md; do
+            [ -f "$f" ] || continue
+            basename "$f" .md | sed 's/^release_notes_//'
+        done | sort -V | tail -1
+    )
     for note in release_notes_v*.md docs/release_notes_v*.md; do
         [ -f "$note" ] || continue
         ver=$(basename "$note" .md | sed 's/^release_notes_//')
         if git rev-parse -q --verify "refs/tags/$ver" >/dev/null 2>&1; then
             ok
         else
-            fail "$note has no matching tag '$ver' — a release note with no tag is not a release (rule 15)"
+            if [ "$ver" = "$newest_ver" ]; then
+                echo "  $note has no matching tag '$ver' yet, but it is the newest release note in the tree and not yet superseded — rule 15a's expected pre-tag window"
+                ok
+            else
+                fail "$note has no matching tag '$ver' — a release note with no tag is not a release (rule 15)"
+            fi
         fi
     done
 fi
@@ -1360,6 +1392,52 @@ else
     done <<< "$board_files"
     printf '%s\n' "$board_files" | grep -qx 'PATHWAY_FORWARD.md' \
         || fail "PATHWAY_FORWARD.md is not at the repo root — that name, that location (rule 21)"
+fi
+
+echo
+echo "Check 35: every tagged release has a release note AND a GitHub Release (rule 15)"
+# Check 27 already proves every release NOTE has a matching TAG. It says
+# nothing about whether a GitHub Release object exists for that tag —
+# haruto-nakamura's release workflow tags and pushes but never itself runs
+# `gh release create`, and that gap held for 23 releases (v1.0.0..v1.20.0)
+# before a maintainer noticed and backfilled all of them by hand. A silent
+# habit is not a mechanism; this check is the mechanism.
+#
+# No existing check in this file shells out to `gh` — this is the first.
+# That is consistent with existing practice, not a new exception to it:
+# Check 8's isolation notes and this project's own CI workflow
+# (fetch-depth: 0, fetch-tags: true) already accept that check.sh reaches
+# the network in CI, and rule 21b's network ban is scoped to
+# PATHWAY_FORWARD.md evidence commands specifically, not to tests/check.sh.
+#
+# DEGRADE-HONESTLY GUARD, same discipline as Checks 27/28's SHALLOW/TAGLESS
+# guards: `gh` missing, or `gh` present but unauthenticated against this
+# repo, are both environments where the check cannot run — named, `ok`,
+# never a silent pass and never a false fail for an environment problem
+# that has nothing to do with whether a Release was actually created.
+if ! command -v gh >/dev/null 2>&1; then
+    echo "  no gh CLI installed — cannot check for GitHub Releases, rule 15's Release half not checkable here"
+    ok
+elif ! gh auth status >/dev/null 2>&1; then
+    echo "  gh CLI installed but not authenticated against this repo — rule 15's Release half not checkable here"
+    ok
+elif [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
+    echo "  no tags in this clone — rule 15 not checkable here"
+    ok
+else
+    while IFS= read -r tag; do
+        [ -z "$tag" ] && continue
+        if [ -f "release_notes_${tag}.md" ] || [ -f "docs/release_notes_${tag}.md" ]; then
+            ok
+        else
+            fail "$tag has a git tag but no release_notes_${tag}.md in the root or docs/ (rule 15)"
+        fi
+        if gh release view "$tag" >/dev/null 2>&1; then
+            ok
+        else
+            fail "$tag has a git tag but no GitHub Release — a pushed tag with no Release object is not a published release (rule 15)"
+        fi
+    done < <(git tag --list 'v*' | sort -V)
 fi
 
 echo
