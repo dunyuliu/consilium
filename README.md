@@ -110,10 +110,11 @@ for users, `PATHWAY_FORWARD.md` as a living prioritized board, and
   `agents/zofia-kaminska.md`, Mode A creates the two that do not
   exist, and `evals/cases/zofia-003-seed-bare-project/` grades whether
   a real run says it did.
-- **Not yet**: the board has no **priority** field — its columns are
-  state, date and interval, so "priorities constantly adjusted" cannot
-  be expressed, seeded, or followed. And nothing holds a seeded README
-  to being *credible*; concise is asked for, evidence-backed is not.
+- **Not yet**: nothing holds a seeded README to being *credible* —
+  concise is asked for, evidence-backed is not. The board's missing
+  priority column was the other half of this and is now closed
+  (PF-018): `prio` is required on every row, seeded by invariant 12,
+  and read by `/autopilot`.
 
 ### 2. Release: does it cover all ten things a release owes?
 
@@ -697,8 +698,11 @@ run goes red.
 
 ### The inspection log
 
-`PATHWAY_FORWARD.md` is the present tense: one row per surface of the repo,
-with the date it was last audited and the command whose output was read.
+`PATHWAY_FORWARD.md` is the present tense and a queue: one row per surface of
+the repo, with a priority the work is taken in (`P1` first), the date it was
+last audited, and the command whose output was read. Re-prioritising is the
+expected maintenance — state says how bad a row is, `prio` says whether to
+touch it today, and Check 12 fails a row carrying no priority.
 Release notes are history and are never revised — the board is what you read
 to know where things actually stand.
 

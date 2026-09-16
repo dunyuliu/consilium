@@ -688,6 +688,15 @@ the current view, and must not be used as one.
   writing one line in the deferral log with a reason. Letting it lapse silently
   may not. The gate reddens on an undecided item, never on a date alone.
 - **Items are never deleted.** The board only grows (rule 8).
+- **Every row carries a priority — P1, P2 or P3 — and the work is taken in
+  that order.** Check 12 fails a row without one. The board is a queue, not an
+  archive: it holds what is open, what is done and what is claimed, and `prio`
+  is the column that says which to touch next. Re-prioritising as the project
+  moves is the maintenance this file is for, not evidence it was written wrong.
+  State is not priority: `BROKEN` says how bad a row is, `prio` says how much
+  it matters now, and they disagree often. Priority stays a column rather than
+  a row order so that a re-prioritisation is one character and its diff stays
+  reviewable.
 
 **Rationale**: rule 4 says only fresh runs are evidence, but it is applied at
 the moment of writing and never again. Nothing obliged anyone to re-check, so

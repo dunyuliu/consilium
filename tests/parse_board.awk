@@ -2,7 +2,7 @@
 #
 # Usage: awk -f parse_board.awk -v section=board|items|defer PATHWAY_FORWARD.md
 #
-# board -> id|area|state|last|interval        (one per table row)
+# board -> id|area|state|last|interval|prio   (one per table row)
 # items -> id|state|has_cmd|has_result        (one per '### <id>' block)
 # defer -> id|until                           (one per deferral-log row)
 #
@@ -20,14 +20,19 @@ function emit_item() {
     cur = ""; cur_state = ""; has_cmd = 0; has_result = 0; infence = 0
 }
 
-# --- board table: | PF-001 | `area` | claim | STATE | date | interval |
+# --- board table: | PF-001 | `area` | claim | STATE | date | interval | prio |
+#
+# `prio` is appended rather than inserted on purpose: every field here is read
+# by position, so a column in the middle would silently shift state, date and
+# interval one place left and Check 12 would validate the wrong cells.
 section == "board" && /^\| *PF-[0-9]+ *\|/ {
     n = split($0, f, "|")
-    id = f[2]; area = f[3]; state = f[5]; last = f[6]; iv = f[7]
+    id = f[2]; area = f[3]; state = f[5]; last = f[6]; iv = f[7]; prio = f[8]
     gsub(/^ +| +$/, "", id);    gsub(/^ +| +$/, "", area)
     gsub(/^ +| +$/, "", state); gsub(/^ +| +$/, "", last)
     gsub(/^ +| +$/, "", iv);    gsub(/`/, "", area)
-    print id "|" area "|" state "|" last "|" iv
+    gsub(/^ +| +$/, "", prio)
+    print id "|" area "|" state "|" last "|" iv "|" prio
     next
 }
 

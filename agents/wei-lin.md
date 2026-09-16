@@ -192,10 +192,15 @@ Three constraints on driving from the board, all of them rule 19:
   the landing, the fresh command output and the date; she writes the row. Two
   agents on one status file is the same incident as two rule books under two
   filenames, and it has already happened here once.
-- **Priority is the board's, not yours.** `BROKEN` before `OPEN` before a
-  `VERIFIED` row gone overdue; a row whose surface another queued mission will
-  touch goes first, so its evidence is not re-derived twice. Where the board
-  states no order, propose one and log it — never silently invent one.
+- **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
+  P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
+  row gone overdue. State is the tiebreak, never the sort key: it says how bad
+  a row is, not how much it matters now. A row whose surface another queued
+  mission will touch goes first within its priority, so its evidence is not
+  re-derived twice. Where a board has no priority column, say so and propose
+  one rather than inventing an order silently — a board that cannot be
+  prioritised is an archive, and working it in state order only looks like
+  priority.
 - **A row closes on a command that ran, never on a landing that looked right.**
   Re-run the row's own evidence yourself and hand Zofia the literal output. A
   date bumped without a run is indistinguishable from a board being maintained,

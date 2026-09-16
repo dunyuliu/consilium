@@ -485,11 +485,15 @@ else
         defer_count[$id]=$(( ${defer_count[$id]:-0} + 1 ))
     done < <(awk -f tests/parse_board.awk -v section=defer "$BOARD")
 
-    while IFS='|' read -r id area st last iv; do
+    while IFS='|' read -r id area st last iv prio; do
         [ -z "$id" ] && continue
         board_rows=$((board_rows + 1))
         err=""
         case "$st" in VERIFIED|OPEN|BROKEN|DEFERRED) ;; *) err="bad state '$st'" ;; esac
+        # Rule 21's priority. A row with no priority cannot be queued, and a
+        # board that cannot be queued is an archive: state says how bad a row
+        # is, never how much it matters now.
+        case "$prio" in P1|P2|P3) ;; *) err="${err:-no priority — every row carries P1, P2 or P3 (rule 21)}" ;; esac
         if [ -z "${item_state[$id]:-}" ]; then
             err="${err:-no matching '### $id' block}"
         elif [ "${item_state[$id]}" != "$st" ]; then

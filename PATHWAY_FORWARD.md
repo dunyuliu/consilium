@@ -3,6 +3,18 @@
 The present tense of this repository, by surface. Release notes are history and are
 never revised (rule 8); this file is revised constantly.
 
+**This is a queue, not an archive.** Rows are the work: what is open, what is
+done, what is claimed, each with the command that settles it. `prio` is what the
+work is taken in — **P1 first, then P2, then P3** — and adjusting it as the
+project changes is the maintenance this file exists for, not a sign it was
+written wrong. `/autopilot` reads that column and works the board top down.
+
+Priority is a column and not the row order on purpose: the table stays in id
+order so its diffs stay readable, and a re-prioritisation is a one-character
+change rather than a reshuffle nobody can review. State is not priority —
+`BROKEN` says how bad a row is, `prio` says how much it matters now, and the
+two disagree often.
+
 **How to read a row.** Each row is a *part of the repo* and *the date it was last
 audited* — a firehydrant tag. A blank `last-checked` means **nobody has ever checked
 it**, and it stays blank until someone does. A blank is information, not an unfilled
@@ -20,27 +32,27 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 
 ## Board
 
-| id | area | what is claimed | state | last-checked | interval |
-|---|---|---|---|---|---|
-| PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 |
-| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 |
-| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-09-16 | 14 |
-| PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 |
-| PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 |
-| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 |
-| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-09-16 | 30 |
-| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 |
-| PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-09-16 | 30 |
-| PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 |
-| PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 |
-| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 |
-| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-16 | 30 |
-| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 |
-| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-09-16 | 14 |
-| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 |
-| PF-017 | `agents/` | every behaviour shipped this session has a fixture that grades it | BROKEN | 2026-09-16 | 14 |
-| PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | OPEN | 2026-09-16 | 30 |
-| PF-019 | `tests/release_gate.sh` | the publish row covers the published release, not just the tag | OPEN | 2026-09-16 | 30 |
+| id | area | what is claimed | state | last-checked | interval | prio |
+|---|---|---|---|---|---|---|
+| PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 | P2 |
+| PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
+| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-09-16 | 30 | P2 |
+| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 | P3 |
+| PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 | P3 |
+| PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 | P2 |
+| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 | P3 |
+| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-09-16 | 14 | P3 |
+| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
+| PF-017 | `agents/` | every behaviour shipped this session has a fixture that grades it | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-019 | `tests/release_gate.sh` | the publish row covers the published release, not just the tag | OPEN | 2026-09-16 | 30 | P2 |
 
 ## Items
 
@@ -253,7 +265,7 @@ it. Note the circularity this row sits in — it cannot honestly record "green" 
 its own overdue entry is one of the things keeping the suite red, so the other three
 were refreshed first and this one last.
 
-**Re-run 2026-09-16: 789 -> 1259.** The same lapse, wider: ten rows were overdue
+**Re-run 2026-09-16: 789 -> 1294.** The same lapse, wider: ten rows were overdue
 by 4 to 13 days, so Check 12 had the suite red on a branch that did not cause it
 — the second occurrence of the failure mode this row already records. The nine
 others were re-run and dated first and this one last, for the circularity
@@ -276,7 +288,7 @@ the maintenance-shaped work the rest of the board exists to avoid needing.
 
 ```bash
 bash tests/check.sh | tail -1
-# → Summary: 1259 passed, 0 failed
+# → Summary: 1294 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -1591,7 +1603,7 @@ ls evals/cases | grep -cE 'autopilot|release-gate'
 # → 0
 ```
 
-### PF-018 — `PATHWAY_FORWARD.md` — OPEN
+### PF-018 — `PATHWAY_FORWARD.md` — VERIFIED
 
 The board records state, date and interval, and has no **priority** field. It
 is worked in the order `BROKEN` before `OPEN` before an overdue `VERIFIED` —
@@ -1606,12 +1618,25 @@ Check 12, Check 17 and every row in the table. Invariant 12 in
 `agents/zofia-kaminska.md` would need it too, or seeded projects inherit a
 board that cannot be prioritised.
 
-The command counts the fields the parser emits per row; it moves from 5 to 6
-when priority lands.
+**Closed 2026-09-16, hours after it was opened.** The row was written to track
+a gap and the gap was the point of the session: the user had asked three times
+for a board that drives the work, and twice I answered by adding audit rows to
+a board that could not be worked from. `prio` now exists on every row, Check 12
+fails a row without one, rule 21 carries the queue framing, and invariant 12
+seeds it so the next project does not inherit the same archive.
+
+It is appended rather than inserted because `tests/parse_board.awk` reads every
+field by position — a column in the middle would have shifted state, date and
+interval one cell left and left Check 12 validating the wrong things, silently.
+
+What it cost: nothing in the parser, one case in Check 12, one column on
+nineteen rows. The estimate on this row when it was opened said it would cost
+"the parser, Check 12, Check 17 and every row", which was wrong in the
+direction estimates usually are.
 
 ```bash
 awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | head -1 | awk -F'|' '{print NF}'
-# → 5
+# → 6
 ```
 
 ### PF-019 — `tests/release_gate.sh` — OPEN

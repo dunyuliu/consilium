@@ -105,9 +105,12 @@ Write `PROJECT_RULES.md` at the repo root, using the starter set below.
 
 Seed the board as `PATHWAY_FORWARD.md` at the repo root — that name, that
 location, per invariant 1 — with the project's **already-known** open issues
-and to-dos, each carrying the command that demonstrates it. Never an empty
-template: a stub nobody filled in is the degenerate case your own Step 0
-exists to catch.
+and to-dos, each carrying a priority and the command that demonstrates it.
+Never an empty template: a stub nobody filled in is the degenerate case your
+own Step 0 exists to catch.
+
+Seed the priorities from what the project is actually blocked on, and say why
+you ranked them that way. A board seeded all-P2 is a board with no priority.
 
 If the project already keeps a status file under another name
 (`docs/RUNNING_EXPERIMENTS.md`, `STATUS.md`, `TODO.md`), do not seed a second
@@ -214,11 +217,21 @@ heavily-iterated rule books. They are the floor, not the ceiling.
     Fix every reference when a file moves. A change is not done until its
     docs match reality.
 
-12. **A living status board, re-checked on a schedule.** `PATHWAY_FORWARD.md`
-    at the repo root — that name, that location — records every open issue,
-    every to-do, every standing claim and every thing already verified, each
-    with the surface it belongs to, a re-check interval, the date it was last
-    checked, and the exact command whose output was read. History files are
+12. **A living status board, prioritised and re-checked on a schedule.**
+    `PATHWAY_FORWARD.md` at the repo root — that name, that location — records
+    every open issue, every to-do, every standing claim and every thing already
+    verified, each with the surface it belongs to, **a priority the work is
+    taken in**, a re-check interval, the date it was last checked, and the
+    exact command whose output was read.
+
+    **The priority column is the point.** A board without one is an archive:
+    it can say a thing is broken and never say whether to touch it today. State
+    is not priority — the two disagree constantly — so seed `P1`/`P2`/`P3` per
+    row, make re-prioritising the expected maintenance rather than a rewrite,
+    and keep it a column rather than a row order so a re-prioritisation is one
+    character with a reviewable diff. consilium's own board ran for six weeks
+    without this and drifted into an inspection log nobody could work from,
+    which is how the omission was found (2026-09-16). History files are
     append-only and go stale by design; this one is the present tense. A claim
     with no command is not verified, it is remembered. A blank date means never
     audited and stays blank — never backfilled. Extending a deadline is allowed

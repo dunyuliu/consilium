@@ -7,10 +7,11 @@ Invoke `wei-lin` to conduct an autopilot run for the budget passed as argument
 before spending any of it).
 
 The queue is the project's status board, not a roadmap file: `PATHWAY_FORWARD.md`
-where the rule book names it, worked in the board's own priority — `BROKEN`
-before `OPEN` before a `VERIFIED` row gone overdue. Every row already carries
-the command that decides whether it is done, which is what makes it a better
-queue than a to-do list.
+where the rule book names it, worked in its own `prio` order — P1, then P2,
+then P3, with state as the tiebreak inside a priority. Every row already
+carries the command that decides whether it is done, which is what makes it a
+better queue than a to-do list, and re-prioritising rows as the project moves
+is expected rather than exceptional.
 
 She does not write the board. Rows belong to `zofia-kaminska` (rule 19): Wei
 lands the work, re-runs the row's own evidence command, and hands over the
