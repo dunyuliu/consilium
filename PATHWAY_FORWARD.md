@@ -1197,11 +1197,18 @@ Worth naming: `haruto-002-tag-before-gate` covers precisely the behaviour the
 CI gate just changed, and it is in PF-003's never-run list. The case that would
 grade this change exists and has never been executed.
 
+**Re-run 2026-09-16: 15 -> 16.** `zofia-kaminska`'s prompt changed — the job
+statement, the Step 0 inventory, the patch-not-revamp contract and the
+frontmatter description — so her third case went stale too. All three of her
+cases now carry verdicts older than the prompt they grade, and one of them
+(`zofia-003`) has never had a verdict at all. The agent whose seeding behaviour
+this session was convened to fix is now the least measured on the board.
+
 Re-derived on a full clone, for the reason PF-005 now records.
 
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 15
+# → 16
 ```
 
 ### PF-013 — `agents/` — OPEN

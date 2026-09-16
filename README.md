@@ -325,7 +325,7 @@ code outside it.
 | `dunyu-liu` | Senior computational researcher. Owns research-heavy new implementations where no reference exists — frames the question, designs the numerical experiment, spikes cheaply, lands the minimal version, and reports what failed. |
 | `nadia-hadid` | Onsite evaluation PM. Reviews real deployments, diagnoses misses, recommends prompt or fixture edits. Closes the loop between the team and the wild. |
 | `lian-zhao` | Agent-refinement engineer. Owns the prompts themselves — measures where tokens go, changes one variable, verifies on the agent's own fixture, reverts on failure keeping the reason. Never grades its own work. |
-| `zofia-kaminska` | Project-rules enforcer. Seeds a rule book for a new project, audits a repo against the one it has, and codifies incidents into rules. Edits the rule book only; routes every violation it finds to the owning specialist. |
+| `zofia-kaminska` | Project-rules enforcer. Aligns an existing project to a proven rule book — creates what it lacks, reports what breaks the rules it has, codifies what it learned — and sets up one that has no rules. Enhances, never revamps: creates missing files, adds rules at the next free number, rewrites nothing. Edits the rule book and board only; routes every violation to the owning specialist. |
 
 ### Campaign orchestration
 
@@ -481,7 +481,7 @@ routes.
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
 | `/eval-deployment` | `nadia-hadid` | Grade a real agent run against its contract, diagnose misses, recommend prompt or fixture edits. |
 | `/implement` | `dunyu-liu` | Research-heavy new implementation with no reference. `implement <feature>` builds; `implement spike <question>` is feasibility only. |
-| `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book. No argument audits, `seed` writes one for a new project, `codify` turns an incident into a rule. |
+| `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book. No argument audits; `seed` aligns the project to the book — creating what is absent, patching what exists, on a new or established repo; `codify` turns an incident into a rule. |
 
 ---
 
@@ -586,7 +586,7 @@ consilium/
 │   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
 │   ├── marta-silva.md      #   publication-figure engineer — print-width scaling
 │   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
-│   ├── zofia-kaminska.md   #   project-rules enforcer — seed, audit, codify
+│   ├── zofia-kaminska.md   #   project-rules enforcer — align a project to the book
 │   ├── lian-zhao.md        #   agent refinement — cheaper without worse
 │   ├── dunyu-liu.md        #   computational researcher — new implementations
 │   └── wei-lin.md          #   campaign conductor — multi-mission orchestration
