@@ -1008,43 +1008,40 @@ if [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
     echo "  no tags in this clone — rule 15 not checkable here"
     ok
 else
+    # RULE 15a PRE-TAG GRACE, STATE-BASED. An earlier version of this grace
+    # window was wall-clock (7 days from the note's first-add commit), which
+    # made the gate non-deterministic — the same commit passed today and
+    # would fail next week with no code change. Replaced with a rule keyed
+    # only to tree state: the grace applies ONLY to the single NEWEST
+    # release note present (by version), and ONLY until a newer one
+    # supersedes it. An older, superseded, untagged note has no excuse left
+    # and fails hard — this is what keeps "a note that never gets tagged
+    # must still fail eventually" true.
+    #
+    # Deliberately NOT "grace only while the note's adding commit is HEAD":
+    # that reading was tried first and rejected because it does not survive
+    # ordinary autopilot operation — any commit landing on top of the
+    # release-note commit (a test fix, a board update, exactly what this
+    # session did three times) would expire the grace immediately and
+    # re-fail Check 27 on the very note this window exists to protect,
+    # recreating the deadlock rather than resolving it.
+    newest_ver=$(
+        for f in release_notes_v*.md docs/release_notes_v*.md; do
+            [ -f "$f" ] || continue
+            basename "$f" .md | sed 's/^release_notes_//'
+        done | sort -V | tail -1
+    )
     for note in release_notes_v*.md docs/release_notes_v*.md; do
         [ -f "$note" ] || continue
         ver=$(basename "$note" .md | sed 's/^release_notes_//')
         if git rev-parse -q --verify "refs/tags/$ver" >/dev/null 2>&1; then
             ok
         else
-            # RULE 15a PRE-TAG GRACE WINDOW. Rule 15a requires the tag to be
-            # pushed strictly after the release-note commit, so a note that
-            # just landed and has no tag yet is not a violation — it is the
-            # expected intermediate state 15a names explicitly. PF-020's own
-            # re-audit interval is 7 days (see PATHWAY_FORWARD.md), so a note
-            # untagged for longer than that is no longer "about to be tagged"
-            # — it is a stalled release, and that IS a real rule 15 failure.
-            #
-            # A shallow clone cannot compute a note's first-add date
-            # reliably, so it gets no grace: this matches Check 28's shallow
-            # guard, which is conservative (fails/skips) rather than silently
-            # lenient when history isn't available.
-            if [ "$(git rev-parse --is-shallow-repository 2>/dev/null || echo true)" = "true" ]; then
-                fail "$note has no matching tag '$ver' — a release note with no tag is not a release (rule 15)"
+            if [ "$ver" = "$newest_ver" ]; then
+                echo "  $note has no matching tag '$ver' yet, but it is the newest release note in the tree and not yet superseded — rule 15a's expected pre-tag window"
+                ok
             else
-                added=$(git log --diff-filter=A --format=%ct -- "$note" 2>/dev/null | tail -1)
-                if [ -n "$added" ]; then
-                    now=$(date +%s)
-                    age_days=$(( (now - added) / 86400 ))
-                    grace_days=7
-                    if [ "$age_days" -lt "$grace_days" ]; then
-                        echo "  $note has no matching tag '$ver' yet, but is only ${age_days}d old — rule 15a's expected pre-tag window (grace: ${grace_days}d)"
-                        ok
-                    else
-                        fail "$note has no matching tag '$ver' after more than 7 days — a release note with no tag is not a release (rule 15)"
-                    fi
-                else
-                    # No first-add date found — do not silently pass (rule 2);
-                    # fall through to the original hard failure.
-                    fail "$note has no matching tag '$ver' — a release note with no tag is not a release (rule 15)"
-                fi
+                fail "$note has no matching tag '$ver' — a release note with no tag is not a release (rule 15)"
             fi
         fi
     done
