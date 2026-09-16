@@ -64,39 +64,39 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 0 | **Always eat what you cook** — apply every discipline here first | judgment |
 | 1 | Minimal changes; no new files; the root is a whitelist | judgment; root table mechanical — Check 31 |
 | 2 | No silent fallbacks or swallowed errors | judgment |
-| 3 | `bash tests/check.sh` is the gate; green before merge | mechanical |
+| 3 | `bash tests/check.sh` is the gate; green before merge | mechanical — the pre-push hook, not a check |
 | 4 | Only fresh runs are evidence | judgment |
-| 5 | One definition of "pass" — `check.sh` exit 0, `evals/README.md` criteria | mechanical |
+| 5 | One definition of "pass" — `check.sh` exit 0, `evals/README.md` criteria | mechanical — Checks 15, 16, 24 |
 | 5a | The answer key is never inside `input/` | mechanical — Check 18 |
 | 5b | The answer key is never LINKED into `input/` | mechanical — Check 23 |
 | 6 | *(dropped — see "Dropped starter rules")* | — |
 | 7 | `evals/cases/*/input/` is read-only fixture data | mechanical — Check 26 |
 | 8 | Never delete evidence: release notes archive, never vanish | mechanical — Check 28 |
-| 9 | Run the cheap check locally before pushing | mechanical |
+| 9 | Run the cheap check locally before pushing | mechanical — the pre-push hook, not a check |
 | 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |
 | 11 | Docs move with the prompt, in the same change | judgment |
-| 12 | A new agent lands with README roster, model table, and Layout entry | mechanical |
-| 13 | A new agent lands with at least one `evals/cases/` fixture | mechanical |
+| 12 | A new agent lands with README roster, model table, and Layout entry | mechanical — Checks 6, 7 |
+| 13 | A new agent lands with at least one `evals/cases/` fixture | mechanical — Check 25 |
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
 | 15a | A tag never reaches the remote ahead of a green CI run on its commit | judgment — see the rule for what would make it mechanical |
 | 15b | Every release records its gate, row by row; the gate refuses what it can decide | mechanical — `tests/release_gate.sh`, held to the schema by Check 33 |
-| 16 | Agent frontmatter is a contract, not a preamble | mechanical |
-| 17 | Cross-references between agents must resolve | mechanical |
-| 18 | One writer per repo — never run two mutating workflows at once | mechanical |
-| 19 | One owner per write surface | mechanical |
-| 20 | Every writer declares isolation first; merge is judged by someone else | mechanical |
-| 21 | Standing claims are re-checked on a schedule and cite a command | mechanical |
+| 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 |
+| 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
+| 18 | One writer per repo — never run two mutating workflows at once | mechanical in name only — the pre-commit hook exists only where install.sh ran; nothing in the repo checks it |
+| 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
+| 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
+| 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Check 12 |
 | 21a | Board `# →` lines are literal command stdout, and the command is re-run | mechanical — Check 17 |
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
 | 13a | An agent's fixture must name it exactly | mechanical — Check 25 |
-| 22 | Every agent declares communication discipline | mechanical |
+| 22 | Every agent declares communication discipline | mechanical — Check 13 |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
-| 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical |
+| 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical — Checks 15, 16 |
 | 25a | must_not_find guards are declarative, never imperative | mechanical — Check 19 |
-| 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical |
+| 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical — Check 14 |
 | 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
 
 ---
@@ -808,6 +808,14 @@ the machine-readable source of truth, not documentation of one.
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
+
+**Human-owned surfaces.** `README.md` and `CLAUDE.md` have no agent owner and
+are not an oversight: they are maintained by hand. An agent proposes a change
+to either and routes it — `zofia-kaminska` refuses to edit them while auditing,
+`sophia-okafor` reports their drift without fixing it. Declared here because
+Check 10 walks agents to surfaces and cannot see a surface with nobody on it;
+`CLAUDE.md` sat outside the model entirely for the day it took to notice
+(2026-09-16).
 
 **Precedence when surfaces touch.** CI config is `iris-vermeulen`'s; a port
 needing a CI change asks her rather than editing it. Production code is

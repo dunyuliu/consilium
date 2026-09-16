@@ -154,7 +154,7 @@ is not one of them, so it is maintained by hand: `zofia-kaminska` refuses to
 edit it while auditing, and `sophia-okafor` reports doc-versus-code drift
 rather than fixing it.
 
-Keep it a working doc. Usage belongs in `README.md` and is cited here, never
-copied; a binding constraint belongs in `PROJECT_RULES.md`; a dated open issue
-belongs in `PATHWAY_FORWARD.md` and nowhere else. A fact living in two of the
-four will be wrong in one of them, and not in the one you happen to be reading.
+Keep it a working doc: rule 1's table says which of the four root documents a
+fact belongs in, and this file is not exempt from it. It held a restatement of
+that clause for most of a day — the rule and its copy, one screen apart in two
+root documents, which is the thing the clause forbids.

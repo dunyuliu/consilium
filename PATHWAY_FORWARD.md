@@ -38,6 +38,9 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-09-16 | 14 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 |
+| PF-017 | `agents/` | every behaviour shipped this session has a fixture that grades it | BROKEN | 2026-09-16 | 14 |
+| PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | OPEN | 2026-09-16 | 30 |
+| PF-019 | `tests/release_gate.sh` | the publish row covers the published release, not just the tag | OPEN | 2026-09-16 | 30 |
 
 ## Items
 
@@ -1563,6 +1566,69 @@ one that cannot hit it.
 ```bash
 grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
 # → 1
+```
+
+### PF-017 — `agents/` — BROKEN
+
+Rules 10 and 25, breached by the session that wrote three checks to enforce
+them. `agents/wei-lin.md` gained the board-driven queue, the milestone release
+cycle and the clean close; `agents/haruto-nakamura.md` gained the CI gate, the
+release-gate step and the Kai dispatch. Roughly 190 lines of new behaviour, and
+not one fixture grades any of it.
+
+`zofia-003-seed-bare-project` covers the seeding bug only, and is itself in
+PF-003's never-run list. So the new release discipline is exactly the shape of
+the defect that started the session: a large, confidently-written mode that
+nothing measures. `haruto-002-tag-before-gate` already covers the tagging
+order this session changed and has never been executed either.
+
+The command is a tripwire, not a measure of coverage: it goes to 1 when a case
+whose name says autopilot or release-gate exists at all. Running it is PF-003's
+problem.
+
+```bash
+ls evals/cases | grep -cE 'autopilot|release-gate'
+# → 0
+```
+
+### PF-018 — `PATHWAY_FORWARD.md` — OPEN
+
+The board records state, date and interval, and has no **priority** field. It
+is worked in the order `BROKEN` before `OPEN` before an overdue `VERIFIED` —
+`commands/autopilot.md` says so, because state is the only thing there is to
+sort by. That is a proxy: state says how bad a row is, never how much it
+matters, and "priorities constantly adjusted to drive the work" cannot be
+written down here at all.
+
+Not a silent gap any more, but not a cheap fix either: `tests/parse_board.awk`
+reads fields by position (`f[2]` through `f[7]`), so a column costs the parser,
+Check 12, Check 17 and every row in the table. Invariant 12 in
+`agents/zofia-kaminska.md` would need it too, or seeded projects inherit a
+board that cannot be prioritised.
+
+The command counts the fields the parser emits per row; it moves from 5 to 6
+when priority lands.
+
+```bash
+awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | head -1 | awk -F'|' '{print NF}'
+# → 5
+```
+
+### PF-019 — `tests/release_gate.sh` — OPEN
+
+Rule 15b's `publish` row decides that the note version, the local tag and the
+remote tag agree. It does not create or verify a GitHub Release, so "the
+release is published where a user would look for it" is still unchecked — the
+tag exists, the release page may not.
+
+Deliberately not fixed in the same change that added the gate: reading or
+creating a release needs the network and credentials, and rule 21b keeps this
+board's own evidence offline. The honest form is a row in the gate that reports
+SKIP without them, the way `ci` already does.
+
+```bash
+grep -c 'gh release' tests/release_gate.sh
+# → 0
 ```
 
 ## Deferral log
