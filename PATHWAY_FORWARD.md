@@ -1717,8 +1717,20 @@ deliberately short because an untagged note reddens the gate for every clone.
 
 ```bash
 git tag --list 'v1.21.0' | wc -l | tr -d ' '
-# → 1
+# → 0
 ```
+
+**2026-09-16**: Re-ran the evidence command in this checkout — it printed `0`,
+not the `1` previously recorded (Check 17 was failing on the stale value).
+Root cause: the `1` was recorded from a session/machine where `v1.21.0` was
+created as a **local, never-pushed** tag; that tag was never shared, so any
+other clone or worktree reproduces `0` for this same command. That makes this
+evidence command inherently clone-dependent, not just network-blind — rule
+21b already forbids reaching the network here, but the deeper issue is that
+"tag exists" is being asserted from local repo state that isn't shared across
+checkouts. The row stays BROKEN: the tag genuinely is not on the remote, and
+nothing about the underlying blocker changed, only the recorded number was
+corrected to match a real re-run.
 
 ## Deferral log
 
