@@ -1,10 +1,14 @@
-# PATHWAY_FORWARD.md — inspection log
+# PATHWAY_FORWARD.md — the to-do book
 
-The present tense of this repository, by surface. Release notes are history and are
-never revised (rule 8); this file is revised constantly.
+**The to-do book.** What to do next, in priority order; what is done; and the
+standing claims that have to keep being true. Release notes are history and are
+never revised (rule 8); this file is revised constantly, and re-prioritising it
+is the work, not a symptom of having written it wrong.
 
-**This is a queue, not an archive.** Rows are the work: what is open, what is
-done, what is claimed, each with the command that settles it. `prio` is what the
+**Two kinds of row, one format.** A **task** is something to do — it closes
+when it is done. A **standing claim** is something that must stay true — it
+never closes, it comes due again on its interval. Both carry the command that
+settles them, both carry a priority, and a task with no command is a wish. `prio` is what the
 work is taken in — **P1 first, then P2, then P3** — and adjusting it as the
 project changes is the maintenance this file exists for, not a sign it was
 written wrong. `/autopilot` reads that column and works the board top down.
@@ -32,12 +36,12 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 
 ## Board
 
-| id | area | what is claimed | state | last-checked | interval | prio |
+| id | area | to do, or claim to keep true | state | last-checked | interval | prio |
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | every fixture has been executed and its outcome recorded | BROKEN | 2026-09-16 | 14 | P1 |
-| PF-004 | `evals/` | grading measures precision, not only phrasing | OPEN | 2026-08-04 | 60 | P2 |
+| PF-003 | `evals/cases/` | run the 11 fixtures that have never been executed | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-08-04 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-09-16 | 30 | P2 |
@@ -50,9 +54,9 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
-| PF-017 | `agents/` | every behaviour shipped this session has a fixture that grades it | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | BROKEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-019 | `tests/release_gate.sh` | the publish row covers the published release, not just the tag | OPEN | 2026-09-16 | 30 | P2 |
+| PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
 
 ## Items
 
@@ -1601,12 +1605,17 @@ the defect that started the session: a large, confidently-written mode that
 nothing measures. `haruto-002-tag-before-gate` already covers the tagging
 order this session changed and has never been executed either.
 
+Three fixtures are owed, and the third is now the most load-bearing: zofia's
+seed path no longer branches on repo state, so **patching an established
+project** is the behaviour a user gets and nothing grades it.
+`zofia-003-seed-bare-project` tests the empty-repo path only.
+
 The command is a tripwire, not a measure of coverage: it goes to 1 when a case
-whose name says autopilot or release-gate exists at all. Running it is PF-003's
-problem.
+whose name says autopilot, release-gate or seed-patch exists at all. Running
+what exists is PF-003's task.
 
 ```bash
-ls evals/cases | grep -cE 'autopilot|release-gate'
+ls evals/cases | grep -cE 'autopilot|release-gate|seed-patch'
 # → 0
 ```
 
