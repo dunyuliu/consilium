@@ -723,3 +723,64 @@ the wrong answer is a broken gate.
 
 `zofia-004` remains SUPERSEDED and has been re-dispatched against the corrected
 criteria. A verdict produced by criteria that no longer exist is not a verdict.
+
+## Finding 15 — the re-run scored WORSE, and the fixture is measuring the wrong thing
+
+`zofia-004` was re-dispatched against the corrected criteria. It scored
+**FAIL — 8 criteria, 3 failed**, worse than the 2 that started this. Two
+distinct causes, and neither is the agent being wrong.
+
+**Cause 1 — enumerating surface forms cannot converge.** The report's
+inventory row reads:
+
+```
+| `PROJECT_RULES.md` | present (5 rules, real rules — station ID format, ...
+```
+
+The criterion now carries nine terms, including `` PROJECT_RULES.md` | **present** ``
+and `PROJECT_RULES.md | present`. It does **not** carry
+`` PROJECT_RULES.md` | present `` — backtick-delimited filename followed by an
+unbolded verdict, which is exactly what this run produced. Verified directly:
+the string is in the report, and `grep -cF` for it in `case.yaml` returns `0`.
+
+That is the third consecutive round of the same move. Round one demanded
+`"exists"` where the prompt says "present". Round two added terms that named no
+file and let the wrong answer through. Round three coupled them again and
+missed one backtick-and-bold permutation. The space of Markdown renderings of
+"this file is present" is not enumerable, and each round has looked like a
+small remaining gap from inside the change.
+
+**Cause 2 — the fixture encodes one of two defensible judgements as the only
+right answer.** Criterion 2 requires the agent to add a new rule at the next
+free number (`"rule 6"`, `"next free number"`). Run 1 proposed rule 6. Run 2
+declined, explicitly: *"Nothing to add without inventing a rule the project
+didn't ask for."* Same agent, same prompt, opposite call on the fixture's
+central question — and the refusal is arguably the better one, given that this
+agent's own contract is to enhance rather than revamp and to prefer sharpening
+an existing rule to adding one.
+
+So the case cannot currently distinguish a correct seed pass from an incorrect
+one: it rejects a correct report for its Markdown, and it rejects a defensible
+refusal for being a refusal.
+
+**Stopping here rather than attempting a fourth repair.** Two repair rounds on
+one criterion set is the point at which another retry stops being work and
+starts being churn, and the pattern is now diagnosed rather than suspected. The
+verdict stands as produced — FAIL 8/3 — because that is what the criteria
+printed, and a verdict is about the criteria that existed when it ran.
+
+What this fixture needs is a design decision, not another literal:
+- whether "the rule book is already present" can be graded by substring at all,
+  or whether it needs a criterion kind that matching does not currently have;
+- whether adding rule 6 is genuinely required, or whether a reasoned refusal is
+  an equally correct answer the case must accept.
+
+Both are `iris-vermeulen`'s to make, with the second worth `nadia-hadid`'s
+adjudication first, since it is exactly the agent-defect-versus-criterion-defect
+call. Neither is being made at 3 in the morning by the conductor.
+
+**A separate result worth keeping: two dispatches of one prompt to one agent
+produced materially different substantive answers.** Not different wording —
+different judgement on whether to add a rule. Every verdict in this project is
+a single sample, and nothing in the eval machinery says so. That is a limit on
+what any of today's eleven verdicts mean, including the seven PASSes.
