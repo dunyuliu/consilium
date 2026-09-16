@@ -1,4 +1,14 @@
 # date	commit	current	stale	never_run	total	pct_current
+# APPEND-ONLY HISTORY. One row per `run.sh score --record`, describing the suite
+# at that commit. It is never revised, so every row but the last is wrong by
+# design and the last one goes wrong the moment a case is added — 2026-09-16 it
+# read 30/13/3 while the suite was 31/16/11.
+#
+# The present tense lives on PATHWAY_FORWARD.md: PF-003 for never-run, PF-012
+# for stale (rule 1 — a fact in two files will be wrong in one of them). The
+# counts here are also computed differently from PF-003's, which greps case.yaml
+# for a recorded run, so the two do not have to agree and a difference is not a
+# finding. Read this file for the trend and the board for the state.
 2026-08-27	5916fd8	4	16	9	29	13
 2026-08-27	64d75fd	14	13	2	29	48
 2026-08-27	06aa09d	14	13	2	29	48
