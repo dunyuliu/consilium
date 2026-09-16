@@ -58,7 +58,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
 | PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
-| PF-021 | `tests/check.sh` | Check 14's script selector uses `find .`, not `git ls-files` — reddens for any worktree-isolated dispatch | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-021 | `tests/check.sh` | Check 29's script selector uses `find .`, not `git ls-files` — reddens for any worktree-isolated dispatch | BROKEN | 2026-09-16 | 14 | P1 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description contradicts her own body on the fixture write surface | OPEN | 2026-09-16 | 30 | P2 |
 
 ## Items
@@ -185,8 +185,16 @@ wordings and produces no false negative on the two cases using `Later run (`
 (`lian-002`, `selin-001`), which the old pattern already reached only because
 they also contained an earlier `Run (`/`First run (` line.
 
+**Sharpened 2026-09-16, same day, before this ever shipped as the loose
+form.** `run \(`, bare, also matches ordinary prose that is not a dispatch
+record at all — "a fresh run (see below)", "the run (above)" — and the corpus
+only happens to contain none today. `run \((19|20)[0-9]{2}-` is the same
+length, keeps every one of the four wordings (all four are followed
+immediately by a date), and cannot be satisfied by prose that merely mentions
+a run. Re-run below is from the pattern that actually ships.
+
 ```bash
-for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
+for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → haruto-003-release-gate-red-row: NEVER RUN
 # → wei-lin-003-autopilot-board-order: NEVER RUN
 # → zofia-004-seed-patch-established: NEVER RUN
@@ -1820,12 +1828,12 @@ corrected to match a real re-run.
 
 ### PF-021 — `tests/check.sh` — BROKEN
 
-Check 14's script selector at `tests/check.sh:1098` is
+Check 29's script selector at `tests/check.sh:1098` is
 `find . -name '*.sh' -not -path './.git/*'`, which walks the working
 directory rather than the tracked tree. The harness places agent worktrees at
 `./.claude/worktrees/<agent-id>/`, excluded only via a local, uncommitted
 `.git/info/exclude:11` — invisible to `git status` and to any clone, and fully
-visible to `find`. Check 14 then reports the worktree's own `install.sh` as a
+visible to `find`. Check 29 then reports the worktree's own `install.sh` as a
 second installer and fails rule 14: the gate reddens for the duration of any
 worktree-isolated dispatch, and reddened a `pre-push` hook twice today on two
 different agent ids. It is the only bare `find .` selector in the file — every
