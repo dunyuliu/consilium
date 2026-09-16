@@ -381,3 +381,67 @@ Caught only because the next action happened to need the lock. The work she
 reported was accurate in every other respect and independently re-verified —
 which is the point: a report can be right about the hard part and wrong about
 the cleanup, and the cleanup is what the next session inherits.
+
+## Finding 9 — the board owner overrode her own row's instruction, and was right
+
+`PF-003`'s notes said fixing the detector "changes what the row measures and
+belongs in its own change, with the new number established by a fresh run
+rather than inherited from this note". `zofia-kaminska` fixed it in the same
+change that recorded the new evidence, and said so explicitly rather than
+quietly.
+
+Allowed at the merge gate, after checking the thing that would have made it
+wrong. The risk in widening `first run (|second run (` to `run (` is a false
+positive: ordinary prose such as "a fresh run (see below)" would mark an
+unexecuted fixture as executed, which is the one error this row must never
+make. Tested across the whole corpus — every case matching `run (` also
+carries `run (<date>` — so the widening was a strict superset on today's
+inputs. It was then sharpened further, on review, to
+`run \((19|20)[0-9]{2}-`, which cannot be satisfied by prose at all. Recorded
+output is unchanged either way: three `NEVER RUN`, exactly the three PF-017
+fixtures delivered today and not yet dispatched.
+
+Her re-run also caught something my brief had wrong. I handed her a list of 15
+`NEVER RUN` lines derived from the broken detector; `zofia-003-seed-bare-project`
+already carried `Run (2026-09-16, via a fresh zofia-kaminska dispatch). FAIL 6/7`
+at `case.yaml:147`, from an earlier session. Twelve real dispatches exist, not
+eleven. She found it because she re-ran the command instead of trusting the
+paste — rule 4 working in the direction that is easy to skip, against the
+person who dispatched her.
+
+One defect in what she wrote, caught at the gate and returned to her: `PF-021`
+cited "Check 14" in three places. Check 14 is `every agent declares tool
+economy`; the check holding the defective selector is **Check 29**, which
+enforces *rule* 14. Check number conflated with rule number, in a row whose
+only job is routing `iris-vermeulen` to the right check. Corrected to zero
+occurrences of `Check 14`, with "rule 14" left intact where the rule is meant.
+
+## Finding 10 — `tests/lock.sh` does not work from a worktree, which explains finding 8
+
+Reported by `zofia-kaminska` from inside her own worktree, and it is the cause
+of the false lock claim recorded above.
+
+A linked worktree's `.git` is a **file** containing a gitdir pointer, not a
+directory. `tests/lock.sh` resolves its lock path as `REPO_DIR/.git/consilium.lock`,
+so from a worktree that path is `<file>/consilium.lock` and the call fails with
+"Not a directory". Every worktree-isolated agent — which is every agent this
+role dispatches, by policy — therefore cannot reliably acquire or release the
+lock from its own working directory.
+
+This closes finding 8. `iris-vermeulen` did not misreport out of carelessness:
+her release failed the way an acquire that never persisted would look, her
+`status` read free from where she stood, and the lock stayed held for the main
+checkout, where it blocked my commit. A report can be honest and wrong at the
+same time when the tool it trusts is broken in the caller's environment.
+
+Zofia worked around it by invoking `/home/utig5/dliu/consilium/tests/lock.sh`
+by absolute path without changing directories, so `REPO_DIR` resolves to the
+main checkout. That is the workaround, not the fix.
+
+Not fixed here, and not added to the board by her because she was scoped to two
+named corrections. Queued: surface is `tests/lock.sh`, and the fix is to
+resolve the lock path via `git rev-parse --git-common-dir` rather than
+`$REPO_DIR/.git`, which is the one form that is correct in both a main checkout
+and a linked worktree. Needs a negative test from inside a real worktree,
+because that is the environment where every previous test of this script was
+not run.
