@@ -445,3 +445,55 @@ resolve the lock path via `git rev-parse --git-common-dir` rather than
 and a linked worktree. Needs a negative test from inside a real worktree,
 because that is the environment where every previous test of this script was
 not run.
+
+## Finding 11 — both test-tooling defects fixed, and re-verified independently
+
+`iris-vermeulen` fixed PF-021 and the `lock.sh` worktree defect in one mission.
+Neither was accepted on her report.
+
+**PF-021.** `tests/check.sh:1098` now reads
+`for script in $(git ls-files '*.sh' | sort); do`, with the skip case narrowed
+from `./install.sh` to `install.sh` to match. My own checks:
+
+- With a live worktree present, Check 29 no longer fires. Before this fix the
+  same condition reddened the gate three separate times today.
+- **My own negative test, because a fix that makes a check unable to fail is
+  worse than the defect (rule 2).** I planted a TRACKED `tests/wl_negtest.sh`
+  containing `ln -s "$PWD/agents" "$HOME/.claude/agents"` and `git add`ed it, so
+  `git ls-files` would see it. Result: exactly one new line —
+  `FAIL: tests/wl_negtest.sh references the Claude symlink directories`,
+  `Summary: 1458 passed, 2 failed`. Removing it returned `1458 passed, 1 failed`.
+  The selector was narrowed, not gutted.
+
+**The lock.** `LOCK` is now resolved through `git rev-parse --git-common-dir`
+rather than `$REPO_DIR/.git`, the one form that names the same shared `.git`
+from a main checkout and from every linked worktree. Verified against a
+throwaway worktree at `/tmp/wl-lock-test`, all five transitions run by me:
+
+```
+  acquire from the worktree       -> acquired by 'probe-agent', scope tests/
+  status from the MAIN checkout   -> HELD by 'probe-agent' ... scope: tests/
+  foreign owner from the worktree -> REFUSED: held by 'probe-agent' ... Rule 18
+  release from the worktree       -> released (was 'probe-agent')
+  status from the MAIN checkout   -> free
+```
+
+The last two lines are the incident that started this: a release from a
+worktree that silently did nothing, and a `status` that read free while the
+lock was held against the main checkout. The fourth line is the one that had to
+hold regardless — the lock still fails CLOSED against a foreign writer. A lock
+that fails open is worse than no lock, and "the fix works" would have been an
+incomplete claim without it.
+
+One detail worth keeping, from Iris: the installed `.git/hooks/pre-commit` was
+never affected, because hooks execute from the shared common dir. The breakage
+was confined to the user-invoked `tests/lock.sh` — which is the half that
+agents actually call, and the half whose failure mode is a false report rather
+than a refused commit. The enforcement worked throughout; only the interface
+agents use to cooperate with it was broken.
+
+**The remaining red is the row working.** PF-021's evidence command is a
+defect-present detector (`grep -c "find \. -name '\*\.sh'" tests/check.sh`),
+so repairing the defect necessarily makes the recorded `1` stale and reddens
+Check 17. That is the board catching its own row going out of date on the day
+the fix landed, and it is `zofia-kaminska`'s to close.

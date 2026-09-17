@@ -41,7 +41,20 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-LOCK="$REPO_DIR/.git/consilium.lock"
+# A linked worktree's .git is a FILE holding a gitdir pointer, not a directory,
+# so "$REPO_DIR/.git/consilium.lock" resolved to "<file>/consilium.lock" and
+# failed with "Not a directory" — the lock could not be taken, read, or
+# released from a worktree, and `release` failing silently once produced a
+# false "no lock held" report while the real lock was still in force.
+# --git-common-dir is the one form that resolves to the SAME shared .git in
+# both a main checkout and any of its linked worktrees, so every writer reads
+# and writes the identical lock file regardless of which checkout it runs from.
+GIT_COMMON_DIR="$(cd "$REPO_DIR" && git rev-parse --git-common-dir)"
+case "$GIT_COMMON_DIR" in
+    /*) : ;;
+    *) GIT_COMMON_DIR="$REPO_DIR/$GIT_COMMON_DIR" ;;
+esac
+LOCK="$GIT_COMMON_DIR/consilium.lock"
 
 OWNER="${CONSILIUM_LOCK_OWNER:-${USER:-unknown}}"
 
