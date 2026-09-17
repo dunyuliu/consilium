@@ -784,3 +784,114 @@ produced materially different substantive answers.** Not different wording —
 different judgement on whether to add a rule. Every verdict in this project is
 a single sample, and nothing in the eval machinery says so. That is a limit on
 what any of today's eleven verdicts mean, including the seven PASSes.
+
+---
+
+# Second wake — after the rate limit
+
+Two session rate limits hit this campaign in one afternoon. The first cost
+nothing: the branch was clean, the lock was free, and resuming from `git` and
+the board recovered the whole state. The second cost 174 minutes of a held
+lock, and the difference between them is the finding.
+
+## Finding 16 — the interruption did not break the lock; the working pattern did
+
+A dispatched `zofia-kaminska` died inside the rate limit holding the repo lock,
+scoped `PATHWAY_FORWARD.md`, with 164 lines of uncommitted board work in her
+worktree. Every other writer was blocked for the duration, and rule 18 —
+correctly — forbids clearing a lock however stale it looks, so nothing could
+proceed automatically.
+
+It is tempting to file this under "the API failed". That reading is wrong and
+would produce no fix. The defect is in the pattern the briefs prescribed:
+**agents were told to take the lock first and then do their work**, and most of
+that work is slow, read-only verification — re-running board commands, running
+`bash tests/check.sh`, re-deriving evidence. Holding an exclusive lock across a
+multi-minute read is a design choice, and it is the choice that converted a
+routine interruption into a blocked repo.
+
+The lock window should cover the write and nothing else. From this dispatch
+onward every brief carries:
+
+  1. All reading, board-command re-runs and gate runs happen WITHOUT the lock.
+  2. Acquire only when ready to write.
+  3. Write, `git add`, `git commit`, release — immediately.
+  4. Any final verification happens AFTER releasing.
+
+Seconds, not minutes. An agent killed outside that window leaves nothing stuck.
+
+Two details worth keeping because they shaped the recovery:
+
+- **The work was recoverable and was recovered, not redone.** Her base's
+  `PATHWAY_FORWARD.md` was byte-identical to main's, so the uncommitted diff
+  applied cleanly and she was re-dispatched to finish her own draft from a saved
+  patch. An interruption is not automatically a loss of work; it is a loss of
+  work only if nobody checks the worktree before reaping it. The coordinator's
+  instruction to check before removing was the right one and it saved 164 lines.
+- **Rule 18 did exactly what it should and that is why this cost time.** A rule
+  that auto-cleared stale locks would have made this cheap and would have made
+  the two-writers-in-one-tree incident possible. The right response is to make
+  the held window short, not to weaken the rule. Releasing it was done as an
+  explicit act, by name, after confirming no live process owned the worktree —
+  and recorded here rather than done quietly, because a force-release that
+  nobody writes down is indistinguishable from a lock that never worked.
+
+## What the interruption did NOT cost
+
+Verified rather than assumed, on resumption: `origin/main` at `e6674a8` with
+PRs #18 and #19 merged on green CI, and my own fresh run of the gate on a clean
+main reading `Summary: 1462 passed, 0 failed` — up from 1371 at the start of
+the campaign. Nothing landed was lost, no branch was orphaned, and the only
+casualty was one agent's in-flight edit, which survived in its worktree.
+
+## Finding 17 — PR #19 merged a stale snapshot, because I pushed once and kept committing
+
+This is mine and it is the most serious process error of the campaign.
+
+I pushed `wei-lin/pf-021-and-lock-worktree` at `3bca18e` and opened PR #19. I
+then continued working on that same branch, cherry-picking six further commits
+onto it, and **never pushed again**. The maintainer merged the PR in good
+faith, on green CI, and got the snapshot as of `3bca18e`. Everything after it
+was left behind:
+
+```
+  876838b  PF-022: fix lian-zhao.md frontmatter/body contradiction
+  4aee30b  session log: STALE mechanism correction + finding 13
+  8d3c986  PF-017 verdicts recorded; zofia-004 present-vocab criterion fix
+  c339ca8  zofia-004: fix filename-less terms in criterion 3
+  09bb09a  session log: finding 14 + my stale-SHA error
+  dbbfc03  session log: finding 15
+```
+
+Six commits, including two agents' delivered work and four of my own findings.
+The local branch was deleted after the merge, so nothing referenced them; they
+survived only as unreachable objects.
+
+**How it was caught, which is the part worth keeping.** Not by noticing the
+push was missing — I did not notice. I ran the campaign's trend numbers for
+item 5 while waiting on a dispatch, and one figure was wrong: `never-run: 3`
+where I had verified `0` hours earlier. Three is exactly the count of fixtures
+whose verdict records were in the unpushed commits. A number that disagreed
+with something I had personally run was the only signal, and I would not have
+had it if the standing trend eval had not made me compute a figure I did not
+strictly need yet.
+
+**Why the gate could not catch it.** Every check ran green on the PR, because
+the PR's tree was internally consistent — a stale snapshot is not a broken one.
+No assertion in this repo compares a pushed branch to its local counterpart,
+and `git status` says "up to date with origin/..." only about the tracking ref,
+which is exactly as stale. The condition is invisible from inside the branch.
+
+**The rule this earns**: a branch with an open PR is append-only through the
+remote. Any commit added to it must be pushed in the same action that creates
+it, or the PR silently describes a tree that no longer exists. My own checklist
+already asks "what have I left that the next session cannot reconstruct: a
+worktree, a held lock, an **unpushed tag**" — the answer was the same shape and
+I did not extend it from tags to commits.
+
+The mechanical form is cheap and should exist: before reporting a PR as
+landed, assert `git rev-list --count <branch>..<pushed-ref>` is zero, or simply
+push before every report. Routed as a board row; the check belongs in
+`tests/check.sh` only if it can be made to work offline, which it probably
+cannot — this may be a discipline rather than a gate, and should be written
+down as one rather than assumed.
