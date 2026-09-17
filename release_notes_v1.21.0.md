@@ -177,7 +177,7 @@ unauthenticated `gh` — designed degradation, stated explicitly here because
 ## Release gate
 
 - audit: milestone audit from a prior session found 8 critical defects (PF-028 install.sh hooks from worktree; 8 vacuous check.sh loops on empty evals/cases/; 6 more routed to PF-017/PF-003 board rows); none fixed in this run, all disclosed above (§4, §5)
-- correctness: no source/prompt files touched this run beyond the release note itself and archiving v1.20.0's note; tests/check.sh green save for the one expected pre-tag Check 27/35 failure
+- correctness: `bash tests/check.sh` — 1590 passed, 1 failed pre-tag (the expected Check 27 tag-missing red); 1593 passed, 0 failed after tagging; no source/prompt files touched this run beyond the release note itself and the already-completed archive of v1.20.0's note
 - conciseness: no refactor performed or needed for this run's own change (a release-note rewrite plus an archive move); the campaign-wide +10367/-182 growth is reported in the trend section as a fact, not excused
 - fixes: none applied beyond archiving release_notes_v1.20.0.md to docs/ and replacing the stale release_notes_v1.21.0.md draft; all 8 audit findings and the PF-017/PF-028 board items are deferred, filed, and cited above
 - docs: PATHWAY_FORWARD.md, README.md and CLAUDE.md reconciled against the actual filesystem via bash tests/check.sh (1590/1 pre-tag) and bash evals/run.sh list/score, not against git diff alone
