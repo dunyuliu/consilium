@@ -1449,3 +1449,43 @@ the team is pointed at. The lesson's value scales with how far out it lands,
 and the failure it prevents — a change that improves a metric by deleting what
 the metric measured — is not a consilium problem. It is available anywhere
 someone replaces an alarm and reports that alarms went down.
+
+## Finding 29 — three false negatives from over-narrow patterns, all mine, all in one day
+
+Rule 26 landed carrying the maintainer's sentence verbatim. My verification
+grep returned `0` and I was about to report the sentence missing. It is present
+at `PROJECT_RULES.md:1146-1147` — my pattern was single-line and the sentence
+wraps.
+
+That is the third time today the same error produced a confident wrong answer:
+
+1. Tested five of `nadia-hadid`'s nine `any_of` terms, saw the first report
+   match none of the five, and nearly reported that her fix "inverts the
+   verdict". It matches `five existing rules`, one of the four I skipped.
+2. Grepped `superseded|historical|not re-run` against a de-fenced board block
+   and found nothing, and nearly reported an unlabelled history. Its label
+   reads "kept as history rather than as a live fence" — the right meaning,
+   different words.
+3. Grepped a sentence that spans a line break with a single-line pattern.
+
+Each time the zero was mine, not the artifact's. I caught all three only
+because the result was surprising enough to re-check, which is luck dressed as
+diligence: a false negative that *confirms* what I already expect will not feel
+surprising and will not get re-checked.
+
+The shape is precise and worth naming, because it is the mirror of rule 26.
+Rule 26 warns against removing a signal without measuring what it catches. This
+is the same error at the observation end: **a search returning nothing is not
+evidence of absence until the search has been shown capable of finding the
+thing.** A grep that cannot match across a line break, an `any_of` sampled
+rather than exhausted, a fixed pattern against variable wording — each reports
+absence with the same confidence whether the thing is missing or the instrument
+is blind.
+
+The corrective is cheap and I should have been applying it all along: when a
+search for something I expect to exist returns nothing, **first prove the
+search can find a thing I know is there.** One positive control. `grep 'metric
+moving to zero'` would have found it instantly; I went straight to the full
+sentence and read the failure as the file's rather than my own.
+
+This is mine to carry, not a repo defect, and there is nothing to route.
