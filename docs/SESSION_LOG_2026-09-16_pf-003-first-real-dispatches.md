@@ -2497,3 +2497,49 @@ remain true, not what happens to be true"*, and the first where it sat directly
 in the path of a landing rather than costing a re-run. Caught before tagging
 rather than after, which is the only reason the release is not now wedged
 behind its own board row.
+
+## Decision recorded — local hook enforcement comes out, AFTER the release
+
+A maintainer decision, recorded here before acting on it, and deliberately not
+folded into the release.
+
+**The decision:** `install.sh` stops wiring `pre-commit` and `pre-push`. Keep
+`post-merge` only if it still earns its place as symlink sync. The two live
+hooks are cleared by hand by the maintainer; my job is ensuring the installer
+does not put them back.
+
+**The evidence, which is a comparison I had not made.** EQdyna carries the same
+apparatus — 26 rules, a 108-row board, a rule book, a test system — and in the
+last 24 hours took **60 commits and six tags, +19,098/−273**. Consilium took
+**151 commits and zero tags**. EQdyna's `.git/hooks` is **empty**: its rules are
+advisory, enforced by CI and the agent's own discipline. Ours are mechanical,
+and mechanical enforcement deadlocked us three times today — most absurdly when
+`pre-push` refused the push that deleted the fabricated tag.
+
+**The honest framing, which I am to put in the note:** we are trading pre-push
+*prevention* for post-push *detection*, on the evidence that the preventive
+version blocked more legitimate work than illegitimate.
+
+**And the loss, stated plainly rather than reasoned away.** CI catches after the
+push, not before. Tonight's rogue commit reached `origin/main` precisely because
+a worktree had no hooks. **We are now choosing that condition deliberately
+instead of suffering it accidentally** — which is a better position to be in,
+but it is not a smaller exposure. The alternative was fixing `install.sh`'s
+worktree bug, which would have made the hooks *more* binding everywhere. That
+alternative is being rejected, not overlooked.
+
+**Three rules rest on hooks that will not exist** and must be reconciled with
+`zofia-kaminska`: rule 9 (the gate runs before anything leaves the machine),
+rule 15a (nothing red is ever pushed), and rule 18's one-writer lock, which
+`pre-commit` enforced. They do not all survive unchanged. The likely shape is
+that they become obligations on the agent rather than mechanisms — which is
+what rule 0 argues for anyway, since a hook reaches this repo and a prompt
+reaches every project. But that reasoning must not paper over the loss above.
+
+**Immediate routing consequence, caught before it wasted a dispatch:** PF-028 —
+`install.sh` installs zero hooks from a linked worktree — was filed P1 BROKEN an
+hour ago and routed to `iris-vermeulen`. If the hooks are being removed, that
+defect largely evaporates, and repairing it would make the hooks *more* binding,
+which is the rejected alternative. **PF-028 is held, not dispatched**, pending
+the hook removal. Zofia will need to re-scope or close it as part of the
+reconciliation.
