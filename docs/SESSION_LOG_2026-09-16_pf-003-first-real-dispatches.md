@@ -1531,3 +1531,47 @@ those apart grades agreement rather than method.
 Three landings from one incident — a rule, two prompts, and now a fixture —
 which is what rule 0 asks for and what a session log alone would not have
 produced.
+
+## Finding 31 — rule 18b deadlocks, and I found it by obeying it
+
+Rule 18b landed today, written by `zofia-kaminska` at my request after finding
+23: *"Never dispatch a writer while the gate is red; if commits sit local,
+track them and push in the same action that turns it green."* I adopted it the
+moment it existed.
+
+Tonight the gate went red with six board rows — PF-003, PF-004, PF-011,
+PF-025 (twice) and PF-027 — every one of them stale because real work landed.
+All six are `PATHWAY_FORWARD.md` rows, and `PATHWAY_FORWARD.md` has exactly one
+writer. To clear the red I must dispatch that writer. 18b, read literally,
+forbids it.
+
+**The only agent who can turn the gate green is the one the rule forbids me to
+dispatch.** That is a deadlock, and it is total: no amount of waiting clears it,
+because nothing else is going to edit the board.
+
+I dispatched her anyway, deliberately, saying so in the brief and here. That is
+a rule violation and it is recorded as one rather than rationalised into
+compliance.
+
+**The rule is not wrong; its scope is.** 18b exists because a red gate means the
+local branch and the remote disagree, so an agent branching from the remote
+starts from a base missing work — which happened twice today through two
+different doors. That hazard is real. But it attaches to dispatching a writer
+onto work *unrelated* to the red. Dispatching the owner of the failing row, to
+fix that row, is not merely permitted; it is the only thing that ends the
+condition.
+
+The amendment is routed to its author rather than written by me. I gave her my
+reading of the right shape and told her to improve on it — she wrote the rule
+and she is better placed to scope it than the agent who tripped over it.
+
+**What this says about writing rules from incidents**, which is most of what
+this campaign has done. 18b was derived from two real failures, tiered
+honestly, and reviewed by me before landing. It still shipped with a deadlock
+that took about four hours to surface, and surfaced only because the exact
+condition arose — a red caused *solely* by the rows of the single agent the
+rule would bar. A rule written from an incident is fitted to that incident; the
+cases it will meet next are the ones nobody has seen yet. That is an argument
+for writing rules narrowly and amending them when they bind wrongly, not for
+writing fewer of them — but it is also why "we made a rule" is not the same as
+"we fixed it", and I should stop treating a landed rule as a closed loop.
