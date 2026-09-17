@@ -116,7 +116,7 @@ for users, `PATHWAY_FORWARD.md` as a living prioritized board, and
   (PF-018): `prio` is required on every row, seeded by invariant 12,
   and read by `/autopilot`.
 
-### 2. Release: does it cover all ten things a release owes?
+### 2. Release: does it cover what a release owes?
 
 Audit the changes, correctness, conciseness, fix, document, refactor
 for leanness, a clean tree with no wandering work dirs, CI green, the
