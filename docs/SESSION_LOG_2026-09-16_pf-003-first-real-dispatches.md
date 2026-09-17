@@ -2257,3 +2257,46 @@ rather than an edit: is a check feasible that flags an authorship verb in a
 answer honestly if it cannot be made to work without false-positiving on
 "commissions", "reviews", "enforces" — this project has been bitten by checks
 that looked like gates and were not, and a reasoned refusal is a fine outcome.
+
+## Finding 45 — the drift fix, and a bounded answer on mechanizing it
+
+`lian-zhao` corrected `agents/wei-lin.md:3`: "Maintains project rules" →
+**"Commissions and enforces project rules"**, and example (5) "draft a
+project-rules.md gate" → **"commission"**. One line, nothing else touched. I
+verified the authorship verbs are gone, the body's "Delegate the writing to
+`zofia-kaminska`" is intact, and the gate held at 1571/0.
+
+The distinction landed is the one she drew for herself in PF-022 — **commissions
+versus writes** — and it preserves a real role rather than flattening it:
+specify what the rules must cover, delegate the writing, review what comes
+back, enforce at every merge.
+
+**On mechanizing the pattern, her answer is the kind I want and did not have to
+argue for.** I asked whether a check could flag an authorship verb in a
+`description:` naming a surface rule 19 assigns elsewhere, and told her a
+reasoned "no" was acceptable. She said **feasible but narrow**, and specified
+the shape: parse rule 19's table for each agent's non-surfaces, scan the
+description for a verb governing a noun naming one of them, flag authorship
+verbs (write, draft, author, maintain, produce) against delegation verbs
+(commission, specify, review, enforce, audit).
+
+Then the caveat that makes it an honest recommendation rather than an
+enthusiasm:
+
+> "it won't generalize the way Check 10's frontmatter parsing does. It will
+> catch the shape we've now seen twice but needs a human to keep tuning the two
+> lists, which is a real but bounded ongoing cost. Recommend routing it to
+> `iris-vermeulen` as a proposal with that caveat attached, not as a request for
+> a fully general 'authorship drift' detector — that would overreach into prose
+> comprehension the gate has deliberately stayed out of."
+
+That last clause is the important one. This gate's whole design is that it
+reads structure and never prose; the two defects it missed were both in prose.
+The temptation is to fix that by teaching it to read prose, and she named why
+not. A curated two-list check that catches a known shape, with its maintenance
+cost stated up front, is a different and more honest proposition than a
+detector that claims to understand descriptions.
+
+Routed to `iris-vermeulen` as a proposal carrying that caveat — not dispatched
+yet; PF-004 and PF-012 are ahead of it and the check is worth doing only if
+those leave room.
