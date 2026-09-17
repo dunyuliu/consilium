@@ -1694,3 +1694,64 @@ failures look identical from the board.
 Routed to `iris-vermeulen`. The verdict stands as produced (rule 5); the
 criteria change is a separate act, and it must be followed by a fresh dispatch,
 not by re-grading this report against a bar rewritten to fit it.
+
+## Finding 34 — rule 25d made prompt edits expensive, and a board row turned that into a gate failure
+
+`lian-zhao` was landing the codify-caution in two prompts. She landed
+`agents/wei-lin.md` and **reverted** the `agents/zofia-kaminska.md` half,
+because landing it reddened the gate. Her reasoning, which I reproduced:
+
+```
+  $ printf '\n' >> agents/zofia-kaminska.md && git commit
+  zofia-004-seed-patch-established   CONTESTED — no sample at current SHA 8376da9 yet; not settled
+  FAIL: PF-027: recorded evidence no longer reproduces
+  Summary: 1529 passed, 1 failed
+```
+
+Any commit touching that prompt — including a revert commit, which is why she
+hard-reset instead of layering one — changes the file's SHA, strips the pin on
+`zofia-004`'s two samples, and flips the case to unsettled. Clearing it needs
+two fresh dispatches at the new SHA.
+
+**This is rule 25d working as designed, and it is also a real cost nobody
+priced.** The verdict genuinely *is* invalidated by a prompt change — that is
+the whole point of pinning the SHA. But the consequence is that **improving a
+prompt now costs two dispatches per contested fixture of that agent**, and an
+agent facing that price will quietly not improve the prompt. A rule that makes
+the right action expensive produces the wrong action without anyone deciding to
+take it.
+
+**But the gate failure is not 25d's fault — it is a board-row design error, and
+mine to have caught.** PF-027's evidence command is:
+
+```bash
+bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
+# → zofia-004-seed-patch-established   zofia-kaminska   run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
+```
+
+That pins a **transient state** as if it were an invariant. "This specific case
+is currently settled at this specific SHA" is true today and is *supposed* to
+stop being true the moment the prompt changes. Recording it as board evidence
+converts a correct, expected state transition into a red gate. The row should
+assert the **mechanism** — that `run.sh` pins SHAs and refuses to settle a
+contested case without a current-SHA sample — which stays true across every
+prompt edit.
+
+Same shape as PF-021's original command, which was a defect-present detector
+that went red the moment the defect was fixed, and which `zofia-kaminska`
+replaced with a claim-holds command. This is the third instance of that
+distinction mattering, and it is now clear enough to state as a general test:
+**an evidence command should assert what must remain true, not what happens to
+be true.**
+
+**What Lian did right, and it is exactly the caution she was landing.** She hit
+a rule that blocked a change she believed correct, and she did not reason her
+way past it. She took the cost — dropped the edit, kept the draft in her
+report, named the owner of the blocker, and said plainly that the edit is
+unlanded and why. That is the behaviour the sentence she was adding describes,
+applied to her own work while adding it. She also caught herself mid-repair
+accidentally staging a revert, spotted it with `git status`, and undid it
+before committing.
+
+Routed to `zofia-kaminska`: re-scope PF-027's evidence to the mechanism, which
+unblocks prompt editing for every agent with a contested fixture.
