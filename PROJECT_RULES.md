@@ -93,6 +93,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 |
 | 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical in name only — the pre-commit hook exists only where install.sh ran; nothing in the repo checks it |
+| 18a | Acquire only for the write step; verify unlocked, before and after | norm — `tests/lock.sh status` reports hold *age* mechanically; whether the hold was write-only is not checkable after the fact |
 | 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Checks 12, 34 |
@@ -928,6 +929,63 @@ reasoning that caused the incident.
 
 **How to apply**: one release at a time. If a workflow appears stuck, stop it
 explicitly and confirm it stopped before taking over its work.
+
+### 18a. Acquire only for the write step; verify unlocked, before and after
+
+The lock is exclusive, and exclusivity is only worth what it costs the other
+writers waiting on it. Reading files, re-running board commands, running
+`bash tests/check.sh`, re-deriving evidence — none of that needs exclusivity,
+and none of it belongs inside the held window. The held window is: acquire,
+write the file, `git add`, `git commit`, release. Seconds, not minutes. Any
+final verification — the gate, a re-run of the command you just closed a
+board row with — happens *after* release, on the commit you just made, not
+before it.
+
+**Rationale**: rule 18 is correct that a lock must never auto-clear, however
+stale it looks — that is what makes the lock meaningful. But a rule that
+never auto-clears is only survivable if nothing holds it for long, and
+"acquire, then do the slow part" turns every ordinary interruption of the
+slow part into a repo-wide block. Shortening the window is the only lever
+this rule has, because rule 18 correctly forbids the other one.
+
+**Incident (2026-09-16)**: two session rate limits hit in one afternoon. The
+first was routine. The second killed a dispatched agent mid-run while it held
+the repo lock, scoped to `PATHWAY_FORWARD.md`, for 174 minutes — the entire
+duration of a verification pass it had started *after* acquiring, not before.
+Every other writer was blocked for that whole window. Recovery required a
+human-equivalent decision under rule 18 (nothing may auto-clear the lock):
+confirm the holder was actually gone, inspect its worktree for unlanded work
+— it held 164 uncommitted lines, recovered rather than redone — then release
+`--force` by name, and write down that it happened. The lock behaved exactly
+as designed; the incident was that a multi-minute read-only pass ran inside
+the held window at all.
+
+**How to apply**:
+1. Do all reading, re-running of evidence commands, and gate runs first,
+   unlocked.
+2. `bash tests/lock.sh acquire "<what>" <path-prefix>…` only once you are
+   ready to write.
+3. Write, `git add`, `git commit`, `bash tests/lock.sh release` — as one
+   unbroken sequence, nothing else interleaved.
+4. Any closing verification (the gate, a re-run of a board command you just
+   recorded) happens after release.
+5. Before force-releasing a lock whose holder appears dead: check that
+   holder's worktree for unlanded work and recover it — do not re-do work
+   that already exists uncommitted. A force-release is always an explicit,
+   recorded act naming the holder and the reason; a silent one is
+   indistinguishable from a lock that never worked.
+
+**Tier**: a norm, not a mechanical check, and this is stated rather than
+claimed otherwise. `tests/lock.sh status` already prints how long a lock has
+been held (`age_of()`, rule 18's own mechanism) — that half is mechanical.
+Whether the held time was spent writing or reading is not something a script
+can determine after the fact, because the lock file records only who holds
+it and since when, not what commands ran while it was held; and agents here
+are prompted, not scripted, so there is no invocation boundary for a check to
+sit between. What would make it checkable: a lock-history log (append a line
+on every acquire and release, rather than overwriting one file) that a check
+could diff against `bash tests/check.sh` invocation timestamps to flag a hold
+that spans a slow command. Nothing in this repo does that today.
 
 ## 23. Every agent declares tool economy; dispatchers declare dispatch cost
 

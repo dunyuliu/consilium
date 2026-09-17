@@ -63,7 +63,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-023 | `tests/lock.sh` | the lock resolves to the SAME shared file from a main checkout and from any linked worktree | VERIFIED | 2026-09-16 | 14 | P2 |
 | PF-024 | `evals/run.sh` | STALE compares dates, not the prompt SHA a verdict was produced against — same-day edit+run is invisible | OPEN | 2026-09-16 | 14 | P2 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | fixture cannot yet distinguish a correct Mode A seed pass from an incorrect one | OPEN | 2026-09-16 | 14 | P2 |
-| PF-026 | `tests/lock.sh` / working pattern | codify "acquire only for the write window" as a `PROJECT_RULES.md` rule (proposed, not enacted) | OPEN | 2026-09-16 | 30 | P1 |
+| PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-16 | 30 | P1 |
 
 ## Items
 
@@ -2153,7 +2153,7 @@ grep -c 'PROJECT_RULES.md` | present"' evals/cases/zofia-004-seed-patch-establis
 # → 0
 ```
 
-### PF-026 — `tests/lock.sh` / working pattern — OPEN
+### PF-026 — `tests/lock.sh` / working pattern — VERIFIED
 
 **A workflow finding, not a code defect** — `tests/lock.sh` itself is sound
 (PF-023) and correctly reports how long a lock has been held
@@ -2183,8 +2183,21 @@ tier — a held-lock age is mechanically checkable (`tests/lock.sh status`
 already prints it) but "was it held only across a write" is a judgment call
 a script cannot make after the fact.
 
+**Closed 2026-09-16 (this dispatch).** Written as `PROJECT_RULES.md` 18a — a
+sub-rule of 18, not a new number, since it governs how long the same lock may
+be held rather than a second mechanism. Tier declared as a norm, not
+mechanical: `tests/lock.sh status` already reports hold age (rule 18's own
+`age_of()`), but nothing in the repo can tell, after the fact, whether a hold
+was write-only — the lock file records holder, description and timestamp,
+never the commands run while it was held, and agents here are prompted, not
+scripted, so there is no invocation boundary for a check to sit between. The
+rule also writes down the recovery half that this incident actually paid
+for: check a dead holder's worktree for unlanded work before force-releasing,
+and record every force-release by name.
+
 ```bash
-bash tests/lock.sh status
+grep -c '^### 18a\. Acquire only for the write step' PROJECT_RULES.md; bash tests/lock.sh status
+# → 1
 # → free
 ```
 
