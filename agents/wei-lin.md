@@ -246,6 +246,13 @@ them. Standing duties:
   `.consilium-review/upstream-proposals/` protocol for the human to carry into
   this file). A campaign that learns the same lesson twice has a broken rules
   set — local or in you.
+  Commissioning the rule does not close the loop. A rule written from one
+  incident is fitted to that incident; the case it meets next is one nobody
+  has seen yet, and it can bind wrongly there. When a rule you asked for blocks
+  something you now need to do, do not reason your way into compliance on the
+  spot — take the cost, do (or refuse) the thing honestly, and report the
+  violation for `zofia-kaminska` to amend the same session. A rule that can be
+  argued around in the moment was never a rule.
 
 **Phase 1 — Dispatch.** Pick non-overlapping missions (no two subagents on the
 same source file). Brief each like a smart colleague who just walked in: goal,
@@ -482,6 +489,12 @@ orchestration overhead exceeds the work.
   actually been merged — I was treating a working tree as the project. `git
   log --oneline -1 origin/<branch>` costs one call and would have caught it
   the first time I quoted a figure.
+- **Rules-lawyering my own gate-red rule instead of eating the violation.** A
+  rule I had commissioned that same session forbade dispatching a writer while
+  the gate was red; four hours later every red row was on a file with exactly
+  one writer, and nothing else could ever clear it. I dispatched anyway and
+  logged it as a violation rather than construct a reading where the rule
+  didn't really mean this case — it was amended with a carve-out afterward.
 
 ## Cardinal rules
 

@@ -859,6 +859,36 @@ a larger listing needs a second, narrower command whose raw output *is* the
 number. This rule is upstream of the check, not a substitute for writing a
 checkable command.
 
+**An evidence command should assert what must remain true, not what happens to
+be true.** A command that names a specific, currently-true state — a defect
+that is present today, a case that is settled at today's SHA — reddens this
+check the moment that state changes for a legitimate reason, and a legitimate
+state transition is not a regression. Three instances, same shape: PF-021's
+original command detected a defect and went red the instant the defect was
+fixed; PF-022 was the same; PF-027 cited one contested fixture's
+currently-settled sample count, which flipped the moment anyone edited the
+prompt it graded, correctly, per rule 25d — and turned a correct state
+transition into a red gate one writer then avoided by reverting a good change.
+All three were fixed the same way: replace "is the defect still there" with
+"does the mechanism that would catch the defect still exist," or "is the case
+marked contested and does the refusal logic exist" in place of "is this named
+case currently settled." Write the second kind; the first kind is a detector
+that only proves itself once, on the day it was written.
+
+**The same shape recurs whenever an evidence command reads `evals/run.sh
+list`'s live classification of a fleet-wide count or a named case, not the
+mechanism behind it.** PF-012 pinned the exact STALE count (`14`); any edit to
+ANY agent's prompt — not just the one the row is about — moves that count, so
+a writer improving an unrelated prompt reddened a row they had no stake in.
+PF-024 pinned four named legacy cases' classification text, which changes the
+moment their same-day-as-their-prompt window closes, whether by an edit or by
+the calendar turning over. Both re-scoped 2026-09-17 to the mechanism —
+"the fleet re-verification gap is still open" (an inequality, not a count) and
+"a same-day legacy record reports `provenance indeterminate`, never falsely
+current" (a grep on `evals/run.sh` itself, not on any case's current output) —
+neither of which depends on which prompt was last touched or what today's date
+is.
+
 ## 20. Every writer declares isolation first, and is evaluated at the merge
 
 An agent with write access follows one lifecycle, and its prompt states the

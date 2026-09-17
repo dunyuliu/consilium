@@ -1575,3 +1575,337 @@ cases it will meet next are the ones nobody has seen yet. That is an argument
 for writing rules narrowly and amending them when they bind wrongly, not for
 writing fewer of them — but it is also why "we made a rule" is not the same as
 "we fixed it", and I should stop treating a landed rule as a closed loop.
+
+---
+
+# Sixth wake — the fixture becomes a test, and the caution lands
+
+## Finding 32 — where the codify-caution goes, and why not a rule
+
+The maintainer asked that finding 31's generalisation land somewhere an agent
+will read, with rule 0 deciding: does it ship in the agent, or only in our gate?
+
+The lesson:
+
+> A rule derived from an incident is fitted to that incident. The cases it meets
+> next are the ones nobody has seen yet. This argues for writing rules narrowly
+> and amending them promptly when they bind wrongly — not for writing fewer of
+> them — and it means a landed rule is not a closed loop.
+
+Plus the operational half, which is the part that actually changes behaviour:
+**when a rule you wrote binds wrongly, take the cost and report the violation
+rather than reasoning your way into compliance.** A rule that can be reasoned
+around on the spot is not a rule, and the agent doing the reasoning is how that
+happens.
+
+**Call: `agents/wei-lin.md`, not `PROJECT_RULES.md`.** The reasoning, recorded
+so it can be overruled rather than inherited:
+
+This is a caution about the *act of codifying* — an agent behaviour, not a
+project invariant. `wei-lin`'s prompt already carries the standing duty that
+creates the risk: *"the moment a campaign pays for a new lesson, write it back
+as a numbered rule the SAME session."* That instruction produced 18b, and it
+has no counterweight — nothing warns the agent that the rule it is about to
+write is fitted to the single incident in front of it. A caution belongs next
+to the duty that generates the hazard, not in a separate document.
+
+A project rule saying "rules are fitted to their incidents" would be a rule
+about rules: hard to enforce, and it reaches one repo. A prompt reaches every
+project the team is pointed at. Rule 0's test favours the prompt, and this is
+the first time in this campaign the test has come out *against* writing a rule
+— which is worth noting, because four rules landed today and the reflex to
+write a fifth was real.
+
+Whether `agents/zofia-kaminska.md` also wants it is `lian-zhao`'s call. My
+instinct — stated to her as an instinct, not a finding — is that Zofia needs
+the *narrowness* half, since she writes the text, while `wei-lin` needs the
+*not-a-closed-loop* half, since I commission it.
+
+## The fixture's first real dispatch
+
+`iris-002-measure-before-replacing` was built yesterday evening to grade rule
+26's behaviour and has never been run. It is dispatched now against
+`iris-vermeulen` at prompt SHA recorded at dispatch time. The case is
+`contested: false`, so under rule 25d one current-SHA sample settles it.
+
+This is the moment the case stops being a claim about behaviour and becomes a
+test of it — PF-003 reopened specifically to track that gap, and the maintainer
+was right that a board getting worse honestly beats one that stays green by not
+asking.
+
+## Finding 33 — the fixture built to teach rule 26 failed its own first real dispatch, on phrasing
+
+`iris-002-measure-before-replacing` was dispatched for the first time. The
+report is **substantively excellent** and did exactly what rule 26 asks:
+
+- ran `backdate_check.sh` and counted **5 of 20** flagged, naming all five
+  invoice IDs;
+- counted same-day issue/pay pairs and found **zero**;
+- went further than the brief required and found *why* zero is structural —
+  `gateway_note.md` says every invoice cleared through a legacy ACH pipeline
+  that takes ≥1 business day, so same-day pairs are impossible until a future
+  gateway ships;
+- refused the wholesale replacement and proposed a sequenced alternative.
+
+It graded **FAIL — 6 criteria, 3 failed.**
+
+Two of the three failures are phrasing, on work the agent demonstrably did:
+
+```
+criterion 2 (was the zero measured?)
+  agent wrote:  "occur **0 times**" / "zero members"
+  terms:        "0 same-day" / "zero same-day" / "no same-day" / "same-day: 0" ...
+  -> measured, unmatched
+
+criterion 4 (the verdict)
+  agent wrote:  "do not replace `backdate_check.sh` wholesale"
+                "keep `backdate_check.sh` running as-is"
+  terms:        "do not replace backdate_check.sh" / "keep backdate_check.sh" ...
+  -> the backticks break adjacency. Markdown again.
+```
+
+The third is not phrasing and is more interesting. Criterion 5 expects the
+narrow fix to be a *needs-review flag* (`"needs-review"`, `"manual review"`,
+`"flag same-day"`). The agent instead proposed landing the new check
+**alongside** the old one, gated by two fixtures — one proving it resolves
+same-day ordering, one proving it reproduces the same five flags — and retiring
+the old check only after the gateway ships. That is a different remedy, and
+arguably a better one. The criterion encodes one defensible answer as the only
+correct answer, which is precisely `zofia-004`'s criterion-2 defect wearing
+different clothes.
+
+**What makes this worth more than a fixture bug report.** My adversarial test
+passed: a report with the right conclusion and no measurement scores FAIL 4/6.
+The author's `pass.md` scores 6/0 and `fail.md` 6/6. By every check available
+before a real dispatch, this fixture was sound. **The first contact with a real
+agent found three defects that no author-written sample could surface** —
+because an author writes the sample in the phrasing the criteria already
+contain. That is not a criticism of Iris; it is structural, and it is now the
+third independent instance (`zofia-004` took three repair rounds, `haruto-002`
+and `lian-002` each missed on a synonym or a hyphen).
+
+The generalisation, which I think is the real output of this campaign's eval
+work: **Check 15 proves a fixture's criteria are self-consistent, not that they
+are satisfiable by a correct report.** A fixture's criteria are unvalidated
+until at least one real dispatch has been graded against them. A case that has
+never been run is not merely unmeasured — its *bar* is unmeasured, and the two
+failures look identical from the board.
+
+Routed to `iris-vermeulen`. The verdict stands as produced (rule 5); the
+criteria change is a separate act, and it must be followed by a fresh dispatch,
+not by re-grading this report against a bar rewritten to fit it.
+
+## Finding 34 — rule 25d made prompt edits expensive, and a board row turned that into a gate failure
+
+`lian-zhao` was landing the codify-caution in two prompts. She landed
+`agents/wei-lin.md` and **reverted** the `agents/zofia-kaminska.md` half,
+because landing it reddened the gate. Her reasoning, which I reproduced:
+
+```
+  $ printf '\n' >> agents/zofia-kaminska.md && git commit
+  zofia-004-seed-patch-established   CONTESTED — no sample at current SHA 8376da9 yet; not settled
+  FAIL: PF-027: recorded evidence no longer reproduces
+  Summary: 1529 passed, 1 failed
+```
+
+Any commit touching that prompt — including a revert commit, which is why she
+hard-reset instead of layering one — changes the file's SHA, strips the pin on
+`zofia-004`'s two samples, and flips the case to unsettled. Clearing it needs
+two fresh dispatches at the new SHA.
+
+**This is rule 25d working as designed, and it is also a real cost nobody
+priced.** The verdict genuinely *is* invalidated by a prompt change — that is
+the whole point of pinning the SHA. But the consequence is that **improving a
+prompt now costs two dispatches per contested fixture of that agent**, and an
+agent facing that price will quietly not improve the prompt. A rule that makes
+the right action expensive produces the wrong action without anyone deciding to
+take it.
+
+**But the gate failure is not 25d's fault — it is a board-row design error, and
+mine to have caught.** PF-027's evidence command is:
+
+```bash
+bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
+# → zofia-004-seed-patch-established   zofia-kaminska   run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
+```
+
+That pins a **transient state** as if it were an invariant. "This specific case
+is currently settled at this specific SHA" is true today and is *supposed* to
+stop being true the moment the prompt changes. Recording it as board evidence
+converts a correct, expected state transition into a red gate. The row should
+assert the **mechanism** — that `run.sh` pins SHAs and refuses to settle a
+contested case without a current-SHA sample — which stays true across every
+prompt edit.
+
+Same shape as PF-021's original command, which was a defect-present detector
+that went red the moment the defect was fixed, and which `zofia-kaminska`
+replaced with a claim-holds command. This is the third instance of that
+distinction mattering, and it is now clear enough to state as a general test:
+**an evidence command should assert what must remain true, not what happens to
+be true.**
+
+**What Lian did right, and it is exactly the caution she was landing.** She hit
+a rule that blocked a change she believed correct, and she did not reason her
+way past it. She took the cost — dropped the edit, kept the draft in her
+report, named the owner of the blocker, and said plainly that the edit is
+unlanded and why. That is the behaviour the sentence she was adding describes,
+applied to her own work while adding it. She also caught herself mid-repair
+accidentally staging a revert, spotted it with `git status`, and undid it
+before committing.
+
+Routed to `zofia-kaminska`: re-scope PF-027's evidence to the mechanism, which
+unblocks prompt editing for every agent with a contested fixture.
+
+## Finding 35 — the fix was instance-level; the class survived, and I found it by finishing the test
+
+`zofia-kaminska` re-scoped PF-027's evidence to assert the mechanism rather
+than one case's current settled state, and wrote the general test into rule
+21a: *"An evidence command should assert what must remain true, not what
+happens to be true."*
+
+I then finished the decisive test I had been cut off during — edit
+`agents/zofia-kaminska.md`, is the gate still green?
+
+```
+  zofia-004   CONTESTED — no sample at current SHA cbaaeaf yet; not settled
+  FAIL: PF-012: recorded evidence no longer reproduces
+  FAIL: PF-024: recorded evidence no longer reproduces
+  Summary: 1528 passed, 2 failed
+```
+
+**PF-027 is fixed and the gate still goes red.** The failure moved to two other
+rows. Editing a prompt today (2026-09-17) makes that agent's legacy verdicts —
+all dated 2026-09-16 — *different-day* rather than same-day, so they reclassify
+from `provenance indeterminate` to STALE. That is `evals/run.sh` behaving
+exactly correctly. PF-012 pins the STALE count; PF-024 pins the four same-day
+cases' output strings. Both are transient states recorded as invariants.
+
+So the rule was written and applied to the instance that produced it. The other
+two rows carrying the same defect were not swept, and nothing in the change
+looked for them. **That is finding 31 recurring at one remove**: a lesson
+derived from an incident got fitted to that incident, this time in the shape of
+a fix rather than a rule.
+
+I am partly to blame for the scope. My brief asked her to re-scope PF-027 and
+asked whether the general test was worth writing down. It did not ask the
+obvious follow-up — *which other rows have this shape?* — and a brief that
+commissions a principle without commissioning its application is half a job.
+
+**The cost this leaves in place is the one worth reporting to the maintainer,
+because it is unchanged.** Improving any agent prompt still reddens the gate,
+just via different rows, and still costs board work before anything can land.
+An agent facing that price will quietly not improve the prompt. The `zofia-
+kaminska.md` half of the codify-caution is *still* unlanded for exactly this
+reason — a documented, tracked debt now two findings old.
+
+Routed back with the class, not the instance: sweep every board row whose
+evidence pins a value that a legitimate prompt edit changes, and re-scope each
+to its mechanism.
+
+**Method note, and a small win.** My check for 21a's new sentence returned zero
+on an exact match and I did *not* report it missing — I ran the loose pattern
+first, per finding 29's corrective, and found it at line 862 wrapping across
+two lines. Same trap as before, caught by the habit rather than by luck. The
+positive control cost one extra pattern and saved a false finding.
+
+## Finding 36 — the class fix holds, verified on an agent nobody mentioned
+
+`zofia-kaminska` swept the class: PF-012's pinned STALE count and PF-024's
+pinned four-case output strings both re-scoped to assert their mechanisms, with
+the old values kept as unfenced history. She checked PF-002/003/004/013/015/017
+for the same shape and found none — PF-002 and PF-004 count monotonically
+growing declarations that *are* the row's claim, and PF-003's detector is not
+sensitive to SHA or date reclassification at all. She declared the class closed
+with no residual.
+
+I verified it myself, and deliberately not only on the prompt that exposed it:
+
+```
+  baseline                                          1530 passed, 0 failed
+  whitespace commit to agents/zofia-kaminska.md     1530 passed, 0 failed
+  whitespace commit to agents/haruto-nakamura.md    1530 passed, 0 failed
+```
+
+The second line is the instance. **The third is the class** — `haruto-nakamura`
+was never mentioned in the incident, the diagnosis, or the brief, and editing
+his prompt is now free too. A fix verified only against the case that produced
+it is the same error as a rule fitted to its own incident, one level down, and
+this campaign has now made that error twice. Testing a third party was cheap
+and is the only thing that distinguishes "closed" from "closed here".
+
+She also reported two self-inflicted problems she hit and corrected mid-run: a
+double evidence fence she had left on PF-012, where Check 17 graded both the
+new command and the stale one, and a `git reset --hard` that discarded an
+uncommitted fix along with a throwaway test commit. Neither reached me as a
+defect; both are in her report. An agent that names the mess it made on the way
+to the result is worth more than one that reports only the result.
+
+**The debt this clears.** `lian-zhao` reverted her `agents/zofia-kaminska.md`
+edit two findings ago rather than land a red gate. That edit is now dispatched
+to land. The cost rule 25d imposed on prompt improvement — the thing I said I
+would report as plainly as the 18b deadlock — is paid off, not by weakening
+25d, but by fixing three board rows that were converting a correct state
+transition into a failure.
+
+## Finding 37 — I nearly accused an agent of fabricating work, and the fault was my dirty index
+
+`iris-vermeulen` reported repairing criteria 2 and 4 of `iris-002`, widening
+them along two axes rather than patching the one phrasing the last run used,
+and said the real report now graded `FAIL 6/1` with only criterion 5 failing.
+
+I verified and got `FAIL 6/3`. I then checked whether the terms she described
+were in the file:
+
+```
+  "0 times"      in-report=1  in-caseyaml=0
+  "zero members" in-report=1  in-caseyaml=0
+```
+
+Zero. Her commit's own diff showed those lines being *added*. I was one step
+from reporting that a subagent had described work its commit did not contain —
+the most damaging accusation available in this role, because the whole
+delegation model rests on reports being truthful.
+
+The contradiction saved it. A diff that adds a line and a file that lacks it
+cannot both be true, so I checked the one thing I had not:
+
+```
+  working tree == HEAD?  1 file modified
+  HEAD version:          46 terms
+  working tree:          30 terms
+```
+
+**My checkout was carrying a staged revert of her changes.** Almost certainly
+from the command that timed out at two minutes mid-`git reset --hard` during
+the class-fix probe — killed partway, leaving the index inconsistent with HEAD.
+Every grade I ran after that point measured a file that existed nowhere in
+history. After `git reset --hard HEAD`:
+
+```
+  FAIL — 6 criteria, 1 failed
+  PASS  keyword  (matched: 0 times)
+  PASS  keyword  (matched: do not replace `backdate_check.sh`)
+```
+
+Exactly her number. She was right about all of it.
+
+**The lesson is narrow, mechanical, and I should have had it already.** After a
+command is interrupted — a timeout, a rate limit, a kill — **verify the working
+tree matches HEAD before trusting any measurement taken from the filesystem.**
+`git status --porcelain | wc -l` costs nothing. I have been scrupulous about
+re-deriving numbers from subagents and careless about whether the tree I was
+deriving them from was the tree I thought it was. Four interruptions in this
+campaign and this is the first time one silently corrupted a measurement rather
+than stopping me outright.
+
+It also sharpens finding 29's rule. "A search returning nothing is not evidence
+of absence until the search is shown capable of finding the thing" — and the
+instrument includes **the tree you are searching**, not just the pattern. My
+pattern was fine this time. The corpus was wrong.
+
+**On the near-accusation.** The thing that stopped it was noticing that two of
+my own observations were mutually inconsistent, rather than picking the one
+that fit the story I was forming. A subagent fabricating a detailed report,
+complete with plausible term lists, is a far less likely explanation than my
+own state being wrong — and I should have weighted it that way before running
+the check, not after.

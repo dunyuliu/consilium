@@ -40,7 +40,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, see PF-025 for the one criterion set still known-defective | OPEN | 2026-09-16 | 14 | P3 |
+| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, and a superseded record still counts as coverage, see PF-025 for the one criterion set still known-defective | VERIFIED | 2026-09-17 | 14 | P3 |
 | PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
@@ -119,7 +119,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed '
 #   → 22 of 22 agents have at least one fixture
 ```
 
-### PF-003 — `evals/cases/` — OPEN
+### PF-003 — `evals/cases/` — VERIFIED
 
 The cited command no longer tells the truth: `evals/cases/lian-001-no-fixture-no-cut/`
 has no `case.yaml`, and `cmd_list` in `evals/run.sh` exits 2 partway through the
@@ -284,9 +284,44 @@ choice this row made for `haruto-003`/`wei-lin-003`/`zofia-004` earlier today.
 Closes again the same way it always has: dispatch and grade `iris-002`, paste
 empty here.
 
+**Re-run 2026-09-16 (this pass), unchanged, and correctly so.** I was told
+`iris-002-measure-before-replacing` was dispatched for the first time today
+and graded FAIL 6/3. Per rule 4 I do not take that as evidence: this row's
+own established discipline (the `haruto-003`/`wei-lin-003`/`zofia-004` episode
+above) is that `evals/run.sh grade` does not write the verdict back into
+`case.yaml`, and a run that exists only as a paste handed to me is not a
+recorded run. `evals/cases/iris-002-measure-before-replacing/case.yaml` still
+reads "Not yet dispatched." verbatim, and writing today's run record into it
+is `evals/cases/` work — `iris-vermeulen`'s surface, not this board's. This
+row stays as it is until that record lands.
+
+**Re-run 2026-09-17, VERIFIED, and I was handed the resolved figure twice
+before re-running it myself (rule 4).** `iris-vermeulen` recorded
+`iris-002-measure-before-replacing`'s first real dispatch as a SHA-bearing
+line in its own `case.yaml` (prompt `306f1cc`): `FAIL — 6 criteria, 3 failed`,
+marked SUPERSEDED in the same note because criteria 2 and 4 were repaired
+afterward and the verdict was produced against criteria that no longer exist
+(rule 5). Against the repaired criteria the same report grades `FAIL — 6
+criteria, 1 failed`; the sole remaining failure, criterion 5, is recorded as
+decided rather than repaired — Iris found from the fixture's own input (the
+timestamp field the alternative remedy would need does not exist until a
+future gateway ships) that the agent's miss is genuine, not a phrasing gap,
+and left the criterion as it stood.
+
+This row's claim is coverage, not health, and a superseded verdict still
+satisfies it: the fixture has been dispatched and graded, so the command
+below — which only asks whether a `run (<date>` line exists at all — correctly
+prints nothing. `iris-002` separately owes a re-dispatch for a *current*
+verdict, since the SUPERSEDED one was produced against retired criteria; that
+distinction belongs to the fixture's own history, not to this row, which does
+not distinguish current from superseded coverage and says so in its own
+wording now. Independently re-derived below, not inherited: I re-ran the
+detector on this branch myself rather than accept the "prints nothing" claim
+handed to me for the second time in this campaign.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
-# → iris-002-measure-before-replacing: NEVER RUN
+# →
 ```
 
 ### PF-004 — `evals/` — OPEN
@@ -1406,10 +1441,8 @@ cases off STALE — this is the count improving because verdicts got fresher,
 not because the underlying claim narrowed. The row's own claim (no regression
 proven fleet-wide) is unchanged.
 
-```bash
-bash evals/run.sh list | grep -c STALE
-# → 14
-```
+    bash evals/run.sh list | grep -c STALE
+    # → 14
 
 **Note, 2026-09-16.** This count is read through the same-day blind spot
 PF-024 now names: `evals/run.sh` compares dates, not the prompt SHA a
@@ -1418,6 +1451,22 @@ calendar day reads current here whether or not it actually is. Filed as its
 own row rather than folded in, because the defect is in `evals/run.sh`
 itself and fixing it changes what this count measures, not the other way
 round.
+
+**Re-scoped 2026-09-17 — the same defect PF-027 was found to have, swept for
+here rather than assumed absent.** `bash evals/run.sh list | grep -c STALE`
+moves every time ANY agent's prompt changes, including edits this row has no
+stake in: touching `agents/zofia-kaminska.md` for an unrelated reason
+reclassifies her cases and reddens this row's pinned `14`, coupling this row
+to work nobody assigned it (confirmed live: appending a commit to that file
+moves two cases from same-day-indeterminate to genuinely STALE, changing the
+count). Re-scoped to what must remain true while the fleet is unverified —
+that the gap is still open — not to the exact number, which is expected to
+drift and was never this row's claim.
+
+```bash
+[ "$(bash evals/run.sh list | grep -c STALE)" -gt 0 ] && echo "fleet re-verification gap still open (STALE > 0)"
+# → fleet re-verification gap still open (STALE > 0)
+```
 
 ### PF-013 — `agents/` — OPEN
 
@@ -2149,12 +2198,34 @@ to order a same-day run against a same-day prompt edit — now print
 2026-09-16`. That is the honest answer for a legacy record with no SHA field:
 neither current nor stale, visibly unresolved rather than silently current.
 
+Historical, kept as a record rather than as a live fence — pinning four named
+legacy cases the same way this row's own text criticises: `evals/run.sh
+list`'s per-case classification of a legacy (no-SHA) record depends on
+whether its run date and its prompt's last-touch date still match, and mere
+time passing, or any future edit to `agents/haruto-nakamura.md` or
+`agents/wei-lin.md`, moves one of these four off "same day" and into plain
+STALE without touching PF-024's own claim at all:
+
+    bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
+    # → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+    # → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+    # → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+    # → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+
+**Re-scoped 2026-09-17, same sweep as PF-012.** Confirmed live: editing
+`agents/zofia-kaminska.md` today moves `zofia-002` and `zofia-003` off the
+"same calendar day" branch (their 2026-09-16 legacy date now precedes the
+prompt's 2026-09-17 touch date) and into genuinely-STALE wording, breaking
+the pinned block above for reasons unrelated to whether the fix works. The
+row's real claim is the mechanism — a same-day legacy record reports itself
+`provenance indeterminate`, never falsely `current` — which is a property of
+`evals/run.sh` itself, not of which four cases happen to sit on a shared
+calendar day today:
+
 ```bash
-bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
-# → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
-# → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
-# → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
-# → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+grep -c 'provenance indeterminate' evals/run.sh; grep -c 'date fallback, rule 25d' evals/run.sh
+# → 1
+# → 2
 ```
 
 ### PF-025 — `evals/cases/zofia-004-seed-patch-established` — OPEN
@@ -2402,15 +2473,56 @@ contested path this row specified. I re-ran her five negative tests plus a
 sixth of my own (a mutation to the SHA-comparison branch) and all six held.
 
 **Re-run 2026-09-16 (this pass): the two pre-registered samples landed since,
-and the row now reports settled, not CONTESTED.**
+and the row now reports settled, not CONTESTED.** Superseded below — kept as
+history, not live evidence, for the reason the next paragraph explains.
+
+    bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
+    # → zofia-004-seed-patch-established           zofia-kaminska         run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
+
+**Re-scoped 2026-09-16, and the previous evidence line was the defect, not
+`agents/zofia-kaminska.md`.** `lian-zhao` landed a caution in
+`agents/wei-lin.md` and `agents/zofia-kaminska.md` together and reverted only
+the second half, because landing it turned this row's recorded `# →` line
+into a lie: any commit touching `agents/zofia-kaminska.md` changes that
+file's SHA, so `zofia-004`'s two `03bf9a1` samples stop being current-SHA
+samples and the case reports CONTESTED again — correctly, per rule 25d. That
+is the mechanism working. The defect was citing "this named case is settled
+at this SHA today" as the row's board evidence: a fact that is true only
+until the next edit to a file this row does not own, and false the moment
+someone does the very thing rule 25d exists to make safe. Re-scoped to assert
+the mechanism instead — that `zofia-004` is authored `contested: true` and
+that `evals/run.sh` implements the SHA-pinned, contested-refusal branch —
+none of which depends on which SHA `agents/zofia-kaminska.md` happens to be
+at right now. This is the third time this shape of fix has been needed on
+this board (PF-021, PF-022); the general form is worth keeping and is now in
+rule 21a.
 
 ```bash
-bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
-# → zofia-004-seed-patch-established           zofia-kaminska         run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
+grep -c 'contested: true' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -c 'CONTESTED_UNSETTLED' evals/run.sh; grep -c 'prompt <short-SHA>' evals/run.sh
+# → 2
+# → 4
+# → 1
 ```
+
+**On the dispatch-cost consequence, not just the gate defect.** Before this
+re-scoping, keeping this row's evidence reproducing required re-earning two
+fresh same-SHA samples of `zofia-004` every time anyone edited
+`agents/zofia-kaminska.md` — two dispatches paid by whoever touched the
+prompt next, for no reason connected to their own change. That is what made
+`lian-zhao`'s revert the cheaper move. The re-scoped command above removes
+that coupling: this row now asserts only that the mechanism exists, so
+editing the prompt correctly flips `evals/run.sh list`'s live answer for
+`zofia-004` to CONTESTED without reddening the gate. Resettling `zofia-004` —
+two fresh same-SHA dispatches — is only owed at the point someone wants to
+*cite it as settled again* (PF-025, if it reopens on cause 3's own terms),
+never merely to land an unrelated edit to the same file. No change to rule
+25d itself: the pin and the refusal are correct as specified; only this
+row's choice of what to cite as evidence was wrong.
 
 PF-024 and PF-025 close (respectively: fully, and narrowed to criterion 3)
 through this row, per the plan above — see each for the closing evidence.
+Neither of their own evidence commands cites `zofia-004`'s per-edit settled
+state, so neither inherits this defect.
 
 ## Deferral log
 
