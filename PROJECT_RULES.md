@@ -110,6 +110,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 25a | must_not_find guards are declarative, never imperative | mechanical — Check 19 |
 | 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical — Check 14 |
 | 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
+| 26 | Before removing, weakening, or replacing a signal, measure what it currently catches | mechanical in part — a check could require a before/after count in the commit message; whether the count was measured against the real corpus is judgment |
 
 ---
 
@@ -199,6 +200,12 @@ agent's own report, from this file — is a hypothesis until a fresh run
 reproduces it. Be most skeptical of "already fixed" and "that check covers
 it"; both end investigation early. When citing a check result, say whether
 you ran it or read it.
+
+This covers a figure handed to you in your own dispatch brief, by the agent
+that dispatched you, same as any other agent's report — the dispatcher is not
+exempt from being wrong, and re-deriving its number is the same discipline as
+re-deriving anyone else's (rule 26's incident: the pasted split was wrong
+twice, and re-counting it against the real corpus is what caught it).
 
 **Incident (2026-07-31)**: the README claimed eval coverage of three cases
 (`lars-001`, `sophia-001`, `iris-001`); `ls evals/cases` showed four. The
@@ -1124,6 +1131,64 @@ on every agent. **Limit, stated rather than papered over**: the check
 verifies the section exists; it does not separately verify that an agent
 capable of dispatching a subagent states the dispatch-cost multiplier inside
 it — that half is judgment, not gated.
+
+## 26. Before removing, weakening, or replacing a signal, measure what it currently catches
+
+A check, a metric, a classifier, or an alarm that is about to be removed,
+weakened, or replaced is measured against the **real corpus** first — count
+what it currently flags, not what the failure mode you are fixing would
+predict it flags. **A failure mode having no members in the actual data means
+the signal is right on that data, however unsound the method looks in
+principle.** Confirm a new boundary by mutation, not by argument: take one
+real record, move it across the boundary by hand, watch it flip, restore it,
+and confirm nothing else moved.
+
+**A metric moving to zero is not evidence of a fixed problem — it is evidence
+of a changed question.**
+
+**Rationale**: rule 4 governs trusting an inherited conclusion; rule 25's
+family governs designing a new criterion; the negative-test convention
+(rule 12, 25) governs *adding* an assertion and proving it can fail. None of
+them govern *taking one away* — replacing a signal reads as strictly better
+than the thing it replaces precisely because nobody counted what the old
+signal was catching before it was gone.
+
+**Incident (2026-09-16)**: `evals/run.sh`'s STALE check compared a verdict's
+calendar date to the prompt's last-commit date, which cannot order two events
+on the same day (PF-024). Rule 25d replaced the date with the prompt's commit
+SHA. Fifty existing `Run (...)` records carry no SHA, and backfilling one is
+forbidden (rule 4) — so a SHA-less record needed a defined fallback, and the
+choice was made on the *method's* soundness alone: same-day date comparison
+is unsound in principle, so every SHA-less record was marked
+provenance-unknown rather than falling back to the date. Measured against the
+real corpus this was wrong. Of the 14 records the date comparison flagged
+STALE before the change, **0 were same-day** — the exact case date comparison
+cannot order — and all 14 were different-day, true positives, one gap of 6.5
+weeks. The change took STALE 14 -> 0 and provenance-unknown 0 -> 34: fourteen
+correct warnings replaced by thirty-four refusals to answer, and every summary
+written afterward would have read it as an improvement, because the alarm
+count went to zero. Caught by two things, both general: the true-positive rate
+of the signal being removed was counted before it was removed, and the new
+boundary was confirmed by flipping one real record's date to same-day, watching
+it move STALE -> indeterminate, and restoring it.
+
+**How to apply**: before a commit that removes, weakens, or replaces a
+check, a grading criterion, a classifier, or a board detector, run the old
+signal against the real corpus and record the split (how many flags, and on
+what basis each fired) in the commit message or the rule/board entry the
+change lands beside. Then mutate one real record across the new boundary and
+confirm the flip, before trusting the new signal's silence.
+
+**Tier**: mechanical in part. A commit that touches `tests/check.sh` or
+`evals/run.sh` in a way that removes or changes a check/classifier could be
+required to name a before/after count in its message — cheap, and gameable,
+because nothing can verify the count was measured against the real corpus
+rather than invented to match the diff, and rule 2 already warns that a check
+worse than none is worse than nothing. What would make the substance
+checkable: none of this repo's tooling can currently distinguish "I counted
+the real corpus" from "I wrote a plausible number", so the count itself stays
+a norm; only its *presence* in the commit message is mechanizable, and is not
+yet built.
 
 ---
 
