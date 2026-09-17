@@ -599,9 +599,11 @@ done
 # author who cannot write a report that passes their own criteria has not
 # written criteria that test what they think.
 echo "Check 15: fixture criteria are provably executable"
+check15_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -f "$case_dir/case.yaml" ] || continue
+    check15_n=$((check15_n + 1))
     if [ ! -f "$case_dir/samples/pass.md" ] || [ ! -f "$case_dir/samples/fail.md" ]; then
         fail "$id: missing samples/pass.md and/or samples/fail.md (rule 25)"
         continue
@@ -617,6 +619,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check15_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 15 asserted nothing"
 
 # --- Check 16: criteria linter ----------------------------------------------
 #
@@ -634,9 +637,11 @@ done
 # The word cap is deliberately loose: it flags sentences, not phrases. A
 # four-word technical term is fine; a clause is a guess about phrasing.
 echo "Check 16: fixture criteria are linted"
+check16_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
     [ -f "$cy" ] || continue
+    check16_n=$((check16_n + 1))
     exp_terms=$(awk -f evals/parse_case.awk -v section=expected "$cy" | cut -d'|' -f5- | tr '\037' '\n')
     mnf_terms=$(awk -f evals/parse_case.awk -v section=must_not_find "$cy" | cut -d'|' -f5- | tr '\037' '\n')
 
@@ -659,6 +664,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check16_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 16 asserted nothing"
 
 echo
 echo "Check 17: PATHWAY_FORWARD.md evidence commands still print what is recorded"
@@ -749,9 +755,11 @@ echo "Check 18: no fixture input contains fixture-authoring language"
 # case.yaml with a must_not_find key. Flagging it was a false positive, and a
 # check that fails on correct content is not a gate, it is an obstacle.
 LEAK_PHRASES='planted defect|deliberately absent|answer key|the agent is supposed to|eval fixture|this eval|for the .*-00[0-9] eval'
+check18_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -d "$case_dir/input" ] || continue
+    check18_n=$((check18_n + 1))
     # `|| true` is load-bearing: grep exits 1 when it finds nothing, which is
     # the NORMAL case here, and under `set -e` the assignment inherits that
     # status and kills the suite before the Summary line. Same failure that
@@ -765,6 +773,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check18_n" -gt 0 ] || fail "no case input/ directories found under evals/cases/*/ — Check 18 asserted nothing"
 
 echo
 echo "Check 19: must_not_find guards are declarative, not imperative"
@@ -787,9 +796,11 @@ echo "Check 19: must_not_find guards are declarative, not imperative"
 # `cutting` is deliberately absent: "cutting rina-solberg.md is safe" is
 # declarative and negates cleanly. An -ing form is a gerund, not an imperative.
 IMPERATIVES='rotate|remove|redact|delete|switch|rewrite|drop|add|commit|scrub|purge|revoke|change|update|fix|recommend|suggest|backfill|back-fill|merge|refactor|loosen|tighten|edit|implement|patch|apply|replace|ignore|skip|widen|restore|check|use|write'
+check19_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
     [ -f "$cy" ] || continue
+    check19_n=$((check19_n + 1))
     bad=$(awk -f evals/parse_case.awk -v section=must_not_find "$cy" \
         | cut -d'|' -f5- | tr '\037' '\n' \
         | grep -iE "^($IMPERATIVES)\b" | head -1 || true)
@@ -799,6 +810,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check19_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 19 asserted nothing"
 
 echo
 echo "Check 20: the dispatch-cost warning tracks the Agent tool exactly"
@@ -877,9 +889,11 @@ echo "Check 22: every case tier is a tier the tooling consumes"
 # below. Adding a tier to the tooling means adding it here in the same change,
 # which is the point — the list is the contract between the cases and the runner.
 KNOWN_TIERS='smoke'
+check22_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
     [ -f "$cy" ] || continue
+    check22_n=$((check22_n + 1))
     tier=$(grep -m1 '^tier:' "$cy" 2>/dev/null | sed 's/^tier: *//; s/ *#.*$//; s/ *$//' || true)
     if [ -z "$tier" ]; then
         ok                      # no tier is fine: the case is full-suite only
@@ -889,6 +903,7 @@ for case_dir in evals/cases/*/; do
         fail "$id: tier '$tier' is not consumed by any tool — known tiers are: $KNOWN_TIERS"
     fi
 done
+[ "$check22_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 22 asserted nothing"
 
 echo
 echo "Check 23: no fixture input contains a symlink"
@@ -904,9 +919,11 @@ echo "Check 23: no fixture input contains a symlink"
 #
 # `stage` now refuses such a case, but that is late — the author finds out when
 # somebody tries to run it. This fails at commit time instead.
+check23_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -d "$case_dir/input" ] || continue
+    check23_n=$((check23_n + 1))
     link=$(find "$case_dir/input" -type l -print -quit 2>/dev/null || true)
     if [ -n "$link" ]; then
         fail "$id: ${link#"$case_dir"} is a symlink — it would resolve out of the staged copy and defeat the isolation (rule 5)"
@@ -914,6 +931,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check23_n" -gt 0 ] || fail "no case input/ directories found under evals/cases/*/ — Check 23 asserted nothing"
 
 echo
 echo "Check 24: an empty report fails every case"
@@ -934,9 +952,11 @@ echo "Check 24: an empty report fails every case"
 # `lars-002` was found by hand, not by this.
 empty_report=$(mktemp) || die_msg=""
 : > "$empty_report"
+check24_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -f "$case_dir/case.yaml" ] || continue
+    check24_n=$((check24_n + 1))
     verdict=$(bash evals/run.sh grade "$id" "$empty_report" 2>&1 | grep -cE '^PASS —' || true)
     if [ "$verdict" -gt 0 ]; then
         fail "$id: an EMPTY report passes this case — its guards are satisfied by silence and its expected criteria are too weak to require work (rule 25)"
@@ -945,6 +965,7 @@ for case_dir in evals/cases/*/; do
     fi
 done
 rm -f "$empty_report"
+[ "$check24_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 24 asserted nothing"
 
 echo
 echo "Check 25: every agent has a fixture that names it (rule 13)"
@@ -985,9 +1006,11 @@ echo "Check 26: no generated artefact in a fixture input (rule 7)"
 #
 # Untracked counts. A tracked artefact is a committed mistake; an untracked one
 # is the mistake still happening, on the machine where it happened.
+check26_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -d "$case_dir/input" ] || continue
+    check26_n=$((check26_n + 1))
     art=$(find "$case_dir/input" \( -name '__pycache__' -o -name '*.pyc' -o -name '*.pyo' \
             -o -name '.pytest_cache' -o -name 'node_modules' -o -name '.ipynb_checkpoints' \
             -o -name '*.egg-info' \) -print -quit 2>/dev/null || true)
@@ -997,6 +1020,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check26_n" -gt 0 ] || fail "no case input/ directories found under evals/cases/*/ — Check 26 asserted nothing"
 
 echo
 echo "Check 27: every release note has a matching tag (rule 15)"
