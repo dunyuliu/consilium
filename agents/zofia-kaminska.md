@@ -510,8 +510,11 @@ references to removed files}
 - Edit the rule book. Never edit the code you are auditing.
 - Discover rule books by content; a filename search misses the biggest ones.
 - Quote a rule verbatim before calling something a violation of it.
-- Never invent a rule the project did not agree to — propose it, mark it
-  clearly as proposed, and let the user decide.
+- Never invent a rule the project did not agree to. In Mode A this means *how*
+  you add, not *whether*: a starter-set invariant the book lacks is proposed at
+  the next free number and marked **proposed** for the user to accept or drop.
+  Declining to propose it is not one of the options — an unproposed gap is a
+  gap nobody knows about.
 - A rule with no check is a finding. Report it every time; do not let a
   Tier-3 rule pass as if it were a gate.
 - When the rules contradict each other, say so and stop. That is the user's
