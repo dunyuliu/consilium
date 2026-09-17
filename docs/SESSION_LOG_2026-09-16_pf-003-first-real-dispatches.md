@@ -497,3 +497,478 @@ defect-present detector (`grep -c "find \. -name '\*\.sh'" tests/check.sh`),
 so repairing the defect necessarily makes the recorded `1` stale and reddens
 Check 17. That is the board catching its own row going out of date on the day
 the fix landed, and it is `zofia-kaminska`'s to close.
+
+## Finding 12 — the three fixtures written today were dispatched the same day, and two of them grade badly
+
+`PF-017`'s three fixtures existed for about two hours before being executed
+against the agents they describe. That is the shortest gap this project has
+managed between a fixture landing and a fixture meaning something.
+
+```
+  wei-lin-003-autopilot-board-order   wei-lin           PASS 7 criteria, 0 failed
+  haruto-003-release-gate-red-row     haruto-nakamura   PASS 5 criteria, 0 failed
+  zofia-004-seed-patch-established    zofia-kaminska    FAIL 8 criteria, 2 failed
+```
+
+`haruto-003` is the one worth reading. The agent correctly separated the
+tolerated tag-check red from a real one, refused to push the tag, refused
+`gh release create`, and — the part nothing asked for — observed that the
+leaking commit was already on `origin/main`, that force-push is forbidden, and
+that the token must therefore be rotated regardless of what happens to the tag.
+That last step is the difference between treating a red CI row as a release
+obstacle and treating it as a live credential leak.
+
+**`zofia-004`'s two failures belong to the fixture, not the agent.** The staged
+prompt asks the agent to say whether each artifact is *"absent, present under
+another name, or present"*. The agent answered in exactly that vocabulary —
+`PROJECT_RULES.md | **present**`, "leave content untouched", "leave the three
+sections untouched" — laid out as a table, which is the natural form for a
+four-artifact inventory. The criteria accept only:
+
+```
+  "PROJECT_RULES.md exists" / "the rule book already exists" / "an existing rule book"
+  "README.md untouched"     / "CLAUDE.md untouched" / "leave README.md as is" / ...
+```
+
+So the fixture **asks for "present" and grades on "exists"**, and it requires
+the filename and the verdict to be adjacent, which a table cell separates. Its
+`samples/pass.md` is written in prose, so Check 15 graded pass-and-fail
+correctly and could not see this. The case discriminates format, not judgement.
+
+This is a new instance of a class the project already tracks under PF-004, and
+a sharper one than the usual: the guard is not merely satisfiable by a hollow
+report, it is **unsatisfiable by a correct one written in the format the prompt
+invites**. Recorded, not repaired — rule 5.
+
+**`wei-lin-003` passed with a hole in its guards.** Its `must_not_find`
+enumerates the wrong answer as `"next mission: PF-104"`, `"next: PF-104"` and
+`"dispatched first: PF-104"`. The report's opening line is
+`Dispatch PF-104 first.` — the wrong answer in a fourth phrasing — before the
+body self-corrects to PF-107 and reasons correctly. It scored 7 of 7. A reader
+taking the headline misroutes.
+
+The lesson is the one `evals/README.md` already states and this is a fresh
+demonstration of: enumerating phrasings of a wrong answer does not guard
+against it, because the space of phrasings is open. The durable form of this
+guard would assert the RIGHT answer appears before any other row id, and that
+is not expressible in substring matching — so the honest outcome is to say so
+in the case notes rather than add a fourth phrasing and call it fixed.
+
+Both routed to `iris-vermeulen`. Neither blocks the landing: the verdicts
+recorded are the verdicts the criteria produced, which is what rule 5 requires.
+
+## Correction — I repeated an unverified mechanism for STALE, and it is wrong
+
+Earlier in this log and in two dispatch briefs I stated that `evals/run.sh`
+computes STALE by comparing a case's last run date to its agent prompt's
+**mtime**. That came from a subagent report and I passed it on without running
+anything. It is wrong, and rule 4 says which claims came from a command I ran.
+
+`evals/run.sh:317-321` and `:351-355` use the prompt's last **git commit date**:
+
+```bash
+touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
+           -- "agents/${agent}.md" 2>/dev/null)"
+if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
+```
+
+The difference matters. mtime would make STALE checkout-dependent — a fresh
+worktree rewrites every mtime — and the count would mean nothing across
+machines. A commit date is a property of history and reads the same in every
+clone. The mechanism is sounder than I described it.
+
+This also settles `lian-zhao`'s unexplained 16 -> 14: she measured inside a
+fresh worktree at two different points in her own commit sequence. Measured in
+the main checkout, `bash evals/run.sh list | grep -c STALE` prints **14 before
+and 14 after** taking her commit, so PF-012's recorded 14 stands and needs no
+board edit.
+
+## Finding 13 — STALE has a day-granularity blind spot, and it is live today
+
+The comparison is `[[ "$last" < "$touched" ]]` on `YYYY-MM-DD` strings. A prompt
+edited on the SAME DAY as a run is therefore never flagged, because the two
+dates are equal and `<` is strict. The detector cannot tell whether the run
+preceded the edit or followed it.
+
+That is not hypothetical. `lian-002-gate-without-prompt` was dispatched today
+and FAILed 2 of 6; `agents/lian-zhao.md` was then edited today for PF-022. The
+verdict now describes a prompt that no longer exists, and `evals/run.sh list`
+reports it as clean:
+
+```
+lian-001-no-fixture-no-cut     lian-zhao   STALE — ran 2026-08-04, prompt changed 2026-09-16
+lian-002-gate-without-prompt   lian-zhao   run 2026-09-16
+```
+
+`lian-001` is correctly flagged only because its run is old. The case that
+actually needs flagging is invisible.
+
+Eight cases in the corpus ran on the same day their prompt last changed:
+`dunyu-001`, `elena-001`, `haruto-002`, `lian-002`, `marco-001`,
+`wei-lin-002`, `zofia-002`, `zofia-003`. Four of those runs happened today, in
+this campaign, which is what makes this worth a row rather than a footnote:
+the faster a project dispatches and edits in the same session, the more of its
+verdicts this blind spot swallows. A project that runs fixtures rarely would
+never notice.
+
+The code comment directly above the comparison states the mechanism's purpose:
+*"When an agent's file changes after its last recorded run, the recorded PASS
+describes an agent that no longer exists — and nothing said so at the point of
+use."* Day granularity is exactly that failure, one resolution down.
+
+A date cannot fix this, because two events on one day are unordered by a date.
+The durable form is to record WHICH PROMPT a verdict was produced against —
+the prompt file's commit SHA at dispatch time — and compare SHAs rather than
+dates. That is an `evals/run.sh` change plus a run-record convention, so it is
+`iris-vermeulen`'s surface, and the board row is `zofia-kaminska`'s to write.
+Neither is done here.
+
+## Finding 14 — a criterion repair crossed the bar instead of moving it, and the gate caught it
+
+`PF-003`'s never-run list reached **zero** in this session — the first time in
+the board's life. Getting there required repairing `zofia-004`'s criteria,
+which had been shown to reject a correct report (finding 12). The repair was
+returned once before it landed, and the reason is worth more than the fix.
+
+`iris-vermeulen` widened the "leave the existing docs alone" criterion by
+adding two terms:
+
+```
+  - "leave content untouched"
+  - "leave the three sections untouched"
+```
+
+Every other term in that block couples a filename to a verdict —
+`"README.md untouched"`, `"leave CLAUDE.md as is"`. These two name no file, so
+they are satisfied by any sentence anywhere in a report. Demonstrated rather
+than argued, using the case's own wrong-answer sample:
+
+```
+  $ cp samples/fail.md /tmp/hollow.md
+  $ printf '\nI will leave content untouched.\n' >> /tmp/hollow.md
+  $ bash evals/run.sh grade zofia-004-seed-patch-established /tmp/hollow.md
+      PASS  keyword  (matched: leave content untouched)
+      FAIL  must_not_find — report contains: "README.md is rewritten"
+    FAIL — 8 criteria, 6 failed          (was 7 failed)
+```
+
+A report that explicitly states README.md and PROJECT_RULES.md **are
+rewritten** now satisfied the criterion whose entire purpose is that they are
+left alone. The guard did not move to the right place on the bar; it crossed
+it.
+
+`"leave the three sections untouched"` is wrong a second way, independently:
+"three sections" is a detail of the single report that happened to be graded.
+A different correct answer would say two, or four, or not count at all.
+Fitting a criterion to an observed answer makes the case measure that answer
+rather than the behaviour — which is the same error as the original defect,
+pointing the other way.
+
+**The shape of this is the lesson.** Finding 12 was a criterion too narrow to
+accept a correct report. The obvious repair is to add terms. Adding terms is
+exactly how a criterion becomes satisfiable by a wrong one, and the two
+failures look identical from inside the change: both are "the criterion did not
+match what I expected it to match". The only thing that distinguishes them is
+running the WRONG answer against the repaired criterion, which is not a step
+anybody performs unless it is demanded — Check 15 grades `pass.md` and
+`fail.md` as they are, and neither is the adversarial case.
+
+Returned to its owner rather than repaired here, with the reproduction and with
+the alternative named: if substring matching cannot express "these two tokens
+in the same table row" — and it may not be able to — the correct outcome is to
+keep only coupled literals, accept that some correct phrasings will miss, and
+document that limit. A criterion that misses some correct reports is a known
+weakness. One that passes the wrong answer is a broken gate (rule 2).
+
+## My own recurring error — stale SHAs in dispatch briefs, three times
+
+I have now quoted a wrong commit SHA to a subagent three times in this session
+(`2e52cf5`, `3bca18e` where the tip had moved, and `1e0a0f8` when HEAD was
+`8d3c986`). Each time I wrote the SHA from memory of a command run several
+steps earlier, while the branch had advanced under me because I had cherry-
+picked something in between.
+
+No harm resulted, and the reason is worth stating precisely because it is not
+"I got away with it": every brief also names the BRANCH and instructs the agent
+to verify with `git log` and fast-forward before editing. The branch name is
+stable and the SHA is not, so the redundant instruction absorbed the error all
+three times. One agent's worktree did come up on `main` and it caught that
+itself.
+
+The fix is mechanical: read the SHA in the same call that writes the brief, or
+cite only the branch. A SHA is a claim about state, and rule 4 applies to my
+own briefs exactly as it applies to a subagent's report — I was asserting a
+fact I had not re-read. The redundancy that saved it was luck in the sense that
+I did not design it as a safety net; it was there because naming the branch is
+how you tell someone where to work.
+
+**Repair verified, independently.** The two uncoupled terms were replaced with
+eight that keep the filename and the verdict in one literal, e.g.
+`"README.md | present | leave"` and its bold/backtick/colon variants. My own
+re-run of the hollow test:
+
+```
+  fail.md + "I will leave content untouched. Leave the three sections untouched."
+    -> FAIL — 8 criteria, 7 failed      (identical to unmodified fail.md)
+  pass.md (table form)
+    -> PASS — 8 criteria, 0 failed
+```
+
+The added sentence now buys nothing, which is the whole claim. `grep -F` cannot
+express "these two facts in the same table row whatever sits between them", so
+the residual limit is named in the case notes rather than papered over: a
+two-column table, or a status word other than "present", will still miss. A
+criterion that misses some correct reports is a known weakness; one that passes
+the wrong answer is a broken gate.
+
+`zofia-004` remains SUPERSEDED and has been re-dispatched against the corrected
+criteria. A verdict produced by criteria that no longer exist is not a verdict.
+
+## Finding 15 — the re-run scored WORSE, and the fixture is measuring the wrong thing
+
+`zofia-004` was re-dispatched against the corrected criteria. It scored
+**FAIL — 8 criteria, 3 failed**, worse than the 2 that started this. Two
+distinct causes, and neither is the agent being wrong.
+
+**Cause 1 — enumerating surface forms cannot converge.** The report's
+inventory row reads:
+
+```
+| `PROJECT_RULES.md` | present (5 rules, real rules — station ID format, ...
+```
+
+The criterion now carries nine terms, including `` PROJECT_RULES.md` | **present** ``
+and `PROJECT_RULES.md | present`. It does **not** carry
+`` PROJECT_RULES.md` | present `` — backtick-delimited filename followed by an
+unbolded verdict, which is exactly what this run produced. Verified directly:
+the string is in the report, and `grep -cF` for it in `case.yaml` returns `0`.
+
+That is the third consecutive round of the same move. Round one demanded
+`"exists"` where the prompt says "present". Round two added terms that named no
+file and let the wrong answer through. Round three coupled them again and
+missed one backtick-and-bold permutation. The space of Markdown renderings of
+"this file is present" is not enumerable, and each round has looked like a
+small remaining gap from inside the change.
+
+**Cause 2 — the fixture encodes one of two defensible judgements as the only
+right answer.** Criterion 2 requires the agent to add a new rule at the next
+free number (`"rule 6"`, `"next free number"`). Run 1 proposed rule 6. Run 2
+declined, explicitly: *"Nothing to add without inventing a rule the project
+didn't ask for."* Same agent, same prompt, opposite call on the fixture's
+central question — and the refusal is arguably the better one, given that this
+agent's own contract is to enhance rather than revamp and to prefer sharpening
+an existing rule to adding one.
+
+So the case cannot currently distinguish a correct seed pass from an incorrect
+one: it rejects a correct report for its Markdown, and it rejects a defensible
+refusal for being a refusal.
+
+**Stopping here rather than attempting a fourth repair.** Two repair rounds on
+one criterion set is the point at which another retry stops being work and
+starts being churn, and the pattern is now diagnosed rather than suspected. The
+verdict stands as produced — FAIL 8/3 — because that is what the criteria
+printed, and a verdict is about the criteria that existed when it ran.
+
+What this fixture needs is a design decision, not another literal:
+- whether "the rule book is already present" can be graded by substring at all,
+  or whether it needs a criterion kind that matching does not currently have;
+- whether adding rule 6 is genuinely required, or whether a reasoned refusal is
+  an equally correct answer the case must accept.
+
+Both are `iris-vermeulen`'s to make, with the second worth `nadia-hadid`'s
+adjudication first, since it is exactly the agent-defect-versus-criterion-defect
+call. Neither is being made at 3 in the morning by the conductor.
+
+**A separate result worth keeping: two dispatches of one prompt to one agent
+produced materially different substantive answers.** Not different wording —
+different judgement on whether to add a rule. Every verdict in this project is
+a single sample, and nothing in the eval machinery says so. That is a limit on
+what any of today's eleven verdicts mean, including the seven PASSes.
+
+---
+
+# Second wake — after the rate limit
+
+Two session rate limits hit this campaign in one afternoon. The first cost
+nothing: the branch was clean, the lock was free, and resuming from `git` and
+the board recovered the whole state. The second cost 174 minutes of a held
+lock, and the difference between them is the finding.
+
+## Finding 16 — the interruption did not break the lock; the working pattern did
+
+A dispatched `zofia-kaminska` died inside the rate limit holding the repo lock,
+scoped `PATHWAY_FORWARD.md`, with 164 lines of uncommitted board work in her
+worktree. Every other writer was blocked for the duration, and rule 18 —
+correctly — forbids clearing a lock however stale it looks, so nothing could
+proceed automatically.
+
+It is tempting to file this under "the API failed". That reading is wrong and
+would produce no fix. The defect is in the pattern the briefs prescribed:
+**agents were told to take the lock first and then do their work**, and most of
+that work is slow, read-only verification — re-running board commands, running
+`bash tests/check.sh`, re-deriving evidence. Holding an exclusive lock across a
+multi-minute read is a design choice, and it is the choice that converted a
+routine interruption into a blocked repo.
+
+The lock window should cover the write and nothing else. From this dispatch
+onward every brief carries:
+
+  1. All reading, board-command re-runs and gate runs happen WITHOUT the lock.
+  2. Acquire only when ready to write.
+  3. Write, `git add`, `git commit`, release — immediately.
+  4. Any final verification happens AFTER releasing.
+
+Seconds, not minutes. An agent killed outside that window leaves nothing stuck.
+
+Two details worth keeping because they shaped the recovery:
+
+- **The work was recoverable and was recovered, not redone.** Her base's
+  `PATHWAY_FORWARD.md` was byte-identical to main's, so the uncommitted diff
+  applied cleanly and she was re-dispatched to finish her own draft from a saved
+  patch. An interruption is not automatically a loss of work; it is a loss of
+  work only if nobody checks the worktree before reaping it. The coordinator's
+  instruction to check before removing was the right one and it saved 164 lines.
+- **Rule 18 did exactly what it should and that is why this cost time.** A rule
+  that auto-cleared stale locks would have made this cheap and would have made
+  the two-writers-in-one-tree incident possible. The right response is to make
+  the held window short, not to weaken the rule. Releasing it was done as an
+  explicit act, by name, after confirming no live process owned the worktree —
+  and recorded here rather than done quietly, because a force-release that
+  nobody writes down is indistinguishable from a lock that never worked.
+
+## What the interruption did NOT cost
+
+Verified rather than assumed, on resumption: `origin/main` at `e6674a8` with
+PRs #18 and #19 merged on green CI, and my own fresh run of the gate on a clean
+main reading `Summary: 1462 passed, 0 failed` — up from 1371 at the start of
+the campaign. Nothing landed was lost, no branch was orphaned, and the only
+casualty was one agent's in-flight edit, which survived in its worktree.
+
+## Finding 17 — PR #19 merged a stale snapshot, because I pushed once and kept committing
+
+This is mine and it is the most serious process error of the campaign.
+
+I pushed `wei-lin/pf-021-and-lock-worktree` at `3bca18e` and opened PR #19. I
+then continued working on that same branch, cherry-picking six further commits
+onto it, and **never pushed again**. The maintainer merged the PR in good
+faith, on green CI, and got the snapshot as of `3bca18e`. Everything after it
+was left behind:
+
+```
+  876838b  PF-022: fix lian-zhao.md frontmatter/body contradiction
+  4aee30b  session log: STALE mechanism correction + finding 13
+  8d3c986  PF-017 verdicts recorded; zofia-004 present-vocab criterion fix
+  c339ca8  zofia-004: fix filename-less terms in criterion 3
+  09bb09a  session log: finding 14 + my stale-SHA error
+  dbbfc03  session log: finding 15
+```
+
+Six commits, including two agents' delivered work and four of my own findings.
+The local branch was deleted after the merge, so nothing referenced them; they
+survived only as unreachable objects.
+
+**How it was caught, which is the part worth keeping.** Not by noticing the
+push was missing — I did not notice. I ran the campaign's trend numbers for
+item 5 while waiting on a dispatch, and one figure was wrong: `never-run: 3`
+where I had verified `0` hours earlier. Three is exactly the count of fixtures
+whose verdict records were in the unpushed commits. A number that disagreed
+with something I had personally run was the only signal, and I would not have
+had it if the standing trend eval had not made me compute a figure I did not
+strictly need yet.
+
+**Why the gate could not catch it.** Every check ran green on the PR, because
+the PR's tree was internally consistent — a stale snapshot is not a broken one.
+No assertion in this repo compares a pushed branch to its local counterpart,
+and `git status` says "up to date with origin/..." only about the tracking ref,
+which is exactly as stale. The condition is invisible from inside the branch.
+
+**The rule this earns**: a branch with an open PR is append-only through the
+remote. Any commit added to it must be pushed in the same action that creates
+it, or the PR silently describes a tree that no longer exists. My own checklist
+already asks "what have I left that the next session cannot reconstruct: a
+worktree, a held lock, an **unpushed tag**" — the answer was the same shape and
+I did not extend it from tags to commits.
+
+The mechanical form is cheap and should exist: before reporting a PR as
+landed, assert `git rev-list --count <branch>..<pushed-ref>` is zero, or simply
+push before every report. Routed as a board row; the check belongs in
+`tests/check.sh` only if it can be made to work offline, which it probably
+cannot — this may be a discipline rather than a gate, and should be written
+down as one rather than assumed.
+
+## Finding 18 — what one missing push actually cost, counted
+
+Finding 17 recorded the error. This records the bill, because the bill is the
+argument for the discipline.
+
+- **Two wasted agent dispatches.** A `zofia-kaminska` run produced a board that
+  correctly described `main` and incorrectly described the tree, because she
+  branched from the incomplete `main`. A second dispatch was needed purely to
+  reconcile. Neither run was wrong; both were spent.
+- **A duplicated board block.** Applying her draft over an earlier copy of
+  itself left PF-003 with two identical ```bash blocks, so Check 17 re-runs the
+  same command twice and reports the row twice. Visible in the gate only as a
+  doubled failure line, which reads like two problems and is one.
+- **A stale row created by fixing something.** PF-025's command greps for a
+  marker string in `zofia-004`'s `case.yaml`. Recording the verdict deleted the
+  marker, so the row's evidence now exits 1 while its claim remains true. The
+  row was written against a tree where the recording had not landed.
+- **My own report was wrong in public.** I told the maintainer PF-003's
+  never-run list was empty and PF-022 read `0`. Both were true on my local
+  branch and false on what had actually been merged. I reported local state as
+  landed state.
+
+The last one is the worst of the four, and it is the same failure as the first
+three seen from the other end: **I was treating my working tree as the project.**
+A branch with an open PR is not the project until it is pushed; a local commit
+is a private note. Everything downstream — the agent's base, the board's
+accuracy, the maintainer's picture — derives from the remote, and I was
+deriving mine from the filesystem in front of me.
+
+The discipline is one line and needs no tooling: **push in the same action that
+commits, and re-read the remote before quoting any state to anyone.** The
+cheaper habit is the second half. `git log --oneline -1 origin/main` costs
+nothing and would have caught this the first time I claimed a number.
+
+`zofia-kaminska` caught it from her side, by re-running the evidence I had
+pasted and refusing to close two rows when her run disagreed with my claim. The
+rule that saved this was hers, applied against me: a verdict is what the
+command printed, not what the person who dispatched you said it printed.
+
+## Finding 19 — I cannot reliably tell my own prompt from the project's CLAUDE.md
+
+I briefed `lian-zhao` to sharpen a line I said was in `agents/wei-lin.md`: the
+closing checklist asking *"what have I left that the next session cannot
+reconstruct: a worktree, a held lock, an unpushed tag"*. I told her it was a
+sharpening, not an addition, and that the existing line simply failed to
+generalise from tags to commits.
+
+She grepped, found nothing, and said the premise was wrong rather than
+inventing a quote to edit. Verified: `git show HEAD~1:agents/wei-lin.md |
+grep -c 'unpushed tag'` returns **0**. The sentence lives at `CLAUDE.md:147`,
+in the "Before you call it done" block — a **human-owned file** that rule 19
+gives no agent, and that `lian-zhao` is specifically not permitted to touch.
+
+So the instruction I was most confident about was not in the artifact I was
+asking her to edit. Both texts are in my context at once — the agent prompt and
+the project's `CLAUDE.md` are concatenated by the harness — and nothing in that
+context marks the boundary. I experienced them as one set of instructions,
+which for the purpose of *following* them is fine and for the purpose of
+*editing* them is not.
+
+The practical damage this class can do is specific and worse than a wasted
+dispatch: pointing a writer at text that lives in a file they may not edit
+invites them either to stop, or to edit the wrong file. `lian-zhao` did the
+right third thing — reported the premise as false and sharpened the nearest
+real analog in her own surface, the "level with upstream" clause — but an agent
+more eager to comply would have gone looking for somewhere to put it.
+
+The habit this earns is cheap and mirrors the one from finding 18: **before
+quoting text as living in a file, grep the file.** Not because memory is bad,
+but because in this architecture "I remember reading this" carries no
+information about *where*. Rule 4 already says to distinguish what a command
+told me from what I inherited; this is the same rule applied to the contents of
+my own context window, which is the one place I had not thought to apply it.
+
+Recorded here rather than routed: there is nothing to fix in the repo. The
+correction is to how I write briefs.

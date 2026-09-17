@@ -35,6 +35,14 @@ missed finding, because it destroys work that was already correct.
   holds the mission; do not fix their work yourself mid-flight.
 - Merge deliberately, one at a time, gate-green. Never run two merges at once,
   and never merge intending to fix the regression afterwards.
+- **Hold a shared lock only for the write step.** Acquire it immediately
+  before the commit/push, release it the instant that lands; run every
+  read-only verification that precedes it — re-deriving numbers, running the
+  gate, re-checking a subagent's report — unlocked. A lock protects nothing
+  during verification; it only blocks every other writer for as long as you
+  hold it, and verification is the slow part. A force-release is an explicit,
+  recorded act naming the holder, never a quiet cleanup — an unrecorded one is
+  indistinguishable from a lock that never worked.
 - Rule-book authorship belongs to `zofia-kaminska`. Specify what the rules must
   cover; do not write them yourself.
 
@@ -237,9 +245,12 @@ them. Standing duties:
 **Phase 1 — Dispatch.** Pick non-overlapping missions (no two subagents on the
 same source file). Brief each like a smart colleague who just walked in: goal,
 background, files + lines, verification target (concrete numbers), test command,
-constraints, end-of-mission report fields — and explicit paths (see waste,
-above). Always isolate in a git worktree (`isolation: "worktree"`); have the
-brief re-sync any shared file it will edit from current main (see gate axis 4).
+constraints — including, for any mission that will touch a shared lock,
+"acquire it only immediately before the write, release it the instant that
+write lands, never across verification" — end-of-mission report fields, and
+explicit paths (see waste, above). Always isolate in a git worktree
+(`isolation: "worktree"`); have the brief re-sync any shared file it will edit
+from current main (see gate axis 4).
 Cap concurrency at 3-6.
 
 **Phase 2 — Land.** Per returning subagent: pull from worktree, syntax-check
@@ -301,12 +312,21 @@ disagree about the same day, and the board is the one people trust.
 **Close the milestone on a clean tree, and prove it.** The release gate's
 `tree` row decides this — clean status, one worktree, no held lock, level with
 upstream — so re-run `tests/release_gate.sh` after the release and read that
-row rather than eyeballing the four. Two things are yours beyond it: deciding
-which leftovers are evidence and which are scratch (evidence stays and gets
-named, rule 8), and reaping the worktrees, because you are the only one who
-knows which mission held which. A dirty close blocks the next milestone rather
-than becoming tidying you will get to — the cost lands on whoever wakes up
-next, which in an autonomous run is you, without the context you have now.
+row rather than eyeballing the four. "Level with upstream" is not a
+milestone-close-only check: on any branch with an open PR, push in the same
+action that commits, every time, not only at the end. Such a branch is
+append-only through the remote — a maintainer can merge the pushed snapshot in
+good faith on green CI while later commits sit local and unpushed, and the
+moment the merge lands those commits are unreachable. The same failure as an
+unpushed tag, same fix: commit and push as one action, not two. Two things are
+yours beyond the tree row: deciding which leftovers are evidence and which are
+scratch (evidence stays and gets named, rule 8), and reaping the worktrees,
+because you are the only one who knows which mission held which — check each
+for uncommitted or unpushed work before reaping it; a dead agent's worktree can
+hold real, unlanded work, not just scratch. A dirty close blocks the next
+milestone rather than becoming tidying you will get to — the cost lands on
+whoever wakes up next, which in an autonomous run is you, without the context
+you have now.
 
 **Phase 4 — Heartbeat.** When idle, schedule the next wake-up via whatever
 primitive the environment provides (a `ScheduleWakeup` tool if one exists, else
@@ -442,6 +462,21 @@ orchestration overhead exceeds the work.
   clean re-run on stable HEAD.
 - **Search-waste.** A subagent burned hours on `find`/`bfs` over NFS for a path
   the brief could have stated. Give paths; kill stray searches by PID.
+- **Holding the lock through verification, not just the write.** A brief said
+  "take the lock, then do your work" — most of that work was slow read-only
+  verification, and the agent was killed by an external rate limit mid-way,
+  holding the lock for 174 minutes and blocking every other writer. Acquire
+  only when ready to write; verify unlocked, both before and after.
+- **Reporting a push as done because the commit was done.** A branch was
+  pushed and a PR opened, then six more commits landed on it locally and were
+  never pushed again. The maintainer merged the stale pushed snapshot on
+  green CI, in good faith; two agents' work and four findings became
+  unreachable git objects the instant the merge landed.
+- **Quoting my local branch as the project's state.** Board numbers I reported
+  to the maintainer were true on my local branch and false on what had
+  actually been merged — I was treating a working tree as the project. `git
+  log --oneline -1 origin/<branch>` costs one call and would have caught it
+  the first time I quoted a figure.
 
 ## Cardinal rules
 
@@ -461,5 +496,11 @@ orchestration overhead exceeds the work.
 - Never modify a project's reference test oracle. Read it; never write it.
 - Never write into the consilium checkout from a project deployment; stage
   anonymised upstream proposals in `.consilium-review/upstream-proposals/`.
+- Never hold a shared lock past the write step it was taken for — acquire only
+  to write, release the instant it lands.
+- Never leave a commit unpushed on a branch with an open PR — commit and push
+  are one action, not two; that branch is append-only through the remote.
+- Never quote board state, a landing, or a number from your local branch alone
+  — check the remote first.
 - Final sign-off on the CAMPAIGN rests with the human. You sign off on individual
   merges; the user signs off on the campaign.
