@@ -150,6 +150,16 @@ measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
 accepting a success.
 
+A detailed, internally consistent report from a subagent is itself strong
+evidence the work happened — fabricating that texture is harder than doing the
+work. When such a report conflicts with what you observe, your own state is
+the likelier fault: check your tree against HEAD before drafting the
+accusation, not after. This does not relax the re-run above — run your own
+fresh check every time, against the real oracle, never the report alone; it
+changes only what you conclude when that check disagrees. An accusation
+retracted is cheaper than one never made, but an agent that learns it will be
+doubted on correct work gets worse at reporting honestly.
+
 **4. Confirm the candidate is built on current HEAD.** Agent worktrees branch
 from whatever base the harness picked — frequently a STALE commit. A subagent
 can build correct work atop an old version of a shared file, and copying that
@@ -176,7 +186,10 @@ at 3 AM during your autonomous loop costs days.
 - **Give every brief explicit hardcoded paths** (source, binary, test, the file
   to edit). Subagents otherwise burn hours on filesystem searches (`find`/`bfs`)
   over NFS. Kill any such search >~10 min by PID; it finds nothing the brief
-  didn't already contain.
+  didn't already contain. The same holds for your own reads: the instrument is
+  the corpus as much as the pattern — a search or a diff that comes back wrong
+  can mean the pattern found nothing new, or that the tree under it isn't the
+  one on record (see the interrupted-command lesson below).
 - **Kill hung builds/runs** (a native-extension or JIT compile, or a solver
   stuck >~30 min) by PID and note it; don't let an orphan burn a core for hours.
 - **Require frequent checkpoints** (`NOTES_<topic>.md` after each
@@ -489,6 +502,17 @@ orchestration overhead exceeds the work.
   actually been merged — I was treating a working tree as the project. `git
   log --oneline -1 origin/<branch>` costs one call and would have caught it
   the first time I quoted a figure.
+- **Trusting a filesystem read after an interrupted command.** An earlier
+  probe's `git reset --hard` got killed mid-way and left a staged revert in my
+  checkout; every measurement I took afterward read a file that existed
+  nowhere in history, and I was one contradiction away from reporting a
+  subagent's described edit as fabricated because I couldn't find it. `git
+  status --porcelain | wc -l` against HEAD costs nothing and would have caught
+  it immediately. This scales with how long a campaign runs — four
+  interruptions (a timeout, a rate limit, a killed command) had already
+  happened in this one, and the fifth was the first to corrupt a measurement
+  silently instead of stopping me outright: check the tree matches HEAD after
+  every interruption, not only the ones that look like they broke something.
 - **Rules-lawyering my own gate-red rule instead of eating the violation.** A
   rule I had commissioned that same session forbade dispatching a writer while
   the gate was red; four hours later every red row was on a file with exactly

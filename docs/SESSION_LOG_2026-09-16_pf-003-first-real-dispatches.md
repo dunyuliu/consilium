@@ -1909,3 +1909,182 @@ that fit the story I was forming. A subagent fabricating a detailed report,
 complete with plausible term lists, is a far less likely explanation than my
 own state being wrong — and I should have weighted it that way before running
 the check, not after.
+
+---
+
+# Seventh wake — the repair validates, and a criterion comes under real doubt
+
+## Finding 38 — the criterion repair held against text it had never seen
+
+`iris-002` was re-dispatched against its repaired criteria. Verdict
+**FAIL — 6 criteria, 1 failed**, down from 6/3.
+
+The part that matters is *how* criteria 2 and 4 passed. Run 1 wrote
+`occur **0 times**` and ``do not replace `backdate_check.sh` wholesale``. Run 2,
+written after the repair and with no knowledge of it, wrote `0 same-day` and
+``keep `backdate_check.sh` running as-is`` — different phrasings again, and both
+matched.
+
+That is the distinction between this repair and `zofia-004`'s three failed
+rounds. Those rounds each added the wording the *previous* run had used and
+were defeated by the *next* one. This repair widened along axes — both
+orderings of the compact form, and the standalone "quantifier + times /
+instances / members" shape a report reaches for when the count and the concept
+are separated by a clause — and then held against independent text. **A repair
+tested only against the report that exposed it is untested; this one was tested
+by a report written afterwards, which is the only validation that means
+anything.**
+
+`iris-vermeulen` also rewrote `samples/pass.md` in phrasing deliberately not
+copied from the criteria, which is the specific blindness that let the original
+defect ship (finding 33).
+
+## Finding 39 — two independent runs converged on a remedy the criterion rejects
+
+Criterion 5 failed both times, and both runs proposed the *same alternative*:
+keep the old check, land the timestamp check as an addition once the gateway
+field ships, gated behind a fixture containing a real same-day pair. Neither
+proposed the needs-review flag the criterion expects.
+
+```
+run 1: "land timestamp_check.sh alongside it, gated by a fixture with at least
+        one synthetic same-day pair ... plus a regression fixture proving it
+        reproduces the same 5 BACKDATED flags"
+run 2: "land the timestamp check as an addition once the gateway field ships,
+        gated behind a fixture with an actual same-day pair, and keep
+        backdate_check.sh running as-is in the interim"
+```
+
+`iris-vermeulen` judged this a genuine miss and reasoned it from the input, not
+from preference: the timestamp field does not exist until the gateway ships, so
+the new check cannot be fixture-gated before then, leaving an interval from
+gateway launch until it passes its fixtures during which same-day pairs become
+possible and the old check silently passes them. A needs-review flag is
+buildable today and closes that interval. Neither run addressed it.
+
+That argument is strong. But **one agent missing a remedy is a miss; two agents
+independently proposing the same different remedy is evidence about the
+criterion**, and it is exactly the defect `nadia-hadid` diagnosed in
+`zofia-004`'s criterion 2 — a fixture deciding by implication a judgement the
+contract left open.
+
+I have not decided it. I have a stake — I specified this fixture's pass bar —
+and the call belongs to the agent whose contract is agent-defect versus
+criterion-defect. Dispatched to `nadia-hadid` with both arguments stated at
+their strongest and the instruction to settle it on the fixture's own input.
+
+**A method question I raised with her, which may outlast the case.** The case is
+`contested: false` because its pass bar is a reproducible fact about the corpus.
+Rule 25d says a case becomes contested "when a second dispatch is found to
+disagree with the first". Here the two dispatches **agree with each other and
+disagree with the criterion**. That is a third state 25d does not name, and if
+it is a gap it is a gap in a rule written yesterday — finding 31 again, on
+schedule.
+
+## Finding 40 — the adjudicator corrected me, and the correction was checkable
+
+`nadia-hadid` ruled criterion 5 **too narrow** and refuted my framing directly.
+All three of her load-bearing claims verify:
+
+**1. The two runs are not the same remedy.** I reported that two independent
+dispatches "converged on the same alternative", and treated that as evidence
+about the criterion. She read the reports more carefully than I did:
+
+```
+run 1: "gated by a fixture with at least one SYNTHETIC same-day pair"
+run 2: "gated behind a fixture with an ACTUAL same-day pair"
+```
+
+A synthetic pair is buildable today, so under run 1's plan the uncovered
+interval is length **zero**. Run 2's leaves one. They differ precisely where
+the argument turns. **"Two independent dispatches converged" was one data
+point, not two**, and I built a case on the word "converged" without checking
+whether the convergence survived the detail.
+
+**2. The interval premise is not in the input.** `gateway_note.md` fixes when
+the gateway goes live and says nothing about when `timestamp_check.sh` can be
+built or tested. The timestamp field's absence blocks production data, not
+development — which is exactly why run 1 proposed a synthetic pair. A criterion
+resting on `contested: false` must stand on facts the input contains, and this
+one rested on a scheduling contingency the reviewer supplied.
+
+**3. The decisive tell was inside the case all along.** Its own `README.md:37`
+says the correct answer is a narrow addition "**e.g.**, treat
+`issued_date == paid_date` as NEEDS-REVIEW". The author marked it an example;
+the criterion encodes it as the only pass. That is the `zofia-004` shape —
+a fixture deciding by implication a judgement the contract left open.
+
+Her replacement is the **mutation confirmation**, and I checked her reason for
+choosing it: it is in `agents/iris-vermeulen.md:205-206` verbatim — "take one
+real record, move it across the boundary by hand, watch it flip, restore it,
+confirm nothing else moved". So it grades a behaviour the contract actually
+demands, which is the test criterion 5 failed.
+
+Her cardinal point, which I want kept because it governs every future fixture
+here: **a fixture cannot be the place a new expectation is introduced.** If an
+agent *should* do something its prompt never asks for, the recommendation is a
+prompt change, never "the agent failed to do it". Rule 10's fixture-first order
+governs behaviour the prompt already demands.
+
+**Method, and it is my fourth line-wrap false negative today.** My check for the
+mutation text returned 0 on an exact phrase; it wraps across two lines. I ran
+the loose pattern first and did not report it missing. Finding 29's corrective
+has now caught four of these, which is the only reason none became a false
+finding — including one that would have been a false accusation against
+Nadia's reasoning.
+
+**On 25d's gap, she was sharper than my question.** I asked whether
+dispatches-agreeing-against-a-criterion makes a case contested after the fact.
+Her answer: no, and do not close the gap by widening 25d's trigger. The two
+shapes route to opposite remedies — dispatches disagreeing with *each other*
+means the answer is genuinely a judgement call (`contested: true`, more
+samples); dispatches agreeing *against the criterion* is evidence the criterion
+is wrong (repair or split it). Marking the second case contested "would be a
+place to park a defective criterion instead of fixing it, and would quietly
+lower the bar on the criteria around it that are factual."
+
+## Finding 41 — the repaired criterion grades the act, not the reasoning about it
+
+`iris-vermeulen` rebuilt criterion 5 as three ANDed sub-criteria drawn from her
+own contract at `:205-206` — 5a the mutation performed, 5b the boundary outcome
+observed, 5c the record restored — each widened by class rather than by
+instance.
+
+My grades reproduce hers exactly: `pass.md` 8/0, `fail.md` 8/8, both prior runs
+8/3 (neither performed a mutation), a wholesale-swap denial 8/7, an empty report
+8/7.
+
+**The test worth running was the one neither of us had:** a report that *reasons*
+about the boundary without touching a record. I wrote one — correct counts,
+correct verdict, and "the check still passes such a row silently and is blind to
+same-day ordering... I did not need to try it; the comparison is lexicographic
+on equal strings."
+
+```
+  FAIL — 8 criteria, 2 failed
+  5a (mutation performed)  FAIL
+  5b (boundary outcome)    PASS  (matched "still passes")
+  5c (record restored)     FAIL
+```
+
+Exactly the right shape. 5b alone is weak — a reasoning-only report produces it
+naturally, which is precisely what `nadia-hadid` warned about when she flagged
+`"silently passes"` as close to something a hollow report could say about any
+check. The AND across three sub-criteria is what converts a weak signal into a
+strong one: **you can argue your way to the outcome, but not to having mutated a
+row and put it back.**
+
+That is a better criterion than the one it replaced in a way worth naming. The
+old one asked *what remedy do you propose* — a design opinion, gradeable only by
+enumerating acceptable opinions. The new one asks *what did you do* — an act,
+with residue. Criteria that grade acts are cheap to widen safely; criteria that
+grade opinions are the ones that have cost this campaign four repair rounds.
+
+**Iris conceded her own premise**, and the sentence is worth keeping verbatim
+because it is the hardest kind to write: *"I invented the premise, not read
+it."* She had argued the uncovered interval from the input; on re-reading she
+agreed `gateway_note.md` never says when a replacement can be built. She also
+kept the instinct alive in the right place — if "name what covers the gap
+between retirement and replacement" is worth requiring, it belongs as new prompt
+text via `lian-zhao`, and only then earns a fixture. Not smuggled into a
+criterion the current contract never asked for.
