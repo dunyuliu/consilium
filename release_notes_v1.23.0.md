@@ -81,6 +81,7 @@ See open issues F6 and F7.
 | F6 | Medium | `tests/check.sh:1294-1306` | With the grace gone, Check 35 fails on any local tag that has no GitHub Release — including, unavoidably, the window between `git tag` and `gh release create` on every future cut. Harmless today because no hooks are installed; it bites the moment `install.sh`'s hook enforcement is restored. | Deferred → `iris-vermeulen` |
 | F7 | Low | `tests/check.sh:1109-1117` | Check 31(d) is red in the window between writing the root note and creating the tag, for the same structural reason as F6. Avoidable by ordering, but the gate cannot distinguish a release in progress from an inversion. | Deferred → `iris-vermeulen` |
 | F8 | Low | `tests/release_gate.sh` (row `release` header comment) | The comment still describes Check 35's newest-tag grace and step 12a's autonomous carve-out as live; both were removed in this stretch. The script's logic is correct — only the comment is stale. | Deferred → `iris-vermeulen` |
+| F9 | **High** | `agents/haruto-nakamura.md` step 11 | The "exactly one red CI assertion between the two pushes" clause is unsatisfiable now that Check 31(d) asserts tag-absence a second time. Hit on this very cut. See the CI section for the evidence and the proposed wording. | Deferred → `lian-zhao` |
 
 **Confirmed clean.** Check 4's removal leaves no gap: Check 6 requires a
 model-table row per agent and Check 7 a roster row and a Layout line, both
@@ -123,7 +124,39 @@ if it is left until hook enforcement returns.
 
 ## CI
 
-- ci: run `35252753021`, https://github.com/dunyuliu/consilium/actions/runs/35252753021, conclusion `success`, workflow `structural-invariants`, SHA `632c439` — the commit this release's tree is built on. The release commit's own run is recorded in the `ci:` gate row below.
+**The run this release was gated on:** run `35253828372`,
+https://github.com/dunyuliu/consilium/actions/runs/35253828372, conclusion
+`success`, workflow `structural-invariants`, SHA
+`7e7e1bb5b36414f43e4f586d3052c6bddba23a5d` — the release commit. Triggered by
+the tag push.
+
+**The run before it was red, and the reason is a rule defect worth recording.**
+Run `35253727256` on the same SHA, fired by the commit push, failed on two
+assertions:
+
+1. Check 27 — `release_notes_v1.23.0.md has no matching tag 'v1.23.0'`
+2. Check 31(d) — `the root release note is 'release_notes_v1.23.0.md' but the newest tag is v1.22.0`
+
+Both have one cause: between the commit push and the tag push, the tag does not
+exist on the remote, and CI reads only remote tags. Both went green on the tag
+push with no other change. `agents/haruto-nakamura.md` step 11 permits
+**exactly one** red assertion in that window — the tag check naming this note —
+and Check 31(d) makes that clause unsatisfiable for every future cut, because
+it asserts the same tag-absence a second time. Check 31(d) landed in `632c439`,
+hours before this release; the step 11 clause predates it. **This is a rule
+that cannot be followed literally and must be amended**, from "exactly one red
+assertion" to "only assertions whose sole cause is the not-yet-pushed tag,
+naming this release". Filed as F9; the amendment is `lian-zhao`'s surface.
+
+## Release gate outcome
+
+`bash tests/release_gate.sh release_notes_v1.23.0.md` → **11 passed, 1 failed.**
+The one red row is `tree`: `2 worktrees — a worktree outlives the agent that
+held it`. The second worktree is the isolation container `wei-lin` created for
+this cut, held by the agent writing this line; it is not abandoned work, and it
+cannot be removed from inside itself. The row goes green when `wei-lin` removes
+it. Recorded rather than worked around: the tag is public and rule 8 forbids
+unpublishing, so this is a follow-up, not an abort.
 
 ## Trend since v1.22.0
 
