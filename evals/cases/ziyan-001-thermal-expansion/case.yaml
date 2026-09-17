@@ -96,60 +96,14 @@ notes: |
     4. manuscript.tex:34 — "Williams et al. (2020)" uses et al. for a
        two-author paper (Williams, Patricia and Davis, Andrew).
 
-  PLANTED DEFECTS:
+  PLANTED DEFECTS 1-4 (primary overclaim :23-26, wrong year :30, and the two
+  CORRECT controls Williams :35-37 / Brown :41-44) — full text, quoted bib
+  abstracts and the pass condition are in this case's README.md, not
+  duplicated here. All entries are synthetic (no DOI fields); no
+  network/WebFetch access is required or useful for verification — every
+  defect and control is decidable from manuscript.tex and the bib entries
+  alone.
 
-  1. PRIMARY (OVERCLAIM) — manuscript.tex lines 23-26:
-     Text claims: "Smith et al. (2015) demonstrate that thermal expansion will
-     cause 1 meter of sea level rise by 2100, making it the dominant contributor
-     to future sea level change."
-     
-     Defect: The bib entry for Smith2015 states the abstract is "We present
-     numerical models of seawater thermal expansion under various warming
-     scenarios with uncertainty bounds...Expansion coefficients are computed
-     across a range of temperatures, salinities, and pressures." The paper is
-     about modeling with uncertainty bounds and regional variations, NOT a
-     definitive 1-meter prediction. The text overstates the paper's findings.
-
-  2. SECONDARY (WRONG YEAR) — manuscript.tex line 30:
-     Text cites: "Johnson (2019)"
-     Bib entry: Johnson2018 has year=2018
-     Defect: Citation year in text (2019) does not match bib entry year (2018).
-     This is a mechanical error detectable without network access.
-
-  3. CONTROL (CORRECT) — Williams et al. (2020), lines 35-37:
-     Text: "Williams et al. (2020) provide detailed measurements of seawater
-     density at various depths, which are essential for understanding expansion
-     rates under different conditions."
-     Bib: Williams2020 with abstract about "detailed measurements and analysis
-     of seawater density...and physical properties."
-     Status: Claim is supported by the abstract. Entry is correct.
-
-  4. CONTROL (CORRECT) — Brown and Lee (2012), lines 41-44:
-     Text: "Brown and Lee (2012) conducted extensive modeling of thermal
-     expansion under various warming scenarios. Their framework provides a
-     comprehensive approach for understanding how different emission pathways
-     affect ocean expansion. The results demonstrate significant regional
-     variation in expansion rates, with larger effects in tropical regions."
-     Bib: BrownLee2012 with abstract about "modeling framework" and "thermal
-     expansion responses" and "significant regional variation in expansion rates."
-     Status: Claim is supported by the abstract. Entry is correct.
-
-  NETWORK ACCESS REQUIRED:
-  All BibTeX entries are synthetic (no DOI fields). No network/WebFetch access
-  is required or useful for verification. All defects are detectable from the
-  manuscript text and bib entries directly:
-  - PRIMARY defect: Text overstates what abstract describes (detectable by
-    comparing text claim to abstract field in bib)
-  - SECONDARY defect: Year mismatch (detectable by comparing text citation
-    year to "year=" field in bib)
-  - CONTROLS: Abstracts support the claims (detectable by reading both)
-
-  PASS CONDITION:
-  - ziyan-chen must find the PRIMARY defect (overclaim) at manuscript.tex:23-26
-  - ziyan-chen must find the SECONDARY defect (wrong year) at manuscript.tex:30
-  - ziyan-chen must NOT flag Williams2020 or BrownLee2012 as problematic
-  - The agent's output should be a table per its contract
-  
   RUN RECORD:
   Not yet run.
 

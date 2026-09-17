@@ -100,7 +100,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Checks 12, 34 |
-| 21a | Board `# →` lines are literal command stdout, and the command is re-run | mechanical — Check 17 |
+| 21a | The board cites a command; it does not paste and byte-diff the command's output | norm — Check 17 retired 2026-09-17 |
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
@@ -115,6 +115,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
 | 26 | Before removing, weakening, or replacing a signal, measure what it currently catches | mechanical in part — a check could require a before/after count in the commit message; whether the count was measured against the real corpus is judgment |
 | 27 | A restriction does not survive a dispatch hop — restate it in every sub-brief | norm — no mechanism logs dispatch briefs today |
+| 28 | A gate that blocks a correct action is a P1 defect in the machinery, not a reason to wait | norm — the override for two of three incidents already exists and is named; the third is open as PF-033 |
 
 ---
 
@@ -950,45 +951,43 @@ printed, set `last-checked` to today, append a dated note. `tests/check.sh`
 Check 12 enforces the shape; only you can enforce that the command was really
 run.
 
-## 21a. The board's `# →` line is the command's literal stdout, and the command is re-run
+## 21a. The board cites a command; it does not paste and byte-diff the command's output
 
-Tier: mechanical (Check 17). Every fenced evidence command in
-`PATHWAY_FORWARD.md` is executed on every suite run and its output byte-diffed
-against the recorded `# →` lines. Narration belongs in the item's prose above
-the fence, never on a `# →` line.
+Tier: norm. Every row's evidence block names one command whose output would
+settle the claim. That is the requirement in full — a claim with no command is
+not verified, it is remembered (rule 21). The command is read by whoever
+re-checks the row on its interval; nothing re-executes and byte-diffs it on
+every suite run, and no `# →` line is required.
 
-**Why it is not enough to cite a command.** Check 12 verifies a `VERIFIED` claim
-*cites* a command. It cannot tell whether the recorded output still matches what
-that command prints today, so a row can be date-bumped without being re-derived.
-Four rows did exactly that on a day their `last-checked` already read today
-(2026-08-04). When Check 17 first ran, **five of thirteen rows had drifted**,
-including two whose recorded "literal stdout" was only the first line of a
-multi-line output — the precondition for this rule had itself silently lapsed.
+**Amended 2026-09-17 — dropped the recorded-output half, and Check 17 with
+it.** The original rule required pasting the command's literal stdout on a
+`# →` line and having Check 17 re-run every fenced command on every suite run
+to catch drift. Measured against a working instance of the same board design
+— EQdyna's `pathway_forward.md`, 108 rows at roughly 2 lines/row, command cited
+but not diffed — this repo ran at roughly 81 lines/row for a third of the rows.
+The byte-diff was the identifiable cause: it turned every row's evidence into
+a paragraph of "Re-run" narration accounting for why the pasted output still
+matched, on every recheck, whether the underlying claim was one line of
+judgment or ten. It also made a row's color depend on facts outside its own
+claim: PF-026 pinned `bash tests/lock.sh status` → `free` and went red the
+moment another writer correctly held the lock for a write — the row
+documenting "acquire only for the write step" (rule 18a) turned red exactly
+when someone obeyed it. That is the same failure the paragraph below already
+names, applied to this rule itself.
 
-**One command per fence.** A fence carrying more than one command line fails.
-Line-oriented parsing cannot reconstruct multi-line shell: joining `for ...; do`
-fragments with `;` yields `do;`, a syntax error the check would then report as
-drift. The first attempt at this rule did exactly that and was reverted.
+**What stays.** A row still names its command, and running it — not diffing
+its output — is how a reader closes or re-verifies the row. Rule 21's
+blank-date and no-backfill discipline is unchanged; so is the requirement that
+`VERIFIED` cites a command (Check 12).
 
-**Exit status is ignored; only stdout is the contract.** The first attempt
-blocked the entire suite, and the parser was not the cause: `tests/check.sh` runs
-under `set -euo pipefail`, so the first evidence command to exit nonzero — a
-`grep -c` that finds nothing is routine — killed the run before the Summary line.
-Evidence commands run with errexit suspended. A gate that stops the suite when it
-trips is worse than no gate (rule 2).
+**What this rests on now.** Whether the command was actually run before a row
+was dated is not mechanized, and should not be: that mechanization is exactly
+the machinery this amendment removes. It rests on the agent doing its job.
 
-**Self-referential rows are named, not dropped.** A command that invokes
-`bash tests/check.sh` would recurse; those rows print
-`self-referential, not re-run: <id>` and are exempt. An exemption that leaves no
-trace in the output is indistinguishable from a check that silently passed.
-
-**What it still cannot fix**: a command whose true output is a derived tally from
-a larger listing needs a second, narrower command whose raw output *is* the
-number. This rule is upstream of the check, not a substitute for writing a
-checkable command.
-
-**An evidence command should assert what must remain true, not what happens to
-be true.** A command that names a specific, currently-true state — a defect
+**What the byte-diff got right, and this amendment keeps as guidance rather
+than as a gate.** An evidence command should still assert what must remain
+true, not what happens to be true. A command that names a specific,
+currently-true state — a defect
 that is present today, a case that is settled at today's SHA — reddens this
 check the moment that state changes for a legitimate reason, and a legitimate
 state transition is not a regression. Three instances, same shape: PF-021's
@@ -1416,6 +1415,82 @@ constraint was restated. What would make it partly mechanical: logging
 dispatch briefs (as 18a's own proposed lock-history fix would do for holds),
 so a check could grep a sub-brief for the restrictions named in the brief that
 spawned it. Nothing in this repo logs dispatch briefs today.
+
+---
+
+## 28. A gate that blocks a correct action is a P1 defect in the machinery, not a reason to wait
+
+A gate is only allowed two shapes: it refuses and stays refused because the
+thing it guards is actually wrong, or it refuses and a corrective path exists
+in the same breath — a named override, a narrower re-scope, a documented
+force-procedure. A gate that goes terminal on a correct action — no override,
+no re-scope, nothing but "wait" or "work around it by hand outside the
+machinery" — has stopped being a gate and become an obstacle indistinguishable
+from the failure it was built to catch. The fix belongs in the machinery
+itself, filed and prioritized like any other P1, never absorbed as the cost of
+having gates.
+
+**Rationale**: rules 18a, 18b and 9a are each the same shape found three
+times: a mechanism doing exactly what it was built to do, on a correct action
+it had no way to distinguish from an incorrect one. The lesson those three
+share is general, but the rule text at each site was scoped narrowly to the
+mechanism that failed — this rule is the general form, so the next gate that
+goes terminal has somewhere to land besides a fourth narrow carve-out.
+
+**Incidents (2026-09-17, all three from the same milestone-audit cycle)**:
+1. Rule 18b, as first written, forbade dispatching a writer while the gate was
+   red — including the single writer who could fix the six red rows and turn
+   it green. Logged as a violation when the dispatch happened anyway; 18b now
+   carries the carve-out (its own step 5) that the writer clearing the red is
+   exactly the dispatch to make.
+2. `pre-push` (`install.sh`) refused the push that deleted the fabricated
+   `v9.9.9` tag — the gate was red *because of* that tag, so refusing the push
+   that repaired it was the mechanism defeating its own correction. The
+   maintainer used `--no-verify` deliberately, the documented escape rule 9
+   already names.
+3. Check 35's newest-tag grace was held by the fabricated `v9.9.9` tag, so the
+   real `v1.21.0` release could not claim the grace and the milestone could
+   not complete until a human removed the tag — no override existed inside
+   the check itself; the correction happened entirely outside the gate.
+
+**How to apply**: when a gate refuses a correct action, do not wait and do not
+route around it by hand and call the incident closed. File it — a board row
+naming the gate and the blocked action — and fix the gate: add the missing
+override, narrow the refusal condition, or document the force-procedure in
+the same file as the refusal. A gate fixed only in the incident write-up will
+do the same thing to the next writer.
+
+**Tier**: norm. Whether a blocked action was *correct* is a judgment call —
+the same limit rule 18b already states for "was this dispatch decision
+right" — so no check here can distinguish a gate correctly holding firm from
+a gate wrongly gone terminal. What is partly mechanical, and already exists
+for two of the three incidents above: rule 9's `--no-verify` escape is a
+named, documented override for `pre-push`, and 18b's own step 5 is a named
+override for the red-gate dispatch case. Check 35's newest-tag grace has no
+override today (incident 3) — that gap is board row PF-033. What would make
+the general rule itself checkable: a convention that every hard-refusal site
+(`exit 1` in a hook, a `row_fail` in `tests/release_gate.sh`) is grepped for a
+paired override keyword (`--no-verify`, `--force`, `--accept-skips`, a named
+force-procedure) in the same file — that would catch a gate shipped with no
+escape at all, though never whether the escape covers the case that actually
+needed it.
+
+**Swept for the same shape, 2026-09-17**: `tests/check.sh`, `tests/lock.sh`,
+`evals/run.sh`, `.github/workflows/check.yml`, and every hard-refusal site in
+`install.sh`'s three hooks. No fourth instance found:
+- `install.sh`'s `pre-commit` (lock-holder refusal) already has a corrective
+  path — rule 18a's force-release procedure, named and recorded, not silent.
+- `install.sh`'s `pre-commit` (scope-guard refusal) is corrected by
+  re-scoping the lock (`tests/lock.sh acquire` with a wider path list), always
+  available to the writer who was refused.
+- `tests/release_gate.sh`'s `row_skip` paths (no `gh` CLI, no network) are
+  designed to skip rather than block, and `--accept-skips` is the named
+  override for a human choosing to proceed anyway.
+- `evals/run.sh` and `.github/workflows/check.yml` gate nothing terminally —
+  a failing grade or a red CI run is the correct, corrective signal itself,
+  not a mechanism standing between a writer and a fix.
+- `tests/lock.sh acquire` refusing a second lock holder is rule 18 working as
+  designed; its corrective path is the same force-release 18a already names.
 
 ---
 

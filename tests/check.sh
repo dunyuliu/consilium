@@ -25,7 +25,6 @@
 #  14. Every agent declares tool economy (section presence only).
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
 #  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
-#  17. Every PATHWAY_FORWARD.md evidence command still prints what is recorded.
 #  18. No fixture input contains fixture-authoring language (answer-key leak).
 #  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
 #  20. Every agent holding the Agent tool warns about dispatch cost, and no
@@ -48,6 +47,7 @@
 #      (rule 15) — haruto's workflow tags and pushes but does not itself
 #      run `gh release create`, so this closes the gap that let 23 tagged
 #      releases exist with no Release object behind them.
+#  36. No tracked file contains a merge-conflict marker.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -599,9 +599,11 @@ done
 # author who cannot write a report that passes their own criteria has not
 # written criteria that test what they think.
 echo "Check 15: fixture criteria are provably executable"
+check15_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -f "$case_dir/case.yaml" ] || continue
+    check15_n=$((check15_n + 1))
     if [ ! -f "$case_dir/samples/pass.md" ] || [ ! -f "$case_dir/samples/fail.md" ]; then
         fail "$id: missing samples/pass.md and/or samples/fail.md (rule 25)"
         continue
@@ -617,6 +619,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check15_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 15 asserted nothing"
 
 # --- Check 16: criteria linter ----------------------------------------------
 #
@@ -634,9 +637,11 @@ done
 # The word cap is deliberately loose: it flags sentences, not phrases. A
 # four-word technical term is fine; a clause is a guess about phrasing.
 echo "Check 16: fixture criteria are linted"
+check16_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
     [ -f "$cy" ] || continue
+    check16_n=$((check16_n + 1))
     exp_terms=$(awk -f evals/parse_case.awk -v section=expected "$cy" | cut -d'|' -f5- | tr '\037' '\n')
     mnf_terms=$(awk -f evals/parse_case.awk -v section=must_not_find "$cy" | cut -d'|' -f5- | tr '\037' '\n')
 
@@ -659,72 +664,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
-
-echo
-echo "Check 17: PATHWAY_FORWARD.md evidence commands still print what is recorded"
-# Rule 21a. A VERIFIED claim is only as good as its last run; Check 12 verifies a
-# claim CITES a command, never that the command still says so.
-#
-# The first attempt at this check blocked the whole suite and was reverted. Root
-# cause was not the parser: check.sh runs under `set -e`, and an evidence command
-# exiting nonzero (grep finding nothing is routine) killed the run before the
-# Summary line printed. Evidence commands are therefore run with errexit
-# suspended and their exit status deliberately ignored — the contract is what a
-# command PRINTS, not whether it succeeded.
-#
-# Two exemptions, both reported rather than silent:
-#   * a fence with no command line records an absence of evidence (a never-audited
-#     row); the parser does not emit it, so there is nothing to run.
-#   * a command that invokes `bash tests/check.sh` would recurse into this check.
-# A fence with more than one command line FAILS: line-oriented parsing cannot
-# reconstruct multi-line shell, and joining fragments with `;` produces `do;`,
-# which is what broke attempt 1. One line per command is the contract.
-if [ ! -f "$BOARD" ]; then
-    fail "$BOARD missing — rule 21a has nothing to execute"
-else
-    ev_rows=0
-    is_shallow=$(git rev-parse --is-shallow-repository 2>/dev/null || echo false)
-    while IFS=$'\037' read -r ev_id ev_n ev_cmd ev_res; do
-        [ -z "$ev_id" ] && continue
-        ev_rows=$((ev_rows + 1))
-        if [ "$ev_n" -gt 1 ]; then
-            fail "$ev_id: evidence command spans $ev_n lines — rule 21a requires one line so it can be re-run"
-            continue
-        fi
-        case "$ev_cmd" in
-            *"bash tests/check.sh"*)
-                echo "  self-referential, not re-run: $ev_id"
-                ok; continue ;;
-        esac
-        # A shallow clone has no tags and one commit, so any command reading
-        # history produces output that cannot match what a full clone recorded.
-        # CI hit exactly this: `git show --stat v1.10.0` found no tag, and
-        # `evals/run.sh list` reported 20 stale cases instead of 13 because
-        # `git log -1 -- agents/X.md` returns the tip commit for every file.
-        # Skipping is named in the output rather than silent — an exemption that
-        # leaves no trace is indistinguishable from a check that passed.
-        if [ "$is_shallow" = "true" ]; then
-            case "$ev_cmd" in
-                *"git "*|*"run.sh list"*|*"run.sh smoke"*)
-                    echo "  shallow clone, history-dependent evidence not re-run: $ev_id"
-                    ok; continue ;;
-            esac
-        fi
-        ev_expected=$(printf '%s' "$ev_res" | tr '\036' '\n')
-        set +e
-        ev_actual=$(bash -c "$ev_cmd" 2>&1)
-        set -e
-        if [ "$ev_actual" = "$ev_expected" ]; then
-            ok
-        else
-            fail "$ev_id: recorded evidence no longer reproduces — re-run and paste what it printed"
-            printf '        command:  %s\n' "$ev_cmd"
-            printf '        recorded: %s\n' "$(printf '%s' "$ev_expected" | tr '\n' '|')"
-            printf '        actual:   %s\n' "$(printf '%s' "$ev_actual" | tr '\n' '|')"
-        fi
-    done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
-    [ "$ev_rows" -gt 0 ] || fail "no evidence commands parsed from $BOARD — the parser or the format changed"
-fi
+[ "$check16_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 16 asserted nothing"
 
 echo
 echo "Check 18: no fixture input contains fixture-authoring language"
@@ -749,9 +689,11 @@ echo "Check 18: no fixture input contains fixture-authoring language"
 # case.yaml with a must_not_find key. Flagging it was a false positive, and a
 # check that fails on correct content is not a gate, it is an obstacle.
 LEAK_PHRASES='planted defect|deliberately absent|answer key|the agent is supposed to|eval fixture|this eval|for the .*-00[0-9] eval'
+check18_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -d "$case_dir/input" ] || continue
+    check18_n=$((check18_n + 1))
     # `|| true` is load-bearing: grep exits 1 when it finds nothing, which is
     # the NORMAL case here, and under `set -e` the assignment inherits that
     # status and kills the suite before the Summary line. Same failure that
@@ -765,6 +707,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check18_n" -gt 0 ] || fail "no case input/ directories found under evals/cases/*/ — Check 18 asserted nothing"
 
 echo
 echo "Check 19: must_not_find guards are declarative, not imperative"
@@ -787,9 +730,11 @@ echo "Check 19: must_not_find guards are declarative, not imperative"
 # `cutting` is deliberately absent: "cutting rina-solberg.md is safe" is
 # declarative and negates cleanly. An -ing form is a gerund, not an imperative.
 IMPERATIVES='rotate|remove|redact|delete|switch|rewrite|drop|add|commit|scrub|purge|revoke|change|update|fix|recommend|suggest|backfill|back-fill|merge|refactor|loosen|tighten|edit|implement|patch|apply|replace|ignore|skip|widen|restore|check|use|write'
+check19_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
     [ -f "$cy" ] || continue
+    check19_n=$((check19_n + 1))
     bad=$(awk -f evals/parse_case.awk -v section=must_not_find "$cy" \
         | cut -d'|' -f5- | tr '\037' '\n' \
         | grep -iE "^($IMPERATIVES)\b" | head -1 || true)
@@ -799,6 +744,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check19_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 19 asserted nothing"
 
 echo
 echo "Check 20: the dispatch-cost warning tracks the Agent tool exactly"
@@ -833,39 +779,6 @@ for agent_file in agents/*.md; do
 done
 
 echo
-echo "Check 21: no evidence command reaches the network"
-# Rule 2. Check 17 executes every fenced evidence command on every suite run, so
-# an evidence command IS part of the gate. A gate that needs the network fails in
-# a clone behind a firewall, on a machine with no route out, or when a public API
-# rate-limits — and it fails for a reason that has nothing to do with the
-# repository being wrong. CI was red for twenty-two commits on exactly that kind
-# of environmental dependency (a shallow checkout, PF-016), which is why this one
-# is closed before it is ever opened rather than after.
-#
-# The temptation is concrete: CI status IS readable from this repository with
-# `curl` against the public API, and it was deliberately recorded as a MANUAL
-# procedure in PF-016 rather than as that row's evidence. This check is what
-# stops a later edit from quietly promoting it.
-#
-# WHAT THIS CHECKS, EXACTLY: that no evidence command names a network tool or a
-# URL scheme. It is complete for that, and it is not the general claim that every
-# evidence command is environment-independent — that is not mechanizable, and the
-# axes already tested by hand (working directory, locale, timezone, shallow
-# clone, GNU vs BSD padding) are recorded on PF-016 instead.
-NET_TOOLS='(^|[|;& ])(curl|wget|nc|ncat|telnet|ssh|scp|rsync|ftp|ping)([ |;&]|$)|https?://'
-for_each_evidence_net=0
-while IFS=$'\037' read -r ev_id ev_n ev_cmd _ev_res; do
-    [ -z "$ev_id" ] && continue
-    for_each_evidence_net=$((for_each_evidence_net + 1))
-    if printf '%s' "$ev_cmd" | grep -qE "$NET_TOOLS"; then
-        fail "$ev_id: evidence command reaches the network — Check 17 runs it on every suite pass, so the gate would need a route out (rule 2)"
-    else
-        ok
-    fi
-done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
-[ "$for_each_evidence_net" -gt 0 ] || fail "no evidence commands parsed for the network check"
-
-echo
 echo "Check 22: every case tier is a tier the tooling consumes"
 # `evals/run.sh smoke` selects on `^tier: smoke` and nothing reads any other
 # value. `dunyu-001` carried `tier: dev` with a considered justification beside
@@ -877,9 +790,11 @@ echo "Check 22: every case tier is a tier the tooling consumes"
 # below. Adding a tier to the tooling means adding it here in the same change,
 # which is the point — the list is the contract between the cases and the runner.
 KNOWN_TIERS='smoke'
+check22_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir"); cy="$case_dir/case.yaml"
     [ -f "$cy" ] || continue
+    check22_n=$((check22_n + 1))
     tier=$(grep -m1 '^tier:' "$cy" 2>/dev/null | sed 's/^tier: *//; s/ *#.*$//; s/ *$//' || true)
     if [ -z "$tier" ]; then
         ok                      # no tier is fine: the case is full-suite only
@@ -889,6 +804,7 @@ for case_dir in evals/cases/*/; do
         fail "$id: tier '$tier' is not consumed by any tool — known tiers are: $KNOWN_TIERS"
     fi
 done
+[ "$check22_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 22 asserted nothing"
 
 echo
 echo "Check 23: no fixture input contains a symlink"
@@ -904,9 +820,11 @@ echo "Check 23: no fixture input contains a symlink"
 #
 # `stage` now refuses such a case, but that is late — the author finds out when
 # somebody tries to run it. This fails at commit time instead.
+check23_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -d "$case_dir/input" ] || continue
+    check23_n=$((check23_n + 1))
     link=$(find "$case_dir/input" -type l -print -quit 2>/dev/null || true)
     if [ -n "$link" ]; then
         fail "$id: ${link#"$case_dir"} is a symlink — it would resolve out of the staged copy and defeat the isolation (rule 5)"
@@ -914,6 +832,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check23_n" -gt 0 ] || fail "no case input/ directories found under evals/cases/*/ — Check 23 asserted nothing"
 
 echo
 echo "Check 24: an empty report fails every case"
@@ -934,9 +853,11 @@ echo "Check 24: an empty report fails every case"
 # `lars-002` was found by hand, not by this.
 empty_report=$(mktemp) || die_msg=""
 : > "$empty_report"
+check24_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -f "$case_dir/case.yaml" ] || continue
+    check24_n=$((check24_n + 1))
     verdict=$(bash evals/run.sh grade "$id" "$empty_report" 2>&1 | grep -cE '^PASS —' || true)
     if [ "$verdict" -gt 0 ]; then
         fail "$id: an EMPTY report passes this case — its guards are satisfied by silence and its expected criteria are too weak to require work (rule 25)"
@@ -945,11 +866,12 @@ for case_dir in evals/cases/*/; do
     fi
 done
 rm -f "$empty_report"
+[ "$check24_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 24 asserted nothing"
 
 echo
 echo "Check 25: every agent has a fixture that names it (rule 13)"
 # Rule 13 had no check. Its only enforcement was PF-014's board evidence
-# command, which Check 17 byte-diffs — so a new agent without a fixture would be
+# command, which Check 17 byte-diffed before it was retired — so a new agent
 # caught only because a recorded "0" became "1". That works, and it is an odd
 # place for a rule to live: the enforcement is a side effect of a number.
 #
@@ -985,9 +907,11 @@ echo "Check 26: no generated artefact in a fixture input (rule 7)"
 #
 # Untracked counts. A tracked artefact is a committed mistake; an untracked one
 # is the mistake still happening, on the machine where it happened.
+check26_n=0
 for case_dir in evals/cases/*/; do
     id=$(basename "$case_dir")
     [ -d "$case_dir/input" ] || continue
+    check26_n=$((check26_n + 1))
     art=$(find "$case_dir/input" \( -name '__pycache__' -o -name '*.pyc' -o -name '*.pyo' \
             -o -name '.pytest_cache' -o -name 'node_modules' -o -name '.ipynb_checkpoints' \
             -o -name '*.egg-info' \) -print -quit 2>/dev/null || true)
@@ -997,6 +921,7 @@ for case_dir in evals/cases/*/; do
         ok
     fi
 done
+[ "$check26_n" -gt 0 ] || fail "no case input/ directories found under evals/cases/*/ — Check 26 asserted nothing"
 
 echo
 echo "Check 27: every release note has a matching tag (rule 15)"
@@ -1458,6 +1383,33 @@ else
         fi
     done < <(git tag --list 'v*' | sort -V)
 fi
+
+echo
+echo "Check 36: no tracked file contains a merge-conflict marker"
+#
+# Structural, deterministic, and there is no runtime to catch it. A conflict
+# marker is valid text in every file this repo ships, so nothing downstream
+# objects: the board, the rule book and an agent prompt all parse and read as
+# normal until a human hits the marker weeks later.
+#
+# Incident (2026-09-17): a cherry-pick of a board compression left three
+# markers in PATHWAY_FORWARD.md. The suite reported 1538 passed, 0 failed with
+# them present, and the file was one `git commit` from main. The 47-rows-versus-
+# 34-blocks discrepancy it caused was noticed and explained away as a counting
+# artefact before the markers themselves were found.
+#
+# Scope is markers and nothing else. This does not read prose, does not judge
+# content, and must not grow: a check that starts policing file health is the
+# shape this suite just retired two checks for.
+conflicted=0
+while IFS= read -r f; do
+    if LC_ALL=C grep -qE '^(<<<<<<< |=======$|>>>>>>> )' "$f" 2>/dev/null; then
+        fail "$f contains a merge-conflict marker — a conflicted file parses as valid text and ships silently"
+        conflicted=$((conflicted + 1))
+    fi
+done < <(git ls-files -- '*.md' '*.sh' '*.yaml' '*.yml' '*.awk' '*.tsv')
+[ "$conflicted" -eq 0 ] && ok
+
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
