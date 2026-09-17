@@ -1404,3 +1404,48 @@ and would have read, on the board, as an improvement — STALE went to zero.
 A metric moving to zero is not evidence of a fixed problem. It is evidence of a
 changed question, and the two are distinguishable only by measuring what the
 old signal was actually catching before you remove it.
+
+---
+
+# Fifth wake — promoting the lesson out of this log
+
+## Finding 28 — the near-miss is being written where it ships, not where it is merely recorded
+
+The maintainer's instruction: the staleness near-miss "deserves to outlive the
+board row", and rule 0 is the test — does this ship in the agent, or only in
+our gate?
+
+Applying that test honestly splits the lesson into three parts with three
+different homes:
+
+**Already covered, no action.** "Re-derive a figure someone handed you before
+implementing against it" is rule 4, which already names an inherited conclusion
+"from an agent's own report" as a hypothesis. `iris-vermeulen` applied it
+correctly and unprompted — she re-derived the same-day/different-day split
+before writing the fix and said so. A rule that was followed does not need
+rewriting. The only open question is whether rule 4 should explicitly name the
+narrower case that actually occurred: *a figure in the brief, from the agent
+that dispatched you*. Three times today I was that source and twice I was
+wrong. Asked `zofia-kaminska` to decide; it is one clause or nothing.
+
+**Genuinely new, and unowned.** Nothing in the rule book governs *removing or
+replacing* an existing signal. Rule 25's family governs criterion design; the
+negative-test convention governs *adding* an assertion. Replacing one is
+ungoverned, which is exactly how a change that took STALE from 14 to 0 could
+look like progress. That is the rule being written.
+
+**Portable, and belongs in a prompt.** The two habits that caught it —
+measuring a signal's true positives before removing it, and confirming a new
+boundary by mutation rather than argument — are not consilium-specific. They
+belong to `iris-vermeulen`, who is the agent that would make such a change, and
+to `wei-lin`, who is the one that must catch it at a merge gate. Neither is my
+surface; both go to `lian-zhao` after the rule exists, so she has canonical
+wording to draw from rather than inventing a second phrasing.
+
+**Why I am not shortcutting this into the session log and moving on.** A
+session log is read by whoever is already in this campaign. A rule is read by
+whoever audits this project. A prompt is read by every agent on every project
+the team is pointed at. The lesson's value scales with how far out it lands,
+and the failure it prevents — a change that improves a metric by deleting what
+the metric measured — is not a consilium problem. It is available anywhere
+someone replaces an alarm and reports that alarms went down.
