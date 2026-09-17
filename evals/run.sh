@@ -43,15 +43,36 @@ die() { echo "error: $1" >&2; exit 2; }
 # A record written under rule 25d reads:
 #   Run (<date>, <agent>, prompt <short-SHA>). <VERDICT> — <k> criteria, <m> failed.
 # Records written before 25d landed name no SHA and are NEVER backfilled — an
-# invented SHA is a guess wearing a receipt (PF-027). `list`/`score` treat a
-# SHA-less record as UNKNOWN PROVENANCE: not current (nothing proves it still
-# describes the prompt), and not STALE either (nothing proves it doesn't —
-# calling it stale would be a false alarm on a verdict that may be perfectly
-# current, training readers to ignore the STALE flag). Only a SHA-bearing
-# record can be compared against the prompt file's current SHA at all.
+# invented SHA is a guess wearing a receipt (PF-027). A SHA-bearing record is
+# always compared by SHA: match -> CURRENT, mismatch -> STALE.
+#
+# A SHA-less (legacy) record falls back to the date comparison this repo ran
+# before 25d landed, but ONLY when that fallback can actually order the two
+# events. Measured 2026-09-16 (session log, finding 26): of the legacy records
+# with a run history, every one whose date differs from its agent prompt's
+# last-commit date is EARLIER (14 cases) or LATER (10 cases) — never same-day
+# in this corpus, i.e. PF-024's blind spot (same-day edit, no way to order by
+# date) has zero known members here, and reserving UNKNOWN PROVENANCE for
+# every legacy record regardless of date converted those 14 true STALE
+# positives into shrugs. So:
+#   - date differs, legacy record EARLIER than the prompt's last commit
+#     -> STALE, exactly as the pre-25d comparison called it.
+#   - date differs, legacy record LATER than the prompt's last commit
+#     -> the record postdates every known prompt edit, so nothing here
+#     contradicts it; reported as CURRENT (no SHA to sample-count, but
+#     nothing proves it stale either).
+#   - date EQUAL to the prompt's last commit -> the one case a date genuinely
+#     cannot order (same-day edit-then-dispatch). This is the only case
+#     UNKNOWN PROVENANCE is reserved for now.
 agent_current_sha() {
     # $1 = agent name as it appears in case.yaml's `agent:` field.
     git -C "$REPO_DIR" log -1 --format=%h -- "agents/$1.md" 2>/dev/null || true
+}
+
+agent_current_date() {
+    # $1 = agent name. Date (YYYY-MM-DD) of the prompt file's last commit —
+    # the same value the pre-25d date comparison called "prompt changed".
+    git -C "$REPO_DIR" log -1 --format=%ad --date=short -- "agents/$1.md" 2>/dev/null || true
 }
 
 run_record_lines() {
@@ -80,11 +101,15 @@ run_record_verdict() {
 #   STATUS: NEVER | UNKNOWN | STALE | CURRENT | CONTESTED_UNSETTLED
 #   N:      count of Run(...) records naming the CURRENT sha (sample count,
 #           rule 25d — never a stored field, always derived by counting)
+#   OLD_SHA: for a STALE sha-mismatch, the mismatched sha. For a STALE
+#           legacy-date fallback, "date:<record-date>->_<prompt-date>" —
+#           still plain text, never a fabricated sha (see header above).
 classify_case() {
-    local d="$1" agent contested=0 cur_sha lines
+    local d="$1" agent contested=0 cur_sha cur_date lines
     agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
     if grep -q '^contested: true' "$d/case.yaml" 2>/dev/null; then contested=1; fi
     cur_sha="$(agent_current_sha "$agent")"
+    cur_date="$(agent_current_date "$agent")"
     lines="$(run_record_lines "$d/case.yaml")"
 
     if [ -z "$lines" ]; then
@@ -92,8 +117,8 @@ classify_case() {
         return
     fi
 
-    local n_cur=0 n_legacy=0 n_stale=0
-    local last_cur_date="" last_legacy_date="" last_stale_sha=""
+    local n_cur=0 n_stale=0
+    local last_cur_date="" last_stale_sha="" last_legacy_date=""
     local v1="" v2=""
     while IFS= read -r line; do
         [ -z "$line" ] && continue
@@ -102,7 +127,9 @@ classify_case() {
         date="$(run_record_date "$line")"
         verdict="$(run_record_verdict "$line")"
         if [ -z "$sha" ]; then
-            n_legacy=$((n_legacy + 1))
+            # Legacy record — no SHA was ever recorded. Track only the most
+            # recent one; an earlier legacy run superseded by a later run
+            # (or by a later SHA-bearing run, handled below) doesn't matter.
             last_legacy_date="$date"
         elif [ "$sha" = "$cur_sha" ]; then
             n_cur=$((n_cur + 1))
@@ -132,13 +159,25 @@ classify_case() {
 
     if [ "$n_cur" -gt 0 ]; then
         echo "CURRENT|$n_cur|$last_cur_date|$v1||$cur_sha|"
-    elif [ "$n_stale" -gt 0 ]; then
-        echo "STALE|0||||$cur_sha|$last_stale_sha"
-    elif [ "$n_legacy" -gt 0 ]; then
-        echo "UNKNOWN|0|$last_legacy_date|||$cur_sha|"
-    else
-        echo "NEVER|0||||$cur_sha|"
+        return
     fi
+    if [ "$n_stale" -gt 0 ]; then
+        echo "STALE|0||||$cur_sha|$last_stale_sha"
+        return
+    fi
+    if [ -n "$last_legacy_date" ]; then
+        # No SHA-bearing record at all. Fall back to the date comparison —
+        # see the header above for exactly which of the three cases this is.
+        if [ -n "$cur_date" ] && [ "$last_legacy_date" = "$cur_date" ]; then
+            echo "UNKNOWN|0|$last_legacy_date|||$cur_sha|"
+        elif [ -n "$cur_date" ] && [[ "$last_legacy_date" < "$cur_date" ]]; then
+            echo "STALE|0||||$cur_sha|date:${last_legacy_date}->${cur_date}"
+        else
+            echo "LEGACY_CURRENT|0|$last_legacy_date|||$cur_sha|"
+        fi
+        return
+    fi
+    echo "NEVER|0||||$cur_sha|"
 }
 
 resolve_case() {
@@ -429,21 +468,21 @@ cmd_smoke() {
 }
 
 # --- list ------------------------------------------------------------------
-# A verdict is only about the prompt that produced it. Rule 25d replaces the
-# date comparison this used to run with a SHA comparison: a "Run (...)" line
-# names the prompt file's SHA at dispatch time and `list` compares it against
-# `agents/<agent>.md`'s SHA now, so a same-day edit-then-dispatch (invisible
-# to a date compare, PF-024) is caught.
+# A verdict is only about the prompt that produced it. A SHA-bearing "Run
+# (...)" line names the prompt file's SHA at dispatch time and `list`
+# compares it against `agents/<agent>.md`'s SHA now, so a same-day
+# edit-then-dispatch (invisible to a date compare, PF-024) is caught.
 #
-# All 50 records that existed before rule 25d landed name no SHA, and rule
-# 25d forbids backfilling one — annotating a verdict with a SHA nobody
-# recorded is inventing data. Such a record reads UNKNOWN PROVENANCE: not
-# CURRENT (nothing here proves it still describes the prompt) and not STALE
-# either (nothing proves it doesn't, and calling it stale would be a false
-# alarm on a verdict that may be perfectly current — training a reader to
-# ignore the flag is worse than the gap). Only a SHA-bearing record can be
-# compared at all; STALE is now reserved for a same-case SHA mismatch, not a
-# missing SHA.
+# Records that existed before rule 25d landed name no SHA, and rule 25d
+# forbids backfilling one — annotating a verdict with a SHA nobody recorded
+# is inventing data. Such a record falls back to the date comparison this
+# repo ran before 25d, but only where a date can actually order the two
+# events — see the header above `classify_case` for the measurement that
+# settled this (session log, finding 26 / PF-027 follow-up):
+#   - legacy date EARLIER than the prompt's last commit -> STALE.
+#   - legacy date LATER -> CURRENT (nothing known contradicts it).
+#   - legacy date EQUAL -> UNKNOWN PROVENANCE, the one case a date genuinely
+#     cannot order.
 #
 # A `contested: true` case cites its sample count next to the verdict and is
 # never reported settled on a single current-SHA sample; two current-SHA
@@ -459,9 +498,20 @@ cmd_list() {
             NEVER)
                 run="NEVER RUN" ;;
             UNKNOWN)
-                run="run $date (no prompt SHA — provenance unknown, rule 25d)" ;;
+                run="run $date (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)" ;;
             STALE)
-                run="STALE — verdict at prompt $old_sha, agent's prompt is now $cur_sha" ;;
+                case "$old_sha" in
+                    date:*)
+                        local legd touchd
+                        legd="${old_sha#date:}"; legd="${legd%%->*}"
+                        touchd="${old_sha##*->}"
+                        run="STALE — verdict dated $legd (no prompt SHA), prompt changed $touchd (date fallback, rule 25d)" ;;
+                    *)
+                        run="STALE — verdict at prompt $old_sha, agent's prompt is now $cur_sha" ;;
+                esac
+                ;;
+            LEGACY_CURRENT)
+                run="run $date (no prompt SHA, dated after the prompt's last change — current, date fallback, rule 25d)" ;;
             CURRENT)
                 local plural="s"
                 [ "$n" = 1 ] && plural=""
@@ -526,11 +576,11 @@ cmd_score() {
         id="$(basename "$d")"
         IFS='|' read -r status n date v1 v2 cur_sha old_sha <<< "$(classify_case "$d")"
         case "$status" in
-            NEVER)               never=$((never + 1)) ;;
-            UNKNOWN)              unknown=$((unknown + 1)) ;;
-            STALE)                stale=$((stale + 1)) ;;
-            CURRENT)              current=$((current + 1)) ;;
-            CONTESTED_UNSETTLED)  contested_unsettled=$((contested_unsettled + 1)) ;;
+            NEVER)                       never=$((never + 1)) ;;
+            UNKNOWN)                     unknown=$((unknown + 1)) ;;
+            STALE)                       stale=$((stale + 1)) ;;
+            CURRENT|LEGACY_CURRENT)      current=$((current + 1)) ;;
+            CONTESTED_UNSETTLED)         contested_unsettled=$((contested_unsettled + 1)) ;;
         esac
     done
 
