@@ -122,13 +122,13 @@ Audit the changes, correctness, conciseness, fix, document, refactor
 for leanness, a clean tree with no wandering work dirs, CI green, the
 published release and version control, and the rule book followed.
 
-- **Enforced**: all ten are rows in `tests/release_gate.sh`, which
+- **Enforced**: all twelve are rows in `tests/release_gate.sh`, which
   refuses a tag when any fails (rule 15b). It decides the tree, CI and
-  publication rows itself; the other seven must carry a recorded
-  verdict in the release note, and a blank line fails the gate.
-- **Not yet**: no GitHub Release object is created — the publish row
-  checks the note, the tag and the remote, not a published release
-  page. And a recorded verdict proves the pass happened, never that it
+  publication rows itself; the others must carry a recorded
+  verdict in the release note, and a blank line fails the gate. A
+  GitHub Release object is created and Check 35 asserts every tag has
+  both a note and a published Release.
+- **Not yet**: a recorded verdict proves the pass happened, never that it
   was any good.
 
 ### 3. Autopilot: how is any of that enforced strictly, rather than hoped for?
@@ -141,9 +141,10 @@ published release and version control, and the rule book followed.
   is `zofia-kaminska`'s, the refactor is `kai-fischer`'s. Prompt prose
   is not a tier: a step described only in prose is satisfied by an
   agent believing it did the step.
-- **Not yet**: 11 of 31 fixtures have never been run, so what an agent
-  *does* under these rules is less measured than the rules themselves.
-  `PATHWAY_FORWARD.md` is where that gap is tracked, PF-003.
+- **Not yet**: every one of the 36 fixtures has been dispatched at
+  least once, but only 11 verdicts describe the prompt as it stands
+  today — improving a prompt invalidates the evidence about it. That
+  30% is close to the ceiling of grading prose, not a backlog.
 
 Refining these three is the point of them, and that is the human's
 call. An agent proposes a change to them; it does not make one.
