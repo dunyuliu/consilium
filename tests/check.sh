@@ -37,7 +37,8 @@
 #  28. No release note that once existed has vanished (rule 8).
 #  29. Only install.sh writes the Claude symlink directories (rule 14).
 #  30. No expected keyword appears in ordinary finding-free review prose.
-#  31. The repo root holds exactly the documents rule 1 whitelists.
+#  31. The repo root holds exactly the documents rule 1 whitelists, and the
+#      one release note there is the newest tag's.
 #  32. The README and CLAUDE questions blocks exist and share no question.
 #  33. The release gate's rows and the documented note schema agree.
 #  34. Exactly one board carries the project forward (rule 21).
@@ -1048,6 +1049,11 @@ echo "Check 31: the repo root holds exactly the documents rule 1 whitelists"
 #      created is unenforceable, which is how this check came to be written)
 #   c. anything other than exactly one release note at the root (rule 8
 #      archives the older ones to docs/, it does not leave them here)
+#   d. that single root release note being for some version other than the
+#      newest v* tag. (c) alone was green through the whole of
+#      v1.21.0 -> v1.22.0: the root held release_notes_v1.21.0.md while
+#      v1.22.0's note sat in docs/ — exactly one note at the root, and the
+#      wrong one. Counting never asked WHICH (2026-09-17).
 #
 # Tracked, not present on disk: an untracked scratch file at the root is a
 # developer's business, and failing the gate on one would teach people to
@@ -1086,13 +1092,30 @@ else
         case "$entry" in
             *'*'*)
                 count=0
+                the_one=""
                 for f in "${ROOT_FILES[@]:-}"; do
-                    case "$f" in $entry) count=$((count + 1)) ;; esac
+                    case "$f" in $entry) count=$((count + 1)); the_one="$f" ;; esac
                 done
                 if [ "$count" -eq 1 ]; then
                     ok
                 else
                     fail "rule 1 allows exactly one '$entry' at the root and $count are tracked there (rule 8 archives the rest to docs/)"
+                fi
+                # And it must be the CURRENT one. Same degradation shape as the
+                # `not a git checkout` arm above and Checks 27/28: a clone with
+                # no tags cannot answer this, and says so rather than passing
+                # quietly.
+                if [ "$count" -eq 1 ]; then
+                    newest_tag=$(git tag --list 'v*' | sort -V | tail -1)
+                    if [ -z "$newest_tag" ]; then
+                        echo "  no v* tags in this clone — cannot tell which release note is current; not checkable here"
+                        ok
+                    else
+                        case "$the_one" in
+                            *"$newest_tag"*) ok ;;
+                            *) fail "the root release note is '$the_one' but the newest tag is $newest_tag — the current release's note belongs at the root and the older one in docs/ (rule 8)" ;;
+                        esac
+                    fi
                 fi
                 ;;
             *)

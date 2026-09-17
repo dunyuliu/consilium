@@ -75,6 +75,20 @@ acquire)
     fi
     shift 2 || true
     scope="$*"
+    # A root-wide scope is not a scope guard. Rule 18 (amended 2026-09-17):
+    # on 2026-09-17 a lock taken with a scope of `.` let a `git add -A` sweep
+    # an untracked root file into someone else's commit — the guard matched
+    # every path, so the hook had nothing to refuse. Name the directories.
+    for p in "$@"; do
+        case "$p" in ""|"."|"./"|"/")
+            echo "REFUSED: scope path '$p' covers the whole repo." >&2
+            echo "  Rule 18: a scope of '.' is not a scope guard — the pre-commit hook" >&2
+            echo "  would match every staged path and refuse nothing, which is how a" >&2
+            echo "  \`git add -A\` swallowed an untracked root file (2026-09-17)." >&2
+            echo "  Name the directories you intend to touch instead." >&2
+            exit 2 ;;
+        esac
+    done
     # A path containing a space cannot be represented. The scope is stored as one
     # space-separated line and the pre-commit hook splits it on whitespace, so
     # `evals/cases/a b/` becomes the two prefixes `evals/cases/a` and `b/` — and
