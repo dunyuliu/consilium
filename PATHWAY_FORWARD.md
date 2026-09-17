@@ -64,6 +64,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-024 | `evals/run.sh` | STALE compares dates, not the prompt SHA a verdict was produced against — same-day edit+run is invisible | OPEN | 2026-09-16 | 14 | P2 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | fixture cannot yet distinguish a correct Mode A seed pass from an incorrect one | OPEN | 2026-09-16 | 14 | P2 |
 | PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-16 | 30 | P1 |
+| PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against and a contested case cites its sample count (rule 25d) — format specified, not yet built | OPEN | 2026-09-16 | 14 | P1 |
 
 ## Items
 
@@ -2094,6 +2095,13 @@ bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-co
 # → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16
 ```
 
+**Fix specified 2026-09-16, not yet built — see PF-027.** The date-vs-SHA fix
+sketched above is now `PROJECT_RULES.md` rule 25d: record the prompt file's
+SHA in every `Run (...)` line and compare SHAs in `list`, not dates. Filed as
+one row rather than two because the same field also closes half of PF-025's
+exposure (sample count). This row closes when PF-027 lands the SHA comparison
+in `evals/run.sh`.
+
 ### PF-025 — `evals/cases/zofia-004-seed-patch-established` — OPEN
 
 The fixture that is supposed to tell a correct Mode A seed-and-patch pass
@@ -2153,6 +2161,14 @@ grep -c 'PROJECT_RULES.md` | present"' evals/cases/zofia-004-seed-patch-establis
 # → 0
 ```
 
+**Cause 2 reclassified 2026-09-16 — see PF-027.** The "two dispatches, opposite
+judgements" fact this row already cites is not only a criterion-design gap: it
+is the general case that nothing in this suite records how many samples a
+verdict rests on, or which prompt SHA it was produced against. `PROJECT_RULES.md`
+rule 25d specifies the fix (`contested: true` plus a same-SHA sample count) and
+`iris-vermeulen` builds it (PF-027). Cause 1 (the enumerable-renderings problem)
+is unaffected by this and stays hers to fix independently.
+
 ### PF-026 — `tests/lock.sh` / working pattern — VERIFIED
 
 **A workflow finding, not a code defect** — `tests/lock.sh` itself is sound
@@ -2199,6 +2215,67 @@ and record every force-release by name.
 grep -c '^### 18a\. Acquire only for the write step' PROJECT_RULES.md; bash tests/lock.sh status
 # → 1
 # → free
+```
+
+### PF-027 — `evals/cases/*/case.yaml`, `evals/run.sh` — OPEN
+
+**The finding, stated once here rather than split across PF-024 and PF-025.**
+Every verdict in `evals/cases/*/case.yaml`, and every board row that cites one,
+is a single sample presented as a measurement. Nothing anywhere — not the case
+file, not the board, not `evals/run.sh list` — says how many times a case was
+dispatched or which version of the prompt a verdict was produced against. Two
+same-day dispatches of `zofia-004-seed-patch-established` against the identical
+prompt returned opposite judgements on its "add a rule at the next free number"
+criterion (propose rule 6, vs. refuse to invent one) — both defensible, and the
+fixture's criteria accept only the first (PF-025's own finding). Separately,
+`evals/run.sh`'s STALE check compares calendar dates, so a same-day prompt edit
+and a same-day dispatch are unordered and a verdict can silently outlive the
+prompt version it graded (PF-024).
+
+**Both are the same missing field, not two.** A verdict record that carries
+`date + agent + prompt SHA + result` is stale-detectable (compare SHAs, not
+dates — closes PF-024) and countable (count records sharing a SHA — closes half
+of PF-025's exposure) from one schema addition. Specified as `PROJECT_RULES.md`
+rule 25d, this session — merged deliberately rather than filed as two
+schema changes for `iris-vermeulen` to reconcile later.
+
+**Format, for `iris-vermeulen` to implement without a follow-up question:**
+
+1. Every `Run (...)` line in a case's `notes:` gains a third field:
+   `Run (<YYYY-MM-DD>, <agent>, prompt <short-SHA>). <VERDICT> — <k> criteria, <m> failed.`
+   `<short-SHA>` is `git log -1 --format=%h -- agents/<agent>.md` (or the
+   relevant `commands/*.md`, for a command-driven case) evaluated at dispatch
+   time — the exact prompt content graded, not the repo tip.
+2. `evals/run.sh list` compares this SHA against the current
+   `git log -1 --format=%h -- agents/<agent>.md` instead of comparing dates.
+   Mismatch → STALE, exactly the case PF-024 names live on this branch.
+3. Sample count is never a maintained field — it is the count of `Run (...)`
+   lines sharing the current SHA. `evals/run.sh list` prints it next to the
+   verdict (e.g. `run 2026-09-16 (2 samples, current)`).
+4. A case whose pass bar is a judgement call, not a fact with one right
+   answer, carries `contested: true` in `case.yaml` plus a one-line reason —
+   author-set judgement, not a retroactive audit obligation on the existing
+   suite. `evals/run.sh list` refuses to print a contested case as settled
+   (or `score` refuses to count it) when its current-SHA sample count is 1,
+   and prints both verdicts, unresolved, when two same-SHA samples disagree.
+   An uncontested case is unaffected: one current-SHA sample is sufficient,
+   as it is today.
+
+**Not built here** — `evals/cases/**` and `evals/run.sh` are `iris-vermeulen`'s
+surface, not this board's (rule 19). This row and rule 25d are the
+specification; `iris-vermeulen` implements the schema field and the `list`/
+`score` comparison, and PF-024 and PF-025 close through this row rather than
+independently once she has.
+
+**Explicitly not done here, and not implied by this row**: no verdict already
+recorded in `evals/cases/*/case.yaml` is retroactively annotated with a SHA or
+a sample count — none of today's twelve dispatches were re-run or re-dated to
+manufacture one. Doing so here would be inventing data for a run this session
+did not perform.
+
+```bash
+grep -c '^### 25d\. Every verdict records the prompt SHA' PROJECT_RULES.md
+# → 1
 ```
 
 ## Deferral log
