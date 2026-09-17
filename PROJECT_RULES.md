@@ -61,7 +61,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
 | 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — the pre-push hook enforces the local half; see the rule |
-| 15b | Every release records its gate, row by row; the gate refuses what it can decide | mechanical — `tests/release_gate.sh`, held to the schema by Check 33 |
+| 15b | Five rows the gate decides; seven obligations the release engineer owes | mechanical for the five — `tests/release_gate.sh`, held to the schema by Check 33; the seven are norm |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 |
 | 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical in name only — the pre-commit hook exists only where install.sh ran; nothing in the repo checks it |
@@ -391,24 +391,24 @@ stops.**
 offline check reads a network conclusion, so the note records the run (schema
 item 9), including the pre-tag run and its single permitted failure.
 
-## 15b. Every release records its gate, row by row, and the gate refuses what it can decide
+## 15b. Five rows the gate decides; seven obligations the release engineer owes
 
-Ten rows, named in `agents/haruto-nakamura.md`'s note schema and parsed by
-`tests/release_gate.sh`: audit, correctness, conciseness, fixes, docs,
-refactor, tree, ci, publish, rules. No tag is pushed until that script exits 0.
+`tests/release_gate.sh` decides five rows — tree, ci, publish, release, clone —
+each against reality: the working tree, CI, the tag and Release on the remote,
+a stranger's clone of the tagged commit. No tag is pushed until it exits 0.
 
-Three it decides itself (tree, ci, publish) because they are readable; the
-other seven it cannot, since no program judges whether an audit was thorough.
-What is decidable is whether the pass happened and produced a verdict, so each
-owes one line in the note and a blank line fails the gate. **Quality stays a
-reader's judgement; the absence of the work stops being invisible.**
+The other seven — audit, correctness, conciseness, fixes, docs, refactor, rules
+— are obligations stated once in `agents/haruto-nakamura.md` and discharged in
+the note for a human reading it later. Until 2026-09-17 they were rows that
+passed on any `key:` line of twelve characters or more: the gate verified a
+string, never the pass. **Ownership and review carry what no script can judge.**
 
 The gate is `iris-vermeulen`'s surface (rule 19), not the release engineer's: a
 gate owned by the agent it judges is not a gate, for the same reason rule 20
 has the merge judged by someone other than the author.
 
 **How to apply**: `bash tests/release_gate.sh <note>` before the tag, every
-time. Check 33 holds the script's rows and the documented schema together.
+time. Check 33 holds the script's five rows and the documented schema together.
 
 ## 16. Agent frontmatter is a contract, not a preamble
 

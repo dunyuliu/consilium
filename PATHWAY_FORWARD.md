@@ -53,7 +53,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-017 | `agents/` | fixtures exist for the autopilot cycle, the release gate and zofia's patch path, and have been dispatched | OPEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-019 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-019 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-020 | `tests/check.sh` Check 27 | the untagged-release-note check exists independent of any one tag's current state | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-16 | 30 | P3 |
@@ -68,7 +68,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-031 | `tests/check.sh` Check 28 | a rule-8a deletion's two conditions are checkable from the commit message, not just asserted in prose (owner: `iris-vermeulen`) | OPEN | 2026-09-17 | 30 | P2 |
 | PF-032 | `README.md` question 1 | the seeded-README credibility gap ("nothing holds a seeded README to being credible") has no check today and stays open — a true "Not yet", not drift | OPEN | 2026-09-17 | 60 | P3 |
 | PF-033 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 verifies the mechanism and its newest-tag grace is gone (`f109ef8`); the false README prose is the only half left, human-owned | OPEN | 2026-09-17 | 30 | P2 |
-| PF-034 | `README.md` question 2 | the release gate has twelve rows, not ten — Check 33's header comment is corrected (`f109ef8`); README still says ten, human-owned prose | OPEN | 2026-09-17 | 30 | P2 |
+| PF-034 | `README.md` question 2 | the gate decides five rows and haruto owes seven; the question's heading still says "all ten things a release owes", human-owned prose | OPEN | 2026-09-17 | 30 | P2 |
 | PF-035 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — mechanized in Check 31 (`632c439`) | VERIFIED | 2026-09-17 | 30 | P3 |
 
 **Re-tiered 2026-09-17 (third pass, after PF-035 closed)**: 4 P1 / 8 P2
@@ -240,8 +240,27 @@ awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | head -1 | awk
 ```
 
 ### PF-019 — `tests/release_gate.sh` — VERIFIED
+
+Re-pointed 2026-09-17: `67c5a68` cut `ROWS` from twelve to five, so the old
+command grepped a line that no longer exists and returned 0 under a VERIFIED
+row. The claim itself is unchanged — `release` is still a row and still skips
+rather than failing when `gh` is absent or the tag is not on the remote.
+
+**Limitation, intrinsic (determined by `iris-vermeulen` against the five-row
+gate, 2026-09-17).** The gate is not re-runnable after the release it gated:
+`publish` compares the tag against HEAD and reds the moment any commit lands on
+main, with `release` and `clone` skipping behind it, and checking out the tag
+does not recover it because `tree` needs an upstream a detached HEAD has not
+got. Removing the seven note rows did not dissolve this. So the gate is run
+once, in the window where HEAD is the tagged commit and the remote agrees; its
+output is the artifact and is pasted at that moment; a later red `publish` is
+not a regression. Check 35 is what answers "is this tag still properly
+published" afterwards, being tag-relative rather than HEAD-relative. Recorded
+here rather than as a new row: it is a property of this row's surface, and a
+row whose command can never go green is not a row.
 ```bash
-grep -c "^ROWS=(audit correctness conciseness fixes docs refactor tree ci publish release clone rules)" tests/release_gate.sh
+grep -qE '^ROWS=\(.* release .*\)' tests/release_gate.sh && grep -c 'row_skip release' tests/release_gate.sh
+# → 2
 ```
 
 ### PF-020 — `tests/check.sh` Check 27 — VERIFIED
@@ -373,16 +392,22 @@ grep -c 'gh release view' tests/check.sh; grep -c 'GitHub Release' tests/release
 
 ### PF-034 — `README.md` question 2 — OPEN
 
-**Code-comment half closed 2026-09-17.** Check 33's header comment said "ten
-row keys" against a twelve-entry `ROWS` array; `f109ef8` corrected it, and
-`grep -c 'ten row' tests/check.sh` is now 0. `tests/release_gate.sh` was always
-right (its own header says twelve).
+**Twice overtaken, re-stated 2026-09-17.** The row opened on ten-versus-twelve:
+Check 33's header comment said "ten row keys" against a twelve-entry `ROWS`
+array (`f109ef8` corrected it). `67c5a68` then cut the gate to the five rows a
+script can decide, and the README's "all ten are rows" prose went with it
+(`6513a69`), so both halves the row was written for are gone.
 
-**Human-owned half stays open.** README question 2 still reads "all ten are
-rows in `tests/release_gate.sh`". Same treatment as PF-033: prose drift routed
-to `sophia-okafor`, kept visible here rather than closed on the code fix alone.
+**What is left is one word.** README question 2's heading still asks whether a
+release covers "all ten things a release owes" while the body under it now
+enumerates twelve — five rows plus seven obligations. Prose on
+`sophia-okafor`'s surface, kept visible here rather than closed: the heading is
+the first line a reader of that question meets.
 ```bash
-grep -o 'ROWS=([^)]*)' tests/release_gate.sh | tr ' ' '\n' | grep -c .; grep -c 'ten row' tests/check.sh
+grep -o 'ROWS=([^)]*)' tests/release_gate.sh | tr ' ' '\n' | grep -c .
+grep -c 'ten things a release owes' README.md
+# → 5
+# → 1
 ```
 
 ### PF-035 — `release_notes_v*.md` — VERIFIED
