@@ -69,10 +69,10 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-032 | `README.md` question 1 | the seeded-README credibility gap ("nothing holds a seeded README to being credible") has no check today and stays open — a true "Not yet", not drift | OPEN | 2026-09-17 | 60 | P3 |
 | PF-033 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 verifies the mechanism and its newest-tag grace is gone (`f109ef8`); the false README prose is the only half left, human-owned | OPEN | 2026-09-17 | 30 | P2 |
 | PF-034 | `README.md` question 2 | the release gate has twelve rows, not ten — Check 33's header comment is corrected (`f109ef8`); README still says ten, human-owned prose | OPEN | 2026-09-17 | 30 | P2 |
-| PF-035 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — Check 31 counts that exactly one note sits at root, never which one | VERIFIED | 2026-09-17 | 30 | P2 |
+| PF-035 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — mechanized in Check 31 (`632c439`) | VERIFIED | 2026-09-17 | 30 | P3 |
 
-**Re-tiered 2026-09-17 (second pass, after the day's closures)**: 4 P1 / 9 P2
-/ 20 P3 across 33 live rows, plus 2 RETIRED. The prior paragraph's arithmetic
+**Re-tiered 2026-09-17 (third pass, after PF-035 closed)**: 4 P1 / 8 P2
+/ 21 P3 across 33 live rows, plus 2 RETIRED. The prior paragraph's arithmetic
 was wrong — it enumerated five P1s while claiming four, and 12 P2 / 15 P3
 against an actual 8 / 19; the counts below are the table's.
 **P1** is what is actively broken or is an unclosed gap in a mechanism the rest
@@ -83,7 +83,9 @@ a worktree). PF-015 leaves P1 — its task was already done before the row was
 written (see its block) — and nothing was promoted in its place: today's three
 closures were all follow-through on landed work, not discoveries.
 **P2** is active work and the claims worth rechecking often: PF-003, PF-006,
-PF-025, PF-029, PF-030, PF-031, PF-033, PF-034, PF-035. PF-033 and PF-034 stay
+PF-025, PF-029, PF-030, PF-031, PF-033, PF-034. PF-035 leaves P2 for P3: its
+claim is mechanized in Check 31 and now recheck-for-drift like any other
+settled claim. PF-033 and PF-034 stay
 P2 after losing their mechanical halves because the remaining half is a false
 statement in the user-facing README — prose drift that misdescribes a shipped
 gate, not a cosmetic one.
@@ -138,13 +140,14 @@ git show --stat v1.10.0 --name-only | grep -c anya-001
 
 ### PF-006 — `tests/check.sh` — VERIFIED
 Green means the checks pass, not that the repo is correct (PF-008).
+`794 passed, 0 failed` at `18c9cef` on 2026-09-17, the v1.23.0 release base.
 ```bash
 bash tests/check.sh | tail -1
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
 No longer self-maintaining now that Check 17 is retired (PF-015) — recheck on
-interval like any other row.
+interval like any other row. 32 checks as of the v1.23.0 cut.
 ```bash
 grep -c '^echo "Check' tests/check.sh
 ```
@@ -179,6 +182,14 @@ ls evals/cases | wc -l | tr -d ' '
 ### PF-012 — `agents/` — OPEN
 Fleet-wide staleness: fixture verdicts recorded against a prompt SHA that has
 since moved. Route: `iris-vermeulen`.
+
+**Worse on 2026-09-17, not better**: the command prints `3`. Fixture
+trustworthiness went 9/10 to 5/10 in a day because `agents/haruto-nakamura.md`
+and `agents/zofia-kaminska.md` both changed and staled their own verdicts —
+including `haruto-002-tag-before-gate`, which exercises the exact ordering step
+that changed and has not been re-dispatched against the new prompt. Staleness
+here is a prompt edit outrunning its evidence, which is the row's point, not a
+tooling fault. Stays P1.
 ```bash
 bash evals/run.sh list | grep -c STALE
 ```
@@ -292,7 +303,8 @@ anywhere in the file, and their normative text is not folded into their parents
 either — rule 5's body covers 5a's planted-keyword ban and never mentions a
 symlinked answer key, and the same holds for 21/23/25. So the row's claim is
 right about those four: each is a real rule, each names a real mechanical check
-(23, 21, 20, 22 respectively), and a reader who wants to know what the rule
+(23, 20, 22 respectively) — except 21b, whose Check 21 was retired
+2026-09-17 in `1faaa1f`, and a reader who wants to know what the rule
 actually requires has only the one-line index claim to read.
 
 13a drops out of the claim. It is retired with rule 13, and the index row says
@@ -343,7 +355,10 @@ tags and forgave the only tag that could fail, so the Release leg never bound �
 and it let v1.20.0 and v1.22.0 ship tagged with no GitHub Release, gate green
 both times, each published by hand afterwards. `agents/haruto-nakamura.md` step
 12a is now unconditional in the same campaign (`9461844`), so an autonomous cut
-creates the Release too.
+creates the Release too. **Exercised 2026-09-17**: v1.23.0 was cut on `7e7e1bb`,
+CI-green (run 35253828372), and published as a real GitHub Release — the first
+cut under the unconditional step, so the mechanism is now run, not just
+asserted.
 
 **Human-owned half stays open.** `README.md:129` still states "no GitHub
 Release object is created", which is false and now doubly so. That is prose, on
@@ -379,8 +394,20 @@ part that was not fixed: Check 31 asserts that *exactly one* release note sits
 at the root and never that it is the newest tag's, which is why the inversion
 was green. A defect fixed with nothing re-asking about it is a board row, not a
 new rule. Teaching Check 31 the version is `iris-vermeulen`'s surface.
+
+**Closed 2026-09-17, mechanized.** `632c439` gave Check 31 a fourth arm: with
+exactly one note at the root, it must name the newest `v*` tag, with a
+no-tags-in-this-clone degradation like Checks 27/28. Negative-tested by its
+author and independently — renaming the root note to
+`release_notes_v1.21.0.md` on main took the suite to `789 passed, 2 failed`
+with `FAIL: the root release note is 'release_notes_v1.21.0.md' but the newest
+tag is v1.22.0`; tree restored. The v1.23.0 cut is the first release the arm
+gated. The row becomes a standing claim on the mechanism rather than on
+today's filenames, per rule 21a: a command comparing the current note to the
+current tag reports a fact that changes every release, so it greps for the arm
+instead.
 ```bash
-ls -1 release_notes_v*.md | sed 's/release_notes_v//; s/\.md$//'; git tag --sort=-v:refname | head -1 | tr -d 'v'
+grep -c 'the root release note is' tests/check.sh
 ```
 
 ## Deferral log

@@ -71,7 +71,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Checks 12, 34 |
 | 21a | The board cites a command; it does not paste and byte-diff the command's output | norm — Check 17 retired 2026-09-17 |
-| 21b | No board evidence command reaches the network | mechanical — Check 21 |
+| 21b | No board evidence command reaches the network | norm — Check 21 retired 2026-09-17 in `1faaa1f`; nothing reads evidence commands for network reach today |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
 | 25d | A verdict records the prompt SHA it was graded against; a contested case needs more than one sample | mechanical in part — SHA/count derivable by tooling; "is this case contested" is judgment |
