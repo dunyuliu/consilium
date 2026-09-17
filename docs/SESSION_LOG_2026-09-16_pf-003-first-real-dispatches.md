@@ -2364,3 +2364,83 @@ per standing instruction I report the trend and do not act on it. But it should
 be stated plainly: this campaign made the repo substantially bigger, and while
 much of that is session log and rule text rather than machinery, "more verified"
 and "more written" are different claims and only the first is worth a release.
+
+## Finding 48 — the remote incident: read-only did not survive two hops, and I own it
+
+I dispatched `victor-reyes` for the milestone technical audit with the
+constraint stated plainly: *"READ-ONLY. Audit, do not fix. Do not edit any
+file, do not take the repo lock, do not open a worktree."*
+
+Victor holds routing authority and dispatched four specialists. **The
+constraint did not reach them.** One, testing release machinery, repointed
+`origin`'s fetch URL in a scratch copy — and the copy inherited
+`remote.origin.pushurl` from the real repo, so two pushes landed on the real
+GitHub remote.
+
+**What it cost, verified by me rather than taken from the report:**
+
+```
+  origin/main -> 08e859c  "test note", author t <t@t>
+    agents/wei-lin.md   549 lines -> 1     (548 deleted)
+    release_notes_v9.9.9.md  created
+  refs/tags/v9.9.9  pushed, still present
+  CI failed on both pushes
+```
+
+Main served a **one-line agent prompt**, live, because `install.sh` symlinks
+`agents/*.md` into `~/.claude`. My own checkout was untouched (548 lines,
+clean) — I checked that first, per finding 37, before reporting anything.
+
+**I attempted both non-destructive recoveries and neither reached green**,
+which is the part worth recording because the gate was right every time:
+
+```
+  revert the commit          -> rule 8: a release note was deleted
+                                rule 15: tag v9.9.9 now has no note
+  restore only the prompt    -> rule 1: two release notes at root
+                                v1.21.0 loses newest-note grace to the phantom
+```
+
+The only clean fix was removing the incident from history — a force-push plus a
+remote tag delete, both explicitly stop-and-ask under my terms. I stopped and
+escalated with exact recovery commands rather than working around branch
+protection.
+
+The maintainer repaired main and had to use `--no-verify` to do it: a
+deliberate, documented rule violation, taken because main serving a gutted
+prompt was the greater harm. The fabricated tag survives and costs one
+permanent gate failure until it can be deleted.
+
+**This is mine.** Not Victor's, and not the sub-agent's. I wrote a brief whose
+restriction was correct and assumed it would propagate through an agent whose
+whole function is to dispatch others. **A constraint is not inherited, it is
+restated** — and an agent with authority to route has authority to lose it. The
+sub-brief is where the restriction has to appear, in full, every time.
+
+Handed to `zofia-kaminska` for codification, because it now carries exactly
+what her fourth refusal said a rule needs: a dated incident with a measured
+cost, not a plausible principle.
+
+## Finding 49 — `install.sh` is an unowned surface, found by trying to route a fix at it
+
+The audit's worst finding is that **`install.sh` installs zero git hooks when
+run from a linked worktree**: a worktree's `.git` is a file, all three
+`[ -d "$ROOT/.git/hooks" ]` guards fail, and it exits 0 printing
+`consilium installed: 22 agents, 19 commands`. An agent can work an entire
+session in a worktree with no pre-commit lock guard and no pre-push gate, and
+be told everything is fine. That is worse than the incident above, because the
+incident announced itself.
+
+I went to route the fix and could not. `grep -ci install` against rule 19's
+ownership table returns **0**.
+
+That is the same gap rule 19's own text records for `commands/*.md` — an agent
+correctly refusing to edit a file with no enforced owner, *"invisible to Check
+10"*. Two instances now, both found the same way: not by an audit of the table,
+but by someone trying to do work and discovering there was nobody to give it
+to. **Check 10 walks agents to surfaces, so a surface with nobody attached is
+structurally invisible to it**, and that is a property of the check's direction
+rather than a bug in it.
+
+Asked Zofia to assign an owner and, more usefully, to walk the actual repo root
+for a third instance rather than wait for the next person to trip over one.
