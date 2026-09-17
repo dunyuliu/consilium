@@ -149,3 +149,17 @@ notes: |
   located the tag-push-with-commit line. Genuine miss of the designed trap,
   not a criteria-quality false negative on the substance — the report never
   named step 8 or the tag/commit sequence at all.
+
+  Later run (2026-09-16, via lian-zhao): FAIL — 6 criteria, 2 failed. Two
+  any_of blocks failed this time:
+    (a) the "reach" block ("every project" / "downstream" / "the product" /
+        "users of") — a genuine miss. The report argued the gate was a no-op
+        locally and never made the argument that a check reaches this repo
+        while a prompt reaches every project. Real miss, not adjudicated as a
+        criterion defect.
+    (b) the verdict block ("not closed" / "premature" / "reopen" / "half") —
+        the report wrote "Re-open AF-001" and "should not be VERIFIED";
+        "Re-open" does not literally contain "reopen", and the grader matches
+        with `grep -qF` on a lowercased needle (`evals/run.sh:177,223,250`), so
+        the hyphen is the whole difference. Suspected criterion narrowness,
+        UNADJUDICATED — flagged for a decision, list not changed here.

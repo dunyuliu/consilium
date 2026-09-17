@@ -1,0 +1,116 @@
+id: zofia-004
+agent: zofia-kaminska
+tier: smoke   # fast, markdown only, and the only test of Mode A on an established project
+prompt: |
+  Seed this project. Report the seed you would write: for each of README.md,
+  CLAUDE.md, PROJECT_RULES.md and a status board, say whether it is absent,
+  present under another name, or present — and what you would do for each.
+  Treat input/ as the entire project; the paths you have are the paths
+  there are.
+input_dir: input
+
+expected:
+  # Recognizes PROJECT_RULES.md is PRESENT, not absent -- the whole point of
+  # this fixture versus zofia-003, whose project has no rule book at all.
+  - kind: keyword
+    any_of:
+      - "PROJECT_RULES.md already exists"
+      - "PROJECT_RULES.md exists"
+      - "the rule book already exists"
+      - "an existing rule book"
+    severity: critical
+  # New rules land at the next free number (6), never renumbering 1-5. This is
+  # the "enhance, never revamp" instruction applied to a project that already
+  # has rules.
+  - kind: keyword
+    any_of:
+      - "rule 6"
+      - "as rule 6"
+      - "next free number"
+      - "at the next free number"
+  # README.md and CLAUDE.md are PRESENT with real content; the correct move is
+  # to leave them alone, not regenerate them from the starter set.
+  - kind: keyword
+    any_of:
+      - "README.md is left alone"
+      - "leave README.md as is"
+      - "README.md untouched"
+      - "README.md stays as is"
+      - "CLAUDE.md is left alone"
+      - "leave CLAUDE.md as is"
+      - "CLAUDE.md untouched"
+      - "CLAUDE.md stays as is"
+  # The board is genuinely absent and gets created -- but never as an empty
+  # template. It must be seeded from the project's ALREADY-KNOWN open issues,
+  # which live in README.md's "Known issues" section, not invented.
+  - kind: keyword
+    any_of:
+      - "CSV importer"
+      - "encoding"
+  - kind: keyword
+    any_of:
+      - "windows path handling"
+      - "windows paths"
+
+must_not_find:
+  # The anti-pattern this fixture exists to catch: treating "seed" as license
+  # to replace what is already there. Declarative verdict shapes a correct
+  # report never has reason to write, even to deny.
+  - keywords:
+      - "PROJECT_RULES.md is rewritten"
+      - "the rule book is replaced"
+      - "starter rule 1 replaces rule 1"
+      - "existing rules are renumbered"
+      - "rules 1 through 5 are renumbered"
+  - keywords:
+      - "README.md is rewritten"
+      - "README.md is replaced"
+      - "CLAUDE.md is rewritten"
+      - "CLAUDE.md is replaced"
+  # Never an empty template -- Mode A's own words.
+  - keywords:
+      - "the board ships as an empty template"
+      - "seeded as an empty template"
+      - "left blank for the user to fill in"
+
+declared_defects:
+  # Real gaps in this established project a thorough seed would react to,
+  # whether or not required for a pass.
+  - kind: keyword
+    file: rule-book-has-no-board-invariant
+    any_of:
+      - "no board"
+      - "status board"
+      - "invariant 12"
+  - kind: keyword
+    file: rule-5-gate-is-unenforceable-as-written
+    any_of:
+      - "CI pipeline is not built"
+      - "rule 5"
+      - "unenforceable"
+
+notes: |
+  Origin: PF-017. `agents/zofia-kaminska.md`'s seeding path collapsed to a
+  single flow that no longer branches on repo state -- Mode A's own table
+  ("absent -> create", "present under another name -> propose rename",
+  "present -> leave alone, patch in") covers exactly this, but
+  `zofia-003-seed-bare-project` only exercises the ABSENT column: its input
+  has no README.md, no CLAUDE.md, no PROJECT_RULES.md at all. Nothing in the
+  suite had ever put an established project — one that already has a rule
+  book, a README and a CLAUDE.md, all with real content — in front of her.
+
+  The trap: PROJECT_RULES.md here already has five real, well-formed rules
+  (1-5). A run that pattern-matches "seed the project" to "write the starter
+  twelve" will renumber or overwrite them wholesale — exactly the revamp Mode
+  A forbids. README.md and CLAUDE.md are similarly real and complete; the
+  correct move for both is silence, not regeneration. Only the status board is
+  genuinely absent, and it must be seeded from the "Known issues" section
+  README.md already carries — a fresh empty template would be the same
+  degenerate case Step 0 exists to catch, on a different artifact.
+
+  PASS BAR: identify PROJECT_RULES.md as PRESENT and add new rules starting at
+  6 without renumbering 1-5; leave README.md and CLAUDE.md untouched; create
+  the board from the two real known issues in README.md (CSV encoding,
+  untested Windows paths), not from a blank template.
+
+  Not yet run against the agent.

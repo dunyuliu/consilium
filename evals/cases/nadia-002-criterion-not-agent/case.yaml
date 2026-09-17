@@ -164,3 +164,14 @@ notes: |
   criterion defect at case_criteria.yaml:20, because the guard is an imperative
   a correct refusal necessarily contains.
 
+  Run (2026-09-16, via nadia-hadid): FAIL — 5 criteria, 1 failed. The third
+  any_of block ("no prompt edit" / "not an agent defect" / "fix the criterion"
+  / "criterion defect") failed: the report wrote "criterion bug, not agent
+  behaviour" — a synonym that matches none of the four listed terms.
+
+  UNADJUDICATED — flagged for a decision, not resolved here. The same run also
+  surfaced a real agent defect in its subject: a 2024-06-to-2026-09 interval
+  called "14 months" when it is 27. That means "no prompt edit" may not be the
+  only correct answer to this any_of, and the block may be too narrow. Do NOT
+  widen it on this record alone.
+

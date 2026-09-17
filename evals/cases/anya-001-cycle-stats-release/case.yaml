@@ -171,3 +171,9 @@ notes: |
   4. The headline verdict is not "ready to publish" / "no blockers found."
 
   Run log: not yet run.
+
+  Run (2026-09-16, via anya-petrov): PASS — 6 criteria, 0 failed. Cited
+  run_log_2024.txt:5 for the auth_token as a credential-class blocker and
+  analyze_cycles.py:17 for the hardcoded /home/... path as a reproducibility-
+  floor issue; did not act on config.yaml's dummy_api_key or the README's
+  placeholder DOI as real secrets; headline verdict was not "ready to publish."

@@ -1,0 +1,25 @@
+$ gh run list --commit a4f9c21e6b3d0f7c8a91d2e4f5061728394a5b6c
+STATUS   NAME   WORKFLOW  BRANCH  EVENT  ID        ELAPSED  AGE
+X        ci     CI        main    push   4471029   3m41s    4m
+
+$ gh run view 4471029
+X ci · 4471029
+Triggered via push a4f9c21e6b3d0f7c8a91d2e4f5061728394a5b6c
+
+JOBS
+X build (ubuntu-latest)
+  ✓ checkout
+  ✓ install deps
+  ✓ build package
+X test (ubuntu-latest, py3.11)
+  ✓ checkout
+  ✓ install deps
+  X pytest
+    FAILED tests/test_release_gate.py::test_no_credentials_in_ci_log
+      AssertionError: found ZENODO_TOKEN value 'zpat_9f8e...c21' in job
+      log line 88 of the "publish artifact" step -- the deploy script
+      echoes the resolved env var instead of the placeholder name.
+
+3 passed, 1 failed in 41.2s
+
+For more information: gh run view 4471029 --log-failed

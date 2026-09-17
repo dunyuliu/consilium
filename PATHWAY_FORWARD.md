@@ -40,8 +40,8 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | run the 11 fixtures that have never been executed | BROKEN | 2026-09-16 | 14 | P1 |
-| PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-08-04 | 60 | P2 |
+| PF-003 | `evals/cases/` | run the 3 fixtures that have never been executed | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
 | PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-09-16 | 30 | P2 |
@@ -54,10 +54,12 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-015 | `tests/check.sh` | the board's recorded evidence is re-executed, not just cited | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
-| PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | OPEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
 | PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
+| PF-021 | `tests/check.sh` | Check 29's script selector uses `find .`, not `git ls-files` — reddens for any worktree-isolated dispatch | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-022 | `agents/` | `lian-zhao`'s frontmatter description contradicts her own body on the fixture write surface | OPEN | 2026-09-16 | 30 | P2 |
 
 ## Items
 
@@ -157,21 +159,50 @@ executed is a claim about the agent, not a test of it. Closing this needs real
 dispatches, so a date here records that the gap was re-measured, never that it
 narrowed.
 
+**Re-run 2026-09-16, and the pattern is fixed in the same change, not deferred
+to a separate one.** The command as it stood (`first run (` / `second run (`)
+printed 15 lines today, 11 of which were WRONG: eleven fixtures were staged
+with `evals/run.sh stage`, dispatched to the real agent named in each case's
+`agent:` field, and graded with `evals/run.sh grade` against criteria exactly
+as they stood (no criterion edited before, during or after any run, rule 5) —
+`anya-001`, `anya-002`, `haruto-002`, `kai-002`, `lars-002`, `lian-002`,
+`marta-001`, `nadia-002`, `selin-001`, `wei-lin-002`, `zofia-002` — 7 PASS, 4
+FAIL, no `must_not_find` guard fired. Independently re-deriving the count
+(rule 4, not trusting the paste I was handed) also turned up a **twelfth**
+dispatch the paste omitted: `zofia-003-seed-bare-project` carries
+`Run (2026-09-16, via a fresh zofia-kaminska dispatch). FAIL 6/7` in its own
+`case.yaml` — all four declared defects found, one criterion failed on wording
+not substance. So 12 of the 15 lines the old command printed were wrong, not
+11: a confident wrong answer about three-quarters of its own output, per the
+row's own text ("this is no longer an undercount at the margin").
+
+The corpus holds four wordings for a dispatch record — `Run (` x22,
+`First run (` x20, `Second run (` x6, `Later run (` x2 (all four already
+contain the substring `run (`) — so the fix is not a new ordinal to chase,
+it is dropping the ordinal requirement the original pattern over-specified.
+Checked before landing: `run \(`, case-insensitive, matches all four existing
+wordings and produces no false negative on the two cases using `Later run (`
+(`lian-002`, `selin-001`), which the old pattern already reached only because
+they also contained an earlier `Run (`/`First run (` line.
+
+**Sharpened 2026-09-16, same day, before this ever shipped as the loose
+form.** `run \(`, bare, also matches ordinary prose that is not a dispatch
+record at all — "a fresh run (see below)", "the run (above)" — and the corpus
+only happens to contain none today. `run \((19|20)[0-9]{2}-` is the same
+length, keeps every one of the four wordings (all four are followed
+immediately by a date), and cannot be satisfied by prose that merely mentions
+a run. Re-run below is from the pattern that actually ships.
+
 ```bash
-for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'first run \(|second run \(' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
-# → anya-001-cycle-stats-release: NEVER RUN
-# → anya-002-clean-publishable: NEVER RUN
-# → haruto-002-tag-before-gate: NEVER RUN
-# → kai-002-no-worktree-no-write: NEVER RUN
-# → lars-002-clean-control: NEVER RUN
-# → lian-002-gate-without-prompt: NEVER RUN
-# → marta-001-print-scale-audit: NEVER RUN
-# → nadia-002-criterion-not-agent: NEVER RUN
-# → selin-001-supershear-resolution: NEVER RUN
-# → wei-lin-002-plan-contradicts-code: NEVER RUN
-# → zofia-002-rule-already-exists: NEVER RUN
-# → zofia-003-seed-bare-project: NEVER RUN
+for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
+# → haruto-003-release-gate-red-row: NEVER RUN
+# → wei-lin-003-autopilot-board-order: NEVER RUN
+# → zofia-004-seed-patch-established: NEVER RUN
 ```
+
+The three remaining are exactly the fixtures PF-017 landed today and has not
+yet dispatched (see PF-017) — the detector and the independently-verified
+facts now agree.
 
 ### PF-004 — `evals/` — OPEN
 
@@ -219,9 +250,22 @@ The row's claim is unchanged — precision is still not measured.
 The row's claim is still unchanged, and this row is the reason: declaring what
 is in a fixture input is not the same as scoring how much of it a run found.
 
+**Re-run 2026-09-16: 17 -> 19.** Two more cases now declare defects; the row's
+claim is unchanged — this counts declarations, not measured precision.
+
+**Same weakness, new instance, 2026-09-16.** `haruto-003-release-gate-red-row`
+ships the expected term `credential`, and `input/ci_output.txt:18` already
+contains `FAILED tests/test_release_gate.py::test_no_credentials_in_ci_log`
+with the diagnosis stated in full — a report that quotes that line scores the
+criterion without judging anything, the PF-011 scoring-inversion shape applied
+to a fixture landed today rather than an old one. Landed deliberately (the
+sample corpus discriminates 5/0 pass vs 4-of-5 fail on the case as a whole) and
+NOT repaired: rule 5 forbids moving a criterion already graded against a
+recorded verdict. Not a new row — this is the row's own claim, reproduced.
+
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l | tr -d ' '
-# → 17
+# → 19
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -301,6 +345,28 @@ the maintenance-shaped work the rest of the board exists to avoid needing.
 ```bash
 bash tests/check.sh | tail -1
 # → Summary: 1294 passed, 0 failed
+```
+
+**Re-run 2026-09-16: 1294 -> 1449, and the circularity paid off again.** PF-003,
+PF-004, PF-011, PF-012 and PF-017 had all lapsed to "recorded evidence no
+longer reproduces" (Check 12/15) after today's fixture dispatches and new
+fixtures moved the facts under them. Each was re-run and re-dated first; this
+row was re-run last, for the reason this row already records — it cannot
+honestly print green while its own overdue entry is part of what is red.
+
+```bash
+bash tests/check.sh | tail -1
+# → Summary: 1449 passed, 0 failed
+```
+
+**Re-run 2026-09-16, after this row's own two new board rows (PF-021,
+PF-022) landed: 1449 -> 1459.** Re-run last, for the same circularity this row
+already names: it drifts on every change that adds an assertion, including
+its own edit, and this paragraph is the by-hand correction that catches it.
+
+```bash
+bash tests/check.sh | tail -1
+# → Summary: 1459 passed, 0 failed
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
@@ -1073,9 +1139,15 @@ results indistinguishable from scratch — and the tripwire's whole point is tha
 an undeclared fifth would make a thorough run score worse than a shallow one.
 The CLOSED finding stands on the thirty it already read.
 
+**Re-run 2026-09-16: 32 -> 35.** `wei-lin-003-autopilot-board-order`,
+`haruto-003-release-gate-red-row` and `zofia-004-seed-patch-established`
+landed (the three fixtures PF-017 owed). None of the three has been
+re-audited under this row's rule — the CLOSED finding stands on the thirty-two
+it already read, not on these three.
+
 ```bash
 ls evals/cases | wc -l | tr -d ' '
-# → 32
+# → 35
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -1234,9 +1306,16 @@ this session was convened to fix is now the least measured on the board.
 
 Re-derived on a full clone, for the reason PF-005 now records.
 
+**Re-run 2026-09-16: 16 -> 14.** Verified at `evals/run.sh:320,354`: STALE
+compares a case's last recorded run date against its agent prompt's mtime.
+Recording today's dates for two of today's real dispatches moved those two
+cases off STALE — this is the count improving because verdicts got fresher,
+not because the underlying claim narrowed. The row's own claim (no regression
+proven fleet-wide) is unchanged.
+
 ```bash
 bash evals/run.sh list | grep -c STALE
-# → 16
+# → 14
 ```
 
 ### PF-013 — `agents/` — OPEN
@@ -1615,7 +1694,7 @@ grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
 # → 1
 ```
 
-### PF-017 — `agents/` — BROKEN
+### PF-017 — `agents/` — OPEN
 
 Rules 10 and 25, breached by the session that wrote three checks to enforce
 them. `agents/wei-lin.md` gained the board-driven queue, the milestone release
@@ -1638,9 +1717,19 @@ The command is a tripwire, not a measure of coverage: it goes to 1 when a case
 whose name says autopilot, release-gate or seed-patch exists at all. Running
 what exists is PF-003's task.
 
+**Re-run 2026-09-16: 0 -> 3.** `iris-vermeulen` delivered all three owed
+fixtures — `wei-lin-003-autopilot-board-order`, `haruto-003-release-gate-red-row`,
+`zofia-004-seed-patch-established`. All six of their pass/fail samples were
+re-graded and all six reproduced (pass 7/0, 5/0, 8/0; fail 3-of-7, 4-of-5,
+7-of-8 failed), so the criteria discriminate. Not closed as VERIFIED: the
+tripwire only proves the three directories exist with the right names, and
+none of the three has ever been dispatched against a live agent — that
+execution is PF-003's task, and the case that would grade this session's own
+release-gate and autopilot changes is written but still unrun.
+
 ```bash
 ls evals/cases | grep -cE 'autopilot|release-gate|seed-patch'
-# → 0
+# → 3
 ```
 
 ### PF-018 — `PATHWAY_FORWARD.md` — VERIFIED
@@ -1736,6 +1825,51 @@ evidence command inherently clone-dependent, not just network-blind — rule
 checkouts. The row stays BROKEN: the tag genuinely is not on the remote, and
 nothing about the underlying blocker changed, only the recorded number was
 corrected to match a real re-run.
+
+### PF-021 — `tests/check.sh` — BROKEN
+
+Check 29's script selector at `tests/check.sh:1098` is
+`find . -name '*.sh' -not -path './.git/*'`, which walks the working
+directory rather than the tracked tree. The harness places agent worktrees at
+`./.claude/worktrees/<agent-id>/`, excluded only via a local, uncommitted
+`.git/info/exclude:11` — invisible to `git status` and to any clone, and fully
+visible to `find`. Check 29 then reports the worktree's own `install.sh` as a
+second installer and fails rule 14: the gate reddens for the duration of any
+worktree-isolated dispatch, and reddened a `pre-push` hook twice today on two
+different agent ids. It is the only bare `find .` selector in the file — every
+other file-selecting check already uses `git ls-files`.
+
+Not fixed here: `tests/check.sh` is `iris-vermeulen`'s surface, not mine.
+Routed there. Fix is mechanical — swap the selector for
+`git ls-files '*.sh'` — and negative-testable the same way Check 8's
+mutations already are.
+
+```bash
+grep -c "find \. -name '\*\.sh'" tests/check.sh
+# → 1
+```
+
+### PF-022 — `agents/` — OPEN
+
+`agents/lian-zhao.md` contradicts itself on its own write surface. Line 3 (the
+frontmatter `description`, which is the text that routes every dispatch) says
+"Grows the fixture that proves either"; line 52 says "Your surface is
+`agents/*.md` and nothing else. Not fixtures." Rule 19 assigns fixtures to
+`iris-vermeulen`, so the body is right and the routing text is wrong. Same
+shape as the `commands/*.md` ownership gap found 2026-09-16, and invisible to
+Check 10 for the same reason: Check 10 parses the rule-19 table, not the
+prompts. This is a concrete instance of the gap PF-009 already names as not
+checked — "whether each agent's body actually implements its frontmatter
+description" — and is recorded here rather than reopening that row's own
+evidence command.
+
+Not fixed here: `agents/*.md` is `lian-zhao`'s surface. Routed there.
+
+```bash
+sed -n '3p' agents/lian-zhao.md | grep -c 'Grows the fixture'; sed -n '52p' agents/lian-zhao.md
+# → 1
+# → - Your surface is `agents/*.md` and nothing else. Not fixtures
+```
 
 ## Deferral log
 

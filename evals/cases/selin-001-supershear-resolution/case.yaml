@@ -327,3 +327,23 @@ notes: |
   numeric discrepancy worth a second look at either the review's formula or
   the fixture's expected constants, not something resolved here. All four
   must_not_find guards passed (no cherry-picking flag, no cheap-shot pass).
+
+  Later run (2026-09-16, via selin-aydin). FAIL — 9 criteria, 1 failed
+  (`bash evals/run.sh grade selin-001-supershear-resolution <report>`). The
+  `any_of` arithmetic block (case.yaml lines 39-49, accepting
+  423/420/425/430/317/320/1.69/1.27) failed: the agent computed 739 m / ~3.0
+  nodes from `L0 = (9*pi/32)*mu*Dc*(tau_p - tau_r)/(tau_p - tau_0)^2`, rather
+  than the Palmer-Rice/Andrews `L0 = (9*pi/32)*mu*Dc/(tau_p - tau_r)` = 317.6 m
+  = 1.27 cells at dx=250 m. Adjudicated AGENT defect, criterion stands, on an
+  invariant the manuscript itself fixes: Table 1 gives ONE global sigma_n,
+  mu_s, mu_d, Dc, so the breakdown-zone width is the same everywhere on the
+  fault and cannot be a function of prestress -- the agent's form makes it one
+  and then called the asperity "adequately resolved" at a claimed 16 nodes. It
+  also understated the defect (1.27 cells became 3.0).
+
+  Note for the record: the fixture's 423 and 317 are mode II and mode III of
+  one estimate (423.5/317.6 = 1.3333 = 1/(1-nu) at nu=0.25) -- two conventions,
+  not three.
+
+  Diagnostic only: the agent led with the tau_0a circularity, which the case
+  notes state was scrubbed in the adversarial pass.
