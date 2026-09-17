@@ -69,6 +69,9 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-029 | `PROJECT_RULES.md` | every index row has body prose somewhere in the file, not only a one-line index claim | OPEN | 2026-09-17 | 60 | P3 |
 | PF-030 | `install.sh` | `pre-push` skips the gate for a push whose ref updates are all deletions (rule 9a; owner: `iris-vermeulen`, rule 19) | OPEN | 2026-09-17 | 30 | P2 |
 | PF-031 | `tests/check.sh` Check 28 | a deletion permitted under rule 8a has its two conditions checkable from the commit message, not just asserted in prose | OPEN | 2026-09-17 | 30 | P3 |
+| PF-032 | `README.md` question 1 | the seeded-README credibility gap ("nothing holds a seeded README to being credible") has no check today and stays open — a true "Not yet", not drift | OPEN | 2026-09-17 | 60 | P3 |
+| PF-033 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 already creates and verifies the mechanism, but its newest-tag grace has no override, the open half of rule 28 | BROKEN | 2026-09-17 | 30 | P2 |
+| PF-034 | `README.md` question 2 / `tests/check.sh` Check 33 | the release gate has twelve rows, not ten — README and Check 33's own header comment both say ten while `tests/release_gate.sh`'s own header and its `ROWS` array say twelve | BROKEN | 2026-09-17 | 30 | P2 |
 
 ## Items
 
@@ -2681,6 +2684,75 @@ conditions from rule 8a.
 ```bash
 grep -c "rule 8a" tests/check.sh
 # → 0
+```
+
+### PF-032 — `README.md` question 1 — OPEN
+
+README's own "Enforced/Not yet" section carries no evidence tier at all —
+`awk` over it finds zero fenced blocks — so this row and PF-033/PF-034 give
+each standing claim in that section the tier every `PF-` row already carries.
+Question 1's "Not yet" reads: "nothing holds a seeded README to being
+*credible* — concise is asked for, evidence-backed is not." That is still
+true, not drift: no rule, no check, and no fixture criterion mentions
+credibility. `agents/zofia-kaminska.md`'s Mode A seeds a README and
+`evals/cases/zofia-003-seed-bare-project` grades that seeding, but neither
+checks the seeded prose against reality — only that it exists and is
+concise. This is a Tier-3 finding on the claim, not a violation: it names
+what would make it checkable (a criterion in `zofia-003` asserting the
+seeded README's claims match a fixture's planted ground truth) rather than
+manufacturing a command that only looks like enforcement.
+
+```bash
+grep -ci 'credible' PROJECT_RULES.md tests/check.sh
+# → PROJECT_RULES.md:0
+# → tests/check.sh:0
+```
+
+### PF-033 — `README.md` question 2 — BROKEN
+
+README:129 states "no GitHub Release object is created." False: `gh release
+list` on this repo returns 24 published Releases, and `tests/check.sh` Check
+35 (added since this README prose was last true) already shells out to
+`gh release view` to verify a GitHub Release exists for the newest tag,
+degrading honestly when `gh` is unavailable. The mechanism this claim says
+does not exist, exists. Routed to `sophia-okafor` (doc-vs-code drift) for
+the README correction itself, which is human-owned prose this row does not
+touch.
+
+The row does not re-assert "24 Releases exist" — that number moves every
+release and would falsely redden this claim on its own success, the exact
+failure rule 21a's provenance note describes. It asserts the mechanism is
+still present, which is what actually answers question 2:
+
+```bash
+grep -c 'gh release view' tests/check.sh; grep -c 'GitHub Release' tests/release_gate.sh
+# → 1
+# → 4
+```
+
+Cross-reference: `PROJECT_RULES.md` rule 28, incident 3 — Check 35's
+newest-tag grace was held by the fabricated `v9.9.9` tag with no override,
+which is the still-open half of this row (a gate blocking a correct release
+with no corrective path inside the check itself).
+
+### PF-034 — `README.md` question 2 / `tests/check.sh` Check 33 — BROKEN
+
+README's question 2 opens: "Audit the changes, correctness, ... and the rule
+book followed. **Enforced**: all ten are rows in `tests/release_gate.sh`."
+`tests/check.sh` Check 33's own header comment (line 1313) independently
+says "ten row keys." Both are wrong: `tests/release_gate.sh`'s `ROWS` array
+has twelve entries, and the script's own header (line 2) correctly says
+"the twelve rows." Three sources, two different numbers, inside one repo
+whose own rule 11 requires docs to move with the code they describe.
+Routed to `sophia-okafor` — the drift is in prose (README) and in a code
+comment (Check 33's header), not in behavior; `tests/release_gate.sh` itself
+is correct and unaffected.
+
+```bash
+grep -o 'ROWS=([^)]*)' tests/release_gate.sh | tr ' ' '\n' | grep -c .; grep -c 'twelve rows' tests/release_gate.sh; grep -c 'ten row' tests/check.sh
+# → 12
+# → 1
+# → 1
 ```
 
 ## Deferral log
