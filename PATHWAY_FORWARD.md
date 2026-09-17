@@ -44,11 +44,11 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
-| PF-012 | `agents/` | prompt slimming did not change behaviour | OPEN | 2026-09-16 | 30 | P2 |
-| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-08-13 | 60 | P3 |
+| PF-012 | `agents/` | every fixture verdict stays current against the prompt it grades (no fleet-wide staleness) | OPEN | 2026-09-17 | 14 | P2 |
+| PF-013 | `agents/` | every agent runs on the cheapest tier that passes its fixture | OPEN | 2026-09-17 | 60 | P3 |
 | PF-007 | `tests/check.sh` | the header comment describes the checks that exist | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 | P3 |
-| PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | OPEN | 2026-08-05 | 60 | P2 |
+| PF-009 | `agents/` | no agent prompt has drifted from its documented behaviour | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 | P3 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 | P3 |
@@ -567,7 +567,7 @@ is not the same as watching it fail.
 # → (no output)
 ```
 
-### PF-009 — `agents/` — OPEN
+### PF-009 — `agents/` — VERIFIED
 
 The prompts have never been audited as a set — only individually, when someone
 was already editing one.
@@ -629,6 +629,41 @@ fixtures, not a command.
 ```bash
 for f in agents/*.md; do awk '/^## Communication discipline/{f=1;next} /^## /{f=0} f' "$f" | md5sum; done | sort -u | wc -l | tr -d ' '
 # → 1
+```
+
+**Closed 2026-09-17.** `sophia-okafor` read all 22 prompts against the three
+questions this row named as unchecked: whether each body implements its
+frontmatter `description`, whether any procedure contradicts another's, and
+whether any prompt asserts a now-false fact about this project. One drift
+found — `agents/wei-lin.md`'s description claimed "Maintains project rules"
+with an example "draft a project-rules.md gate", while `:248` says "Delegate
+the writing to `zofia-kaminska`, who owns that file" — same shape as PF-022.
+`lian-zhao` fixed it: the description now reads "Commissions and enforces
+project rules" and the example says "commission"; the body constraint at
+`:248` is unchanged. Verified independently below, and the two textual
+variants (`Maintains project rules`, `Commissions and enforces project
+rules`) checked directly rather than trusted from the paste.
+
+One of the audit's own three citations was misattributed and is recorded
+here because the row is about accuracy: it quoted `wei-lin.md:52-54` as "Your
+surface is `agents/*.md` and nothing else"; that text is at
+`agents/lian-zhao.md:52-54`, and `wei-lin.md:52-54` is the stopping/spawning
+paragraph. Confirmed by reading both files directly. The finding on
+`wei-lin.md`'s frontmatter stands on its other two citations, both verified;
+this correction does not reopen it.
+
+**Scope of this closure, stated plainly.** This clears the three questions
+the row named as the specific unchecked gap and the one drift they surfaced.
+It does not certify the prompts will stay aligned — this is a point-in-time
+read of prose, and nothing re-checks it the way Check 20 re-checks the
+dispatch-cost warning. A future prompt edit can reintroduce the same shape of
+drift (PF-022's shape, now PF-009's) without anything here catching it
+mechanically. Interval set to 30 days as a re-read cadence, not a guarantee.
+
+```bash
+grep -c 'Commissions and enforces project rules' agents/wei-lin.md; grep -c 'Maintains project rules' agents/wei-lin.md
+# → 1
+# → 0
 ```
 
 ### PF-010 — `install.sh` — VERIFIED
@@ -1468,6 +1503,31 @@ drift and was never this row's claim.
 # → fleet re-verification gap still open (STALE > 0)
 ```
 
+**Claim reworded 2026-09-17 to match the scope already established in the
+paragraph above, not just re-dated.** "Prompt slimming did not change
+behaviour" named one pass (`d6f6dc9`/`3d06c1e`) that is now three commits and
+dozens of edits in the past, with zero recorded re-runs supporting it by this
+row's own 2026-08-05 analysis — a claim with no baseline left to compare
+against and no evidence it ever had. Considered retiring it the way PF-005
+was retired (a claim rule 8 makes permanently unachievable). Declined: unlike
+PF-005, the underlying concern here is not dead, it recurs on every prompt
+edit, and the 2026-09-17 re-scope already gave it a form that stays
+answerable as the fleet keeps changing — whether any fixture's recorded
+verdict is older than the prompt it grades. The table's claim cell was still
+carrying the retired wording; this brings it into line with the block.
+
+State stays OPEN and gets worse before it gets better: `bash evals/run.sh
+list | grep -c STALE` now reads 18, up from 14 on 2026-09-16 — more prompt
+edits landed since without matching re-dispatches. Interval tightened
+14 -> matches PF-006's cadence, since this count moves on every prompt
+commit and a 30-day check was already proven too slow to catch it (PF-010's
+CI-only miss).
+
+```bash
+bash evals/run.sh list | grep -c STALE
+# → 18
+```
+
 ### PF-013 — `agents/` — OPEN
 
 Three tiers tested by `model` override against the agent's own fixture, no file
@@ -1648,6 +1708,21 @@ grep -h '^model:' agents/*.md | awk '{c[$2]++} END{for(k in c) printf "%d %s\n",
 # → 4 opus
 # → 14 sonnet
 ```
+
+**Re-run 2026-09-17, distribution unchanged, and that is not the same as the
+row being current.** Not doing the tier analysis here — that is `lian-zhao`'s
+work and a separate dispatch — but the row is still meaningful and now needs
+flagging for a reason PF-012 already names: the three tier decisions this
+row rests on (`ziyan-chen`, `selin-aydin`, `priya-nair`) were each earned
+against a fixture run before the fleet-wide slimming pass and the many
+single-agent edits recorded in PF-012 (18 of the fleet's cases now STALE).
+A tier established against prompt text that no longer exists is not
+necessarily wrong, but it is not verified against what ships today either —
+the same "unrecorded claim about a prompt that changed" shape PF-012 tracks
+for behaviour generally, applied here to a narrower claim about cost. Left
+OPEN, P3 unchanged: this is a cost question, not a correctness one, and
+PF-012 already carries the higher-priority version of the same underlying
+gap.
 
 ### PF-014 — `agents/` — VERIFIED
 
