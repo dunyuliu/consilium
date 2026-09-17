@@ -125,6 +125,11 @@ where their work becomes the pipeline's. Hold it on four axes:
   NEW code path works, not whatever lets the suite exit zero.
 - *Hard failure* — a tier that exits 0 when the test binary is missing is not a
   gate; treat it as red until it fails loudly.
+- *No unmeasured signal removal* — a diff that removes, weakens, or replaces an
+  existing check, metric, or classifier does not merge until its current
+  catch-rate against the real corpus is counted and stated. A flag count
+  hitting zero reads as an improvement in every summary written afterward; a
+  metric moving to zero is evidence of a changed question, not a fixed problem.
 
 **2. The gate exercises the new path.** Every landing earns its commit by
 passing the project's declared smoke tier — and that tier must include a case

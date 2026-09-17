@@ -1404,3 +1404,174 @@ and would have read, on the board, as an improvement — STALE went to zero.
 A metric moving to zero is not evidence of a fixed problem. It is evidence of a
 changed question, and the two are distinguishable only by measuring what the
 old signal was actually catching before you remove it.
+
+---
+
+# Fifth wake — promoting the lesson out of this log
+
+## Finding 28 — the near-miss is being written where it ships, not where it is merely recorded
+
+The maintainer's instruction: the staleness near-miss "deserves to outlive the
+board row", and rule 0 is the test — does this ship in the agent, or only in
+our gate?
+
+Applying that test honestly splits the lesson into three parts with three
+different homes:
+
+**Already covered, no action.** "Re-derive a figure someone handed you before
+implementing against it" is rule 4, which already names an inherited conclusion
+"from an agent's own report" as a hypothesis. `iris-vermeulen` applied it
+correctly and unprompted — she re-derived the same-day/different-day split
+before writing the fix and said so. A rule that was followed does not need
+rewriting. The only open question is whether rule 4 should explicitly name the
+narrower case that actually occurred: *a figure in the brief, from the agent
+that dispatched you*. Three times today I was that source and twice I was
+wrong. Asked `zofia-kaminska` to decide; it is one clause or nothing.
+
+**Genuinely new, and unowned.** Nothing in the rule book governs *removing or
+replacing* an existing signal. Rule 25's family governs criterion design; the
+negative-test convention governs *adding* an assertion. Replacing one is
+ungoverned, which is exactly how a change that took STALE from 14 to 0 could
+look like progress. That is the rule being written.
+
+**Portable, and belongs in a prompt.** The two habits that caught it —
+measuring a signal's true positives before removing it, and confirming a new
+boundary by mutation rather than argument — are not consilium-specific. They
+belong to `iris-vermeulen`, who is the agent that would make such a change, and
+to `wei-lin`, who is the one that must catch it at a merge gate. Neither is my
+surface; both go to `lian-zhao` after the rule exists, so she has canonical
+wording to draw from rather than inventing a second phrasing.
+
+**Why I am not shortcutting this into the session log and moving on.** A
+session log is read by whoever is already in this campaign. A rule is read by
+whoever audits this project. A prompt is read by every agent on every project
+the team is pointed at. The lesson's value scales with how far out it lands,
+and the failure it prevents — a change that improves a metric by deleting what
+the metric measured — is not a consilium problem. It is available anywhere
+someone replaces an alarm and reports that alarms went down.
+
+## Finding 29 — three false negatives from over-narrow patterns, all mine, all in one day
+
+Rule 26 landed carrying the maintainer's sentence verbatim. My verification
+grep returned `0` and I was about to report the sentence missing. It is present
+at `PROJECT_RULES.md:1146-1147` — my pattern was single-line and the sentence
+wraps.
+
+That is the third time today the same error produced a confident wrong answer:
+
+1. Tested five of `nadia-hadid`'s nine `any_of` terms, saw the first report
+   match none of the five, and nearly reported that her fix "inverts the
+   verdict". It matches `five existing rules`, one of the four I skipped.
+2. Grepped `superseded|historical|not re-run` against a de-fenced board block
+   and found nothing, and nearly reported an unlabelled history. Its label
+   reads "kept as history rather than as a live fence" — the right meaning,
+   different words.
+3. Grepped a sentence that spans a line break with a single-line pattern.
+
+Each time the zero was mine, not the artifact's. I caught all three only
+because the result was surprising enough to re-check, which is luck dressed as
+diligence: a false negative that *confirms* what I already expect will not feel
+surprising and will not get re-checked.
+
+The shape is precise and worth naming, because it is the mirror of rule 26.
+Rule 26 warns against removing a signal without measuring what it catches. This
+is the same error at the observation end: **a search returning nothing is not
+evidence of absence until the search has been shown capable of finding the
+thing.** A grep that cannot match across a line break, an `any_of` sampled
+rather than exhausted, a fixed pattern against variable wording — each reports
+absence with the same confidence whether the thing is missing or the instrument
+is blind.
+
+The corrective is cheap and I should have been applying it all along: when a
+search for something I expect to exist returns nothing, **first prove the
+search can find a thing I know is there.** One positive control. `grep 'metric
+moving to zero'` would have found it instantly; I went straight to the full
+sentence and read the failure as the file's rather than my own.
+
+This is mine to carry, not a repo defect, and there is nothing to route.
+
+## Finding 30 — the lesson shipped in three places, and the agent who landed it named what was still missing
+
+Rule 26 now exists in the rule book; its portable half is in two prompts:
+
+- `agents/iris-vermeulen.md`, folded into `### 6. Audit the existing tests` —
+  as a **procedure she runs**, since she is the agent who would actually
+  replace a classifier.
+- `agents/wei-lin.md`, one bullet on merge-gate axis 1 alongside
+  *No fallback / No placeholder / No silent failure / Hard failure* — as a
+  **question asked at the boundary**, since I am the one who would otherwise
+  wave through a diff whose alarm count conveniently went to zero.
+
+`lian-zhao` folded both into existing sections rather than appending, proposed
+no cuts and said so explicitly rather than trimming silently, and avoided the
+`## Communication discipline` landmine that reddened the gate when she tried to
+put a per-agent lesson there earlier today.
+
+**Then she named the hole in her own work**, unprompted:
+
+> "no case in `iris-*`/`wei-lin-*` exercises the new 'measure before removing a
+> signal' behaviour, so landing this invalidates their currency but proves
+> nothing about whether the new text actually changes agent behavior."
+
+She is right, and it is rule 10 pointing at the change that just landed. A
+prompt edit with no fixture is an opinion about behaviour. The wording is now
+in two prompts and **nothing measures whether either agent acts on it** — which
+is, with some irony, the same shape as the defect rule 26 exists to prevent: a
+change that improves the artifact without anyone measuring the thing it claims
+to improve.
+
+She correctly declined to originate the fixture (`evals/cases/**` is
+`iris-vermeulen`'s surface, and that boundary is what PF-022 was about), so it
+is dispatched to Iris with the design constraint that matters: **the pass bar
+must be the measurement, not the conclusion.** A report saying "I counted: 14
+flags, 0 same-day" has done the work; one saying "the old check is probably
+fine" has reached the same verdict by guessing, and a fixture that cannot tell
+those apart grades agreement rather than method.
+
+Three landings from one incident — a rule, two prompts, and now a fixture —
+which is what rule 0 asks for and what a session log alone would not have
+produced.
+
+## Finding 31 — rule 18b deadlocks, and I found it by obeying it
+
+Rule 18b landed today, written by `zofia-kaminska` at my request after finding
+23: *"Never dispatch a writer while the gate is red; if commits sit local,
+track them and push in the same action that turns it green."* I adopted it the
+moment it existed.
+
+Tonight the gate went red with six board rows — PF-003, PF-004, PF-011,
+PF-025 (twice) and PF-027 — every one of them stale because real work landed.
+All six are `PATHWAY_FORWARD.md` rows, and `PATHWAY_FORWARD.md` has exactly one
+writer. To clear the red I must dispatch that writer. 18b, read literally,
+forbids it.
+
+**The only agent who can turn the gate green is the one the rule forbids me to
+dispatch.** That is a deadlock, and it is total: no amount of waiting clears it,
+because nothing else is going to edit the board.
+
+I dispatched her anyway, deliberately, saying so in the brief and here. That is
+a rule violation and it is recorded as one rather than rationalised into
+compliance.
+
+**The rule is not wrong; its scope is.** 18b exists because a red gate means the
+local branch and the remote disagree, so an agent branching from the remote
+starts from a base missing work — which happened twice today through two
+different doors. That hazard is real. But it attaches to dispatching a writer
+onto work *unrelated* to the red. Dispatching the owner of the failing row, to
+fix that row, is not merely permitted; it is the only thing that ends the
+condition.
+
+The amendment is routed to its author rather than written by me. I gave her my
+reading of the right shape and told her to improve on it — she wrote the rule
+and she is better placed to scope it than the agent who tripped over it.
+
+**What this says about writing rules from incidents**, which is most of what
+this campaign has done. 18b was derived from two real failures, tiered
+honestly, and reviewed by me before landing. It still shipped with a deadlock
+that took about four hours to surface, and surfaced only because the exact
+condition arose — a red caused *solely* by the rows of the single agent the
+rule would bar. A rule written from an incident is fitted to that incident; the
+cases it will meet next are the ones nobody has seen yet. That is an argument
+for writing rules narrowly and amending them when they bind wrongly, not for
+writing fewer of them — but it is also why "we made a rule" is not the same as
+"we fixed it", and I should stop treating a landed rule as a closed loop.
