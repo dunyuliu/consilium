@@ -1807,3 +1807,42 @@ on an exact match and I did *not* report it missing — I ran the loose pattern
 first, per finding 29's corrective, and found it at line 862 wrapping across
 two lines. Same trap as before, caught by the habit rather than by luck. The
 positive control cost one extra pattern and saved a false finding.
+
+## Finding 36 — the class fix holds, verified on an agent nobody mentioned
+
+`zofia-kaminska` swept the class: PF-012's pinned STALE count and PF-024's
+pinned four-case output strings both re-scoped to assert their mechanisms, with
+the old values kept as unfenced history. She checked PF-002/003/004/013/015/017
+for the same shape and found none — PF-002 and PF-004 count monotonically
+growing declarations that *are* the row's claim, and PF-003's detector is not
+sensitive to SHA or date reclassification at all. She declared the class closed
+with no residual.
+
+I verified it myself, and deliberately not only on the prompt that exposed it:
+
+```
+  baseline                                          1530 passed, 0 failed
+  whitespace commit to agents/zofia-kaminska.md     1530 passed, 0 failed
+  whitespace commit to agents/haruto-nakamura.md    1530 passed, 0 failed
+```
+
+The second line is the instance. **The third is the class** — `haruto-nakamura`
+was never mentioned in the incident, the diagnosis, or the brief, and editing
+his prompt is now free too. A fix verified only against the case that produced
+it is the same error as a rule fitted to its own incident, one level down, and
+this campaign has now made that error twice. Testing a third party was cheap
+and is the only thing that distinguishes "closed" from "closed here".
+
+She also reported two self-inflicted problems she hit and corrected mid-run: a
+double evidence fence she had left on PF-012, where Check 17 graded both the
+new command and the stale one, and a `git reset --hard` that discarded an
+uncommitted fix along with a throwaway test commit. Neither reached me as a
+defect; both are in her report. An agent that names the mess it made on the way
+to the result is worth more than one that reports only the result.
+
+**The debt this clears.** `lian-zhao` reverted her `agents/zofia-kaminska.md`
+edit two findings ago rather than land a red gate. That edit is now dispatched
+to land. The cost rule 25d imposed on prompt improvement — the thing I said I
+would report as plainly as the 18b deadlock — is paid off, not by weakening
+25d, but by fixing three board rows that were converting a correct state
+transition into a failure.
