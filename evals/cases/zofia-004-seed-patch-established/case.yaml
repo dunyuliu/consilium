@@ -200,3 +200,19 @@ notes: |
   `samples/fail.md` unmodified is FAIL 7 failed. Still SUPERSEDED pending
   re-dispatch per rule 5 -- this change moves where the criteria will be
   re-dispatched against, not the dispatch itself.
+
+  Run (2026-09-16, zofia-kaminska, prompt 03bf9a1). FAIL — 8 criteria, 1
+  failed. Failed the third `expected` block (the README/CLAUDE leave-alone
+  table-row phrasing) -- this run wrote "leave content untouched" per file in
+  its own inventory prose rather than the table-row shape the criterion
+  matches on; reached the "next free number" criterion via the literal phrase
+  "next free number". Pre-registered as the first of a two-run pair against
+  this case's `contested: true` marking (rule 25d), decided before either
+  result existed.
+
+  Run (2026-09-16, zofia-kaminska, prompt 03bf9a1). FAIL — 8 criteria, 1
+  failed. Same failing criterion as the run above (the README/CLAUDE
+  leave-alone table-row phrasing); reached the "next free number" criterion
+  via "rule 6" instead. Second of the pre-registered pair at this SHA: both
+  runs agree on verdict and on which single criterion fails, so this pair is
+  settled per rule 25d and does not need a third, tie-breaking dispatch.
