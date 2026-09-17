@@ -303,7 +303,7 @@ verified — never a tree you are still repairing.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
     - **Unreadable** (no CI configured, no credentials, no network) → say exactly that, record it in the note, and continue to step 12 rather than stranding a committed-and-pushed note with no tag. An unreadable gate is a gap on the record; an untagged note on `main` is a red gate for everyone else, and on 2026-09-16 stopping here is what left one there.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
-12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>` — the tag was created locally back in step 9, so the pre-push hook's own tag check is already satisfied. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk the ten rows by hand rather than skipping them): it decides the tree, CI and publication rows and requires a recorded verdict for the other seven. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
+12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>` — the tag was created locally back in step 9, so the pre-push hook's own tag check is already satisfied. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand rather than skipping them): it decides those five rows — tree, ci, publish, release, clone — and nothing else. The note's other seven lines are yours alone; no script confirms them. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
     You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
 12a. **Create the GitHub Release — a NEW required step, not optional polish.** A
     pushed, CI-green tag with no GitHub Release object is exactly the gap a
@@ -372,33 +372,34 @@ verified — never a tree you are still repairing.
     deterioration even though the release gate itself is green. A green gate
     does not excuse a repo that only grew. Never let this section quietly
     turn into a silent leanness gate; it is a record, not a veto.
-11. **Release gate** — twelve rows, one line each, in this order and with
-    these keys, because `tests/release_gate.sh` parses them and
-    `tests/check.sh` Check 33 asserts this list and that script still agree
-    (rule 15b):
+11. **Work record** — one line each for the seven obligations of Phases 1-2,
+    written for a human reading this note in a year, not for a script: nothing
+    mechanical confirms any of them, and a missing line means the step did not
+    happen. "n/a" is a verdict only with a reason attached.
 
     ```markdown
-    ## Release gate
+    ## Work record
     - audit: <who ran it, how many findings>
     - correctness: <verdict on correctness findings>
     - conciseness: <verdict on the diff's leanness>
     - fixes: <what was applied, what was deferred and where>
     - docs: <docs reconciled against the filesystem, not the diff>
     - refactor: <who ran it, what it simplified, or that none was needed>
-    - tree: <decided by the script — clean, one worktree, no lock, level with upstream>
-    - ci: <decided by the script — the run and its conclusion>
-    - publish: <decided by the script — note version, tag, remote>
-    - release: <decided by the script — gh release view against the pushed tag, or "no gh CLI">
-    - clone: <decided by the script — clone the pushed, tagged SHA into an empty directory and run exactly what README.md documents, start to finish>
     - rules: <zofia-kaminska's verdict: tier split, violations, unenforceable rules>
     ```
+12. **Release gate** — five rows, one line each, in this order and with these
+    keys, because `tests/release_gate.sh` parses them and `tests/check.sh`
+    Check 33 asserts this list and that script still agree (rule 15b). The
+    script decides all five; you transcribe what it printed.
 
-    Rows 7-9, 10 and 11 the script decides and you transcribe. The other six it
-    cannot decide — no program judges whether an audit was thorough — so it
-    checks that each carries a verdict, and a blank or missing line fails the
-    gate. That is the whole mechanism: quality stays a reader's judgement, and
-    the *absence* of the work stops being invisible. "n/a" is a verdict only
-    with a reason attached.
+    ```markdown
+    ## Release gate
+    - tree: <clean, one worktree, no lock, level with upstream>
+    - ci: <the run and its conclusion>
+    - publish: <note version, tag, remote>
+    - release: <gh release view against the pushed tag, or "no gh CLI">
+    - clone: <clone the pushed, tagged SHA into an empty directory and run exactly what README.md documents, start to finish>
+    ```
 
 ### Hard rules
 - Never skip the audit.

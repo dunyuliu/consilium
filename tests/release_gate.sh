@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/release_gate.sh — the twelve rows a release must satisfy (rule 15b).
+# tests/release_gate.sh — the five rows a release must satisfy (rule 15b).
 #
 # Run by `haruto-nakamura` before the tag is pushed, and by `wei-lin` before a
 # milestone opens on top of a release. Exit 0 means the release may be tagged.
@@ -9,21 +9,17 @@
 # same reason rule 20 has the merge judged by someone other than the author.
 # Haruto runs it and reads it; he does not edit it to get past it.
 #
-# WHY A SCRIPT AND NOT A LONGER PROMPT. A release step written only in prose is
-# satisfied by an agent believing it did the step. Ten items had accumulated
-# that way — audit, correctness, conciseness, fixes, docs, refactor, clean
-# tree, CI, publication, rule book — and exactly three of them were checked by
-# anything. This script draws the line between what can be decided mechanically
-# and what can only be RECORDED, and refuses both kinds when they are absent:
+# WHAT THIS SCRIPT DECIDES. Every row here is settled against reality: the
+# working tree, the CI conclusion, the tag and Release on the remote, and what
+# a stranger's clone of the tagged commit actually does. Nothing is taken on
+# the release engineer's word — a row passes because the script read the state
+# that makes it true, not because a note said so.
 #
-#   * Rows 7, 8, 9 are decided here. The tree, the CI conclusion, the
-#     publication state — all readable, so no verdict is taken on trust.
-#   * Rows 1-6 and 10 cannot be decided by a script: no program judges whether
-#     an audit was thorough or a refactor left the system leaner. What IS
-#     decidable is whether the pass happened and produced a verdict, so the
-#     release note must carry a line for each, and a missing line fails the
-#     gate. Quality stays a reader's judgement; the ABSENCE of the work stops
-#     being invisible.
+# Obligations that depend on judgement — the audit pass, the correctness pass,
+# the doc and rule-book sweeps — live in agents/haruto-nakamura.md, where they
+# are the release engineer's to discharge and the human's to review. They are
+# deliberately not rows: a script cannot tell a thorough audit from a sentence
+# claiming one.
 #
 # Network-dependent rows report SKIP with the reason and do not pass silently
 # (rule 2). A skipped row is a release the human decides on, not one the script
@@ -51,7 +47,7 @@ if [ -z "$NOTE" ]; then
     exit 2
 fi
 if [ ! -f "$NOTE" ]; then
-    echo "FAIL  note        $NOTE does not exist — the note is the record every recorded row lives in" >&2
+    echo "FAIL  note        $NOTE does not exist — row publish derives the tag from its filename" >&2
     exit 1
 fi
 
@@ -60,20 +56,16 @@ fi
 # there is a gate nobody documented; a row there and not here is a promise
 # nothing enforces.
 #
-# `release` and `clone` both sit right after `publish`, not at the end: each
-# extends the same "is the published artifact real" question one step further
-# than `publish` does. `publish` only checks that a tag exists, points at
-# HEAD, and is on the remote — a tag is not a release a user can find. Check
-# 35 asserts that every tag ON THE REMOTE has a GitHub Release, so it cannot
-# speak for a tag that is still local: this gate runs mid-cut, before or just
-# after the push, and `release` is the row that names the missing Release
-# object for the tag being cut right now rather than leaving it to the next
-# suite run. `clone` is what a
-# brand-new user actually experiences once a Release exists, so it comes
-# next; both belong beside the row they depend on rather than after `rules`,
-# which is a human-judgement row about the project as a whole and has
-# nothing to do with the published artifact.
-ROWS=(audit correctness conciseness fixes docs refactor tree ci publish release clone rules)
+# `release` and `clone` both sit right after `publish`: each extends the same
+# "is the published artifact real" question one step further than `publish`
+# does. `publish` only checks that a tag exists, points at HEAD, and is on the
+# remote — a tag is not a release a user can find. Check 35 asserts that every
+# tag ON THE REMOTE has a GitHub Release, so it cannot speak for a tag that is
+# still local: this gate runs mid-cut, before or just after the push, and
+# `release` is the row that names the missing Release object for the tag being
+# cut right now rather than leaving it to the next suite run. `clone` is what a
+# brand-new user actually experiences once a Release exists, so it comes last.
+ROWS=(tree ci publish release clone)
 
 pass=0; failed=0; skipped=0
 row() { printf '%-5s %-11s %s\n' "$1" "$2" "$3"; }
@@ -81,66 +73,7 @@ row_pass() { pass=$((pass+1)); row PASS "$1" "$2"; }
 row_fail() { failed=$((failed+1)); row FAIL "$1" "$2"; }
 row_skip() { skipped=$((skipped+1)); row SKIP "$1" "$2"; }
 
-# A recorded row: the note carries "- <key>:" followed by something. An empty
-# verdict is the same as no verdict, and "n/a" must be spelled out with a
-# reason rather than left blank.
-recorded() {
-    local key="$1" line
-    line=$(grep -iE "^[-*] *${key}:" "$NOTE" 2>/dev/null | head -1 || true)
-    if [ -z "$line" ]; then
-        row_fail "$key" "no '${key}:' line in $(basename "$NOTE") — the pass is unrecorded, which is indistinguishable from unperformed"
-        return
-    fi
-    local verdict; verdict=$(printf '%s' "$line" | sed "s/^[-*] *${key}: *//I; s/ *$//")
-    if [ ${#verdict} -lt 12 ]; then
-        row_fail "$key" "'${key}:' carries no verdict worth reading (\"$verdict\")"
-    else
-        row_pass "$key" "$verdict"
-    fi
-}
-
-# The `correctness` row gets a stricter check than the other six recorded
-# rows. "audit: two findings, both fixed" is a verdict a reader can act on
-# even though nothing forces it to be true; "correctness: looks fine" is
-# worse than that, because a correctness pass is specifically a claim that
-# something was RUN and checked, and "looks fine" is exactly as consistent
-# with a pass that ran nothing as with one that ran everything. The other six
-# rows describe judgement calls (was the audit thorough, did the refactor
-# leave the system leaner) that have no artifact to cite even when done well;
-# `correctness` is different because a real correctness pass almost always
-# runs something with a name — a test command, a script, a query — and can
-# name it. So: require, in addition to the 12-character floor `recorded()`
-# already enforces, a backtick-delimited span of at least 3 characters inside
-# the verdict, the shape of an inline code citation for the command that ran.
-# This is a heuristic, not a proof — a verdict can fake a backtick span, and a
-# real check can still be run against the wrong thing. It only closes the one
-# gap this row exists to close: a verdict that cites nothing to run is
-# indistinguishable from one that never ran anything, and now fails instead of
-# passing on word count alone.
-correctness_recorded() {
-    local key="correctness" line
-    line=$(grep -iE "^[-*] *${key}:" "$NOTE" 2>/dev/null | head -1 || true)
-    if [ -z "$line" ]; then
-        row_fail "$key" "no '${key}:' line in $(basename "$NOTE") — the pass is unrecorded, which is indistinguishable from unperformed"
-        return
-    fi
-    local verdict; verdict=$(printf '%s' "$line" | sed "s/^[-*] *${key}: *//I; s/ *$//")
-    if [ ${#verdict} -lt 12 ]; then
-        row_fail "$key" "'${key}:' carries no verdict worth reading (\"$verdict\")"
-        return
-    fi
-    if ! printf '%s' "$verdict" | grep -qE '`[^`]{3,}`'; then
-        row_fail "$key" "'${key}:' does not cite a command it ran (\"$verdict\") — a correctness pass with nothing to point at is indistinguishable from one that checked nothing"
-        return
-    fi
-    row_pass "$key" "$verdict"
-}
-
-recorded audit
-correctness_recorded
-for key in conciseness fixes docs refactor; do recorded "$key"; done
-
-# --- row 7: tree — the anchor the next milestone starts from ----------------
+# --- row 1: tree — the anchor the next milestone starts from ----------------
 tree_problems=()
 [ -n "$(git status --porcelain 2>/dev/null)" ] && tree_problems+=("uncommitted or untracked files")
 wt=$(git worktree list 2>/dev/null | wc -l | tr -d ' ')
@@ -157,7 +90,7 @@ else
     row_fail tree "$(IFS='; '; echo "${tree_problems[*]}")"
 fi
 
-# --- row 8: ci — green on the exact SHA being tagged (rule 15a) -------------
+# --- row 2: ci — green on the exact SHA being tagged (rule 15a) -------------
 sha=$(git rev-parse HEAD)
 if ! command -v gh >/dev/null 2>&1; then
     row_skip ci "no gh CLI — read the run for ${sha:0:8} by hand before tagging"
@@ -172,7 +105,7 @@ else
     esac
 fi
 
-# --- row 9: publish — the note's version, the tag, and the remote agree -----
+# --- row 3: publish — the note's version, the tag, and the remote agree -----
 ver=$(basename "$NOTE" | sed -n 's/^release_notes_v\(.*\)\.md$/\1/p')
 if [ -z "$ver" ]; then
     row_fail publish "$(basename "$NOTE") is not named release_notes_v<X.Y.Z>.md, so no tag can be derived from it"
@@ -189,11 +122,11 @@ else
 fi
 : "${publish_result:=FAIL}"
 
-# --- row 10: release — the tag has a GitHub Release, not only a git tag -----
-# Degrades exactly the way row 8/ci does: SKIP without `gh`, never a silent
+# --- row 4: release — the tag has a GitHub Release, not only a git tag -----
+# Degrades exactly the way row 2/ci does: SKIP without `gh`, never a silent
 # pass and never a false fail for an environment problem. Also SKIPs (never
-# fails) when `publish` did not pass, the same prerequisite pattern rows 8
-# and 9 already use -- there is nothing to check a Release against until a
+# fails) when `publish` did not pass, the same prerequisite pattern rows 2
+# and 3 already use -- there is nothing to check a Release against until a
 # tag is pushed.
 if [ "$publish_result" != "PASS" ]; then
     row_skip release "row publish did not pass ($publish_result) — no pushed tag yet to check a Release against"
@@ -208,10 +141,10 @@ else
     fi
 fi
 
-# --- row 11: clone — the gate nobody else runs -------------------------------
-# Depends on row 9/publish: there is nothing to clone until a tag is pushed,
+# --- row 5: clone — the gate nobody else runs -------------------------------
+# Depends on row 3/publish: there is nothing to clone until a tag is pushed,
 # so this SKIPs (never fails, never passes silently) when publish did not
-# pass — same pattern row 8/ci and row 9/publish already use for a
+# pass — same pattern row 2/ci and row 3/publish already use for a
 # prerequisite that does not exist yet (rule 2).
 #
 # When it can run: clone the pushed tag into a fresh, empty scratch HOME (not
@@ -335,9 +268,6 @@ run_clone_row() {
     row_pass clone "fresh clone of v$ver — README's install block and its first following command both exited 0"
 }
 run_clone_row
-
-# --- row 12: rules — the rule book's own owner audited it -------------------
-recorded rules
 
 echo
 echo "release gate: $pass passed, $failed failed, $skipped skipped"

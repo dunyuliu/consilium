@@ -1186,19 +1186,19 @@ fi
 
 echo
 echo "Check 33: the release gate's rows and the documented note schema agree"
-# PROJECT_RULES.md rule 15b. The gate parses twelve row keys out of a release note
-# and the note schema in agents/haruto-nakamura.md tells whoever writes the note
-# what those keys are. Two lists, one contract: a row added to the script and
-# not the schema is a gate nobody was told about, and a row in the schema that
-# the script does not parse is a promise nothing enforces.
+# PROJECT_RULES.md rule 15b. The gate decides five rows against reality and the
+# note schema in agents/haruto-nakamura.md tells whoever writes the note what
+# those keys are. Two lists, one contract: a row added to the script and not
+# the schema is a gate nobody was told about, and a row in the schema that the
+# script does not parse is a promise nothing enforces.
 #
 # Order matters as well as membership — the schema is what a release note is
 # written from, and a reader filling rows top to bottom should produce the
 # order the gate reads.
 #
-# This does NOT check that the gate's rows are the right rows, or that the
-# seven recorded ones were done well. It checks that the two documents cannot
-# drift apart, which is the failure mode a second copy always has.
+# This does NOT check that the gate's rows are the right rows. It checks that
+# the two documents cannot drift apart, which is the failure mode a second copy
+# always has.
 if [ ! -f tests/release_gate.sh ]; then
     fail "tests/release_gate.sh is missing — rule 15b names it as the gate every release runs"
 else
