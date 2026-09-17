@@ -2734,3 +2734,32 @@ the first thing to check is whether anyone has written down *which* obligation
 replaces *which* mechanism. Rules 9, 15a and 18's lock are the ones named. This
 incident says the tree-check discipline belongs on that list too, and nobody had
 it there, including me.
+
+### Correction to finding 55 — the cause is known, and it was a collision
+
+I recorded the staged deletion as unexplained. It was the coordinator, deleting
+this log as part of the leanness pass, while I committed `15abe35` into the same
+checkout. My commit swallowed their staged deletion; their deletion appeared in
+my tree as an unexplained `D `.
+
+So it was not a mystery and not a corruption — it was **the two-writers-in-one-
+tree collision, run from both ends simultaneously.** I confessed to my own
+version an hour earlier (fourteen unlocked session-log commits while requiring
+the lock of everyone I briefed); this is the same failure arriving from the
+other direction, in the same file, within the hour.
+
+Two things survive the correction rather than being dissolved by it:
+
+- **The safety point stands.** With `pre-commit` gone, nothing mechanical would
+  have stopped me committing a staged deletion of 2700 lines that I did not
+  make. That the deletion was someone's deliberate act rather than corruption
+  changes the cause, not the exposure.
+- **The tree-check caught it either way.** It did not need to know why the tree
+  disagreed with HEAD, only that it did — which is the property that makes it
+  worth having as an obligation now that the hook is gone.
+
+What I got wrong was the framing, not the facts: I reached for corruption when
+the likelier explanation was another writer. That is the same error as reaching
+for "the subagent fabricated it" before checking my own tree — **preferring an
+exotic cause over a mundane one because the mundane one implicates coordination
+rather than machinery.**
