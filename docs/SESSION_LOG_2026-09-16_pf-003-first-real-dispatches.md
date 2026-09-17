@@ -1290,3 +1290,69 @@ prompt that behaves this way 95% of the time from one that does 75%. The value
 of the pre-registration was never statistical power — it was that I committed
 to reporting whatever came back before I could see it, so the number in this log
 is not the product of my having stopped when I liked the answer.
+
+## Finding 26 — a correct-sounding design choice that discarded fourteen true positives
+
+`iris-vermeulen` implemented PF-027 and had to decide what `evals/run.sh list`
+does with the 50 legacy `Run (...)` records that carry no prompt SHA — a gap I
+flagged in the brief because neither rule 25d nor PF-027 specifies it. I gave
+her three options and told her to choose on correctness, not on which number
+moved least.
+
+She chose (b), unknown provenance, and justified it well: falling back to dates
+"would keep PF-024's exact blind spot alive under a new label." The machinery
+she built is right — SHA comparison, sample counting, contested handling, all
+five negative tests run and transcribed.
+
+**But the justification does not survive the data.** PF-024's blind spot is
+specifically the SAME-DAY case: two events on one day are unordered by a date.
+Measured against the actual corpus:
+
+```
+  STALE flags on main:  14
+  same-day:              0
+  different-day:        14     (gaps from 1 day to 6.5 weeks)
+```
+
+Every one of the fourteen was a *true positive*. `haruto-001-missing-prior-notes`
+ran 2026-07-31 against a prompt last changed 2026-09-16 — no ordering ambiguity
+exists there, and the date comparison called it correctly. After the change it
+reads:
+
+```
+haruto-001-missing-prior-notes   haruto-nakamura   run 2026-07-31 (no prompt SHA — provenance unknown, rule 25d)
+```
+
+STALE went 14 → 0 and "provenance unknown" went 0 → 34. Fourteen correct
+warnings were replaced by thirty-four shrugs. That is not a gain in honesty; it
+is a loss of signal dressed as one, and it is worse than the defect it was
+fixing — PF-024 was about false *negatives* on same-day records, and the cure
+eliminated every true positive to remove a class with no members.
+
+**The shape is worth naming because it is seductive.** "The old signal was
+derived by an unsound method, so discard it" is correct reasoning about a
+*method* and wrong reasoning about *this data*, where the unsound method's
+precondition (same-day) never occurs. A weaker instrument that is right
+fourteen times out of fourteen beats a stronger one that declines to answer.
+
+**The fix is the hybrid neither of us proposed.** Compare SHAs where a SHA
+exists. Where one does not, fall back to the date — which is sound precisely
+when the dates differ — and reserve "provenance unknown" for the one case that
+genuinely cannot be ordered: a legacy record whose date EQUALS the prompt's.
+That keeps all fourteen true positives, keeps PF-024's blind spot closed, and
+tells the truth about the residual.
+
+Returned to her with the measurement rather than an instruction, since the
+measurement is what settles it.
+
+**One thing her change got exactly right, and it is the first live use of the
+new format.** `zofia-004` now reports:
+
+```
+zofia-004-seed-patch-established   CONTESTED — no sample at current SHA 03bf9a1 yet; not settled (rule 25d)
+```
+
+That is correct and useful: I ran two samples at `03bf9a1` today, but neither is
+yet written into `case.yaml` as a SHA-bearing record, so the tool correctly
+refuses to call the case settled. The machinery is telling me about work I have
+done and not recorded — which is exactly what it is for.
