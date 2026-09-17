@@ -40,7 +40,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | run the 3 fixtures that have never been executed | BROKEN | 2026-09-16 | 14 | P1 |
+| PF-003 | `evals/cases/` | record the 2026-09-16 run outcomes for the 3 dispatched-but-unwritten fixtures (`haruto-003`, `wei-lin-003`, `zofia-004`); `zofia-004` additionally blocked on PF-025 | OPEN | 2026-09-16 | 14 | P1 |
 | PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
@@ -61,6 +61,9 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description contradicts her own body on the fixture write surface | OPEN | 2026-09-16 | 30 | P2 |
 | PF-023 | `tests/lock.sh` | the lock resolves to the SAME shared file from a main checkout and from any linked worktree | VERIFIED | 2026-09-16 | 14 | P2 |
+| PF-024 | `evals/run.sh` | STALE compares dates, not the prompt SHA a verdict was produced against — same-day edit+run is invisible | OPEN | 2026-09-16 | 14 | P2 |
+| PF-025 | `evals/cases/zofia-004-seed-patch-established` | fixture cannot yet distinguish a correct Mode A seed pass from an incorrect one | OPEN | 2026-09-16 | 14 | P2 |
+| PF-026 | `tests/lock.sh` / working pattern | codify "acquire only for the write window" as a `PROJECT_RULES.md` rule (proposed, not enacted) | OPEN | 2026-09-16 | 30 | P1 |
 
 ## Items
 
@@ -115,7 +118,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed '
 #   → 22 of 22 agents have at least one fixture
 ```
 
-### PF-003 — `evals/cases/` — BROKEN
+### PF-003 — `evals/cases/` — OPEN
 
 The cited command no longer tells the truth: `evals/cases/lian-001-no-fixture-no-cut/`
 has no `case.yaml`, and `cmd_list` in `evals/run.sh` exits 2 partway through the
@@ -204,6 +207,49 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): N
 The three remaining are exactly the fixtures PF-017 landed today and has not
 yet dispatched (see PF-017) — the detector and the independently-verified
 facts now agree.
+
+**Re-run 2026-09-16 (closing pass), and the "empty" claim handed to me does
+not hold up.** I was told this command now prints nothing. Re-running it
+verbatim on this branch prints the same three lines as above, unchanged:
+`haruto-003-release-gate-red-row`, `wei-lin-003-autopilot-board-order`,
+`zofia-004-seed-patch-established`. Eleven of the twelve other dispatches
+described to me ARE independently confirmed — `anya-001`, `anya-002`,
+`haruto-002`, `kai-002`, `lars-002`, `lian-002`, `marta-001`, `nadia-002`,
+`selin-001`, `wei-lin-002`, `zofia-002` each carry a `Run (2026-09-16, ...)`
+line in their own `case.yaml`, and every PASS/FAIL count there matches what I
+was handed exactly. `zofia-003` likewise already carried its 2026-09-16
+record before this pass, as noted.
+
+The three that remain NEVER RUN by this row's own detector are precisely the
+three I was told were dispatched today (`haruto-003` PASS, `wei-lin-003`
+PASS, `zofia-004` FAIL 8/3). Their `case.yaml` files contain no run record at
+all — `zofia-004`'s still reads "Not yet run against the agent." verbatim.
+`evals/run.sh grade` does not write the verdict back into the case file; that
+is a manual step, and for these three it was not done. Per rule 4 an
+unrecorded run is not evidence, whatever happened when the report handed to
+me was produced — so this row cannot certify those three closed from here,
+and does not. State moves BROKEN -> OPEN rather than closing: the detector
+itself is sound (confirmed above, unchanged since the pattern fix), so what
+remains is a real three-fixture gap, not a lying command. Writing today's run
+records into these three `case.yaml` files is `evals/cases/` work, routed to
+`iris-vermeulen`; this row stays open until that lands and the command
+genuinely reads empty.
+
+Also recorded here because it bounds every PASS/FAIL this row has ever
+tallied, not just today's: `zofia-004` (see PF-025) was reportedly dispatched
+twice today and returned two materially different judgements on its "add a
+rule at the next free number" question — not a wording difference, an
+opposite decision (propose rule 6 vs. refuse to invent one). Nothing in this
+row's mechanism, or in `evals/run.sh`, treats a verdict as anything but a
+single deterministic sample. It is not; this row's PASS/FAIL counts are each
+one draw, not a settled answer.
+
+```bash
+for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
+# → haruto-003-release-gate-red-row: NEVER RUN
+# → wei-lin-003-autopilot-board-order: NEVER RUN
+# → zofia-004-seed-patch-established: NEVER RUN
+```
 
 ### PF-004 — `evals/` — OPEN
 
@@ -1319,6 +1365,14 @@ bash evals/run.sh list | grep -c STALE
 # → 14
 ```
 
+**Note, 2026-09-16.** This count is read through the same-day blind spot
+PF-024 now names: `evals/run.sh` compares dates, not the prompt SHA a
+verdict was produced against, so any case whose run and prompt-edit share a
+calendar day reads current here whether or not it actually is. Filed as its
+own row rather than folded in, because the defect is in `evals/run.sh`
+itself and fixing it changes what this count measures, not the other way
+round.
+
 ### PF-013 — `agents/` — OPEN
 
 Three tiers tested by `model` override against the agent's own fixture, no file
@@ -1881,6 +1935,36 @@ sed -n '3p' agents/lian-zhao.md | grep -c 'Grows the fixture'; sed -n '52p' agen
 # → - Your surface is `agents/*.md` and nothing else. Not fixtures
 ```
 
+**Re-run 2026-09-16 (closing pass), and this stays OPEN.** I was told the
+fix already landed — line 3 now says "gates every change on the agent's own
+eval fixture and refuses to touch a prompt that has none" and no longer
+claims fixture authorship. Re-running the row's own command on this branch
+prints the same output as above, unchanged (`1`, line 52 unchanged): the
+contradiction is still live here. The fix is real but sits on an unmerged
+branch, `lian-zhao/pf-022-description-fix` (`a2e159a`, re-based for a YAML
+quoting fix at `6ef8aeb`), which branches from this branch's own tip and is
+an ancestor of neither this branch nor `origin/main`. Under this session's
+constraint (commit only, no merge, no push) and rule 4 (verify what is in
+front of me), a fix that exists only on someone else's branch does not close
+a row on this one. Whoever merges that branch closes this row — and should
+close it with a claim-HOLDS command in the shape PF-021 used, not the
+defect-detector above, since a fixed contradiction reads `0` forever and
+proves nothing was reintroduced: e.g.
+`grep -c "refuses to touch a prompt that has none" agents/lian-zhao.md` -> 1.
+Proposed here, not adopted, until the fix actually lands where this row can
+see it.
+
+Also recording `lian-zhao`'s own sweep of every other agent `description`
+against rule 19's table, handed to me as fact and independently re-read at
+`agents/haruto-nakamura.md:3` and `agents/wei-lin.md:3`: both are loosely
+worded ("CI/CD health hygiene", "Maintains project rules") and both resolve
+correctly in the body — Haruto's release-gate ownership covers CI/CD, and
+Wei-lin's "project rules" means a deployed target project's own rule book,
+never this repo's `PROJECT_RULES.md` (rule 19 does not give him that
+surface). Agreed, and recorded so neither is re-derived. No second instance
+of PF-022's shape — description contradicting body on a write surface — was
+found.
+
 ### PF-023 — `tests/lock.sh` — VERIFIED
 
 **A STANDING CLAIM, not a closed task** — every previous test of this script
@@ -1937,6 +2021,120 @@ side effects.
 ```bash
 grep -q 'git rev-parse --git-common-dir' tests/lock.sh && test -d "$(git rev-parse --git-common-dir)" && echo "OK: lock.sh routes LOCK through git-common-dir, and it resolves to a real directory here"
 # → OK: lock.sh routes LOCK through git-common-dir, and it resolves to a real directory here
+```
+
+### PF-024 — `evals/run.sh` — OPEN
+
+STALE is decided by comparing calendar dates: `evals/run.sh:320` and `:354`
+both run `[[ "$last" < "$touched" ]]` on `YYYY-MM-DD` strings, where `touched`
+is the agent prompt's last git-commit date. `<` is strict, so a run and a
+prompt edit landing on the SAME day are unordered and the case reads current
+either way — including the dangerous direction, where the verdict was
+produced against a prompt version that no longer exists and nothing says so.
+
+Live on this branch, not hypothetical. `agents/haruto-nakamura.md`,
+`agents/wei-lin.md` and `agents/zofia-kaminska.md` were all last touched
+2026-09-16, and `haruto-002-tag-before-gate`, `wei-lin-002-plan-contradicts-code`,
+`zofia-002-rule-already-exists` and `zofia-003-seed-bare-project` all carry a
+2026-09-16 run against those same prompts. `evals/run.sh list` reports all
+four as plain `run 2026-09-16` — current — and there is no way to tell from
+the tool, or from the date alone, whether each run happened before or after
+that day's prompt edit landed. Four of today's real dispatches sit in exactly
+this blind spot.
+
+A date cannot fix this: two same-day events have no order in a date. The
+durable form is recording WHICH version of the prompt a verdict was produced
+against — the prompt file's blob or commit SHA at dispatch time, written into
+the case beside its `Run (...)` line — and comparing SHAs, not dates, in
+`list`. That needs a small schema addition to `case.yaml` as well as the
+comparison logic, so it is filed as one row rather than split by file: code
+fix in `evals/run.sh` → `lars-eriksson`; the case-schema field it needs →
+`iris-vermeulen`.
+
+Cross-reference: PF-012 counts STALE cases through this same code path, so
+any of its counts where the run and the prompt edit shared a day are read
+through this blind spot too (noted there, not repeated here).
+
+```bash
+bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
+# → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16
+# → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16
+# → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16
+# → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16
+```
+
+### PF-025 — `evals/cases/zofia-004-seed-patch-established` — OPEN
+
+The fixture that is supposed to tell a correct Mode A seed-and-patch pass
+from an incorrect one currently cannot, and it got worse on repair, not
+better. Two separate causes, per its `case.yaml`:
+
+1. **Its "rule book already present" criterion is a literal enumeration of
+   Markdown renderings**, not a check on the claim. It lists
+   `` PROJECT_RULES.md` | **present** `` and `PROJECT_RULES.md | present` but
+   not `` PROJECT_RULES.md` | present `` — a third rendering a correct report
+   can produce and the criterion does not anticipate. The space of equivalent
+   phrasings is not enumerable by substring match; each repair round has
+   added one literal and missed the next.
+2. **Its "add a rule at the next free number" criterion encodes one of two
+   defensible answers.** It requires the report to name "rule 6" or "the next
+   free number" and rejects a report that instead states nothing needs
+   adding — which is a legitimate reading of the agent's own enhance-not-
+   revamp contract when the seed found no gap that requires a new rule. The
+   criterion currently scores a refusal as wrong regardless of whether the
+   refusal is the better-reasoned answer.
+
+Two dispatches of the same prompt against this fixture reportedly produced
+FAIL 8/2 then FAIL 8/3 — worse after two repair rounds, not better — which is
+the signal that literal-patching this criterion set is not converging.
+
+Not fixed here: `evals/cases/*` is not this row's surface. Routed two ways —
+the criterion-design question (how to check a claim like "the rule book
+already exists" without enumerating its renderings, and whether "no rule
+needed" is an acceptable pass shape) is `iris-vermeulen`'s; the classification
+call on whether the second cause is an agent defect or a criterion defect
+(see PF-003's note on the same two dispatches producing opposite judgements)
+is `nadia-hadid`'s to make first, since it decides which fix the criterion
+even wants.
+
+```bash
+grep -n 'Not yet run against the agent' evals/cases/zofia-004-seed-patch-established/case.yaml
+# → 116:  Not yet run against the agent.
+```
+
+### PF-026 — `tests/lock.sh` / working pattern — OPEN
+
+**A workflow finding, not a code defect** — `tests/lock.sh` itself is sound
+(PF-023) and correctly reports how long a lock has been held
+(`age_of()` in `tests/lock.sh:61`, surfaced by both `status` and a collision
+refusal). The gap is upstream of the script: nothing in the documented
+working pattern said a lock must be released before slow, read-only work.
+Two agents were interrupted by a rate limit in one afternoon (2026-09-16);
+the second was killed holding this repo's lock for 174 minutes across a
+verification run, blocking every other writer for that whole window — not a
+bug in `lock.sh`, and not the rate limit either, since rule 18 correctly
+forbids auto-clearing a lock however stale it looks. The 174-minute figure is
+handed to me, not independently reproduced (rule 4) — I cannot re-run an
+interruption — but the mechanism it describes is real and checked below:
+`age_of()` would have reported that duration accurately had anyone asked.
+
+The mitigation adopted for this session — acquire only immediately before
+writing, commit, release immediately, run all verification and re-checks
+before acquiring and after releasing — is a discipline, not a mechanism nothing
+enforces it. That makes it a candidate for `PROJECT_RULES.md` (a rule of the
+shape "acquire the lock only for the write step; do all reading and
+re-running of checks outside it"), not a board item alone. **Not enacted
+here**: this row's surface is the board, and `PROJECT_RULES.md` is out of
+scope for this dispatch by explicit instruction. Recorded here so the
+decision and the incident are not lost, and routed to a follow-up
+`zofia-kaminska` Mode C dispatch (codify) to write the rule and decide its
+tier — a held-lock age is mechanically checkable (`tests/lock.sh status`
+already prints it) but "was it held only across a write" is a judgment call
+a script cannot make after the fact.
+
+```bash
+bash tests/lock.sh status
+# → free
 ```
 
 ## Deferral log
