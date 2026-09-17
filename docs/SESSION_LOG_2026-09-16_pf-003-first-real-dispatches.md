@@ -934,3 +934,41 @@ nothing and would have caught this the first time I claimed a number.
 pasted and refusing to close two rows when her run disagreed with my claim. The
 rule that saved this was hers, applied against me: a verdict is what the
 command printed, not what the person who dispatched you said it printed.
+
+## Finding 19 — I cannot reliably tell my own prompt from the project's CLAUDE.md
+
+I briefed `lian-zhao` to sharpen a line I said was in `agents/wei-lin.md`: the
+closing checklist asking *"what have I left that the next session cannot
+reconstruct: a worktree, a held lock, an unpushed tag"*. I told her it was a
+sharpening, not an addition, and that the existing line simply failed to
+generalise from tags to commits.
+
+She grepped, found nothing, and said the premise was wrong rather than
+inventing a quote to edit. Verified: `git show HEAD~1:agents/wei-lin.md |
+grep -c 'unpushed tag'` returns **0**. The sentence lives at `CLAUDE.md:147`,
+in the "Before you call it done" block — a **human-owned file** that rule 19
+gives no agent, and that `lian-zhao` is specifically not permitted to touch.
+
+So the instruction I was most confident about was not in the artifact I was
+asking her to edit. Both texts are in my context at once — the agent prompt and
+the project's `CLAUDE.md` are concatenated by the harness — and nothing in that
+context marks the boundary. I experienced them as one set of instructions,
+which for the purpose of *following* them is fine and for the purpose of
+*editing* them is not.
+
+The practical damage this class can do is specific and worse than a wasted
+dispatch: pointing a writer at text that lives in a file they may not edit
+invites them either to stop, or to edit the wrong file. `lian-zhao` did the
+right third thing — reported the premise as false and sharpened the nearest
+real analog in her own surface, the "level with upstream" clause — but an agent
+more eager to comply would have gone looking for somewhere to put it.
+
+The habit this earns is cheap and mirrors the one from finding 18: **before
+quoting text as living in a file, grep the file.** Not because memory is bad,
+but because in this architecture "I remember reading this" carries no
+information about *where*. Rule 4 already says to distinguish what a command
+told me from what I inherited; this is the same rule applied to the contents of
+my own context window, which is the one place I had not thought to apply it.
+
+Recorded here rather than routed: there is nothing to fix in the repo. The
+correction is to how I write briefs.
