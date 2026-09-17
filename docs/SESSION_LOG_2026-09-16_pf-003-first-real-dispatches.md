@@ -1909,3 +1909,74 @@ that fit the story I was forming. A subagent fabricating a detailed report,
 complete with plausible term lists, is a far less likely explanation than my
 own state being wrong — and I should have weighted it that way before running
 the check, not after.
+
+---
+
+# Seventh wake — the repair validates, and a criterion comes under real doubt
+
+## Finding 38 — the criterion repair held against text it had never seen
+
+`iris-002` was re-dispatched against its repaired criteria. Verdict
+**FAIL — 6 criteria, 1 failed**, down from 6/3.
+
+The part that matters is *how* criteria 2 and 4 passed. Run 1 wrote
+`occur **0 times**` and ``do not replace `backdate_check.sh` wholesale``. Run 2,
+written after the repair and with no knowledge of it, wrote `0 same-day` and
+``keep `backdate_check.sh` running as-is`` — different phrasings again, and both
+matched.
+
+That is the distinction between this repair and `zofia-004`'s three failed
+rounds. Those rounds each added the wording the *previous* run had used and
+were defeated by the *next* one. This repair widened along axes — both
+orderings of the compact form, and the standalone "quantifier + times /
+instances / members" shape a report reaches for when the count and the concept
+are separated by a clause — and then held against independent text. **A repair
+tested only against the report that exposed it is untested; this one was tested
+by a report written afterwards, which is the only validation that means
+anything.**
+
+`iris-vermeulen` also rewrote `samples/pass.md` in phrasing deliberately not
+copied from the criteria, which is the specific blindness that let the original
+defect ship (finding 33).
+
+## Finding 39 — two independent runs converged on a remedy the criterion rejects
+
+Criterion 5 failed both times, and both runs proposed the *same alternative*:
+keep the old check, land the timestamp check as an addition once the gateway
+field ships, gated behind a fixture containing a real same-day pair. Neither
+proposed the needs-review flag the criterion expects.
+
+```
+run 1: "land timestamp_check.sh alongside it, gated by a fixture with at least
+        one synthetic same-day pair ... plus a regression fixture proving it
+        reproduces the same 5 BACKDATED flags"
+run 2: "land the timestamp check as an addition once the gateway field ships,
+        gated behind a fixture with an actual same-day pair, and keep
+        backdate_check.sh running as-is in the interim"
+```
+
+`iris-vermeulen` judged this a genuine miss and reasoned it from the input, not
+from preference: the timestamp field does not exist until the gateway ships, so
+the new check cannot be fixture-gated before then, leaving an interval from
+gateway launch until it passes its fixtures during which same-day pairs become
+possible and the old check silently passes them. A needs-review flag is
+buildable today and closes that interval. Neither run addressed it.
+
+That argument is strong. But **one agent missing a remedy is a miss; two agents
+independently proposing the same different remedy is evidence about the
+criterion**, and it is exactly the defect `nadia-hadid` diagnosed in
+`zofia-004`'s criterion 2 — a fixture deciding by implication a judgement the
+contract left open.
+
+I have not decided it. I have a stake — I specified this fixture's pass bar —
+and the call belongs to the agent whose contract is agent-defect versus
+criterion-defect. Dispatched to `nadia-hadid` with both arguments stated at
+their strongest and the instruction to settle it on the fixture's own input.
+
+**A method question I raised with her, which may outlast the case.** The case is
+`contested: false` because its pass bar is a reproducible fact about the corpus.
+Rule 25d says a case becomes contested "when a second dispatch is found to
+disagree with the first". Here the two dispatches **agree with each other and
+disagree with the criterion**. That is a third state 25d does not name, and if
+it is a gap it is a gap in a rule written yesterday — finding 31 again, on
+schedule.
