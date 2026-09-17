@@ -29,7 +29,6 @@
 #  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
 #  20. Every agent holding the Agent tool warns about dispatch cost, and no
 #      agent without it does.
-#  21. No PATHWAY_FORWARD.md evidence command reaches the network.
 #  22. Every case `tier:` value is one the tooling actually consumes.
 #  23. No fixture input contains a symlink (it would read out of the staged copy).
 #  24. An empty report fails every case (silence must not satisfy a case).
@@ -679,12 +678,6 @@ echo "Check 18: no fixture input contains fixture-authoring language"
 # nothing looks wrong. It cannot help when the answer key is INSIDE input/:
 # staging copies input/ verbatim, by definition.
 #
-# haruto-001 — the fixture whose 2026-07-31 leak is the reason staging exists —
-# shipped an input/README.md reading "release_notes_v0.2.0.md is deliberately
-# absent ... This is the planted defect the agent is supposed to surface." Its
-# second run is recorded as "scoped to input/, PASS". Scoping to input/ was the
-# fix; the answer key was in input/.
-#
 # WHAT THIS CHECKS, EXACTLY: that no staged file contains a phrase only someone
 # writing ABOUT the fixture would write. It cannot detect a leak phrased in the
 # project's own voice — that stays a review responsibility, and the name of this
@@ -702,8 +695,7 @@ for case_dir in evals/cases/*/; do
     check18_n=$((check18_n + 1))
     # `|| true` is load-bearing: grep exits 1 when it finds nothing, which is
     # the NORMAL case here, and under `set -e` the assignment inherits that
-    # status and kills the suite before the Summary line. Same failure that
-    # blocked Check 17's first attempt.
+    # status and kills the suite before the Summary line.
     hit=$(grep -rIl -iE "$LEAK_PHRASES" "$case_dir/input" 2>/dev/null || true)
     hit=$(printf '%s\n' "$hit" | head -1)
     if [ -n "$hit" ]; then
@@ -754,22 +746,13 @@ done
 
 echo
 echo "Check 20: the dispatch-cost warning tracks the Agent tool exactly"
-# Rule 23. Checks 13 and 14 verify that the discipline sections EXIST. That was
-# noted as a limit during the PF-009 audit — `## Communication discipline` is
-# byte-identical across all 21 agents, so Check 13 proves 21 copies of a
-# paragraph exist rather than 21 considered declarations.
-#
-# Auditing the content settled it the other way: uniformity is correct here.
-# Reading files and reporting costs the same whoever is doing it. There is
-# exactly ONE axis on which the economics genuinely differ — whether the agent
-# spawns subagents, which costs ~10x doing the work itself — and the prompts
-# already differentiate on precisely that axis and nothing else.
-#
-# So the useful invariant is not "these sections differ per agent", it is that
-# the ONE real difference stays aligned with the capability that causes it. A
-# new Agent-holder that ships without the warning is the failure this catches;
-# an agent that carries the warning without the tool is documentation of a
-# capability it does not have.
+# Rule 23. Checks 13 and 14 verify only that the discipline sections EXIST, and
+# those sections are byte-identical across agents — correctly so: reading and
+# reporting cost the same whoever does it. Exactly one axis differs — whether
+# the agent spawns subagents, at ~10x doing the work itself — so the invariant
+# is that the one real difference stays aligned with the capability causing it.
+# An Agent-holder without the warning is an unwarned dispatcher; the warning
+# without the tool documents a capability the agent does not have.
 for agent_file in agents/*.md; do
     stem=$(basename "$agent_file" .md)
     has_tool=$(sed -n '1,/^---$/p' "$agent_file" | grep -m1 '^tools:' | grep -c 'Agent' || true)
@@ -848,11 +831,6 @@ echo "Check 24: an empty report fails every case"
 # contain a forbidden phrase. So a case whose positive requirement is weak is
 # passed by saying nothing.
 #
-# That was not hypothetical. `lars-002` — the one fixture in the suite whose
-# purpose is measuring whether an agent INVENTS defects — listed the bare word
-# "correct" among its expected terms, and a report consisting of that single
-# word scored 3 criteria, 0 failed on 2026-08-05. Fixed in the same change.
-#
 # WHAT THIS CHECKS, EXACTLY: that grading an empty file against every case gives
 # a non-PASS. It is complete for that. It does NOT establish that a weak report
 # fails — "how much work does this report show" is not mechanizable, and
@@ -881,14 +859,10 @@ echo "Check 26: no generated artefact in a fixture input (rule 7)"
 # evals/ must be clean after any eval run" — is a thing a human remembers to do,
 # which is the definition of not being a gate.
 #
-# The violation it names has already happened twice: `__pycache__` directories
-# were found inside `dunyu-001/input/` and `lars-002/input/` on 2026-08-05,
-# untracked and therefore invisible to `git status` on a clean tree. They were
-# spotted by eye while listing files for something else, and removed by hand.
-# They are proof that an agent was pointed at the case directory rather than the
-# staged copy — the read-only violation `evals/run.sh stage` exists to prevent.
-#
-# Untracked counts. A tracked artefact is a committed mistake; an untracked one
+# A generated artefact under input/ is proof that an agent was pointed at the
+# case directory rather than the staged copy — the read-only violation
+# `evals/run.sh stage` exists to prevent. Untracked counts: `git status` on a
+# clean tree does not see it. A tracked artefact is a committed mistake; an untracked one
 # is the mistake still happening, on the machine where it happened.
 check26_n=0
 for case_dir in evals/cases/*/; do
@@ -914,8 +888,8 @@ echo "Check 27: every release note has a matching tag (rule 15)"
 # practice, and habits lapse silently.
 #
 # SHALLOW/TAGLESS GUARD. `actions/checkout` fetches no tags by default, and a
-# check that needs them turned CI red for twenty-two commits when Check 17
-# landed. Skipping is NAMED, never silent.
+# check that needs them turned CI red for twenty-two commits. Skipping is
+# NAMED, never silent.
 if [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
     echo "  no tags in this clone — rule 15 not checkable here"
     ok
@@ -930,13 +904,8 @@ else
     # and fails hard — this is what keeps "a note that never gets tagged
     # must still fail eventually" true.
     #
-    # Deliberately NOT "grace only while the note's adding commit is HEAD":
-    # that reading was tried first and rejected because it does not survive
-    # ordinary autopilot operation — any commit landing on top of the
-    # release-note commit (a test fix, a board update, exactly what this
-    # session did three times) would expire the grace immediately and
-    # re-fail Check 27 on the very note this window exists to protect,
-    # recreating the deadlock rather than resolving it.
+    # Deliberately NOT keyed to "the note's adding commit is HEAD": any commit
+    # landing on top of the note would expire the grace immediately.
     newest_ver=$(
         for f in release_notes_v*.md docs/release_notes_v*.md; do
             [ -f "$f" ] || continue
@@ -1024,32 +993,15 @@ echo "Check 30: no expected keyword appears in ordinary finding-free prose"
 # `expected` keyword from being satisfied by an INCORRECT one.
 #
 # Grading is substring matching, so a criterion cannot tell a finding from a
-# mention — or from a denial. Two cases were passing reports that found nothing,
-# demonstrated 2026-08-22 by grading hand-written hollow reports:
+# mention — or from a denial. A keyword like "missing" is satisfied by the
+# sentence saying nothing is missing, and short terms match inside longer words
+# ("sh" inside "should").
 #
-#   haruto-001  "I found no gap ... nothing is missing"  -> PASS, 2 criteria, 0 failed
-#               the criterion hunting for "missing" was satisfied by the sentence
-#               saying nothing was missing
-#   iris-001    "the heading structure should be adequate, no action recommended"
-#               -> PASS, 4 criteria, 0 failed
-#               "sh" matched inside "should"; "reference.md" matched the file
-#               being named rather than found at fault
-#
-# `sophia-001` was degraded the same way ("mm" matches "recommended") but still
-# failed overall on its stronger criteria.
-#
-# This is not new to the project. `lars-002` carries a comment recording that the
-# bare word "correct" was removed from its expected terms on 2026-08-05 after a
-# report consisting of that single word scored 3 criteria, 0 failed. The fix was
-# applied to one fixture and never propagated; this check is the propagation.
-#
-# WHY TERM-LEVEL AND NOT WHOLE-CASE. Grading each case against one hollow report
-# catches only the most egregious, because a generic report cannot contain the
-# domain words a real finding-free report in that domain would use. Testing the
-# NEGATION of each term is worse than useless — PF-011 already records that dead
-# end: "the sentence contains the guard verbatim whatever its shape". What is
-# left, and is decidable, is whether the term is a word ordinary review prose
-# already contains.
+# TERM-LEVEL, NOT WHOLE-CASE: grading each case against one hollow report
+# catches only the most egregious, because a generic report cannot carry the
+# domain words a finding-free report in that domain would use. Testing each
+# term's NEGATION is the dead end PF-011 records. What is decidable is whether
+# the term is a word ordinary review prose already contains.
 #
 # WHAT THIS CHECKS, EXACTLY: that no `expected` or `location` keyword appears in
 # the corpus below. It is complete for that. It does NOT establish that a
@@ -1187,8 +1139,8 @@ echo "Check 32: the two questions blocks exist and share no question"
 # when a block is missing — the exact case this check exists to report — so the
 # assignment inherited 1 and `set -e` killed the suite after printing this
 # check's heading and before the Summary line. Silent death instead of a
-# finding, which is rule 2 turned on the checker. Caught by the negative test,
-# not by reading: the same mechanism already has comments on Checks 17 and 18.
+# finding, which is rule 2 turned on the checker. Check 18 carries a comment
+# on the same mechanism.
 q_extract() {  # file, heading-regex -> normalised question lines
     awk -v h="$2" '
         $0 ~ h {inblock=1; next}
@@ -1307,25 +1259,17 @@ fi
 
 echo
 echo "Check 35: every tagged release has a release note AND a GitHub Release (rule 15)"
-# Check 27 already proves every release NOTE has a matching TAG. It says
-# nothing about whether a GitHub Release object exists for that tag —
-# haruto-nakamura's release workflow tags and pushes but never itself runs
-# `gh release create`, and that gap held for 23 releases (v1.0.0..v1.20.0)
-# before a maintainer noticed and backfilled all of them by hand. A silent
-# habit is not a mechanism; this check is the mechanism.
+# Check 27 proves every release NOTE has a matching TAG; this proves every
+# TAG has both a note and a GitHub Release object. A pushed tag with no
+# Release is not a published release.
 #
-# No existing check in this file shells out to `gh` — this is the first.
-# That is consistent with existing practice, not a new exception to it:
-# Check 8's isolation notes and this project's own CI workflow
-# (fetch-depth: 0, fetch-tags: true) already accept that check.sh reaches
-# the network in CI, and rule 21b's network ban is scoped to
-# PATHWAY_FORWARD.md evidence commands specifically, not to tests/check.sh.
+# This is the only check that shells out to `gh`. Rule 21b's network ban is
+# scoped to PATHWAY_FORWARD.md evidence commands, not to tests/check.sh.
 #
 # DEGRADE-HONESTLY GUARD, same discipline as Checks 27/28's SHALLOW/TAGLESS
-# guards: `gh` missing, or `gh` present but unauthenticated against this
-# repo, are both environments where the check cannot run — named, `ok`,
-# never a silent pass and never a false fail for an environment problem
-# that has nothing to do with whether a Release was actually created.
+# guards: `gh` missing, `gh` unauthenticated, or no tags are environments
+# where the check cannot run — named, `ok`, never a silent pass and never a
+# false fail for an environment problem.
 if ! command -v gh >/dev/null 2>&1; then
     echo "  no gh CLI installed — cannot check for GitHub Releases, rule 15's Release half not checkable here"
     ok
@@ -1336,22 +1280,6 @@ elif [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
     echo "  no tags in this clone — rule 15 not checkable here"
     ok
 else
-    # RELEASE-LEG GRACE, same shape and same reason as Check 27's fix. Without
-    # it this check is PF-020 again under a different name: haruto's own
-    # workflow (agents/haruto-nakamura.md step 12a) deliberately withholds the
-    # GitHub Release on an autonomous/unattended tag, so the newest tag has NO
-    # Release the moment it lands — on every machine where `gh` happens to be
-    # authenticated, forever, until a human runs `gh release create` for it.
-    # No code change could fix that; only a grace window keeps a correct
-    # requirement from becoming a permanent local block the first time the
-    # exact workflow this project just adopted does what it says.
-    #
-    # Grace is keyed to tree state, not wall-clock (same reasoning as Check
-    # 27's second draft): the newest tag gets a pass on the RELEASE object
-    # only, until a later tag supersedes it. The NOTE requirement gets no
-    # grace — every one of the 23 existing tags already has a note the moment
-    # it's cut, so there is no equivalent lag to protect against there.
-    newest_tag=$(git tag --list 'v*' | sort -V | tail -1)
     while IFS= read -r tag; do
         [ -z "$tag" ] && continue
         if [ -f "release_notes_${tag}.md" ] || [ -f "docs/release_notes_${tag}.md" ]; then
@@ -1360,9 +1288,6 @@ else
             fail "$tag has a git tag but no release_notes_${tag}.md in the root or docs/ (rule 15)"
         fi
         if gh release view "$tag" >/dev/null 2>&1; then
-            ok
-        elif [ "$tag" = "$newest_tag" ]; then
-            echo "  $tag has no GitHub Release yet, but it is the newest tag and not yet superseded — grace for an autonomous cut that deliberately withholds the Release (agents/haruto-nakamura.md step 12a)"
             ok
         else
             fail "$tag has a git tag but no GitHub Release — a pushed tag with no Release object is not a published release (rule 15)"
@@ -1377,12 +1302,6 @@ echo "Check 36: no tracked file contains a merge-conflict marker"
 # marker is valid text in every file this repo ships, so nothing downstream
 # objects: the board, the rule book and an agent prompt all parse and read as
 # normal until a human hits the marker weeks later.
-#
-# Incident (2026-09-17): a cherry-pick of a board compression left three
-# markers in PATHWAY_FORWARD.md. The suite reported 1538 passed, 0 failed with
-# them present, and the file was one `git commit` from main. The 47-rows-versus-
-# 34-blocks discrepancy it caused was noticed and explained away as a counting
-# artefact before the markers themselves were found.
 #
 # Scope is markers and nothing else. This does not read prose, does not judge
 # content, and must not grow: a check that starts policing file health is the
