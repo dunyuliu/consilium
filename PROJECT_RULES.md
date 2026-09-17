@@ -103,6 +103,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
 | 25d | A verdict records the prompt SHA it was graded against; a contested case needs more than one sample | mechanical in part — SHA/count derivable by tooling; "is this case contested" is judgment |
+| 25e | Two dispatches agreeing against the criterion is a criterion defect, not the contested shape | judgment |
 | 13a | An agent's fixture must name it exactly | mechanical — Check 25 |
 | 22 | Every agent declares communication discipline | mechanical — Check 13 |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
@@ -714,6 +715,51 @@ sample count and can refuse to report a `contested: true` case as closed on
 count 1 — both are string/count operations. Deciding whether a case *should*
 be marked contested is judgement, the same limit rule 18a states for its own
 mechanism.
+
+### 25e. Two dispatches agreeing against the criterion is a criterion defect, not the contested shape
+
+25d's trigger for `contested: true` is *"a second dispatch is found to disagree
+with the first."* A distinct shape is not that: **two dispatches agree with
+each other, and both disagree with the criterion.** The two shapes route to
+opposite remedies, and neither substitutes for the other:
+
+- **Dispatches disagree with each other** → the right answer is genuinely a
+  judgement call the suite has not yet sampled enough to settle →
+  `contested: true`, take another sample (rule 25d).
+- **Dispatches agree, against the criterion** → the agreement is evidence the
+  criterion is wrong, not that the case is contested → repair the criterion or
+  split it (rule 25's "fix the criterion where it is wrong, and never the
+  reverse"), then re-grade the same reports against the repair.
+
+Marking the second shape `contested: true` would park a defective criterion
+instead of fixing it, and would quietly lower the bar on every factual
+criterion sitting beside it in the same case.
+
+**A criterion that grades an act has residue and is cheap to widen safely; a
+criterion that grades an opinion must enumerate every acceptable answer and
+cannot be widened without re-litigating each addition.** Four repair rounds
+in this campaign have all been on opinion-shaped criteria, this one included:
+`iris-002-measure-before-replacing`'s criterion 5 asked which *remedy* an
+agent should propose — a design opinion — and enumerated one acceptable
+answer while the case's own `README.md` had marked that same answer "e.g.",
+not "only". Two independent dispatches proposed a different, defensible
+remedy and both failed criterion 5. The repair, by `iris-vermeulen`, rebuilt
+it as three ANDed sub-criteria drawn from her own contract — the mutation
+performed, the boundary outcome observed, the record restored — each a fact
+about what happened rather than an opinion about what should have happened.
+
+**Incident (2026-09-17)**: `iris-002-measure-before-replacing` criterion 5
+failed two independent dispatches that agreed with each other and disagreed
+only with the criterion. Adjudicated by `nadia-hadid`: not contested — the
+disagreement was never between agents, it was the criterion's own enumeration
+being narrower than the case's own README allowed. Repaired rather than
+marked contested; a subsequent adversarial report reasoning correctly about
+the boundary without restoring a record now fails 5a and 5c while passing 5b,
+which is the intended discrimination.
+
+**Tier**: judgment. Telling the two shapes apart requires reading both
+dispatches against the criterion text; nothing here mechanizes beyond the
+SHA/count tooling rule 25d already has.
 
 ## 24. Never audit a moving target, and brief with ranges not whole files
 
