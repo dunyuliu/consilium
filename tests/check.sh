@@ -1235,7 +1235,7 @@ fi
 
 echo
 echo "Check 33: the release gate's rows and the documented note schema agree"
-# PROJECT_RULES.md rule 15b. The gate parses ten row keys out of a release note
+# PROJECT_RULES.md rule 15b. The gate parses twelve row keys out of a release note
 # and the note schema in agents/haruto-nakamura.md tells whoever writes the note
 # what those keys are. Two lists, one contract: a row added to the script and
 # not the schema is a gate nobody was told about, and a row in the schema that
