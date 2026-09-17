@@ -972,3 +972,219 @@ my own context window, which is the one place I had not thought to apply it.
 
 Recorded here rather than routed: there is nothing to fix in the repo. The
 correction is to how I write briefs.
+
+---
+
+# Third wake — verdict provenance
+
+## Finding 20 — the adjudicator's proposed fix, verified by execution, and my own near-miss
+
+`nadia-hadid` was dispatched on PF-025's agent-versus-criterion call. Her
+report is the strongest single piece of analysis this campaign has produced,
+and she closed it by listing what she had NOT checked — including that she took
+my line references on trust and never read `evals/run.sh`. That list is what
+made the verification below cheap to target.
+
+**Q1 — agent defect, on an ambiguous contract. Verified.** She found a real gap
+in the fixture's input: its rule book has five rules and **zero** mentions of a
+board or `PATHWAY_FORWARD` (`grep -cE '^## [0-9]'` → 5, `grep -ci 'board\|PATHWAY'`
+→ 0), and `case.yaml` already declares it as `rule-book-has-no-board-invariant`.
+So run 2's "nothing to add without inventing a rule the project didn't ask for"
+is factually wrong on that input, and the criterion stands.
+
+But she located *why* a competent agent said it, and that is the useful half.
+Four clauses in `agents/zofia-kaminska.md` collide, and I confirmed the text at
+511-514 reads exactly as she quotes:
+
+```
+- Never invent a rule the project did not agree to — propose it, mark it
+  clearly as proposed, and let the user decide.
+```
+
+The remedy sits after an em-dash. Read quickly it is a prohibition; read fully
+it is an instruction to propose. Run 1 proposed; run 2 collapsed it into a veto.
+The fix is one sentence making the Mode A interaction explicit — *how* you add,
+not *whether*. Owner `lian-zhao`.
+
+**Q2 — enumeration cannot win, and her replacement is sound. Verified in four
+directions, because she explicitly did not grade it.** She proposed replacing
+nine Markdown renderings with *consequence* terms — counts of the existing
+rules, which only a report that correctly classified the book as present has
+reason to write. Tested:
+
+```
+  run 1 (proposed rule 6)   -> MATCHES "five existing rules"
+  run 2 (refused)           -> MATCHES "5 rules"
+  samples/pass.md           -> MATCHES "rules 1-5"
+  samples/fail.md           -> matches NONE
+  a denial ("PROJECT_RULES.md is absent; there is no existing rule book")
+                            -> matches NONE
+```
+
+Accepts every correct classification regardless of rendering, rejects the wrong
+answer, and is negation-safe. This is the first criterion repair in this case's
+history that was tested against *real agent output* rather than against the
+fixture author's own prose — which is precisely why the three previous rounds
+failed. Owner `iris-vermeulen`.
+
+**My own near-miss, recorded because it nearly became a false finding.** I first
+tested five of her nine terms, saw run 1 match none of those five, and was one
+sentence away from reporting that her fix "inverts the verdict — it accepts the
+run she called defective and rejects the better one". I tested the remaining
+four before writing it. Run 1 matches `five existing rules`; there is no
+inversion. A partial test of a disjunction is not a test of the disjunction, and
+an `any_of` is exactly the shape where sampling the terms gives a confidently
+wrong answer. The same error as quoting a SHA from memory (finding 16) and
+quoting a file I had not grepped (finding 19): asserting from a sample I had
+not completed.
+
+**Q3 — the one the maintainer elevated.** Her answer: a single dispatch on a
+judgement case is an opinion with a date on it. Point estimate 0.5 from 1-of-2,
+with an interval wide enough to span "leave the prompt alone" and "rewrite the
+clause" — two opposite actions. Her proposal is N=3 with the verdict recorded
+as `k/N`, never a bare word, and a 2/1 split treated **not as a pass** but as a
+finding that the prompt is ambiguous at that point.
+
+Her deeper claim is the one worth keeping: **resolve the policy in the contract
+first, and a judgement case reverts to a defect-finding case.** PF-025's root
+cause is neither the criterion nor the agent — it is that a judgement was left
+undecided in the prompt, and a fixture then decided it by implication, so the
+agent was graded on a disagreement between two documents rather than on its own
+behaviour.
+
+## Finding 21 — two agents disagreed on how to handle a split, and the synthesis is the useful answer
+
+`nadia-hadid` and `zofia-kaminska` were asked adjacent questions and returned
+different sampling protocols. Recording both, per the rule that a conductor
+synthesizes rather than picks.
+
+**`nadia-hadid`**: N=3 dispatches, verdict recorded as `k/N`, majority wins; a
+2/1 split is *not* a pass but a finding routed to `lian-zhao`, and "a 5th
+dispatch" could resolve it.
+
+**`zofia-kaminska`**, in rule 25d as written: a contested case needs "a second
+dispatch at that same SHA agreeing with the first. A disagreement is reported
+as a split (both verdicts, both criteria that diverged), **never resolved by a
+third tie-breaking run picked to prefer one side.**"
+
+They agree on the thing that matters — a split is not a pass — and differ on N,
+and on whether a further run may break a tie.
+
+**The synthesis, which neither stated and which I think is the actual rule.**
+What makes a third run legitimate is not its number but *when it was decided
+on*. A sample size fixed **before** dispatch is a pre-registration: N=3 taken
+regardless of what the first two say is a measurement. A third run commissioned
+**after** seeing 1-1 is a tie-breaker chosen because the result was
+inconvenient, and it converts a genuine 50% into a reported 2/3 pass. Those two
+are indistinguishable in the recorded output — `3/3` and `2/3` look the same
+whether pre-registered or not — which is exactly why the discipline has to live
+in the protocol and not in the record.
+
+Zofia's wording already forbids the bad case precisely ("picked to prefer one
+side") and her N=2 default is the cheaper pre-registration. Nadia's N=3 is
+legitimate *only* if fixed in advance, which her phrasing does not require and
+her "5th dispatch" clause actively undermines.
+
+So 25d as written is the binding text and it is correct. What is missing from
+it is the reason — that the protection is pre-registration, not the count — and
+without that reason a future reader will reasonably ask "why not just run a
+third one?" and will have no answer in the rule.
+
+Not fixed here, and deliberately: I am not the owner of that file, the rule is
+not wrong, and the addition is one sentence of rationale rather than a
+correction. Handed to `zofia-kaminska` as a follow-up with this note. The
+contradiction is cited rather than papered over, which is the whole obligation.
+
+**One thing both got right and I want on the record.** Neither proposed
+retroactively annotating the twenty-odd existing verdicts with sample counts.
+Zofia wrote the exemption into the rule explicitly — marking a case contested
+is "not a retroactive audit obligation". Backfilling a sample count nobody
+measured would be inventing data, and it is the same failure as backfilling a
+`last-checked` date, which this board has forbidden since it was written.
+
+## Finding 22 — my brief contained a contradiction, and the agent obeyed the boundary rather than the instruction
+
+Briefing `iris-vermeulen` on PF-019, I wrote that she should write
+`tests/release_gate.sh` "plus whatever Check 33 requires for schema agreement",
+and in the same sentence forbade her from touching `agents/*.md`. Check 33
+compares the gate's row list against the schema documented in
+`agents/haruto-nakamura.md` — the only other file it reads. The two clauses are
+unsatisfiable together.
+
+She added the row, hit the failure, and **stopped at the ownership boundary**,
+reporting the conflict and naming the one-line edit someone else must make. The
+gate ended at `1485 passed, 2 failed` with the mismatch reported precisely.
+
+That is the right resolution and I want to be exact about why, because the
+tempting reading is that she was merely being literal. A brief is not a grant
+of surface. Rule 19's table is, and no sentence I write can extend it — if it
+could, then "do whatever the check requires" would be a universal write
+permission, which is precisely the failure mode the ownership table exists to
+prevent. An agent that resolved my contradiction by editing the other file
+would have been helpful once and would have established that briefs can hand
+out surfaces.
+
+**This is the third time today an agent has caught an error in my instructions**,
+and the pattern across the three is worth more than any one of them:
+
+- `zofia-kaminska` re-ran evidence I pasted, got different numbers, and refused
+  to close two rows — my paste came from an unpushed branch.
+- `lian-zhao` grepped for a line I said was in `agents/wei-lin.md`, found it
+  absent, and reported the premise false rather than inventing a quote — it was
+  in `CLAUDE.md`, which she may not edit.
+- `iris-vermeulen` hit a contradiction between two clauses of one sentence and
+  honoured the ownership boundary over the instruction.
+
+All three refused to comply. None of them stopped working. Each reported the
+conflict, did the part that was unambiguously theirs, and named the owner of
+the rest. That is what a specialist with a bounded surface is *for*, and it is
+the strongest argument I have seen for rule 19 being worth its overhead: the
+boundaries did not merely prevent collisions, they caught three defects in the
+conductor's own reasoning that no check in this repo could see.
+
+The corrective on my side is narrow and mechanical. Before dispatching, read
+the brief once asking a single question: **does every file this mission must
+touch belong to the agent I am sending?** If the answer is no, the mission is
+two missions. I did not ask that question and it cost a round trip.
+
+## Finding 23 — "push in the same action that commits" and "nothing red is pushed" collide mid-chain
+
+Finding 17's discipline says push in the same action that commits, because a
+branch with an open PR is append-only through the remote. Rule 3 and the
+`pre-push` hook say nothing red ever leaves the machine. Both are right, and
+tonight they met.
+
+I committed the session log while the gate stood at `1485 passed, 2 failed` —
+Check 33 awaiting a one-line schema edit from `lian-zhao`, and PF-019's board
+row awaiting `zofia-kaminska`. The hook did exactly what it should:
+
+```
+pre-push: tests/check.sh FAILED — push aborted.
+unpushed: 3
+```
+
+So the state finding 17 describes as dangerous — commits on a branch with an
+open PR that the remote has not seen — is now *mandatory*, because the
+alternative is pushing red. The two rules cannot both be satisfied while a
+landing is mid-chain across multiple owners.
+
+The resolution is not to weaken either, and emphatically not `--no-verify`,
+which is the move this collision invites and which would trade a visible
+inconvenience for an invisible regression. It is that the push discipline needs
+its exception stated:
+
+> Push in the same action that commits. Where the gate is red because a
+> multi-owner landing is mid-chain, that is not possible: the commits stay
+> local, the count of unpushed commits is tracked explicitly, and they are
+> pushed in the same action that turns the gate green. The failure finding 17
+> records is not "commits sat local" — it is **commits sat local and I stopped
+> tracking them**, then reported the branch as landed.
+
+That distinction is the whole thing. Tonight's three unpushed commits are safe
+because they are counted, named, and blocked by a mechanism that will not let
+me forget: the hook re-runs on every attempt, so the next push either carries
+them or fails loudly again. The six commits PR #19 lost were unsafe because
+nothing was blocking and nothing was counting — I simply never tried again.
+
+A hook that refuses is a hook that reminds. An absence of a hook is silence,
+and silence is what cost the six commits.

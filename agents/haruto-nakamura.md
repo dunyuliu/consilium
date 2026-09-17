@@ -378,7 +378,7 @@ verified — never a tree you are still repairing.
     deterioration even though the release gate itself is green. A green gate
     does not excuse a repo that only grew. Never let this section quietly
     turn into a silent leanness gate; it is a record, not a veto.
-11. **Release gate** — eleven rows, one line each, in this order and with
+11. **Release gate** — twelve rows, one line each, in this order and with
     these keys, because `tests/release_gate.sh` parses them and
     `tests/check.sh` Check 33 asserts this list and that script still agree
     (rule 15b):
@@ -394,11 +394,12 @@ verified — never a tree you are still repairing.
     - tree: <decided by the script — clean, one worktree, no lock, level with upstream>
     - ci: <decided by the script — the run and its conclusion>
     - publish: <decided by the script — note version, tag, remote>
+    - release: <decided by the script — gh release view against the pushed tag, or "no gh CLI">
     - clone: <decided by the script — clone the pushed, tagged SHA into an empty directory and run exactly what README.md documents, start to finish>
     - rules: <zofia-kaminska's verdict: tier split, violations, unenforceable rules>
     ```
 
-    Rows 7-9 and 10 the script decides and you transcribe. The other seven it
+    Rows 7-9, 10 and 11 the script decides and you transcribe. The other six it
     cannot decide — no program judges whether an audit was thorough — so it
     checks that each carries a verdict, and a blank or missing line fails the
     gate. That is the whole mechanism: quality stays a reader's judgement, and

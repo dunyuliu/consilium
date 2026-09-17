@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/release_gate.sh — the ten rows a release must satisfy (rule 15b).
+# tests/release_gate.sh — the twelve rows a release must satisfy (rule 15b).
 #
 # Run by `haruto-nakamura` before the tag is pushed, and by `wei-lin` before a
 # milestone opens on top of a release. Exit 0 means the release may be tagged.
@@ -60,14 +60,23 @@ fi
 # there is a gate nobody documented; a row there and not here is a promise
 # nothing enforces.
 #
-# `clone` sits right after `publish`, not at the end: it extends the same
-# "is the published artifact real" question one step further than `publish`
-# does. `publish` only checks that a tag exists, points at HEAD, and is on
-# the remote; `clone` is what a brand-new user actually experiences once that
-# is true, so it belongs beside the row it depends on rather than after
-# `rules`, which is a human-judgement row about the project as a whole and has
+# `release` and `clone` both sit right after `publish`, not at the end: each
+# extends the same "is the published artifact real" question one step further
+# than `publish` does. `publish` only checks that a tag exists, points at
+# HEAD, and is on the remote — a tag is not a release a user can find. Check
+# 35 already asserts every tag has a GitHub Release, but it grants the
+# NEWEST tag grace (an autonomous cut deliberately withholds the Release
+# until a human reviews it, per agents/haruto-nakamura.md step 12a), so the
+# tag being cut right now is exactly the one Check 35 does not assert.
+# `release_gate.sh` runs at a human-invoked release, where the Release
+# SHOULD already exist by the time this gate runs -- that is the hole
+# `release` closes, and it is not redundant with Check 35's grace because
+# the two never assert the same tag at the same time. `clone` is what a
+# brand-new user actually experiences once a Release exists, so it comes
+# next; both belong beside the row they depend on rather than after `rules`,
+# which is a human-judgement row about the project as a whole and has
 # nothing to do with the published artifact.
-ROWS=(audit correctness conciseness fixes docs refactor tree ci publish clone rules)
+ROWS=(audit correctness conciseness fixes docs refactor tree ci publish release clone rules)
 
 pass=0; failed=0; skipped=0
 row() { printf '%-5s %-11s %s\n' "$1" "$2" "$3"; }
@@ -183,7 +192,26 @@ else
 fi
 : "${publish_result:=FAIL}"
 
-# --- row 10: clone — the gate nobody else runs -------------------------------
+# --- row 10: release — the tag has a GitHub Release, not only a git tag -----
+# Degrades exactly the way row 8/ci does: SKIP without `gh`, never a silent
+# pass and never a false fail for an environment problem. Also SKIPs (never
+# fails) when `publish` did not pass, the same prerequisite pattern rows 8
+# and 9 already use -- there is nothing to check a Release against until a
+# tag is pushed.
+if [ "$publish_result" != "PASS" ]; then
+    row_skip release "row publish did not pass ($publish_result) — no pushed tag yet to check a Release against"
+elif ! command -v gh >/dev/null 2>&1; then
+    row_skip release "no gh CLI — read the releases page for v$ver by hand before treating this as published"
+else
+    rel_tag=$(gh release view "v$ver" --json tagName --jq '.tagName' 2>/dev/null || true)
+    if [ "$rel_tag" = "v$ver" ]; then
+        row_pass release "GitHub Release exists for v$ver"
+    else
+        row_fail release "no GitHub Release found for v$ver — the tag is pushed but the release page is empty (rule 15b)"
+    fi
+fi
+
+# --- row 11: clone — the gate nobody else runs -------------------------------
 # Depends on row 9/publish: there is nothing to clone until a tag is pushed,
 # so this SKIPs (never fails, never passes silently) when publish did not
 # pass — same pattern row 8/ci and row 9/publish already use for a
@@ -311,7 +339,7 @@ run_clone_row() {
 }
 run_clone_row
 
-# --- row 11: rules — the rule book's own owner audited it -------------------
+# --- row 12: rules — the rule book's own owner audited it -------------------
 recorded rules
 
 echo

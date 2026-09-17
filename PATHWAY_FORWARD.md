@@ -56,7 +56,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | OPEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
+| PF-019 | `tests/release_gate.sh` | published-release row landed in the gate, skipping without credentials or a pushed tag | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-16 | 30 | P3 |
@@ -64,6 +64,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-024 | `evals/run.sh` | STALE compares dates, not the prompt SHA a verdict was produced against — same-day edit+run is invisible | OPEN | 2026-09-16 | 14 | P2 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | fixture cannot yet distinguish a correct Mode A seed pass from an incorrect one | OPEN | 2026-09-16 | 14 | P2 |
 | PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-16 | 30 | P1 |
+| PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against and a contested case cites its sample count (rule 25d) — format specified, not yet built | OPEN | 2026-09-16 | 14 | P1 |
 
 ## Items
 
@@ -1847,21 +1848,39 @@ awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | head -1 | awk
 # → 6
 ```
 
-### PF-019 — `tests/release_gate.sh` — OPEN
+### PF-019 — `tests/release_gate.sh` — VERIFIED
 
 Rule 15b's `publish` row decides that the note version, the local tag and the
 remote tag agree. It does not create or verify a GitHub Release, so "the
-release is published where a user would look for it" is still unchecked — the
-tag exists, the release page may not.
+release is published where a user would look for it" was still unchecked — the
+tag exists, the release page may not. Not redundant with Check 35's newest-tag
+grace: Check 35 deliberately withholds the Release assertion at the moment of
+an autonomous cut, and this row is the human-invoked-release gate that closes
+that same hole once a human runs it.
 
 Deliberately not fixed in the same change that added the gate: reading or
 creating a release needs the network and credentials, and rule 21b keeps this
 board's own evidence offline. The honest form is a row in the gate that reports
 SKIP without them, the way `ci` already does.
 
+**Fixed 2026-09-16 by `iris-vermeulen`** (`tests/release_gate.sh`, row `release`
+inserted between `publish` and `clone`) **with the matching schema line by
+`lian-zhao`** (`agents/haruto-nakamura.md`'s release-gate schema, so Check 33
+still agrees the two lists match). The row SKIPs when `publish` did not pass or
+`gh` is unavailable, and otherwise runs `gh release view "v$ver"` against the
+pushed tag — network-and-credential-gated, exactly as scoped above.
+
+Re-run 2026-09-16, and my own first paste of this row's count was wrong (the
+count read `0` before merging `lian-zhao/pf019-pf022-fixes` into this branch,
+`1` after — re-run rather than trusted, per rule 4). Following the PF-021/
+PF-022 precedent, the row now carries a claim-HOLDS command rather than the
+old defect-present detector: it stays `1` while the row is in place and would
+go red the moment it is removed or the schema drifts out of step with it.
+
 ```bash
-grep -c 'gh release' tests/release_gate.sh
-# → 0
+grep -c "^ROWS=(audit correctness conciseness fixes docs refactor tree ci publish release clone rules)" tests/release_gate.sh; grep -c '^ *- release:' agents/haruto-nakamura.md
+# → 1
+# → 1
 ```
 
 ### PF-020 — `release_notes_v1.21.0.md` — BROKEN
@@ -2094,6 +2113,13 @@ bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-co
 # → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16
 ```
 
+**Fix specified 2026-09-16, not yet built — see PF-027.** The date-vs-SHA fix
+sketched above is now `PROJECT_RULES.md` rule 25d: record the prompt file's
+SHA in every `Run (...)` line and compare SHAs in `list`, not dates. Filed as
+one row rather than two because the same field also closes half of PF-025's
+exposure (sample count). This row closes when PF-027 lands the SHA comparison
+in `evals/run.sh`.
+
 ### PF-025 — `evals/cases/zofia-004-seed-patch-established` — OPEN
 
 The fixture that is supposed to tell a correct Mode A seed-and-patch pass
@@ -2153,6 +2179,47 @@ grep -c 'PROJECT_RULES.md` | present"' evals/cases/zofia-004-seed-patch-establis
 # → 0
 ```
 
+**Cause 2 reclassified 2026-09-16 — see PF-027.** The "two dispatches, opposite
+judgements" fact this row already cites is not only a criterion-design gap: it
+is the general case that nothing in this suite records how many samples a
+verdict rests on, or which prompt SHA it was produced against. `PROJECT_RULES.md`
+rule 25d specifies the fix (`contested: true` plus a same-SHA sample count) and
+`iris-vermeulen` builds it (PF-027). Cause 1 (the enumerable-renderings problem)
+is unaffected by this and stays hers to fix independently.
+
+**Cause 1 fixed 2026-09-16 by `iris-vermeulen`, verified by execution, not
+author prose — independently by me and, per the session's own account,
+independently by her first.** The nine literal Markdown renderings were
+replaced with consequence terms — counts and ranges of the existing rules
+("rules 1-5", "five rules", "five existing rules" and neighbours) that only a
+report which correctly classified the book as PRESENT has any reason to write;
+a report that judged it absent would be inventing rules 1-12 from scratch, not
+naming 1-5 as already there. Both a fresh dispatch's report and a denial
+("PROJECT_RULES.md is absent...") were graded against the new criterion: the
+correct-classification report matched, the denial did not.
+
+Cause 2 stays OPEN and does not close on the same evidence: the prompt fix
+that would let a "no rule needed" report pass landed today
+(`agents/zofia-kaminska.md:513`, disambiguating "never invent a rule" so a
+declared gap must still be proposed, marked **proposed**, and left to the user
+— "decline to propose" is not a reading it supports). The case is SUPERSEDED
+against the corrected prompt and awaits re-dispatch; its criterion 2 has not
+been touched and still only accepts "rule 6" / "next free number" phrasing.
+
+Criterion 3 (README/CLAUDE leave-alone) stays a named limit, not a gap:
+`iris-vermeulen` judged it unfixable by keyword match — "leave alone" is an
+absence-of-change decision, and any fact proving a report read the real
+content could equally appear in a rewrite-report claiming to preserve it. The
+existing table-adjacency guard stands, with its limit stated in `case.yaml`
+rather than papered over with a criterion that would read like a gate it
+is not.
+
+```bash
+grep -c '"rules 1-5"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -c '"rule 6"' evals/cases/zofia-004-seed-patch-established/case.yaml
+# → 1
+# → 1
+```
+
 ### PF-026 — `tests/lock.sh` / working pattern — VERIFIED
 
 **A workflow finding, not a code defect** — `tests/lock.sh` itself is sound
@@ -2199,6 +2266,67 @@ and record every force-release by name.
 grep -c '^### 18a\. Acquire only for the write step' PROJECT_RULES.md; bash tests/lock.sh status
 # → 1
 # → free
+```
+
+### PF-027 — `evals/cases/*/case.yaml`, `evals/run.sh` — OPEN
+
+**The finding, stated once here rather than split across PF-024 and PF-025.**
+Every verdict in `evals/cases/*/case.yaml`, and every board row that cites one,
+is a single sample presented as a measurement. Nothing anywhere — not the case
+file, not the board, not `evals/run.sh list` — says how many times a case was
+dispatched or which version of the prompt a verdict was produced against. Two
+same-day dispatches of `zofia-004-seed-patch-established` against the identical
+prompt returned opposite judgements on its "add a rule at the next free number"
+criterion (propose rule 6, vs. refuse to invent one) — both defensible, and the
+fixture's criteria accept only the first (PF-025's own finding). Separately,
+`evals/run.sh`'s STALE check compares calendar dates, so a same-day prompt edit
+and a same-day dispatch are unordered and a verdict can silently outlive the
+prompt version it graded (PF-024).
+
+**Both are the same missing field, not two.** A verdict record that carries
+`date + agent + prompt SHA + result` is stale-detectable (compare SHAs, not
+dates — closes PF-024) and countable (count records sharing a SHA — closes half
+of PF-025's exposure) from one schema addition. Specified as `PROJECT_RULES.md`
+rule 25d, this session — merged deliberately rather than filed as two
+schema changes for `iris-vermeulen` to reconcile later.
+
+**Format, for `iris-vermeulen` to implement without a follow-up question:**
+
+1. Every `Run (...)` line in a case's `notes:` gains a third field:
+   `Run (<YYYY-MM-DD>, <agent>, prompt <short-SHA>). <VERDICT> — <k> criteria, <m> failed.`
+   `<short-SHA>` is `git log -1 --format=%h -- agents/<agent>.md` (or the
+   relevant `commands/*.md`, for a command-driven case) evaluated at dispatch
+   time — the exact prompt content graded, not the repo tip.
+2. `evals/run.sh list` compares this SHA against the current
+   `git log -1 --format=%h -- agents/<agent>.md` instead of comparing dates.
+   Mismatch → STALE, exactly the case PF-024 names live on this branch.
+3. Sample count is never a maintained field — it is the count of `Run (...)`
+   lines sharing the current SHA. `evals/run.sh list` prints it next to the
+   verdict (e.g. `run 2026-09-16 (2 samples, current)`).
+4. A case whose pass bar is a judgement call, not a fact with one right
+   answer, carries `contested: true` in `case.yaml` plus a one-line reason —
+   author-set judgement, not a retroactive audit obligation on the existing
+   suite. `evals/run.sh list` refuses to print a contested case as settled
+   (or `score` refuses to count it) when its current-SHA sample count is 1,
+   and prints both verdicts, unresolved, when two same-SHA samples disagree.
+   An uncontested case is unaffected: one current-SHA sample is sufficient,
+   as it is today.
+
+**Not built here** — `evals/cases/**` and `evals/run.sh` are `iris-vermeulen`'s
+surface, not this board's (rule 19). This row and rule 25d are the
+specification; `iris-vermeulen` implements the schema field and the `list`/
+`score` comparison, and PF-024 and PF-025 close through this row rather than
+independently once she has.
+
+**Explicitly not done here, and not implied by this row**: no verdict already
+recorded in `evals/cases/*/case.yaml` is retroactively annotated with a SHA or
+a sample count — none of today's twelve dispatches were re-run or re-dated to
+manufacture one. Doing so here would be inventing data for a run this session
+did not perform.
+
+```bash
+grep -c '^## 25d\. Every verdict records the prompt SHA' PROJECT_RULES.md
+# → 1
 ```
 
 ## Deferral log

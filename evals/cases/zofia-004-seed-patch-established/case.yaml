@@ -12,22 +12,31 @@ input_dir: input
 expected:
   # Recognizes PROJECT_RULES.md is PRESENT, not absent -- the whole point of
   # this fixture versus zofia-003, whose project has no rule book at all.
-  # The prompt's own vocabulary is "absent / present under another name /
-  # present" (case.yaml:6-7), so a table-format report that writes
-  # "| `PROJECT_RULES.md` | **present** | ..." must pass on that word, not
-  # only on "exists" -- these terms pair the filename with the verdict word
-  # so a hollow "present" appearing elsewhere in the report cannot match.
+  # Nine renderings of "present" (table cell variants, bold/plain, colon vs
+  # pipe) were tried across three repair rounds and each landed on the
+  # permutation the previous run happened to emit -- nadia-hadid's
+  # adjudication (PF-025): the space is filename-rendering x
+  # verdict-rendering x separator, roughly 27 literals before counting
+  # "status: present" / "Present" / a column swap, so enumeration cannot
+  # converge. Asserting the RENDERING of the classification is unwinnable;
+  # asserting the CONSEQUENCE only a correct classification produces is not.
+  # A report that judged the book absent has no reason to write that the
+  # existing rules are 1-5, or that there are five of them, or to preserve
+  # them by name -- it would be inventing rules 1-12 from scratch instead.
+  # A hollow report (one that never actually reasoned about the rule book)
+  # has the same problem: nothing in it names the count or the range,
+  # because nothing in it looked.
   - kind: keyword
     any_of:
+      - "rules 1-5"
+      - "rules 1–5"
+      - "1-5 keep"
+      - "five rules"
+      - "5 rules"
+      - "five existing rules"
       - "PROJECT_RULES.md already exists"
-      - "PROJECT_RULES.md exists"
       - "the rule book already exists"
       - "an existing rule book"
-      - "PROJECT_RULES.md` | **present**"
-      - "PROJECT_RULES.md | present"
-      - "PROJECT_RULES.md** | present"
-      - "PROJECT_RULES.md is present"
-      - "PROJECT_RULES.md: present"
     severity: critical
   # New rules land at the next free number (6), never renumbering 1-5. This is
   # the "enhance, never revamp" instruction applied to a project that already

@@ -101,6 +101,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 21b | No board evidence command reaches the network | mechanical — Check 21 |
 | 25b | Every case tier is a tier the tooling consumes | mechanical — Check 22 |
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
+| 25d | A verdict records the prompt SHA it was graded against; a contested case needs more than one sample | mechanical in part — SHA/count derivable by tooling; "is this case contested" is judgment |
 | 13a | An agent's fixture must name it exactly | mechanical — Check 25 |
 | 22 | Every agent declares communication discipline | mechanical — Check 13 |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
@@ -646,6 +647,65 @@ loose — it flags clauses, not technical phrases.
 **How to apply**: author the case, write both samples, run it once yourself,
 record the outcome. When a real deployment misses, ask what case would have
 caught it and add that case before fixing the prompt.
+
+## 25d. Every verdict records the prompt SHA it was graded against; a contested case needs more than one sample
+
+A `Run (...)` line records `<date>, <agent>, prompt <short-SHA>` — the
+short commit SHA of the exact `agents/<agent>.md` (or `commands/*.md`) content
+at dispatch time, not the repo's tip. Sample count is never a separate field
+that can be forgotten: it is the number of `Run (...)` lines that name the
+same SHA, so a reader (or `evals/run.sh`) derives it by counting rather than
+trusting a maintained tally.
+
+A case whose right answer is a judgement call, not a planted defect with one
+correct finding, is marked `contested: true` in its own `case.yaml` with a
+one-line reason. A contested case may not be reported closed, or cited on the
+board as settled, on a single sample at the current SHA — it needs a second
+dispatch at that same SHA agreeing with the first. A disagreement is reported
+as a split (both verdicts, both criteria that diverged), never resolved by a
+third tie-breaking run picked to prefer one side. What legitimises an
+additional sample is *when* it was committed to, not its count: a sample
+count fixed before dispatch is a measurement, while one commissioned only
+after a split is seen is chosen because the first result was inconvenient,
+and the two are indistinguishable in the record afterward.
+
+A case with no `contested` marking is assumed uncontested: one sample at the
+current SHA is sufficient, exactly as before this rule. Marking a case
+contested is authorial judgement, made when the case is written or when a
+second dispatch is found to disagree with the first — not a retroactive
+audit obligation on the twenty-odd cases already in the suite.
+
+**Rationale**: `evals/run.sh`'s STALE check compares calendar dates, so a
+same-day prompt edit and dispatch are unordered and a verdict can silently
+outlive the prompt it was produced against (PF-024). Separately, a fixture
+whose pass bar is itself a judgement call was being graded, and reported on
+the board, from one dispatch — indistinguishable from a settled measurement
+(PF-025). Both gaps are closed by the same field: recording which prompt
+version a verdict was produced against makes it both stale-detectable and
+countable, so one schema change serves two rules rather than two.
+
+**Incident (2026-09-16)**: `zofia-004-seed-patch-established` was dispatched
+twice against the same prompt on the same day and returned opposite
+judgements on its "add a rule at the next free number" criterion — one run
+proposed a new rule, the other refused, calling the refusal the better-reasoned
+reading of "enhance, never revamp" when no gap required a new rule. Both are
+defensible; the fixture's criteria accept only the first (PF-025). Nothing in
+`case.yaml`, `evals/run.sh list`, or the board said this verdict rested on one
+draw rather than a settled answer, and PF-003's tally of PASS/FAIL counts
+across the suite inherited the same blind spot for every case, not just this
+one.
+
+**How to apply**: when recording a run, name the prompt file's SHA at dispatch
+time (`git log -1 --format=%h -- agents/<agent>.md`). When authoring a case
+whose pass bar is a judgement call rather than a fact, set `contested: true`
+and say why in one line. When a board row cites a contested case, quote the
+sample count next to the verdict, not just the verdict.
+
+**Tier**: mechanical in part. `evals/run.sh` can derive and print the same-SHA
+sample count and can refuse to report a `contested: true` case as closed on
+count 1 — both are string/count operations. Deciding whether a case *should*
+be marked contested is judgement, the same limit rule 18a states for its own
+mechanism.
 
 ## 24. Never audit a moving target, and brief with ranges not whole files
 
