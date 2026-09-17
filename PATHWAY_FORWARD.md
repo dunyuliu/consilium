@@ -2274,7 +2274,7 @@ manufacture one. Doing so here would be inventing data for a run this session
 did not perform.
 
 ```bash
-grep -c '^### 25d\. Every verdict records the prompt SHA' PROJECT_RULES.md
+grep -c '^## 25d\. Every verdict records the prompt SHA' PROJECT_RULES.md
 # → 1
 ```
 
