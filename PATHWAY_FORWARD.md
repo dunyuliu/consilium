@@ -40,7 +40,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, see PF-025 for the one criterion set still known-defective | VERIFIED | 2026-09-16 | 14 | P3 |
+| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, see PF-025 for the one criterion set still known-defective | OPEN | 2026-09-16 | 14 | P3 |
 | PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
@@ -119,7 +119,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed '
 #   → 22 of 22 agents have at least one fixture
 ```
 
-### PF-003 — `evals/cases/` — VERIFIED
+### PF-003 — `evals/cases/` — OPEN
 
 The cited command no longer tells the truth: `evals/cases/lian-001-no-fixture-no-cut/`
 has no `case.yaml`, and `cmd_list` in `evals/run.sh` exits 2 partway through the
@@ -271,9 +271,22 @@ certifies only that no case sits at zero executions; PF-004 tracks whether
 grading measures the right thing, and PF-025 tracks this fixture's specific
 criterion defects. Re-run this command whenever a new fixture lands.
 
+**Re-opened 2026-09-16 (this pass), and the reopening is correct, not a
+regression.** `iris-002-measure-before-replacing` landed today (`iris-vermeulen`'s
+fixture for rule 26) and has deliberately never been dispatched — rule 18b
+(as amended below) bars dispatching a writer while the gate is red for
+anything other than the row that turns it green, so this fixture sits
+un-dispatched by design until that clears. This row's claim is coverage, not
+intent: "no case sits at zero executions" was true this morning and is false
+now, mechanically, for a reason that is not a defect. State follows the
+detector rather than carrying a judgment call it can't express — the same
+choice this row made for `haruto-003`/`wei-lin-003`/`zofia-004` earlier today.
+Closes again the same way it always has: dispatch and grade `iris-002`, paste
+empty here.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
-# → 
+# → iris-002-measure-before-replacing: NEVER RUN
 ```
 
 ### PF-004 — `evals/` — OPEN
@@ -335,9 +348,13 @@ sample corpus discriminates 5/0 pass vs 4-of-5 fail on the case as a whole) and
 NOT repaired: rule 5 forbids moving a criterion already graded against a
 recorded verdict. Not a new row — this is the row's own claim, reproduced.
 
+**Re-run 2026-09-16: 19 -> 20.** `iris-002-measure-before-replacing` declares
+its defects. The row's claim is unchanged — this counts declarations, not
+measured precision.
+
 ```bash
 grep -c 'declared_defects' evals/README.md evals/run.sh evals/cases/*/case.yaml | grep -v ':0$' | wc -l | tr -d ' '
-# → 19
+# → 20
 ```
 
 ### PF-005 — `docs/release_notes_*` — VERIFIED
@@ -1217,9 +1234,13 @@ landed (the three fixtures PF-017 owed). None of the three has been
 re-audited under this row's rule — the CLOSED finding stands on the thirty-two
 it already read, not on these three.
 
+**Re-run 2026-09-16: 35 -> 36.** `iris-002-measure-before-replacing` landed
+(see PF-003, PF-004). Not a re-audit of the other thirty-five — the CLOSED
+finding stands on what it already read.
+
 ```bash
 ls evals/cases | wc -l | tr -d ' '
-# → 35
+# → 36
 ```
 
 ### PF-012 — `agents/` — OPEN
@@ -2187,13 +2208,12 @@ history deleted. Cause 1's still-missing rendering (backtick, no bold: the
 exact form the agent produced and the criterion set has never covered) and
 cause 2's still-absent "no rule needed" acceptance path are checked directly;
 both print `0`, confirming neither gap has been closed since this row was
-opened.
+opened. (Superseded below — both causes have since closed and the commands
+that tracked them no longer apply; kept as history, not live evidence.)
 
-```bash
-grep -c 'PROJECT_RULES.md` | present"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -ci 'no rule needs adding\|no new rule required\|nothing needs adding\|no rule needed' evals/cases/zofia-004-seed-patch-established/case.yaml
-# → 0
-# → 0
-```
+    grep -c 'PROJECT_RULES.md` | present"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -ci 'no rule needs adding\|no new rule required\|nothing needs adding\|no rule needed' evals/cases/zofia-004-seed-patch-established/case.yaml
+    # → 0
+    # → 0
 
 **Cause 2 reclassified 2026-09-16 — see PF-027.** The "two dispatches, opposite
 judgements" fact this row already cites is not only a criterion-design gap: it
@@ -2230,11 +2250,9 @@ existing table-adjacency guard stands, with its limit stated in `case.yaml`
 rather than papered over with a criterion that would read like a gate it
 is not.
 
-```bash
-grep -c '"rules 1-5"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -c '"rule 6"' evals/cases/zofia-004-seed-patch-established/case.yaml
-# → 1
-# → 1
-```
+    grep -c '"rules 1-5"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -c '"rule 6"' evals/cases/zofia-004-seed-patch-established/case.yaml
+    # → 1
+    # → 1
 
 **Narrowed further 2026-09-16.** Two pre-registered samples dispatched against
 prompt SHA `03bf9a1` (after `agents/zofia-kaminska.md:513`'s disambiguation)
@@ -2247,15 +2265,22 @@ criterion 3 alone (the README/CLAUDE leave-alone guard, already named above as
 a documented limit rather than a gap), which is why it stays OPEN but no
 longer carries the two-cause description this row opened with.
 
-**Not written into `case.yaml` here.** The two `03bf9a1` samples are evidence
-for this row's narrative, not a landed record — recording them as `Run (...)`
-lines with a SHA and closing PF-024/PF-027's sample-count exposure through
-them is `iris-vermeulen`'s surface (`evals/cases/**`), not this board's, and
-is a separate landing.
+**Written into `case.yaml` since, by `iris-vermeulen` (PF-027).** The two
+`03bf9a1` samples are now recorded as `Run (2026-09-16, zofia-kaminska, prompt
+03bf9a1)` lines (`case.yaml:204`, `:213`), both `FAIL — 8 criteria, 1 failed`,
+both failing the same third `expected` block — the README/CLAUDE leave-alone
+guard named above. `evals/run.sh list` reports the case as `run 2026-09-16
+(SHA 03bf9a1 current, n=2 samples)`, no longer CONTESTED/unsettled (re-derived
+below, not inherited from PF-027's paste). `case.yaml`'s own `contested: true`
+comment still names cause 2 as the reason — that line is `iris-vermeulen`'s
+surface, not this board's; flagged, not fixed, here.
+
+**Commands re-scoped 2026-09-16** to what this row now tracks — that both
+samples still fail on criterion 3 alone, not the closed causes 1/2:
 
 ```bash
-grep -c '03bf9a1' evals/cases/zofia-004-seed-patch-established/case.yaml
-# → 0
+grep -c 'README/CLAUDE' evals/cases/zofia-004-seed-patch-established/case.yaml
+# → 2
 ```
 
 ### PF-026 — `tests/lock.sh` / working pattern — VERIFIED
@@ -2376,9 +2401,12 @@ unsettled rather than either PASS or FAIL by default — the live proof of the
 contested path this row specified. I re-ran her five negative tests plus a
 sixth of my own (a mutation to the SHA-comparison branch) and all six held.
 
+**Re-run 2026-09-16 (this pass): the two pre-registered samples landed since,
+and the row now reports settled, not CONTESTED.**
+
 ```bash
 bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
-# → zofia-004-seed-patch-established           zofia-kaminska         CONTESTED — no sample at current SHA 03bf9a1 yet; not settled (rule 25d)
+# → zofia-004-seed-patch-established           zofia-kaminska         run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
 ```
 
 PF-024 and PF-025 close (respectively: fully, and narrowed to criterion 3)

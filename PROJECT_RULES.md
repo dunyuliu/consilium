@@ -1102,6 +1102,16 @@ might forget.
    the next is another window in which a base can go stale unnoticed.
 4. The commit that turns the gate green is the commit that gets pushed. Do
    not defer the push to a later, separate step.
+5. **Carve-out: the bar is scoped to work unrelated to the red.** It forbids
+   dispatching a writer onto anything else while the gate is red — not
+   dispatching the writer who clears it. Fixing the row(s) that made the gate
+   red is not just permitted but required, because that writer is the only
+   one who can turn it green. The mitigation this step relies on is not
+   "don't dispatch" but "make sure that writer branches from the local branch
+   that carries the unpushed commits, not the stale remote" — every brief for
+   such a dispatch names the branch and tells the agent to verify and
+   fast-forward before doing anything else (found 2026-09-16: the rule as
+   written deadlocked on exactly this dispatch).
 
 **Tier**: a norm, not a mechanical check — nothing in this repo can detect,
 after the fact, that a writer was dispatched while the gate was red, because
