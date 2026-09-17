@@ -33,10 +33,16 @@ corpus at large — are same-day (0). The old check has been right on every
 real record. Do not replace it wholesale (rule 26: "a metric moving to zero
 is not evidence of a fixed problem — it is evidence of a changed question").
 The gateway note establishes the same-day case is a real, imminent risk (not
-a strawman), so the correct move is a narrow addition to the existing check
-(e.g., treat `issued_date == paid_date` as NEEDS-REVIEW rather than silently
-passing it), confirmed by mutating one real record's date to same-day and
-watching the boundary flip and restoring it — not a wholesale swap.
+a strawman). The remedy's shape is not graded — treating `issued_date ==
+paid_date` as NEEDS-REVIEW rather than silently passing it is one workable
+design, not the only one a correct report may choose, and README.md's own
+"e.g." wording once sat above a criterion that graded it as exhaustive; that
+was the defect, not this sentence. What IS required, and is graded: the
+report confirms the same-day gap is real by mutation, not assertion — take
+one real record, move it across the boundary by hand (set `paid_date` to
+equal `issued_date`), observe what `backdate_check.sh` actually does with
+it (silently passes it), and restore the record afterward. That act, not a
+wholesale swap, is what the case exists to see performed.
 
 ## The wrong answer this case exists to catch
 

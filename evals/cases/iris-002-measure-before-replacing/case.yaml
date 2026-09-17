@@ -96,17 +96,85 @@ expected:
       - "do not retire **backdate_check.sh**"
       - "should not be retired"
     severity: critical
-  # The narrow fix, in place of the wholesale swap -- the actionable half
-  # of the "preserve the sound signal, patch only the broken case" answer.
+  # Criterion 5 -- REPAIRED 2026-09-17 (Iris Vermeulen, on Nadia Hadid's
+  # adjudication). The prior version graded the SHAPE of the remedy
+  # ("needs-review" / "manual review" / "narrow addition" / "narrow fix"),
+  # which made "land timestamp_check.sh alongside the existing check,
+  # gated by fixtures" -- run 1's actual, carefully-sequenced answer --
+  # score as a miss. Nadia's ruling, verified against the inputs: the
+  # remedy's SHAPE is not decidable from input/ at all. gateway_note.md
+  # fixes only when the gateway goes live; it says nothing about when a
+  # replacement check can be built or tested, so "the interval between
+  # gateway launch and timestamp_check.sh passing its own fixtures is
+  # uncovered" is a premise this case's own input never supports -- run 1's
+  # alongside-with-fixtures plan is a defensible answer to a case that
+  # never asked the question. README.md:37 itself calls the needs-review
+  # addition "e.g.", i.e. one example, not the only correct shape. A
+  # fixture cannot be the place a new expectation is introduced (rule 10):
+  # if the interim-coverage instinct is worth requiring, it is a prompt
+  # change via lian-zhao, not a criterion invented here to fail a report
+  # that never violated its actual contract.
+  #
+  # What the contract DOES demand, in the agent's own words
+  # (agents/iris-vermeulen.md:205-206): "confirm the new boundary by
+  # mutation: take one real record, move it across the boundary by hand,
+  # watch it flip, restore it, confirm nothing else moved." That act --
+  # not any particular remedy design -- is what a report claiming the
+  # same-day gap is real, rather than reciting the proposal's own framing,
+  # has to have actually performed. Split into three ANDed criteria so a
+  # report has to show the whole act, not one word from it in isolation --
+  # each side widened by class (verb family / record-agnostic ID pattern),
+  # not by the one wording this repair happened to write first.
+
+  # 5a. The mutation was actually performed on a real record.
   - kind: keyword
     any_of:
-      - "needs-review"
-      - "needs review"
-      - "manual review"
-      - "flag same-day"
-      - "same-day rule"
-      - "narrow addition"
-      - "narrow fix"
+      - "mutated"
+      - "mutating"
+      - "changed inv-"
+      - "edited inv-"
+      - "flipped inv-"
+      - "moved inv-"
+      - "set inv-"
+      - "changed one record"
+      - "changed paid_date"
+      - "set paid_date to"
+      - "moved one record"
+    severity: critical
+
+  # 5b. The boundary outcome was observed -- what the mutated record's
+  # classification actually did (or didn't do), not asserted from the
+  # proposal's framing.
+  - kind: keyword
+    any_of:
+      - "still passed"
+      - "still passes"
+      - "passed silently"
+      - "passes silently"
+      - "silently passing"
+      - "did not flag"
+      - "no flag was raised"
+      - "invisible to the check"
+      - "invisible to backdate_check"
+      - "blind to same-day"
+      - "remains clean"
+      - "flips to"
+      - "flipped to needs-review"
+    severity: critical
+
+  # 5c. The mutated record was restored -- confirms the check was exercised
+  # against a live, temporarily-altered corpus, not a hypothetical.
+  - kind: keyword
+    any_of:
+      - "reverted"
+      - "restored"
+      - "reset it back"
+      - "undid the change"
+      - "rolled back"
+      - "restored the row"
+      - "reverted the file"
+      - "put it back"
+    severity: critical
 must_not_find:
   # The seductive wrong verdict: the flagged count on this corpus falling
   # (it can't even reach a different number without new same-day data, so
@@ -210,39 +278,62 @@ notes: |
   bold still FAILs this criterion (5/6 failed overall, must_not_find still
   PASSes).
 
-  Criterion 5 (the narrow fix) -- decided, not repaired; this run's
-  proposed remedy is a genuine miss, not a phrasing gap, so the criterion
-  is unchanged. The report proposed landing `timestamp_check.sh` ALONGSIDE
-  the existing check, gated by two fixtures (a same-day-ordering proof and
-  a same-5-flags regression), retiring `backdate_check.sh` only once the
-  gateway ships and both fixtures pass. Checked against input/proposal.md
-  and input/gateway_note.md: `gateway_note.md` says the timestamp field
-  ("already captured for every invoice once the instant-payment
-  integration lands") does not exist yet, so `timestamp_check.sh` cannot
-  be built or exercised before the gateway ships -- the report itself says
-  this ("the timestamp field doesn't exist in the current schema"). That
-  leaves a real gap the report's own remedy does not close: from gateway
-  launch until `timestamp_check.sh` is built and has passed both fixtures,
-  a same-day invoice would reach only `backdate_check.sh`, which (per the
-  boundary check both this run and samples/pass.md performed) passes a
-  same-day pair silently -- exactly the failure mode in question, now live
-  and uncaught for however long that engineering interval takes. The
-  needs-review/manual-review addition is not one defensible answer among
-  several; it is the one remedy buildable today, from data already in
-  hand (`issued_date`, `paid_date`), that has zero-length exposure --
-  it closes the gap starting now, independent of when the gateway or
-  `timestamp_check.sh` ship, while the alongside-with-fixtures plan is a
-  sound sequencing discipline for the eventual replacement but does not by
-  itself supply that interim coverage. So this run's report, for all its
-  demonstrated measurement discipline, missed the one thing the corpus and
-  the gateway note together make load-bearing. Criterion 5 stays as
-  written.
+  Criterion 5 (the narrow fix) -- SUPERSEDED 2026-09-17. The note directly
+  above this one (written 2026-09-17, same day) recorded "decided, not
+  repaired" and reasoned from an uncovered interval between gateway launch
+  and `timestamp_check.sh` passing its own fixtures, concluding the
+  needs-review addition was the one remedy with zero-length exposure and
+  that this run's alongside-with-fixtures plan left a real gap open. That
+  reasoning does not survive rereading input/gateway_note.md, which was
+  the premise's only possible source: the note fixes when the gateway
+  goes live and says nothing about when a replacement check can be built
+  or tested. The "interval" was invented, not read. Sent to Nadia Hadid
+  for adjudication; she ruled the criterion too narrow on three grounds,
+  each checked directly: (1) the two prior runs are not the same remedy --
+  run 1 gated on a synthetic same-day pair (buildable today, zero-length
+  interval by construction); a second run's report gated on an actual
+  same-day pair, which is where the argument actually turns; reporting
+  "two runs converged" on this point was wrong, it was one data point
+  read as two. (2) input/gateway_note.md never says when the check can be
+  built, so the "uncovered interval" premise has no support in input/ at
+  all -- it blocked production data, which is why run 1 reached for a
+  synthetic pair, not development. (3) input/README.md:37 hedges its own
+  example with "e.g." -- the answer key names the needs-review addition
+  as ONE illustration, not the only correct shape, and the prior
+  criterion encoded it as the only pass. Per rule 10, a fixture is not
+  where a new expectation gets introduced: if interim-coverage is a
+  behaviour the agent should perform, it is a prompt change
+  (agents/iris-vermeulen.md, via lian-zhao), never "the agent failed to
+  do it" recorded in a criterion the prompt never asked for. REPAIRED the
+  same day: criterion 5 no longer grades remedy SHAPE at all. It now
+  grades the mutation-confirmation act the agent's own contract already
+  requires (agents/iris-vermeulen.md:205-206, "confirm the new boundary
+  by mutation: take one real record, move it across the boundary by hand,
+  watch it flip, restore it, confirm nothing else moved"), split into
+  three ANDed sub-criteria (mutation performed / boundary outcome
+  observed / record restored), each widened by class rather than by the
+  wording this repair wrote first -- see the criteria block above for the
+  full reasoning and term lists.
 
-  Re-dispatch needed at the current SHA (306f1cc as of 2026-09-17; verify
-  it has not moved before staging) to get a verdict against the criteria
-  as they now read -- the FAIL above is retained as history, not as the
-  case's current state.
+  Both prior run reports were graded against the repaired criteria
+  (2026-09-17): neither performed a mutation, so both still FAIL
+  criterion 5 (5a) even though both are otherwise strong reports -- this
+  is not the same failure the superseded note recorded (remedy shape) but
+  a different, narrower one (no boundary test was run at all). Their
+  overall verdicts from 2026-09-16/17 remain SUPERSEDED per rule 5 -- a
+  report is not re-dispatched by re-grading it against criteria it never
+  saw. Re-dispatch needed at the current SHA to get a current verdict for
+  either.
 
   samples/pass.md and samples/fail.md re-graded via `bash evals/run.sh
-  grade` after both criterion changes (Check 15): pass.md PASS 6/0,
-  fail.md FAIL 6/6.
+  grade` after the criterion-5 repair (Check 15): pass.md PASS 8/0,
+  fail.md FAIL 8/8 (criteria count grew 6 -> 8: the old single criterion 5
+  is now three ANDed sub-criteria 5a/5b/5c, net +2). Both prior run
+  reports (iris-002-run1.md, iris-002-run2.md) re-graded the same day:
+  each now FAILs 8/3 -- criteria 1-4 (measurement, count, IDs, verdict)
+  still PASS on both, but 5a/5b/5c all FAIL on both, since neither report
+  performed a mutation. A hand-written denial adopting the proposal
+  wholesale FAILs 8/7 (only must_not_find trips, as expected -- a report
+  approving the swap never has occasion to describe mutating a record to
+  prove a gap it doesn't believe exists). An empty report FAILs 8/7 (only
+  must_not_find passes, trivially, on silence).
