@@ -33,7 +33,7 @@
 #  22. Every case `tier:` value is one the tooling actually consumes.
 #  23. No fixture input contains a symlink (it would read out of the staged copy).
 #  24. An empty report fails every case (silence must not satisfy a case).
-#  25. Every agent has a fixture that names it exactly (rule 13).
+#  25. (retired 2026-09-17 with rule 13 — fixture count by agent headcount.)
 #  26. No generated artefact has been written into a fixture input (rule 7).
 #  27. Every release note has a matching tag (rule 15).
 #  28. No release note that once existed has vanished (rule 8).
@@ -494,11 +494,15 @@ else
         [ -z "$id" ] && continue
         board_rows=$((board_rows + 1))
         err=""
-        case "$st" in VERIFIED|OPEN|BROKEN|DEFERRED) ;; *) err="bad state '$st'" ;; esac
+        case "$st" in VERIFIED|OPEN|BROKEN|DEFERRED|RETIRED) ;; *) err="bad state '$st'" ;; esac
         # Rule 21's priority. A row with no priority cannot be queued, and a
         # board that cannot be queued is an archive: state says how bad a row
         # is, never how much it matters now.
+        # A RETIRED row describes a surface no longer tracked: it has no interval
+        # and no command, so a priority on it would be decoration (2026-09-17).
+        if [ "$st" != "RETIRED" ]; then
         case "$prio" in P1|P2|P3) ;; *) err="${err:-no priority — every row carries P1, P2 or P3 (rule 21)}" ;; esac
+        fi
         if [ -z "${item_state[$id]:-}" ]; then
             err="${err:-no matching '### $id' block}"
         elif [ "${item_state[$id]}" != "$st" ]; then
@@ -537,7 +541,9 @@ else
                     err="overdue by $(( today_d - due ))d — re-run the command in its block, or defer it in writing"
                 fi
             fi
-        else
+        elif [ "$st" != "RETIRED" ]; then
+            # RETIRED rows carry no interval for the same reason they carry no
+            # priority: nothing re-runs on a surface that is no longer tracked.
             err="${err:-interval '$iv' not an integer in 1..90}"
         fi
         if [ -n "$err" ]; then fail "$id: $err"; else ok; fi
@@ -868,30 +874,7 @@ done
 rm -f "$empty_report"
 [ "$check24_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 24 asserted nothing"
 
-echo
-echo "Check 25: every agent has a fixture that names it (rule 13)"
-# Rule 13 had no check. Its only enforcement was PF-014's board evidence
-# command, which Check 17 byte-diffed before it was retired — so a new agent
-# caught only because a recorded "0" became "1". That works, and it is an odd
-# place for a rule to live: the enforcement is a side effect of a number.
-#
-# Worse, that command matches a fixture to an agent by the stem before the first
-# HYPHEN — `lars-eriksson` -> `lars` -> satisfied by `lars-001`. Add a second
-# agent whose first name is Lars and it is satisfied by a fixture written for
-# somebody else. No two agents share a first name today, which is the only
-# reason the shortcut has held.
-#
-# Every case.yaml already carries an exact `agent:` field. Match on that.
-for agent_file in agents/*.md; do
-    stem=$(basename "$agent_file" .md)
-    if grep -lx "agent: $stem" evals/cases/*/case.yaml >/dev/null 2>&1; then
-        ok
-    else
-        fail "$stem: no eval fixture declares 'agent: $stem' (rule 13). A fixture whose id merely starts with the same first name does not count."
-    fi
-done
 
-echo
 echo "Check 26: no generated artefact in a fixture input (rule 7)"
 # Rule 7 says `evals/cases/*/input/` is read-only fixture data and is marked
 # mechanical. Nothing mechanised it. Its stated procedure — "git status inside
@@ -988,7 +971,10 @@ if [ "$(git rev-parse --is-shallow-repository 2>/dev/null || echo true)" = "true
     echo "  shallow clone — history not available, rule 8 not checkable here"
     ok
 else
-    deleted=$(git log --diff-filter=D --name-only --format= -- '*release_notes_v*.md' 2>/dev/null | sort -u || true)
+    # Scoped to real release notes (root + docs/). A bare '*release_notes_v*.md'
+    # glob also matches SYNTHETIC notes inside evals/cases/*/input/, so deleting a
+    # fixture tripped rule 8 as if a real note had been removed (2026-09-17).
+    deleted=$(git log --diff-filter=D --name-only --format= -- 'release_notes_v*.md' 'docs/release_notes_v*.md' 2>/dev/null | sort -u || true)
     if [ -z "$deleted" ]; then
         ok
     else

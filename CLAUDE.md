@@ -49,7 +49,9 @@ after the prompt changed.
    gate anyway; `--no-verify` is a deliberate act, not a shortcut.
 5. **Move the docs in the same commit** (rule 11). A new agent owes a README
    roster row, a model-table row, a Layout line (rule 12) and a fixture that
-   names it (rule 13). A new rule owes an index row carrying its tier. A new
+   names it only where that fixture would distinguish something — rule 13's
+   one-per-agent mandate was retired 2026-09-17. A new rule owes an index row
+   carrying its tier. A new
    check owes the `Verifies:` list in the header of `tests/check.sh` and the
    board row that counts them.
 6. **Close the board row you touched**: run its command, paste the literal

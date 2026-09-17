@@ -141,10 +141,27 @@ published release and version control, and the rule book followed.
   is `zofia-kaminska`'s, the refactor is `kai-fischer`'s. Prompt prose
   is not a tier: a step described only in prose is satisfied by an
   agent believing it did the step.
-- **Not yet**: every one of the 36 fixtures has been dispatched at
-  least once, but only 11 verdicts describe the prompt as it stands
-  today — improving a prompt invalidates the evidence about it. That
-  30% is close to the ceiling of grading prose, not a backlog.
+- **Not yet**: we now deliberately measure less. On 2026-09-17 the
+  suite was cut from 36 fixtures to 10, and rule 13 — every agent owes
+  a fixture naming it — was retired along with the check enforcing it.
+  That rule is what produced the 36: it mandated fixtures by agent
+  headcount, so 22 agents forced at least 22 fixtures whether or not
+  any had ever distinguished a good report from a bad one. **20 of the
+  36 had never once recorded a FAIL.** The survivors are the ones that
+  earned it — each caught a real regression, changed a prompt, or
+  taught a lesson that shipped.
+  This is a trade, not an improvement. Measuring prose means
+  dispatching a live agent and grading its report by substring, and
+  that cost more than it told us: a verdict expires the moment the
+  prompt improves, which is why the number was never above 30%. We
+  bought back the maintenance burden of 26 fixtures and gave up the
+  claim that every agent is covered by one. **Most agent behaviour is
+  now unmeasured, and rests on the judgement of whoever reviews the
+  prompt.** The machinery to measure — `evals/run.sh`, the grader,
+  Check 30's keyword corpus — is kept intact and works at ten cases
+  exactly as it did at thirty-six, so the method is available when a
+  question is worth the dispatch. It is now used on purpose rather
+  than by mandate.
 
 Refining these three is the point of them, and that is the human's
 call. An agent proposes a change to them; it does not make one.
@@ -629,8 +646,11 @@ Adding a new specialist to the team:
    based on it; vague descriptions break routing.
 4. **Apply the code-discipline and test-gate blocks** if they touch
    code. Skip them if they're editorial.
-5. **Plant at least one regression fixture** under `evals/cases/`
-   covering their core competency, so prompt changes can be measured.
+5. **Plant a fixture only if it would distinguish something** — a
+   defect this agent should catch and plausibly might not. Rule 13,
+   which required one per agent, was retired 2026-09-17 for
+   manufacturing fixtures that only ever passed. No fixture is better
+   than one nothing ever learns from.
 6. Drop `agents/<name>.md` and run `bash install.sh`.
 
 Adding a new slash command:
