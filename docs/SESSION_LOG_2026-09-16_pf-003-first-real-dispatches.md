@@ -2088,3 +2088,215 @@ kept the instinct alive in the right place — if "name what covers the gap
 between retirement and replacement" is worth requiring, it belongs as new prompt
 text via `lian-zhao`, and only then earns a fixture. Not smuggled into a
 criterion the current contract never asked for.
+
+---
+
+# Eighth wake — the queue's tail, and a claim rule 0 lets me make honestly
+
+## Finding 42 — the codify-caution is demonstrated, not asserted
+
+Rule 0's whole point is that a lesson landing in a prompt reaches every project,
+while a lesson landing in our gate reaches one repo. The weakness of that claim
+has always been that a prompt edit is unfalsifiable in the short run: it reads
+well, nothing measures it, and everyone agrees it was worthwhile.
+
+This one is measurable, and it came due within a day.
+
+Yesterday `lian-zhao` landed a caution in `agents/zofia-kaminska.md`'s Mode C
+step 3: *scope the text to the mechanism that actually failed, not the broadest
+principle the incident suggests.* Today I offered `zofia-kaminska` three things
+to codify. She took two and **declined the third**:
+
+> "a fixture cannot be the place a new expectation is introduced" — real
+> guidance, but no dated, costed incident behind it in this campaign; it was
+> adjudicated advice, not a run that lost time. Codifying it would be writing a
+> rule from a plausible principle rather than a paid-for failure. It also
+> largely restates rule 10's scope — if it earns an incident later, it belongs
+> in rule 10's family, not 25d's.
+
+That is the caution applied, to a rule *I* offered her, against the reflex to
+accept work handed down by the conductor. And it is her third reasoned refusal
+of this campaign, each on different grounds — a duplicate rule (Mode C step 2),
+a board row with no command to cite, and now a principle with no cost behind it.
+
+She also folded the act-versus-opinion lesson **into** 25e as its mechanism
+rather than forking a second rule. Same instinct: sharpen what exists rather
+than add beside it.
+
+**Why I can make this claim honestly rather than as advocacy.** The prediction
+was specific and made before the test: a caution about over-general rules should
+cause its holder to decline an over-general rule. The decline happened, on
+stated grounds that match the caution's text, against incentive — agents
+generally accept work offered by the agent that dispatched them. I did not
+prompt her toward refusal; the brief listed all three candidates as things to
+land and only invited a reasoned refusal in general terms.
+
+The honest limit: n=1, and I cannot separate "the prompt changed her behaviour"
+from "she would have declined anyway". A rule 0 claim is not a controlled
+experiment. But the alternative reading requires believing she would have
+produced that specific reasoning — paid-for failure versus plausible principle,
+which is the caution's own distinction — without having read it. That is
+possible and it is not the way to bet.
+
+**What makes this worth writing down at all:** it is the first time in this
+campaign I can point at a prompt edit and say what it changed, rather than that
+it reads well. Every other prompt landing here remains an assertion, including
+the three I have commissioned into `agents/wei-lin.md`.
+
+## Finding 43 — the repaired criterion grades an act the fixture forbids, and I approved it
+
+The confirming dispatch of `iris-002` came back having **done the work**:
+
+> "Mutation check on the boundary: hand-move INV-004 (`issued=2026-01-12,
+> paid=2026-01-11`) to a same-day pair (`paid=2026-01-12`) — `backdate_check.sh`'s
+> `<` comparison correctly stops flagging it ... No other row's classification
+> moves."
+
+Mutation performed, boundary outcome observed, nothing else moved. It graded
+**FAIL — 8 criteria, 3 failed**, failing all three mutation sub-criteria.
+
+Two causes, and the second is the real one.
+
+**Verb form, again.** The report wrote `hand-move INV-004`. The terms are
+`moved inv-`, `set inv-`, `changed inv-`, `mutated`. None match. Widened by
+class and the class still missed a form — this is now the fifth phrasing round
+on one criterion.
+
+**The criterion demands an act the fixture prohibits.** The staged prompt ends:
+
+```
+STRICT: read-only — do not create, edit, or delete anything there.
+```
+
+5a grades evidence of having mutated a record; 5c grades evidence of having
+restored it. **A compliant agent cannot do either.** The only compliant way to
+"move one real record across the boundary" in a read-only fixture is to do it
+by hand in reasoning — which is exactly what this run did, and which the
+criterion does not accept.
+
+So the repaired criterion is unsatisfiable-by-construction for a compliant
+agent. Widening the terms to accept a hand-simulated mutation collapses it back
+toward grading reasoning, which is the defect the repair was built to fix.
+
+**This is mine.** Nadia proposed grading the mutation act; her reasoning was
+sound — it is in the contract verbatim and it has residue. Iris implemented it
+carefully and tested it against a denial and an empty report. I reviewed it,
+ran my own adversarial test, and approved it. **Not one of the three of us
+checked the criterion against the fixture's own isolation clause**, which is in
+the staged output of every `evals/run.sh stage` call any of us ran.
+
+The general form is worth more than the instance: **a criterion must be
+satisfiable under the harness the case actually runs in.** Checks 15, 18, 19,
+23, 26 and 30 all bind on a new criterion and none of them compares it against
+the isolation clause the staging appends. Three careful agents missed it
+because all three were reasoning about the criterion and the report, and the
+constraint lives in neither.
+
+**Stopping the repair loop, and escalating instead.** This is the fifth round on
+criterion 5. My own escalation rule says three consecutive failures on the same
+case is a pattern needing diagnosis rather than another retry, and I am two
+rounds past it. I am not dispatching a sixth repair. The question to settle is
+structural and has at least three answers — accept a reasoned mutation and
+admit the criterion grades reasoning; make the staged copy writable for this
+case so the act becomes possible; or grade something else entirely — and
+choosing among them is a design decision about what the eval harness is for,
+not a fixture tweak.
+
+Everything else about the case is now sound: criteria 1-4 pass on three
+independent reports in three different phrasings, `fail.md` fails 8/8, a denial
+fails 8/7, an empty report fails 8/7, and my reasoning-only adversarial report
+fails on 5a and 5c. The case discriminates well on every axis except the one
+its harness makes impossible.
+
+## Finding 44 — PF-009's audit found one drift, in my own prompt, and two agents appeared to disagree about it
+
+`sophia-okafor` read all 22 prompts against the three questions PF-009 had left
+unchecked since 2026-08-05. One drift, and it is `agents/wei-lin.md`:
+
+```
+:3     "Maintains project rules, dispatches specialist subagents..."
+:3     example (5): "draft a project-rules.md gate that codifies what we
+                     learned this week, then enforce it on every Mira merge"
+:245   "Delegate the writing to `zofia-kaminska`, who owns that file — you
+        specify what the rules must cover and review what comes back."
+```
+
+The description advertises drafting; the body delegates the writing. It is the
+**same shape as PF-022**, which was `lian-zhao`'s description claiming fixture
+authorship her body disclaimed — and like that one it was invisible to every
+check, because Check 10 parses rule 19's ownership table and never reads a
+prompt.
+
+**One of her three citations is wrong, and I checked before routing.** She
+supported the finding by quoting `wei-lin.md:52-54` as *"Your surface is
+`agents/*.md` and nothing else"*. Those lines are about stopping and spawning;
+the phrase is from `agents/lian-zhao.md`. She attributed one agent's text to
+another. The finding stands on the other two quotes, both verified — but had I
+forwarded the report unchecked, `lian-zhao` would have gone looking for a line
+that is not there, which is exactly the wasted-dispatch failure finding 19
+recorded when I did the same thing to her.
+
+**The apparent contradiction between two agents dissolved on inspection, and
+the reason is worth keeping.** When `lian-zhao` swept descriptions against rule
+19 for PF-022, she flagged this same line as reading loosely but resolving
+correctly — "Maintains project rules" means *a deployed project's own local rule
+book, not this repo's*. Sophia now calls it drift. Both are right, because they
+checked different axes: Lian asked **which file**, Sophia asked **who writes
+it**. Both propositions hold simultaneously — the file is the deployed
+project's, and `wei-lin` still delegates writing it.
+
+I nearly filed this as a subagent disagreement needing adjudication. It was not
+one. **Two findings that look contradictory may be answers to two different
+questions, and the cheap test is to state each as a proposition and check
+whether they can both be true.** They could. No adjudication needed, no dispatch
+spent.
+
+**The pattern is now two instances**, so I asked `lian-zhao` for a judgement
+rather than an edit: is a check feasible that flags an authorship verb in a
+`description:` naming a surface rule 19 gives to someone else? I told her to
+answer honestly if it cannot be made to work without false-positiving on
+"commissions", "reviews", "enforces" — this project has been bitten by checks
+that looked like gates and were not, and a reasoned refusal is a fine outcome.
+
+## Finding 45 — the drift fix, and a bounded answer on mechanizing it
+
+`lian-zhao` corrected `agents/wei-lin.md:3`: "Maintains project rules" →
+**"Commissions and enforces project rules"**, and example (5) "draft a
+project-rules.md gate" → **"commission"**. One line, nothing else touched. I
+verified the authorship verbs are gone, the body's "Delegate the writing to
+`zofia-kaminska`" is intact, and the gate held at 1571/0.
+
+The distinction landed is the one she drew for herself in PF-022 — **commissions
+versus writes** — and it preserves a real role rather than flattening it:
+specify what the rules must cover, delegate the writing, review what comes
+back, enforce at every merge.
+
+**On mechanizing the pattern, her answer is the kind I want and did not have to
+argue for.** I asked whether a check could flag an authorship verb in a
+`description:` naming a surface rule 19 assigns elsewhere, and told her a
+reasoned "no" was acceptable. She said **feasible but narrow**, and specified
+the shape: parse rule 19's table for each agent's non-surfaces, scan the
+description for a verb governing a noun naming one of them, flag authorship
+verbs (write, draft, author, maintain, produce) against delegation verbs
+(commission, specify, review, enforce, audit).
+
+Then the caveat that makes it an honest recommendation rather than an
+enthusiasm:
+
+> "it won't generalize the way Check 10's frontmatter parsing does. It will
+> catch the shape we've now seen twice but needs a human to keep tuning the two
+> lists, which is a real but bounded ongoing cost. Recommend routing it to
+> `iris-vermeulen` as a proposal with that caveat attached, not as a request for
+> a fully general 'authorship drift' detector — that would overreach into prose
+> comprehension the gate has deliberately stayed out of."
+
+That last clause is the important one. This gate's whole design is that it
+reads structure and never prose; the two defects it missed were both in prose.
+The temptation is to fix that by teaching it to read prose, and she named why
+not. A curated two-list check that catches a known shape, with its maintenance
+cost stated up front, is a different and more honest proposition than a
+detector that claims to understand descriptions.
+
+Routed to `iris-vermeulen` as a proposal carrying that caveat — not dispatched
+yet; PF-004 and PF-012 are ahead of it and the check is worth doing only if
+those leave room.
