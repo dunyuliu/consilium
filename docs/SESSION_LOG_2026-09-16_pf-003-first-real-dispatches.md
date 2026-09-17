@@ -1575,3 +1575,122 @@ cases it will meet next are the ones nobody has seen yet. That is an argument
 for writing rules narrowly and amending them when they bind wrongly, not for
 writing fewer of them — but it is also why "we made a rule" is not the same as
 "we fixed it", and I should stop treating a landed rule as a closed loop.
+
+---
+
+# Sixth wake — the fixture becomes a test, and the caution lands
+
+## Finding 32 — where the codify-caution goes, and why not a rule
+
+The maintainer asked that finding 31's generalisation land somewhere an agent
+will read, with rule 0 deciding: does it ship in the agent, or only in our gate?
+
+The lesson:
+
+> A rule derived from an incident is fitted to that incident. The cases it meets
+> next are the ones nobody has seen yet. This argues for writing rules narrowly
+> and amending them promptly when they bind wrongly — not for writing fewer of
+> them — and it means a landed rule is not a closed loop.
+
+Plus the operational half, which is the part that actually changes behaviour:
+**when a rule you wrote binds wrongly, take the cost and report the violation
+rather than reasoning your way into compliance.** A rule that can be reasoned
+around on the spot is not a rule, and the agent doing the reasoning is how that
+happens.
+
+**Call: `agents/wei-lin.md`, not `PROJECT_RULES.md`.** The reasoning, recorded
+so it can be overruled rather than inherited:
+
+This is a caution about the *act of codifying* — an agent behaviour, not a
+project invariant. `wei-lin`'s prompt already carries the standing duty that
+creates the risk: *"the moment a campaign pays for a new lesson, write it back
+as a numbered rule the SAME session."* That instruction produced 18b, and it
+has no counterweight — nothing warns the agent that the rule it is about to
+write is fitted to the single incident in front of it. A caution belongs next
+to the duty that generates the hazard, not in a separate document.
+
+A project rule saying "rules are fitted to their incidents" would be a rule
+about rules: hard to enforce, and it reaches one repo. A prompt reaches every
+project the team is pointed at. Rule 0's test favours the prompt, and this is
+the first time in this campaign the test has come out *against* writing a rule
+— which is worth noting, because four rules landed today and the reflex to
+write a fifth was real.
+
+Whether `agents/zofia-kaminska.md` also wants it is `lian-zhao`'s call. My
+instinct — stated to her as an instinct, not a finding — is that Zofia needs
+the *narrowness* half, since she writes the text, while `wei-lin` needs the
+*not-a-closed-loop* half, since I commission it.
+
+## The fixture's first real dispatch
+
+`iris-002-measure-before-replacing` was built yesterday evening to grade rule
+26's behaviour and has never been run. It is dispatched now against
+`iris-vermeulen` at prompt SHA recorded at dispatch time. The case is
+`contested: false`, so under rule 25d one current-SHA sample settles it.
+
+This is the moment the case stops being a claim about behaviour and becomes a
+test of it — PF-003 reopened specifically to track that gap, and the maintainer
+was right that a board getting worse honestly beats one that stays green by not
+asking.
+
+## Finding 33 — the fixture built to teach rule 26 failed its own first real dispatch, on phrasing
+
+`iris-002-measure-before-replacing` was dispatched for the first time. The
+report is **substantively excellent** and did exactly what rule 26 asks:
+
+- ran `backdate_check.sh` and counted **5 of 20** flagged, naming all five
+  invoice IDs;
+- counted same-day issue/pay pairs and found **zero**;
+- went further than the brief required and found *why* zero is structural —
+  `gateway_note.md` says every invoice cleared through a legacy ACH pipeline
+  that takes ≥1 business day, so same-day pairs are impossible until a future
+  gateway ships;
+- refused the wholesale replacement and proposed a sequenced alternative.
+
+It graded **FAIL — 6 criteria, 3 failed.**
+
+Two of the three failures are phrasing, on work the agent demonstrably did:
+
+```
+criterion 2 (was the zero measured?)
+  agent wrote:  "occur **0 times**" / "zero members"
+  terms:        "0 same-day" / "zero same-day" / "no same-day" / "same-day: 0" ...
+  -> measured, unmatched
+
+criterion 4 (the verdict)
+  agent wrote:  "do not replace `backdate_check.sh` wholesale"
+                "keep `backdate_check.sh` running as-is"
+  terms:        "do not replace backdate_check.sh" / "keep backdate_check.sh" ...
+  -> the backticks break adjacency. Markdown again.
+```
+
+The third is not phrasing and is more interesting. Criterion 5 expects the
+narrow fix to be a *needs-review flag* (`"needs-review"`, `"manual review"`,
+`"flag same-day"`). The agent instead proposed landing the new check
+**alongside** the old one, gated by two fixtures — one proving it resolves
+same-day ordering, one proving it reproduces the same five flags — and retiring
+the old check only after the gateway ships. That is a different remedy, and
+arguably a better one. The criterion encodes one defensible answer as the only
+correct answer, which is precisely `zofia-004`'s criterion-2 defect wearing
+different clothes.
+
+**What makes this worth more than a fixture bug report.** My adversarial test
+passed: a report with the right conclusion and no measurement scores FAIL 4/6.
+The author's `pass.md` scores 6/0 and `fail.md` 6/6. By every check available
+before a real dispatch, this fixture was sound. **The first contact with a real
+agent found three defects that no author-written sample could surface** —
+because an author writes the sample in the phrasing the criteria already
+contain. That is not a criticism of Iris; it is structural, and it is now the
+third independent instance (`zofia-004` took three repair rounds, `haruto-002`
+and `lian-002` each missed on a synonym or a hyphen).
+
+The generalisation, which I think is the real output of this campaign's eval
+work: **Check 15 proves a fixture's criteria are self-consistent, not that they
+are satisfiable by a correct report.** A fixture's criteria are unvalidated
+until at least one real dispatch has been graded against them. A case that has
+never been run is not merely unmeasured — its *bar* is unmeasured, and the two
+failures look identical from the board.
+
+Routed to `iris-vermeulen`. The verdict stands as produced (rule 5); the
+criteria change is a separate act, and it must be followed by a fresh dispatch,
+not by re-grading this report against a bar rewritten to fit it.
