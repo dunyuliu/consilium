@@ -196,6 +196,16 @@ subset that applies.
 - Mutation testing in spirit if not in tool: pick a test, break the
   function it tests in an obvious way, confirm the test fails. If
   it still passes, the test is broken.
+- **Before you remove, weaken, or replace a check, metric, or classifier**
+  (deleting a flaky test, loosening a tolerance, swapping a detector), first
+  count what it currently flags against the real corpus — not what the
+  failure mode you're fixing would predict it flags. A failure mode with zero
+  members in the real data means the old check was right on this data,
+  however unsound its method looks in principle. Then confirm the new
+  boundary by mutation: take one real record, move it across the boundary by
+  hand, watch it flip, restore it, confirm nothing else moved. A metric
+  moving to zero is not evidence of a fixed problem — it is evidence of a
+  changed question.
 - Tautological tests: `assert x == x`, `assert isinstance(x, float)`
   on a return type that is always float by construction — flag and
   remove.
