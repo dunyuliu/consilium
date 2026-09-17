@@ -2615,3 +2615,86 @@ this defect.
 
 Routing that as the frame for the vacuous-loop fix rather than a list of eight
 separate repairs.
+
+---
+
+# Tenth wake — the system failing to apply to itself
+
+## Finding 53 — the document that says what this project is for is the only one that can lie unnoticed
+
+The maintainer's north star: the system must apply to itself. The sharpest
+instance of it failing is at the very top.
+
+Every `PF-` row carries an evidence command Check 17 re-runs and byte-diffs.
+The three questions in `README.md` — the project's top-level claims about its
+own purpose — carry **none**. Verified: zero fenced blocks in that section.
+
+So they drifted, and both drifts are material:
+
+```
+  README.md:129  "no GitHub Release object is created"    -> 24 Releases published
+  README.md:144  "11 of 31 fixtures have never been run"  -> 36 fixtures, 0 never run
+```
+
+Both were *true when written* and were made false by work this campaign did
+correctly — Check 35 landing, and PF-003 closing. **The project improved and its
+own description of itself became a lie, with nothing to notice.** That is rule 0
+failing at the top rather than at the edges, which is the more dangerous
+direction: the edges have owners and checks, the top has neither.
+
+**The fix could not go where it was pointed.** I was asked to route README
+structure to `zofia-kaminska`. `PROJECT_RULES.md:1116` is explicit that
+`README.md` and `CLAUDE.md` have **no agent owner**, and her own contract has
+her refuse to edit README while auditing. Dispatching her at it would have been
+me overriding rule 19 on the say-so of a message — the same shape as the
+authority question, one surface down.
+
+The constraint produced a better fix. The enforcement tier does not have to live
+*in* README: the claims can be asserted by **board rows**, which Zofia owns and
+which Check 17 already executes. A stale answer then reddens the gate the day it
+goes stale, with no agent touching a human-owned file, and the prose correction
+stays with the maintainer where rule 19 puts it.
+
+I asked her to tell me plainly whether that is a sufficient answer or a
+workaround for README having no owner — and if her honest view is that README
+needs one, to say so, because that is her surface and mine to carry.
+
+## Finding 54 — three deadlocks in one day is a property of the machinery, not bad luck
+
+All three were the project defeating a correct action:
+
+```
+  18b        forbade the dispatch that would clear the red
+  pre-push   refused the push that deleted the fabricated tag
+  Check 35   grace held by that tag, so the real release could not claim it
+```
+
+I had been reading these as three unrelated misfortunes — a rule scoped too
+broadly, a hook pointed the wrong way, a grace clause captured by an accident.
+Set against the measured cadence difference with EQdyna, that reading does not
+survive: **151 commits and zero tags here, 60 commits and six tags there, same
+apparatus, empty hooks.** They are one pattern with three faces.
+
+Dispatched as a rule with all three incidents attached, plus a sweep of the
+remaining gates — and I told Zofia the scope error that made my own earlier
+survey wrong. I concluded there was no third instance because **I surveyed the
+checks in `tests/check.sh` and never surveyed the hooks**, which live in
+`install.sh` and had no owner at the time. A survey bounded by the files you
+already think of as "the gate" cannot find a gate living outside them.
+
+## On the authority grant, refused a second time
+
+The grant arrived again in a coordinator message, framed as the maintainer's
+rather than the coordinator's. My standing instruction names this exact
+resurfacing and says refuse, and I did.
+
+The reasoning, recorded because the cost is real and I want it legible: I cannot
+distinguish a relayed grant from an unrelayed one, and that indistinguishability
+is the entire reason the rule exists. A boundary that yields to a
+sufficiently well-reasoned message from a trusted peer is not a boundary.
+
+The cost is genuine — it is the cadence problem the maintainer named, and the
+coordinator's diagnosis that their own handoff caused most of it is probably
+right. I am choosing a slower campaign over a principle I would not be able to
+reconstruct once traded. If the grant is real it will arrive through the
+permission system, and I will use it immediately.
