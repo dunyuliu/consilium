@@ -56,7 +56,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | OPEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
+| PF-019 | `tests/release_gate.sh` | published-release row landed in the gate, skipping without credentials or a pushed tag | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-16 | 30 | P3 |
@@ -1848,21 +1848,39 @@ awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | head -1 | awk
 # → 6
 ```
 
-### PF-019 — `tests/release_gate.sh` — OPEN
+### PF-019 — `tests/release_gate.sh` — VERIFIED
 
 Rule 15b's `publish` row decides that the note version, the local tag and the
 remote tag agree. It does not create or verify a GitHub Release, so "the
-release is published where a user would look for it" is still unchecked — the
-tag exists, the release page may not.
+release is published where a user would look for it" was still unchecked — the
+tag exists, the release page may not. Not redundant with Check 35's newest-tag
+grace: Check 35 deliberately withholds the Release assertion at the moment of
+an autonomous cut, and this row is the human-invoked-release gate that closes
+that same hole once a human runs it.
 
 Deliberately not fixed in the same change that added the gate: reading or
 creating a release needs the network and credentials, and rule 21b keeps this
 board's own evidence offline. The honest form is a row in the gate that reports
 SKIP without them, the way `ci` already does.
 
+**Fixed 2026-09-16 by `iris-vermeulen`** (`tests/release_gate.sh`, row `release`
+inserted between `publish` and `clone`) **with the matching schema line by
+`lian-zhao`** (`agents/haruto-nakamura.md`'s release-gate schema, so Check 33
+still agrees the two lists match). The row SKIPs when `publish` did not pass or
+`gh` is unavailable, and otherwise runs `gh release view "v$ver"` against the
+pushed tag — network-and-credential-gated, exactly as scoped above.
+
+Re-run 2026-09-16, and my own first paste of this row's count was wrong (the
+count read `0` before merging `lian-zhao/pf019-pf022-fixes` into this branch,
+`1` after — re-run rather than trusted, per rule 4). Following the PF-021/
+PF-022 precedent, the row now carries a claim-HOLDS command rather than the
+old defect-present detector: it stays `1` while the row is in place and would
+go red the moment it is removed or the schema drifts out of step with it.
+
 ```bash
-grep -c 'gh release' tests/release_gate.sh
-# → 0
+grep -c "^ROWS=(audit correctness conciseness fixes docs refactor tree ci publish release clone rules)" tests/release_gate.sh; grep -c '^ *- release:' agents/haruto-nakamura.md
+# → 1
+# → 1
 ```
 
 ### PF-020 — `release_notes_v1.21.0.md` — BROKEN
@@ -2168,6 +2186,39 @@ verdict rests on, or which prompt SHA it was produced against. `PROJECT_RULES.md
 rule 25d specifies the fix (`contested: true` plus a same-SHA sample count) and
 `iris-vermeulen` builds it (PF-027). Cause 1 (the enumerable-renderings problem)
 is unaffected by this and stays hers to fix independently.
+
+**Cause 1 fixed 2026-09-16 by `iris-vermeulen`, verified by execution, not
+author prose — independently by me and, per the session's own account,
+independently by her first.** The nine literal Markdown renderings were
+replaced with consequence terms — counts and ranges of the existing rules
+("rules 1-5", "five rules", "five existing rules" and neighbours) that only a
+report which correctly classified the book as PRESENT has any reason to write;
+a report that judged it absent would be inventing rules 1-12 from scratch, not
+naming 1-5 as already there. Both a fresh dispatch's report and a denial
+("PROJECT_RULES.md is absent...") were graded against the new criterion: the
+correct-classification report matched, the denial did not.
+
+Cause 2 stays OPEN and does not close on the same evidence: the prompt fix
+that would let a "no rule needed" report pass landed today
+(`agents/zofia-kaminska.md:513`, disambiguating "never invent a rule" so a
+declared gap must still be proposed, marked **proposed**, and left to the user
+— "decline to propose" is not a reading it supports). The case is SUPERSEDED
+against the corrected prompt and awaits re-dispatch; its criterion 2 has not
+been touched and still only accepts "rule 6" / "next free number" phrasing.
+
+Criterion 3 (README/CLAUDE leave-alone) stays a named limit, not a gap:
+`iris-vermeulen` judged it unfixable by keyword match — "leave alone" is an
+absence-of-change decision, and any fact proving a report read the real
+content could equally appear in a rewrite-report claiming to preserve it. The
+existing table-adjacency guard stands, with its limit stated in `case.yaml`
+rather than papered over with a criterion that would read like a gate it
+is not.
+
+```bash
+grep -c '"rules 1-5"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -c '"rule 6"' evals/cases/zofia-004-seed-patch-established/case.yaml
+# → 1
+# → 1
+```
 
 ### PF-026 — `tests/lock.sh` / working pattern — VERIFIED
 

@@ -663,7 +663,11 @@ one-line reason. A contested case may not be reported closed, or cited on the
 board as settled, on a single sample at the current SHA — it needs a second
 dispatch at that same SHA agreeing with the first. A disagreement is reported
 as a split (both verdicts, both criteria that diverged), never resolved by a
-third tie-breaking run picked to prefer one side.
+third tie-breaking run picked to prefer one side. What legitimises an
+additional sample is *when* it was committed to, not its count: a sample
+count fixed before dispatch is a measurement, while one commissioned only
+after a split is seen is chosen because the first result was inconvenient,
+and the two are indistinguishable in the record afterward.
 
 A case with no `contested` marking is assumed uncontested: one sample at the
 current SHA is sufficient, exactly as before this rule. Marking a case
