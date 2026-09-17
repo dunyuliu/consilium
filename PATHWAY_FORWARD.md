@@ -40,16 +40,16 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-17 | 14 | P2 |
 | PF-004 | `evals/` | grading measures precision (false positives/negatives), not just declared-defect mentions | OPEN | 2026-09-16 | 60 | P1 |
 | PF-005 | `docs/release_notes_*` | no divergence between a release note and its tag goes unrecorded (v1.10.0's known divergence stays recorded, uncorrectable per rule 8) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
-| PF-007 | `tests/check.sh` | the header comment's check count matches the checks that exist | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-17 | 14 | P2 |
+| PF-007 | `tests/check.sh` | the header comment's check count matches the checks that exist | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 | P3 |
 | PF-009 | `agents/` | no agent prompt's body contradicts its own frontmatter or another agent's prompt | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 | P3 |
-| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-012 | `agents/` | no fleet-wide fixture-verdict staleness against the prompt it grades | OPEN | 2026-09-17 | 14 | P1 |
 | PF-013 | `agents/` | every agent runs on the cheapest model tier that passes its fixture | OPEN | 2026-09-17 | 60 | P3 |
 | PF-014 | `agents/` | ~~no agent is missing the fixture its name implies~~ — rule 13 retired 2026-09-17, same reason as PF-002 | RETIRED | 2026-09-17 | — | — |
-| PF-015 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12); pending — remove the now-dead byte-diff mechanism (Check 17), retired by the rule 21a amendment | OPEN | 2026-09-17 | 14 | P1 |
+| PF-015 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12) and no residue of the retired byte-diff mechanism (Check 17) remains | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-017 | `agents/` | fixtures exist for the autopilot cycle, the release gate and zofia's patch path, and have been dispatched | OPEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
@@ -60,29 +60,35 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-023 | `tests/lock.sh` | the lock resolves to the same shared file from a main checkout and any linked worktree | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-024 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | causes 1–2 fixed (`iris-vermeulen`); rests on criterion 3 alone — a named substring-grading limit, not a gap | OPEN | 2026-09-16 | 14 | P2 |
-| PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against; a contested case cites its sample count (rule 25d) | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-028 | `install.sh` | install a working hook set from inside a linked worktree, not only a main checkout (owner: `iris-vermeulen`) | BROKEN | 2026-09-17 | 14 | P1 |
-| PF-029 | `PROJECT_RULES.md` | every index row has body prose in the file, not only a one-line index claim | OPEN | 2026-09-17 | 60 | P2 |
+| PF-029 | `PROJECT_RULES.md` | every live index row has body prose in the file, not only a one-line index claim (re-scoped 2026-09-17 to four rows; 13a is retired and needs none) | OPEN | 2026-09-17 | 60 | P2 |
 | PF-030 | `install.sh` | `pre-push` skips the gate for a push whose ref updates are all deletions (rule 9a; owner: `iris-vermeulen`) | OPEN | 2026-09-17 | 30 | P2 |
 | PF-031 | `tests/check.sh` Check 28 | a rule-8a deletion's two conditions are checkable from the commit message, not just asserted in prose (owner: `iris-vermeulen`) | OPEN | 2026-09-17 | 30 | P2 |
 | PF-032 | `README.md` question 1 | the seeded-README credibility gap ("nothing holds a seeded README to being credible") has no check today and stays open — a true "Not yet", not drift | OPEN | 2026-09-17 | 60 | P3 |
-| PF-033 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 already creates and verifies the mechanism, but its newest-tag grace has no override, the open half of rule 28 | BROKEN | 2026-09-17 | 30 | P2 |
-| PF-034 | `README.md` question 2 / `tests/check.sh` Check 33 | the release gate has twelve rows, not ten — README and Check 33's own header comment both say ten while `tests/release_gate.sh`'s own header and its `ROWS` array say twelve | BROKEN | 2026-09-17 | 30 | P2 |
+| PF-033 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 verifies the mechanism and its newest-tag grace is gone (`f109ef8`); the false README prose is the only half left, human-owned | OPEN | 2026-09-17 | 30 | P2 |
+| PF-034 | `README.md` question 2 | the release gate has twelve rows, not ten — Check 33's header comment is corrected (`f109ef8`); README still says ten, human-owned prose | OPEN | 2026-09-17 | 30 | P2 |
+| PF-035 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — Check 31 counts that exactly one note sits at root, never which one | VERIFIED | 2026-09-17 | 30 | P2 |
 
-**Re-tiered 2026-09-17**, from 4 P1 / 8 P2 / 19 P3 to 4 P1 / 12 P2 / 15 P3.
-**P1** is reserved for what is actively broken or is a real, currently-unclosed
-gap in the mechanisms the rest of the board depends on: PF-004 (grading can't
-tell a precise finding from a lucky one), PF-012 (fleet staleness, unmeasured
-drift between prompts and their verdicts), PF-017 (no fixture coverage yet for
-autopilot/release-gate/the patch path), PF-028 (install is broken today from a
-worktree). PF-015 is P1 because it is this change's own direct follow-through
-— Check 17 needs removing now that 21a no longer requires it, not on its own
-60-day drift. **P2** is active work-in-progress and standing claims worth
-rechecking often (PF-003, PF-006, PF-009's next read, PF-025, PF-029–031).
-**P3** is settled, stable claims — most already VERIFIED and unlikely to
-regress on their own — checked on a long interval for drift, not because they
-matter less in kind.
+**Re-tiered 2026-09-17 (second pass, after the day's closures)**: 4 P1 / 9 P2
+/ 20 P3 across 33 live rows, plus 2 RETIRED. The prior paragraph's arithmetic
+was wrong — it enumerated five P1s while claiming four, and 12 P2 / 15 P3
+against an actual 8 / 19; the counts below are the table's.
+**P1** is what is actively broken or is an unclosed gap in a mechanism the rest
+of the board depends on: PF-004 (grading cannot tell a precise finding from a
+lucky one), PF-012 (3 STALE verdicts today), PF-017 (no dispatched fixture for
+autopilot / the release gate / the patch path), PF-028 (install is broken from
+a worktree). PF-015 leaves P1 — its task was already done before the row was
+written (see its block) — and nothing was promoted in its place: today's three
+closures were all follow-through on landed work, not discoveries.
+**P2** is active work and the claims worth rechecking often: PF-003, PF-006,
+PF-025, PF-029, PF-030, PF-031, PF-033, PF-034, PF-035. PF-033 and PF-034 stay
+P2 after losing their mechanical halves because the remaining half is a false
+statement in the user-facing README — prose drift that misdescribes a shipped
+gate, not a cosmetic one.
+**P3** is settled, stable claims on long intervals — checked for drift, not
+because they matter less in kind.
 
 ## Items
 
@@ -189,10 +195,18 @@ Same rule-13 retirement as PF-002: this row measured headcount-by-name
 coverage, which rule 13 mandated and no longer does. Check 25 goes with it
 (`iris-vermeulen`). Kept per rule 21, carries no command or interval.
 
-### PF-015 — `tests/check.sh` — OPEN
-Check 17 (byte-diff of recorded board evidence) is dead weight now that rule
-21a no longer requires a `# →` line — it still runs but checks nothing 21a
-asks for. Route: `iris-vermeulen`, to remove it.
+### PF-015 — `tests/check.sh` — VERIFIED
+**The row was wrong when it was written (settled 2026-09-17).** It asked for
+the removal of Check 17, the byte-diff of recorded board evidence — but Check
+17 had already been retired in `1faaa1f`, which is an ancestor of the commit
+that set this row's own last-checked date. The row asked someone to remove a
+thing that was not there, and would have been closed by reading the gate rather
+than by changing it: an inherited claim taken as current state (rule 4).
+
+What did exist was residue, and it is now gone: the header's `Verifies:` list
+still named retired Check 21, and three comments cited Check 17 by number. The
+claim is re-scoped from "remove Check 17" to "no residue of it remains", which
+is a standing claim a command can settle, and drops to P3 accordingly.
 ```bash
 grep -c 'section=evidence' tests/check.sh
 ```
@@ -272,8 +286,19 @@ test -d "$(git rev-parse --git-common-dir)/hooks" && echo "hooks dir exists (sha
 ```
 
 ### PF-029 — `PROJECT_RULES.md` — OPEN
+**Re-scoped 2026-09-17, still open.** The rule-book compression (`13a21aa`) did
+not close this: 5b, 21b, 23a and 25b remain index rows with no `##` body
+anywhere in the file, and their normative text is not folded into their parents
+either — rule 5's body covers 5a's planted-keyword ban and never mentions a
+symlinked answer key, and the same holds for 21/23/25. So the row's claim is
+right about those four: each is a real rule, each names a real mechanical check
+(23, 21, 20, 22 respectively), and a reader who wants to know what the rule
+actually requires has only the one-line index claim to read.
+
+13a drops out of the claim. It is retired with rule 13, and the index row says
+so; a retired sub-rule owes no body. The command is narrowed to the four.
 ```bash
-for r in 5b 13a 21b 23a 25b; do grep -qx "## $r\." PROJECT_RULES.md || grep -q "^## $r\." PROJECT_RULES.md || echo "$r: no ## heading"; done
+for r in 5b 21b 23a 25b; do grep -q "^## $r\." PROJECT_RULES.md || echo "$r: no ## heading"; done
 ```
 
 ### PF-030 — `install.sh` — OPEN
@@ -310,51 +335,52 @@ grep -ci 'credible' PROJECT_RULES.md tests/check.sh
 # → tests/check.sh:0
 ```
 
-### PF-033 — `README.md` question 2 — BROKEN
+### PF-033 — `README.md` question 2 — OPEN
 
-README:129 states "no GitHub Release object is created." False: `gh release
-list` on this repo returns 24 published Releases, and `tests/check.sh` Check
-35 (added since this README prose was last true) already shells out to
-`gh release view` to verify a GitHub Release exists for the newest tag,
-degrading honestly when `gh` is unavailable. The mechanism this claim says
-does not exist, exists. Routed to `sophia-okafor` (doc-vs-code drift) for
-the README correction itself, which is human-owned prose this row does not
-touch.
+**Mechanical half closed 2026-09-17.** `f109ef8` removed Check 35's newest-tag
+grace. The grace was why the row stayed BROKEN: it passed trivially for old
+tags and forgave the only tag that could fail, so the Release leg never bound —
+and it let v1.20.0 and v1.22.0 ship tagged with no GitHub Release, gate green
+both times, each published by hand afterwards. `agents/haruto-nakamura.md` step
+12a is now unconditional in the same campaign (`9461844`), so an autonomous cut
+creates the Release too.
 
-The row does not re-assert "24 Releases exist" — that number moves every
-release and would falsely redden this claim on its own success, the exact
-failure rule 21a's provenance note describes. It asserts the mechanism is
-still present, which is what actually answers question 2:
+**Human-owned half stays open.** `README.md:129` still states "no GitHub
+Release object is created", which is false and now doubly so. That is prose, on
+`sophia-okafor`'s surface, not this board's to fix — the row stays visible
+until the README says what the gate does.
 
+The command asserts the mechanism is present, not a Release count: a count
+moves every release and would redden this row on its own success.
 ```bash
 grep -c 'gh release view' tests/check.sh; grep -c 'GitHub Release' tests/release_gate.sh
-# → 1
-# → 4
 ```
 
-Cross-reference: `PROJECT_RULES.md` rule 28, incident 3 — Check 35's
-newest-tag grace was held by the fabricated `v9.9.9` tag with no override,
-which is the still-open half of this row (a gate blocking a correct release
-with no corrective path inside the check itself).
+### PF-034 — `README.md` question 2 — OPEN
 
-### PF-034 — `README.md` question 2 / `tests/check.sh` Check 33 — BROKEN
+**Code-comment half closed 2026-09-17.** Check 33's header comment said "ten
+row keys" against a twelve-entry `ROWS` array; `f109ef8` corrected it, and
+`grep -c 'ten row' tests/check.sh` is now 0. `tests/release_gate.sh` was always
+right (its own header says twelve).
 
-README's question 2 opens: "Audit the changes, correctness, ... and the rule
-book followed. **Enforced**: all ten are rows in `tests/release_gate.sh`."
-`tests/check.sh` Check 33's own header comment (line 1313) independently
-says "ten row keys." Both are wrong: `tests/release_gate.sh`'s `ROWS` array
-has twelve entries, and the script's own header (line 2) correctly says
-"the twelve rows." Three sources, two different numbers, inside one repo
-whose own rule 11 requires docs to move with the code they describe.
-Routed to `sophia-okafor` — the drift is in prose (README) and in a code
-comment (Check 33's header), not in behavior; `tests/release_gate.sh` itself
-is correct and unaffected.
-
+**Human-owned half stays open.** README question 2 still reads "all ten are
+rows in `tests/release_gate.sh`". Same treatment as PF-033: prose drift routed
+to `sophia-okafor`, kept visible here rather than closed on the code fix alone.
 ```bash
-grep -o 'ROWS=([^)]*)' tests/release_gate.sh | tr ' ' '\n' | grep -c .; grep -c 'twelve rows' tests/release_gate.sh; grep -c 'ten row' tests/check.sh
-# → 12
-# → 1
-# → 1
+grep -o 'ROWS=([^)]*)' tests/release_gate.sh | tr ' ' '\n' | grep -c .; grep -c 'ten row' tests/check.sh
+```
+
+### PF-035 — `release_notes_v*.md` — VERIFIED
+
+Opened 2026-09-17 out of `971fc36`, which found the repo root holding
+`release_notes_v1.21.0.md` while v1.22.0's note sat in `docs/` — rule 8 has it
+exactly the other way round. The files are now right. The row exists for the
+part that was not fixed: Check 31 asserts that *exactly one* release note sits
+at the root and never that it is the newest tag's, which is why the inversion
+was green. A defect fixed with nothing re-asking about it is a board row, not a
+new rule. Teaching Check 31 the version is `iris-vermeulen`'s surface.
+```bash
+ls -1 release_notes_v*.md | sed 's/release_notes_v//; s/\.md$//'; git tag --sort=-v:refname | head -1 | tr -d 'v'
 ```
 
 ## Deferral log
