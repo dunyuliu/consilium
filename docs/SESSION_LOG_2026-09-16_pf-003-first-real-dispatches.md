@@ -1188,3 +1188,60 @@ nothing was blocking and nothing was counting — I simply never tried again.
 
 A hook that refuses is a hook that reminds. An absence of a hook is silence,
 and silence is what cost the six commits.
+
+---
+
+# Fourth wake — PF-027, and rule 25d's first real application
+
+## Finding 24 — the `:513` disambiguation is verified by dispatch, not assumed
+
+`lian-zhao` disambiguated `agents/zofia-kaminska.md:513`, where the clause after
+an em-dash ("— propose it, mark it clearly as proposed") was being read as a
+veto rather than an instruction. She declined to commission a new fixture under
+rule 10, arguing `zofia-004`'s existing criterion 2 already discriminates the
+behaviour on that exact input and re-dispatching it post-fix is the test.
+
+She was right, and the dispatch proves it rather than arguing it:
+
+```
+criterion 2 terms          run 2 (pre-fix)   run 3 (post-fix)
+  "rule 6"                       0                 0
+  "next free number"             0                 2
+  "at the next free number"      0                 1
+```
+
+Run 2 refused to propose a rule and failed the criterion. Run 3, against the
+corrected prompt, proposed two rules at the next free numbers and explicitly
+marked them **proposed** — which is precisely what the disambiguated clause
+asks for. Full-case verdict moved `FAIL 8/3` → `FAIL 8/2` → **`FAIL 8/1`**
+across the three dispatches, and the single remaining failure is criterion 3,
+the leave-alone guard `iris-vermeulen` judged unfixable by substring matching
+and left as a named limit.
+
+That is a prompt defect found by adjudication, fixed at its source, and
+confirmed by re-running the fixture that exposed it — with no new fixture
+written, because the right one already existed. Lian's rule-10 judgement is
+vindicated.
+
+## Pre-registration, written before the result exists
+
+Rule 25d says a contested case may not be reported closed on a single sample at
+the current SHA. Finding 21 says what legitimises a further sample is *when it
+was committed to*, not its count — a sample size fixed before dispatch is a
+measurement; one commissioned after seeing a split is a tie-breaker chosen
+because the first answer was inconvenient, and the two are indistinguishable
+afterward in the record.
+
+So this is the commitment, recorded now, while I know exactly one result:
+
+> `zofia-004-seed-patch-established` is sampled **N=2** at prompt SHA
+> `03bf9a1`. Run 3 is sample 1 and graded `FAIL — 8 criteria, 1 failed`.
+> Sample 2 is dispatched next. **Both are reported whatever they show.** If
+> they disagree, that is a split and the case is not settled — I will not
+> commission a third to break it, and I will not quietly drop either.
+
+If sample 2 agrees, the case has two concordant samples at one SHA and its
+remaining failure is attributable to criterion 3 alone. If it disagrees, the
+disagreement is the finding, and it says the prompt is still ambiguous
+somewhere — which is information I would lose entirely by running once and
+calling it settled.
