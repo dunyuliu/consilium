@@ -2207,3 +2207,53 @@ independent reports in three different phrasings, `fail.md` fails 8/8, a denial
 fails 8/7, an empty report fails 8/7, and my reasoning-only adversarial report
 fails on 5a and 5c. The case discriminates well on every axis except the one
 its harness makes impossible.
+
+## Finding 44 — PF-009's audit found one drift, in my own prompt, and two agents appeared to disagree about it
+
+`sophia-okafor` read all 22 prompts against the three questions PF-009 had left
+unchecked since 2026-08-05. One drift, and it is `agents/wei-lin.md`:
+
+```
+:3     "Maintains project rules, dispatches specialist subagents..."
+:3     example (5): "draft a project-rules.md gate that codifies what we
+                     learned this week, then enforce it on every Mira merge"
+:245   "Delegate the writing to `zofia-kaminska`, who owns that file — you
+        specify what the rules must cover and review what comes back."
+```
+
+The description advertises drafting; the body delegates the writing. It is the
+**same shape as PF-022**, which was `lian-zhao`'s description claiming fixture
+authorship her body disclaimed — and like that one it was invisible to every
+check, because Check 10 parses rule 19's ownership table and never reads a
+prompt.
+
+**One of her three citations is wrong, and I checked before routing.** She
+supported the finding by quoting `wei-lin.md:52-54` as *"Your surface is
+`agents/*.md` and nothing else"*. Those lines are about stopping and spawning;
+the phrase is from `agents/lian-zhao.md`. She attributed one agent's text to
+another. The finding stands on the other two quotes, both verified — but had I
+forwarded the report unchecked, `lian-zhao` would have gone looking for a line
+that is not there, which is exactly the wasted-dispatch failure finding 19
+recorded when I did the same thing to her.
+
+**The apparent contradiction between two agents dissolved on inspection, and
+the reason is worth keeping.** When `lian-zhao` swept descriptions against rule
+19 for PF-022, she flagged this same line as reading loosely but resolving
+correctly — "Maintains project rules" means *a deployed project's own local rule
+book, not this repo's*. Sophia now calls it drift. Both are right, because they
+checked different axes: Lian asked **which file**, Sophia asked **who writes
+it**. Both propositions hold simultaneously — the file is the deployed
+project's, and `wei-lin` still delegates writing it.
+
+I nearly filed this as a subagent disagreement needing adjudication. It was not
+one. **Two findings that look contradictory may be answers to two different
+questions, and the cheap test is to state each as a proposition and check
+whether they can both be true.** They could. No adjudication needed, no dispatch
+spent.
+
+**The pattern is now two instances**, so I asked `lian-zhao` for a judgement
+rather than an edit: is a check feasible that flags an authorship verb in a
+`description:` naming a surface rule 19 gives to someone else? I told her to
+answer honestly if it cannot be made to work without false-positiving on
+"commissions", "reviews", "enforces" — this project has been bitten by checks
+that looked like gates and were not, and a reasoned refusal is a fine outcome.
