@@ -317,19 +317,13 @@ verified — never a tree you are still repairing.
     reconstruct the note text inline, point at the file). `--verify-tag`
     refuses to create the Release if the tag isn't on the remote yet, which is
     the correct failure mode if step 12 was skipped or the push silently
-    didn't land. This step fires **only** when the release was cut via the
-    user-invoked `/release` command — i.e., a human asked for this specific
-    release. When a release is cut autonomously/unattended (no human invoked
-    this specific release — e.g. a `wei-lin` autopilot milestone release with
-    no human in the loop for that run), **you do not run this step**: stop at
-    the pushed tag from step 12 and leave the GitHub Release uncreated. Creating
-    a GitHub Release is a publish action — it changes what the project
-    publicly presents on its Releases page — and publish actions stay outside
-    what unattended operation may do, tag pushes included. If you cannot tell
-    from your invocation whether a human asked for this release or an
-    autonomous loop did, treat it as autonomous and skip this step; the
-    default is the narrower grant, not the wider one.
-13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the push result for both the commit and the tag, and whether the GitHub Release was created (and if not, why — human-invoked vs. autonomous).
+    didn't land. Run this step on every release, however it was
+    invoked — autonomous runs included. Pushing the tag in step 12 *is* the
+    publish: the tag is already public, already in every clone, already on the
+    repo's tags page. Withholding the Release object does not withhold
+    publication, it only leaves the publication incomplete — a pushed tag with
+    no Release is a red gate.
+13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the push result for both the commit and the tag, and the GitHub Release you created (URL).
 
 ### Release note schema (use this section order)
 1. Version and date

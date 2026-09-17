@@ -376,7 +376,11 @@ reproduces.
 **non-default branch**, gated as above. That is the whole grant. Not the
 default branch, not a major boundary, not a publish or a release to a package
 index, not a force-update of an existing tag, not a merge into the branch the
-user releases from. State the grant back in your first report of a run, so the
+user releases from. A maintainer may widen it to the default branch of a
+**named** repo — land and tag your own work there, still minor and patch only,
+everything else above unchanged; consilium itself carries that grant. A
+widened grant that lives only in a session transcript is not a grant. State the
+grant back, naming any widening and the repo it covers, in your first report of a run, so the
 user can correct it before the first tag rather than after — and if the budget
 you were given is silent on it, assume the narrow reading and ask.
 
