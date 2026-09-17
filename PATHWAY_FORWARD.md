@@ -40,7 +40,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | record the 2026-09-16 run outcomes for the 3 dispatched-but-unwritten fixtures (`haruto-003`, `wei-lin-003`, `zofia-004`); `zofia-004` additionally blocked on PF-025 | OPEN | 2026-09-16 | 14 | P1 |
+| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, see PF-025 for the one criterion set still known-defective | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
@@ -59,7 +59,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-019 | `tests/release_gate.sh` | add a published-release row to the gate, skipping without credentials | OPEN | 2026-09-16 | 30 | P2 |
 | PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
-| PF-022 | `agents/` | `lian-zhao`'s frontmatter description contradicts her own body on the fixture write surface | OPEN | 2026-09-16 | 30 | P2 |
+| PF-022 | `agents/` | `lian-zhao`'s frontmatter description no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-023 | `tests/lock.sh` | the lock resolves to the SAME shared file from a main checkout and from any linked worktree | VERIFIED | 2026-09-16 | 14 | P2 |
 | PF-024 | `evals/run.sh` | STALE compares dates, not the prompt SHA a verdict was produced against — same-day edit+run is invisible | OPEN | 2026-09-16 | 14 | P2 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | fixture cannot yet distinguish a correct Mode A seed pass from an incorrect one | OPEN | 2026-09-16 | 14 | P2 |
@@ -118,7 +118,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed '
 #   → 22 of 22 agents have at least one fixture
 ```
 
-### PF-003 — `evals/cases/` — OPEN
+### PF-003 — `evals/cases/` — VERIFIED
 
 The cited command no longer tells the truth: `evals/cases/lian-001-no-fixture-no-cut/`
 has no `case.yaml`, and `cmd_list` in `evals/run.sh` exits 2 partway through the
@@ -197,12 +197,14 @@ length, keeps every one of the four wordings (all four are followed
 immediately by a date), and cannot be satisfied by prose that merely mentions
 a run. Re-run below is from the pattern that actually ships.
 
-```bash
-for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
-# → haruto-003-release-gate-red-row: NEVER RUN
-# → wei-lin-003-autopilot-board-order: NEVER RUN
-# → zofia-004-seed-patch-established: NEVER RUN
-```
+Historical output at the time (superseded below, not re-run as evidence —
+the live command and its current result are the single fenced block at the
+end of this item):
+
+    for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
+    # → haruto-003-release-gate-red-row: NEVER RUN
+    # → wei-lin-003-autopilot-board-order: NEVER RUN
+    # → zofia-004-seed-patch-established: NEVER RUN
 
 The three remaining are exactly the fixtures PF-017 landed today and has not
 yet dispatched (see PF-017) — the detector and the independently-verified
@@ -242,13 +244,35 @@ rule at the next free number" question — not a wording difference, an
 opposite decision (propose rule 6 vs. refuse to invent one). Nothing in this
 row's mechanism, or in `evals/run.sh`, treats a verdict as anything but a
 single deterministic sample. It is not; this row's PASS/FAIL counts are each
-one draw, not a settled answer.
+one draw, not a settled answer. (The block above is the row's live evidence;
+it is not repeated a second time here — the two identical copies that used to
+follow this paragraph were a duplicate, not two findings, and Check 17 was
+re-running both.)
+
+**Re-run 2026-09-16 (this reconciliation pass), VERIFIED, and my own prior
+paste was the thing that was wrong, not this tree.** I was handed a claim that
+this command "now prints NOTHING" and, per rule 4, re-ran it verbatim myself
+rather than trusting the paste — a discipline this exact row got right once
+already (line 211 above) and got right again here. On this branch — which
+recovered six commits a stale `main` had lost, including `iris-vermeulen`'s
+three missing run-records and `lian-zhao`'s PF-022 fix — the command below
+prints nothing: `haruto-003`, `wei-lin-003` and `zofia-004` all now carry a
+`Run (2026-09-16, ...)` line in their own `case.yaml`. Every fixture in
+`evals/cases/` has been dispatched and graded at least once.
+
+**"Every fixture has run" is not "the suite is healthy", and this row is
+deliberately scoped to the first claim only.** Of today's twelve real
+dispatches, five FAILED (`lian-002` 3/6, `selin-001` 6/9, `zofia-003` 6/7,
+`zofia-004` 8/2 then, on a second dispatch, 8/3 — worse, not better) and
+`zofia-004`'s own criteria are independently known-defective regardless of
+which way the agent answers (PF-025, still OPEN). Closing this row VERIFIED
+certifies only that no case sits at zero executions; PF-004 tracks whether
+grading measures the right thing, and PF-025 tracks this fixture's specific
+criterion defects. Re-run this command whenever a new fixture lands.
 
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
-# → haruto-003-release-gate-red-row: NEVER RUN
-# → wei-lin-003-autopilot-board-order: NEVER RUN
-# → zofia-004-seed-patch-established: NEVER RUN
+# → 
 ```
 
 ### PF-004 — `evals/` — OPEN
@@ -1913,7 +1937,7 @@ grep -c "git ls-files '\*\.sh'" tests/check.sh
 # → 1
 ```
 
-### PF-022 — `agents/` — OPEN
+### PF-022 — `agents/` — VERIFIED
 
 `agents/lian-zhao.md` contradicts itself on its own write surface. Line 3 (the
 frontmatter `description`, which is the text that routes every dispatch) says
@@ -1929,30 +1953,37 @@ evidence command.
 
 Not fixed here: `agents/*.md` is `lian-zhao`'s surface. Routed there.
 
-```bash
-sed -n '3p' agents/lian-zhao.md | grep -c 'Grows the fixture'; sed -n '52p' agents/lian-zhao.md
-# → 1
-# → - Your surface is `agents/*.md` and nothing else. Not fixtures
-```
+Original defect-detector, kept as history rather than as live evidence (a
+fixed contradiction would read `0` on this forever, which proves nothing was
+reintroduced — see the claim-holds command below instead):
 
-**Re-run 2026-09-16 (closing pass), and this stays OPEN.** I was told the
-fix already landed — line 3 now says "gates every change on the agent's own
-eval fixture and refuses to touch a prompt that has none" and no longer
-claims fixture authorship. Re-running the row's own command on this branch
-prints the same output as above, unchanged (`1`, line 52 unchanged): the
-contradiction is still live here. The fix is real but sits on an unmerged
-branch, `lian-zhao/pf-022-description-fix` (`a2e159a`, re-based for a YAML
-quoting fix at `6ef8aeb`), which branches from this branch's own tip and is
-an ancestor of neither this branch nor `origin/main`. Under this session's
-constraint (commit only, no merge, no push) and rule 4 (verify what is in
-front of me), a fix that exists only on someone else's branch does not close
-a row on this one. Whoever merges that branch closes this row — and should
-close it with a claim-HOLDS command in the shape PF-021 used, not the
-defect-detector above, since a fixed contradiction reads `0` forever and
-proves nothing was reintroduced: e.g.
-`grep -c "refuses to touch a prompt that has none" agents/lian-zhao.md` -> 1.
-Proposed here, not adopted, until the fix actually lands where this row can
-see it.
+    sed -n '3p' agents/lian-zhao.md | grep -c 'Grows the fixture'; sed -n '52p' agents/lian-zhao.md
+    # → 1
+    # → - Your surface is `agents/*.md` and nothing else. Not fixtures
+
+**Re-run 2026-09-16 (closing pass), OPEN at that point.** I was told the fix
+already landed and, per rule 4, re-ran the detector myself rather than
+trusting the paste: it printed the same output as above, unchanged (`1`, line
+52 unchanged) — the contradiction was still live on the tree in front of me
+then. The fix was real but sat on an unmerged branch,
+`lian-zhao/pf-022-description-fix` (`a2e159a`, re-based for a YAML quoting fix
+at `6ef8aeb`), an ancestor of neither this branch nor `origin/main` at the
+time.
+
+**Re-run 2026-09-16 (this reconciliation pass), VERIFIED.** This branch
+recovered six commits a stale `main` had lost, including
+`511a6d9 PF-022: fix lian-zhao.md frontmatter/body contradiction on fixture
+ownership` — the fix now sits on this tree. Line 3 reads "Gates every change
+on the agent's own eval fixture and refuses to touch a prompt that has none"
+and makes no fixture-authorship claim; line 52 is unchanged. Switched to the
+claim-holds command proposed above, since the old detector would read `0`
+whether the fix landed correctly or the file were rewritten to say anything
+else entirely — the positive assertion is checkable both ways.
+
+```bash
+grep -c "refuses to touch a prompt that has none" agents/lian-zhao.md
+# → 1
+```
 
 Also recording `lian-zhao`'s own sweep of every other agent `description`
 against rule 19's table, handed to me as fact and independently re-read at
@@ -2097,9 +2128,29 @@ call on whether the second cause is an agent defect or a criterion defect
 is `nadia-hadid`'s to make first, since it decides which fix the criterion
 even wants.
 
+Original marker command, kept as history rather than as live evidence: the
+verdict WAS recorded on this tree (`Run (2026-09-16, via zofia-kaminska).
+FAIL — 8 criteria, 2 failed.`, `case.yaml:144`), so the string
+`'Not yet run against the agent'` no longer exists to match — a deleted
+marker proves the run happened, not that the criteria still fail the way this
+row claims.
+
+    grep -n 'Not yet run against the agent' evals/cases/zofia-004-seed-patch-established/case.yaml
+    # → 116:  Not yet run against the agent.
+
+**Re-run 2026-09-16 (this reconciliation pass), still OPEN.** Switched to a
+command that tracks the actual claim above — that the two named criterion
+defects are still present — rather than a marker string this run's own
+history deleted. Cause 1's still-missing rendering (backtick, no bold: the
+exact form the agent produced and the criterion set has never covered) and
+cause 2's still-absent "no rule needed" acceptance path are checked directly;
+both print `0`, confirming neither gap has been closed since this row was
+opened.
+
 ```bash
-grep -n 'Not yet run against the agent' evals/cases/zofia-004-seed-patch-established/case.yaml
-# → 116:  Not yet run against the agent.
+grep -c 'PROJECT_RULES.md` | present"' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -ci 'no rule needs adding\|no new rule required\|nothing needs adding\|no rule needed' evals/cases/zofia-004-seed-patch-established/case.yaml
+# → 0
+# → 0
 ```
 
 ### PF-026 — `tests/lock.sh` / working pattern — OPEN
