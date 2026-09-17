@@ -36,7 +36,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | id | area | to do, or claim to keep true | state | last-checked | interval | prio |
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and its version marker are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-002 | `agents/` | ~~every agent has at least one eval fixture (rule 13)~~ — rule 13 retired 2026-09-17, headcount is no longer a claim this board makes | RETIRED | 2026-09-17 | — | — |
 | PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-17 | 14 | P2 |
 | PF-004 | `evals/` | grading measures precision (false positives/negatives), not just declared-defect mentions | OPEN | 2026-09-16 | 60 | P1 |
 | PF-005 | `docs/release_notes_*` | no divergence between a release note and its tag goes unrecorded (v1.10.0's known divergence stays recorded, uncorrectable per rule 8) | VERIFIED | 2026-09-16 | 30 | P3 |
@@ -48,7 +48,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-012 | `agents/` | no fleet-wide fixture-verdict staleness against the prompt it grades | OPEN | 2026-09-17 | 14 | P1 |
 | PF-013 | `agents/` | every agent runs on the cheapest model tier that passes its fixture | OPEN | 2026-09-17 | 60 | P3 |
-| PF-014 | `agents/` | no agent is missing the fixture its name implies | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-014 | `agents/` | ~~no agent is missing the fixture its name implies~~ — rule 13 retired 2026-09-17, same reason as PF-002 | RETIRED | 2026-09-17 | — | — |
 | PF-015 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12); pending — remove the now-dead byte-diff mechanism (Check 17), retired by the rule 21a amendment | OPEN | 2026-09-17 | 14 | P1 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-017 | `agents/` | fixtures exist for the autopilot cycle, the release gate and zofia's patch path, and have been dispatched | OPEN | 2026-09-16 | 14 | P1 |
@@ -97,10 +97,13 @@ local `.git/hooks/`.
 grep -c 'PRECOMMIT\|HOOK_VERSION' install.sh
 ```
 
-### PF-002 — `agents/` — VERIFIED
-```bash
-for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed 's/-[0-9].*//' | sort -u | wc -l | tr -d ' '
-```
+### PF-002 — `agents/` — RETIRED
+Rule 13 (`PROJECT_RULES.md`) is retired: it mandated a fixture per agent by
+headcount, not by evidence of coverage. 20 of 36 fixtures have never recorded
+a FAIL, which is what a headcount rule buys. `tests/check.sh` Check 25, which
+enforced this row's claim, retires with it — `iris-vermeulen`'s surface. This
+row is kept, not deleted (rule 21); it no longer asserts anything, so it
+carries no command and no interval.
 
 ### PF-003 — `evals/cases/` — VERIFIED
 Coverage only — a superseded or FAILing verdict still counts. See PF-004 for
@@ -181,10 +184,10 @@ passes its fixture" — only assigned by judgment at creation time.
 grep -h '^model:' agents/*.md | awk '{c[$2]++} END{for(k in c) printf "%d %s\n", c[k], k}' | sort -k2
 ```
 
-### PF-014 — `agents/` — VERIFIED
-```bash
-for a in agents/*.md; do s=$(basename "$a" .md); ls evals/cases 2>/dev/null | grep -q "^${s%%-*}-" || echo "$s"; done | wc -l | tr -d ' '
-```
+### PF-014 — `agents/` — RETIRED
+Same rule-13 retirement as PF-002: this row measured headcount-by-name
+coverage, which rule 13 mandated and no longer does. Check 25 goes with it
+(`iris-vermeulen`). Kept per rule 21, carries no command or interval.
 
 ### PF-015 — `tests/check.sh` — OPEN
 Check 17 (byte-diff of recorded board evidence) is dead weight now that rule

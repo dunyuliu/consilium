@@ -87,7 +87,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |
 | 11 | Docs move with the prompt, in the same change | judgment |
 | 12 | A new agent lands with README roster, model table, and Layout entry | mechanical — Checks 6, 7 |
-| 13 | A new agent lands with at least one `evals/cases/` fixture | mechanical — Check 25 |
+| 13 | *(retired 2026-09-17 — see rule body)* | — |
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
 | 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — the pre-push hook enforces the local half; see the rule |
@@ -106,7 +106,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 25c | Silence must not satisfy a case | mechanical — Check 24 |
 | 25d | A verdict records the prompt SHA it was graded against; a contested case needs more than one sample | mechanical in part — SHA/count derivable by tooling; "is this case contested" is judgment |
 | 25e | Two dispatches agreeing against the criterion is a criterion defect, not the contested shape | judgment |
-| 13a | An agent's fixture must name it exactly | mechanical — Check 25 |
+| 13a | *(retired with rule 13 — its check was the same one)* | — |
 | 22 | Every agent declares communication discipline | mechanical — Check 13 |
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical — Checks 15, 16 |
@@ -478,18 +478,44 @@ Checks 6 and 7 were each negative-tested before landing — a missing row, a
 wrong model, a dropped roster line, and a dropped Layout line all fail as
 intended. A check that has never failed is not known to be a gate.
 
-## 13. A new agent lands with at least one eval fixture
+## 13. *(retired 2026-09-17)*
 
-README "Hiring" step 5, verbatim: *"Plant at least one regression fixture
-under `evals/cases/` covering their core competency, so prompt changes can
-be measured."* This is a rule, not an aspiration.
+Number kept; rule numbers never move (see Conventions).
 
-**Rationale**: without it, the coverage gap grows monotonically and is only
-discovered by counting.
+**What it required**: every new agent lands with at least one
+`evals/cases/` fixture naming it — README "Hiring" step 5, verbatim: *"Plant
+at least one regression fixture under `evals/cases/` covering their core
+competency, so prompt changes can be measured."* Enforced mechanically by
+`tests/check.sh` Check 25.
 
-**How to apply**: `ls evals/cases/ | grep <agent-first-name>` before
-declaring a hire complete. Coverage debt for agents that predate this rule
-is tracked as an open finding, not silently forgiven.
+**Why it is gone**: the rule mandated fixture count by agent headcount, not
+by evidence of what a fixture catches. 22 agents forced at least 22
+fixtures to exist whether or not any of them ever distinguished a good
+report from a bad one. Measured 2026-09-17: **20 of 36 fixtures in the
+suite have never recorded a FAIL** — they have only ever passed, which
+means they have never once told a good report from a bad one. That
+population is exactly what this rule kept alive. Same shape as the
+Check 17 / 21a pair: a rule generates an artifact, a check enforces the
+rule, and the two cite each other as justification while nothing in the
+loop ever asks whether the artifact was worth anything.
+
+**What replaces it**: nothing written here. Whether an agent's coverage is
+worth having is a judgment call made when a fixture is authored or reviewed
+— rule 25's discipline (a fixture proves its criteria are executable and
+absorbs every real miss) already governs that — not a headcount enforced at
+hire time. No new rule and no new board row restate this as prose; if
+coverage now rests on judgment, that is the whole of what changed.
+
+**Check 25 retires with this rule.** It enforced fixture-existence
+(rule 13) and fixture-naming (rule 13a) together in one assertion; once
+headcount is not required, it has nothing left to gate. That removal is
+`tests/check.sh` — `iris-vermeulen`'s surface, not this book's — and lands
+separately.
+
+**13a retires with it**, for the same reason: 13a required an existing
+fixture to name its agent exactly, checked by this same Check 25. With the
+check gone, exact naming becomes a convention worth following when
+authoring a fixture, not a rule with no gate behind it.
 
 ## 14. One installer, one canonical path
 
@@ -1134,6 +1160,20 @@ specifies rules and delegates the writing to `zofia-kaminska`.
 **How to apply**: adding an agent with write tools means adding a row here.
 If the row would duplicate an existing surface, the agent is the wrong shape
 — split the surface or fold the agent in.
+
+**Carve-out: a single-owner landing is permitted when a change is
+mechanically entailed and splitting it across owners would redden the gate
+in between.** Rule 21a's amendment (2026-09-17) mechanically entailed
+removing `tests/check.sh` Check 17 — the byte-diff mechanism the amendment
+describes as dead weight — and landing the two separately would have left
+the gate red between the rule-book commit and the check-removal commit for
+no reason but ownership. `zofia-kaminska` edited `tests/check.sh` directly
+rather than leave the repo at 27 red in the interim. Same reasoning as rule
+28: a gate (here, the ownership boundary itself) that forces a red window to
+stay compliant is failing its own purpose. Narrow on purpose — it excuses
+*this* shape (an amendment that names its own consequence on another
+surface) and nothing broader; it is not license to edit another owner's
+surface because doing so seemed convenient.
 
 ## 18. One writer per repo — never run two mutating workflows at once
 
