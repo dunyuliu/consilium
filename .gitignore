@@ -8,3 +8,4 @@ __pycache__/
 # Compiled reference binaries built while checking a port against its oracle.
 *.o
 *.so
+resume_claude.sh
