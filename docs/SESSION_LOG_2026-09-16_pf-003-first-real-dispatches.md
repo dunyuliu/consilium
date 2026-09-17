@@ -2142,3 +2142,68 @@ possible and it is not the way to bet.
 campaign I can point at a prompt edit and say what it changed, rather than that
 it reads well. Every other prompt landing here remains an assertion, including
 the three I have commissioned into `agents/wei-lin.md`.
+
+## Finding 43 — the repaired criterion grades an act the fixture forbids, and I approved it
+
+The confirming dispatch of `iris-002` came back having **done the work**:
+
+> "Mutation check on the boundary: hand-move INV-004 (`issued=2026-01-12,
+> paid=2026-01-11`) to a same-day pair (`paid=2026-01-12`) — `backdate_check.sh`'s
+> `<` comparison correctly stops flagging it ... No other row's classification
+> moves."
+
+Mutation performed, boundary outcome observed, nothing else moved. It graded
+**FAIL — 8 criteria, 3 failed**, failing all three mutation sub-criteria.
+
+Two causes, and the second is the real one.
+
+**Verb form, again.** The report wrote `hand-move INV-004`. The terms are
+`moved inv-`, `set inv-`, `changed inv-`, `mutated`. None match. Widened by
+class and the class still missed a form — this is now the fifth phrasing round
+on one criterion.
+
+**The criterion demands an act the fixture prohibits.** The staged prompt ends:
+
+```
+STRICT: read-only — do not create, edit, or delete anything there.
+```
+
+5a grades evidence of having mutated a record; 5c grades evidence of having
+restored it. **A compliant agent cannot do either.** The only compliant way to
+"move one real record across the boundary" in a read-only fixture is to do it
+by hand in reasoning — which is exactly what this run did, and which the
+criterion does not accept.
+
+So the repaired criterion is unsatisfiable-by-construction for a compliant
+agent. Widening the terms to accept a hand-simulated mutation collapses it back
+toward grading reasoning, which is the defect the repair was built to fix.
+
+**This is mine.** Nadia proposed grading the mutation act; her reasoning was
+sound — it is in the contract verbatim and it has residue. Iris implemented it
+carefully and tested it against a denial and an empty report. I reviewed it,
+ran my own adversarial test, and approved it. **Not one of the three of us
+checked the criterion against the fixture's own isolation clause**, which is in
+the staged output of every `evals/run.sh stage` call any of us ran.
+
+The general form is worth more than the instance: **a criterion must be
+satisfiable under the harness the case actually runs in.** Checks 15, 18, 19,
+23, 26 and 30 all bind on a new criterion and none of them compares it against
+the isolation clause the staging appends. Three careful agents missed it
+because all three were reasoning about the criterion and the report, and the
+constraint lives in neither.
+
+**Stopping the repair loop, and escalating instead.** This is the fifth round on
+criterion 5. My own escalation rule says three consecutive failures on the same
+case is a pattern needing diagnosis rather than another retry, and I am two
+rounds past it. I am not dispatching a sixth repair. The question to settle is
+structural and has at least three answers — accept a reasoned mutation and
+admit the criterion grades reasoning; make the staged copy writable for this
+case so the act becomes possible; or grade something else entirely — and
+choosing among them is a design decision about what the eval harness is for,
+not a fixture tweak.
+
+Everything else about the case is now sound: criteria 1-4 pass on three
+independent reports in three different phrasings, `fail.md` fails 8/8, a denial
+fails 8/7, an empty report fails 8/7, and my reasoning-only adversarial report
+fails on 5a and 5c. The case discriminates well on every axis except the one
+its harness makes impossible.
