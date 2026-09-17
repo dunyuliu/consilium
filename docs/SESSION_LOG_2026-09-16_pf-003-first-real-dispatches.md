@@ -1146,3 +1146,45 @@ The corrective on my side is narrow and mechanical. Before dispatching, read
 the brief once asking a single question: **does every file this mission must
 touch belong to the agent I am sending?** If the answer is no, the mission is
 two missions. I did not ask that question and it cost a round trip.
+
+## Finding 23 — "push in the same action that commits" and "nothing red is pushed" collide mid-chain
+
+Finding 17's discipline says push in the same action that commits, because a
+branch with an open PR is append-only through the remote. Rule 3 and the
+`pre-push` hook say nothing red ever leaves the machine. Both are right, and
+tonight they met.
+
+I committed the session log while the gate stood at `1485 passed, 2 failed` —
+Check 33 awaiting a one-line schema edit from `lian-zhao`, and PF-019's board
+row awaiting `zofia-kaminska`. The hook did exactly what it should:
+
+```
+pre-push: tests/check.sh FAILED — push aborted.
+unpushed: 3
+```
+
+So the state finding 17 describes as dangerous — commits on a branch with an
+open PR that the remote has not seen — is now *mandatory*, because the
+alternative is pushing red. The two rules cannot both be satisfied while a
+landing is mid-chain across multiple owners.
+
+The resolution is not to weaken either, and emphatically not `--no-verify`,
+which is the move this collision invites and which would trade a visible
+inconvenience for an invisible regression. It is that the push discipline needs
+its exception stated:
+
+> Push in the same action that commits. Where the gate is red because a
+> multi-owner landing is mid-chain, that is not possible: the commits stay
+> local, the count of unpushed commits is tracked explicitly, and they are
+> pushed in the same action that turns the gate green. The failure finding 17
+> records is not "commits sat local" — it is **commits sat local and I stopped
+> tracking them**, then reported the branch as landed.
+
+That distinction is the whole thing. Tonight's three unpushed commits are safe
+because they are counted, named, and blocked by a mechanism that will not let
+me forget: the hook re-runs on every attempt, so the next push either carries
+them or fails loudly again. The six commits PR #19 lost were unsafe because
+nothing was blocking and nothing was counting — I simply never tried again.
+
+A hook that refuses is a hook that reminds. An absence of a hook is silence,
+and silence is what cost the six commits.
