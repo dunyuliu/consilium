@@ -94,6 +94,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
 | 18 | One writer per repo — never run two mutating workflows at once | mechanical in name only — the pre-commit hook exists only where install.sh ran; nothing in the repo checks it |
 | 18a | Acquire only for the write step; verify unlocked, before and after | norm — `tests/lock.sh status` reports hold *age* mechanically; whether the hold was write-only is not checkable after the fact |
+| 18b | Never dispatch a writer while the gate is red; track and push local commits in the same action that turns it green | norm — nothing checks a dispatch decision after the fact; `bash tests/check.sh`'s exit code is the mechanical signal it says to consult |
 | 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Checks 12, 34 |
@@ -1046,6 +1047,63 @@ sit between. What would make it checkable: a lock-history log (append a line
 on every acquire and release, rather than overwriting one file) that a check
 could diff against `bash tests/check.sh` invocation timestamps to flag a hold
 that spans a slow command. Nothing in this repo does that today.
+
+### 18b. Never dispatch a writer while the gate is red; if commits sit local, track them and push in the same action that turns it green
+
+A red gate means the pushed remote and the local branch disagree about what
+passes. Dispatching a new writer during that window gives it a base that is
+missing whatever made the gate red in the first place — every worktree it
+creates inherits the gap silently, because branching does not check the gate.
+
+**Rationale**: this is not the concurrent-writer problem rule 18 already
+covers (two mutating workflows racing the same lock). It is a sequencing
+problem one level up, before any lock is even taken: the *conductor's* choice
+of when to hand a fresh worktree to a writer at all. A green gate is the only
+signal that local and remote currently agree; dispatching on a red one hands
+out a stale base by construction, and no lock protects against that because
+the new worktree never contends for one — it just starts wrong.
+
+**Incident (2026-09-16)**: the same stale-base failure through two different
+doors in one campaign. First, a branch was pushed, a PR opened, then six more
+commits were cherry-picked locally and never pushed again; the maintainer
+merged the snapshot the PR still pointed at, and two agents' work plus four
+findings became unreachable objects — recovered only because someone noticed
+the count didn't match. Second, the gate went red mid-chain, `pre-push`
+correctly refused, commits sat local — and a dispatched agent branched from
+the *remote* anyway and got a stale base; she detected the gap herself and
+merged the missing branch by hand. `pre-push` was correct both times; the gap
+is upstream of it, in the decision to dispatch during the window it exists to
+guard.
+
+**The nuance that makes this survivable rather than a ban on ever having
+local, unpushed commits**: the second failure was never "commits sat local" —
+a red gate legitimately keeps commits local until the fix that turns it green
+lands. The failure was that nobody was counting them while they sat there.
+What this rule requires is not "the gate must always be green" — sometimes it
+isn't, and rule 15a already forbids pushing red — but that the local-ahead
+count is tracked for as long as it's true, and that pushing happens in the
+same action that turns the gate green, not as a later, separate step someone
+might forget.
+
+**How to apply**:
+1. Before dispatching a writer to a fresh worktree, check the gate. Red →
+   do not dispatch; fix or wait.
+2. If commits are legitimately local because the gate is red mid-chain, note
+   how many and why (a session log entry, or the board row the fix belongs
+   to) so the count is never only in one person's head.
+3. Keep multi-owner chains short — each additional owner between a push and
+   the next is another window in which a base can go stale unnoticed.
+4. The commit that turns the gate green is the commit that gets pushed. Do
+   not defer the push to a later, separate step.
+
+**Tier**: a norm, not a mechanical check — nothing in this repo can detect,
+after the fact, that a writer was dispatched while the gate was red, because
+dispatch itself leaves no artifact here to check (agents are prompted, not
+scripted, same limit rule 18a states for lock-hold purpose). What is
+mechanical, and already exists: `bash tests/check.sh`'s exit code as the
+go/no-go signal this rule says to consult before dispatching, and
+`git status`/`git log @{u}..` for the local-ahead count step 2 asks be
+tracked.
 
 ## 23. Every agent declares tool economy; dispatchers declare dispatch cost
 
