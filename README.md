@@ -122,20 +122,24 @@ Audit the changes, correctness, conciseness, fix, document, refactor
 for leanness, a clean tree with no wandering work dirs, CI green, the
 published release and version control, and the rule book followed.
 
-- **Enforced**: all twelve are rows in `tests/release_gate.sh`, which
-  refuses a tag when any fails (rule 15b). It decides the tree, CI and
-  publication rows itself; the others must carry a recorded
-  verdict in the release note, and a blank line fails the gate. A
-  GitHub Release object is created and Check 35 asserts every tag has
-  both a note and a published Release.
-- **Not yet**: a recorded verdict proves the pass happened, never that it
-  was any good.
+- **Enforced**: five of the twelve. `tests/release_gate.sh` refuses a
+  tag when the tree is dirty or holds a stray worktree or lock, when CI
+  is not green on that exact SHA, when the tag or its GitHub Release is
+  missing from the remote, or when a stranger clone of the tagged commit
+  cannot run what the README documents (rule 15b). Check 35 separately
+  asserts every pushed tag carries both a note and a published Release.
+- **Not yet**: the other seven — audit, correctness, conciseness, fixes,
+  docs, refactor, rules — are obligations on the release engineer, not
+  rows. They were rows until 2026-09-17 and passed whenever the note
+  carried a `key:` line of twelve characters or more: the gate never
+  verified the audit happened, only that a string was present. We stopped
+  asserting that a recorded verdict proves a pass.
 
 ### 3. Autopilot: how is any of that enforced strictly, rather than hoped for?
 
 - **Enforced**: by the only three tiers that bind. A **gate that
   refuses** (`tests/release_gate.sh`, `tests/check.sh`), a **recorded
-  verdict a check asserts exists** (the note's ten rows; rule 15a's CI
+  verdict a check asserts exists** (rule 15a's CI
   field), and for what neither can reach, **an owner who is not the
   author** — the gate is `iris-vermeulen`'s file, the rule-book verdict
   is `zofia-kaminska`'s, the refactor is `kai-fischer`'s. Prompt prose
@@ -616,7 +620,7 @@ consilium/
 │   └── cases/              # one directory per planted-bug case
 ├── tests/             # structural-invariant checks for consilium itself
 │   ├── check.sh            # pure-bash; runs in CI on every push/PR
-│   ├── release_gate.sh     # the ten rows a release must satisfy (rule 15b)
+│   ├── release_gate.sh     # the five rows a release must satisfy (rule 15b)
 │   └── lock.sh             # one-writer-per-repo lock (rule 18)
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
