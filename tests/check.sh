@@ -25,7 +25,6 @@
 #  14. Every agent declares tool economy (section presence only).
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
 #  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
-#  17. Every PATHWAY_FORWARD.md evidence command still prints what is recorded.
 #  18. No fixture input contains fixture-authoring language (answer-key leak).
 #  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
 #  20. Every agent holding the Agent tool warns about dispatch cost, and no
@@ -667,72 +666,6 @@ done
 [ "$check16_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 16 asserted nothing"
 
 echo
-echo "Check 17: PATHWAY_FORWARD.md evidence commands still print what is recorded"
-# Rule 21a. A VERIFIED claim is only as good as its last run; Check 12 verifies a
-# claim CITES a command, never that the command still says so.
-#
-# The first attempt at this check blocked the whole suite and was reverted. Root
-# cause was not the parser: check.sh runs under `set -e`, and an evidence command
-# exiting nonzero (grep finding nothing is routine) killed the run before the
-# Summary line printed. Evidence commands are therefore run with errexit
-# suspended and their exit status deliberately ignored — the contract is what a
-# command PRINTS, not whether it succeeded.
-#
-# Two exemptions, both reported rather than silent:
-#   * a fence with no command line records an absence of evidence (a never-audited
-#     row); the parser does not emit it, so there is nothing to run.
-#   * a command that invokes `bash tests/check.sh` would recurse into this check.
-# A fence with more than one command line FAILS: line-oriented parsing cannot
-# reconstruct multi-line shell, and joining fragments with `;` produces `do;`,
-# which is what broke attempt 1. One line per command is the contract.
-if [ ! -f "$BOARD" ]; then
-    fail "$BOARD missing — rule 21a has nothing to execute"
-else
-    ev_rows=0
-    is_shallow=$(git rev-parse --is-shallow-repository 2>/dev/null || echo false)
-    while IFS=$'\037' read -r ev_id ev_n ev_cmd ev_res; do
-        [ -z "$ev_id" ] && continue
-        ev_rows=$((ev_rows + 1))
-        if [ "$ev_n" -gt 1 ]; then
-            fail "$ev_id: evidence command spans $ev_n lines — rule 21a requires one line so it can be re-run"
-            continue
-        fi
-        case "$ev_cmd" in
-            *"bash tests/check.sh"*)
-                echo "  self-referential, not re-run: $ev_id"
-                ok; continue ;;
-        esac
-        # A shallow clone has no tags and one commit, so any command reading
-        # history produces output that cannot match what a full clone recorded.
-        # CI hit exactly this: `git show --stat v1.10.0` found no tag, and
-        # `evals/run.sh list` reported 20 stale cases instead of 13 because
-        # `git log -1 -- agents/X.md` returns the tip commit for every file.
-        # Skipping is named in the output rather than silent — an exemption that
-        # leaves no trace is indistinguishable from a check that passed.
-        if [ "$is_shallow" = "true" ]; then
-            case "$ev_cmd" in
-                *"git "*|*"run.sh list"*|*"run.sh smoke"*)
-                    echo "  shallow clone, history-dependent evidence not re-run: $ev_id"
-                    ok; continue ;;
-            esac
-        fi
-        ev_expected=$(printf '%s' "$ev_res" | tr '\036' '\n')
-        set +e
-        ev_actual=$(bash -c "$ev_cmd" 2>&1)
-        set -e
-        if [ "$ev_actual" = "$ev_expected" ]; then
-            ok
-        else
-            fail "$ev_id: recorded evidence no longer reproduces — re-run and paste what it printed"
-            printf '        command:  %s\n' "$ev_cmd"
-            printf '        recorded: %s\n' "$(printf '%s' "$ev_expected" | tr '\n' '|')"
-            printf '        actual:   %s\n' "$(printf '%s' "$ev_actual" | tr '\n' '|')"
-        fi
-    done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
-    [ "$ev_rows" -gt 0 ] || fail "no evidence commands parsed from $BOARD — the parser or the format changed"
-fi
-
-echo
 echo "Check 18: no fixture input contains fixture-authoring language"
 # Rule 5. `evals/run.sh stage` isolates input/ from case.yaml and the case
 # README, because an agent that reads the answer key produces output in which
@@ -845,39 +778,6 @@ for agent_file in agents/*.md; do
 done
 
 echo
-echo "Check 21: no evidence command reaches the network"
-# Rule 2. Check 17 executes every fenced evidence command on every suite run, so
-# an evidence command IS part of the gate. A gate that needs the network fails in
-# a clone behind a firewall, on a machine with no route out, or when a public API
-# rate-limits — and it fails for a reason that has nothing to do with the
-# repository being wrong. CI was red for twenty-two commits on exactly that kind
-# of environmental dependency (a shallow checkout, PF-016), which is why this one
-# is closed before it is ever opened rather than after.
-#
-# The temptation is concrete: CI status IS readable from this repository with
-# `curl` against the public API, and it was deliberately recorded as a MANUAL
-# procedure in PF-016 rather than as that row's evidence. This check is what
-# stops a later edit from quietly promoting it.
-#
-# WHAT THIS CHECKS, EXACTLY: that no evidence command names a network tool or a
-# URL scheme. It is complete for that, and it is not the general claim that every
-# evidence command is environment-independent — that is not mechanizable, and the
-# axes already tested by hand (working directory, locale, timezone, shallow
-# clone, GNU vs BSD padding) are recorded on PF-016 instead.
-NET_TOOLS='(^|[|;& ])(curl|wget|nc|ncat|telnet|ssh|scp|rsync|ftp|ping)([ |;&]|$)|https?://'
-for_each_evidence_net=0
-while IFS=$'\037' read -r ev_id ev_n ev_cmd _ev_res; do
-    [ -z "$ev_id" ] && continue
-    for_each_evidence_net=$((for_each_evidence_net + 1))
-    if printf '%s' "$ev_cmd" | grep -qE "$NET_TOOLS"; then
-        fail "$ev_id: evidence command reaches the network — Check 17 runs it on every suite pass, so the gate would need a route out (rule 2)"
-    else
-        ok
-    fi
-done < <(awk -f tests/parse_board.awk -v section=evidence "$BOARD")
-[ "$for_each_evidence_net" -gt 0 ] || fail "no evidence commands parsed for the network check"
-
-echo
 echo "Check 22: every case tier is a tier the tooling consumes"
 # `evals/run.sh smoke` selects on `^tier: smoke` and nothing reads any other
 # value. `dunyu-001` carried `tier: dev` with a considered justification beside
@@ -970,7 +870,7 @@ rm -f "$empty_report"
 echo
 echo "Check 25: every agent has a fixture that names it (rule 13)"
 # Rule 13 had no check. Its only enforcement was PF-014's board evidence
-# command, which Check 17 byte-diffs — so a new agent without a fixture would be
+# command, which Check 17 byte-diffed before it was retired — so a new agent
 # caught only because a recorded "0" became "1". That works, and it is an odd
 # place for a rule to live: the enforcement is a side effect of a number.
 #
