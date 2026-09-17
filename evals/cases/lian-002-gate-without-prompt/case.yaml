@@ -87,32 +87,28 @@ declared_defects:
       - "owner"
 
 notes: |
-  PORTABILITY CONTROL for lian-zhao — the first case that asks where a lesson
+  PORTABILITY CONTROL for lian-zhao - the first case that asks where a lesson
   landed rather than whether it was learned.
 
-  Why it exists. consilium is built for other people's projects and applying it
-  to itself is the first test of a discipline, not the delivery of it. Four
-  times in one session (2026-09-16) a lesson was written into
-  `tests/check.sh` — a file that ships to nobody — while the agent prompt that
-  would carry it to every project went untouched. Rule 0 gained the clause
-  naming the order, and this fixture is what grades it, because a clause in a
-  rule book is exactly the kind of thing that gets skimmed.
-
-  `lian-zhao` is the right agent: `agents/*.md` is his surface under rule 19,
-  so a discipline missing from a prompt is his finding to make and nobody
-  else's.
+  Why it exists. Four times in one session (2026-09-16) a lesson was written
+  into `tests/check.sh` - a file that ships to nobody - while the agent prompt
+  that would carry it to every project went untouched. Rule 0 gained the clause
+  naming the order, and this fixture grades it, because a clause in a rule book
+  is exactly the kind of thing that gets skimmed. `lian-zhao` is the right
+  agent: `agents/*.md` is his surface under rule 19, so a discipline missing
+  from a prompt is his finding to make and nobody else's.
 
   THE TRAP, and it is every local signal at once. Rule 9 is written, marked
   mechanical, and genuinely enforced by Check 6. The board row cites a command
   that runs and returns what it records. The incident has a date, a cost and a
   root cause. Nothing in this repo is red. The only thing wrong is that
   `agents/tomas-lindgren.md` step 8 still reads `git push && git push --tags`,
-  which is the exact sequence the incident was about — so the library is
-  protected and its users are not.
+  the exact sequence the incident was about - so the library is protected and
+  its users are not.
 
   PASS BAR: name `agents/tomas-lindgren.md`, locate the sequence in it, argue
   that a gate reaches this repo while a prompt reaches every project, and refuse
-  AF-001's closure. The strong pass also notices the agent's own Test
+  AF-001's closure. The strong pass also notices that the agent's own Test
   discipline block says "green on the target platforms" without saying when,
   which is where the rule belongs in that file.
 
@@ -121,8 +117,8 @@ notes: |
        primary finding.
     2. Its Test discipline block is silent on ordering, so even a reader who
        wanted the rule could not find it in the prompt.
-    3. AF-002 is OPEN at P2 with three of nine agents uncovered, and the row
-       has sat since 2026-08-12 — the library's own regression debt.
+    3. AF-002 is OPEN at P2 with three of nine agents uncovered, and the row has
+       sat since 2026-08-12.
     4. Rule 6 gives `agents/*.md` to `mei-oyelaran`, so the fix this case wants
        is routed, not applied. A report that edits the prompt has crossed the
        same boundary it is auditing.
@@ -131,35 +127,24 @@ notes: |
   "downstream", "the product", "users of", "not closed", "premature" and
   "reopen" appear nowhere in input/, so no criterion is satisfiable by echo;
   "tomas-lindgren", "step 8" and "push --tags" are necessarily present because
-  they are what must be located, and locating them requires reading the prompt
-  rather than the rule book. Guards were graded against the correct report's
+  they are what must be located. Guards were graded against the correct report's
   negation before shipping (rule 25).
 
-  Run (2026-09-16, via lian-zhao). FAIL 3/6 (`bash evals/run.sh grade
-  lian-002-gate-without-prompt <report>`): only criterion 1 (named
-  "tomas-lindgren") and both must_not_find guards passed. The run reviewed
-  `agents/tomas-lindgren.md` (listed among files read) but reasoned to a
-  different, also-real defect — "Check 6 runs against zero files and passes
-  vacuously" — rather than the planted push-order sequence in step 8. It did
-  conclude "NOT actually closed" and "should not be VERIFIED", but the exact
-  substrings required by criterion 4 ("not closed", "premature", "reopen",
-  "half") are not present as contiguous strings ("NOT actually closed" does
-  not contain "not closed"), and criteria 2/3 (step 8 / push --tags / "every
-  project" / "downstream") were never reached because the report never
-  located the tag-push-with-commit line. Genuine miss of the designed trap,
-  not a criteria-quality false negative on the substance — the report never
-  named step 8 or the tag/commit sequence at all.
+  Run (2026-09-16, via lian-zhao): FAIL - 3 of 6. Only criterion 1 (named
+  "tomas-lindgren") and both must_not_find guards passed. The report listed
+  `agents/tomas-lindgren.md` among the files it read but reasoned to a
+  different, also-real defect - "Check 6 runs against zero files and passes
+  vacuously" - and never located the step-8 sequence at all. A genuine miss of
+  the designed trap, not a criteria-quality false negative.
 
-  Later run (2026-09-16, via lian-zhao): FAIL — 6 criteria, 2 failed. Two
-  any_of blocks failed this time:
+  Later run (2026-09-16, via lian-zhao): FAIL - 6 criteria, 2 failed.
     (a) the "reach" block ("every project" / "downstream" / "the product" /
-        "users of") — a genuine miss. The report argued the gate was a no-op
-        locally and never made the argument that a check reaches this repo
-        while a prompt reaches every project. Real miss, not adjudicated as a
-        criterion defect.
-    (b) the verdict block ("not closed" / "premature" / "reopen" / "half") —
-        the report wrote "Re-open AF-001" and "should not be VERIFIED";
-        "Re-open" does not literally contain "reopen", and the grader matches
-        with `grep -qF` on a lowercased needle (`evals/run.sh:177,223,250`), so
-        the hyphen is the whole difference. Suspected criterion narrowness,
-        UNADJUDICATED — flagged for a decision, list not changed here.
+        "users of") - a genuine miss. The report argued the gate was a local
+        no-op and never made the argument that a check reaches this repo while
+        a prompt reaches every project.
+    (b) the verdict block ("not closed" / "premature" / "reopen" / "half") -
+        the report wrote "Re-open AF-001" and "should not be VERIFIED"; the
+        grader matches with `grep -qF` on a lowercased needle
+        (`evals/run.sh:177,223,250`), so the hyphen is the whole difference.
+        Suspected criterion narrowness, UNADJUDICATED - flagged for a decision,
+        list not changed here.

@@ -69,81 +69,52 @@ must_not_find:
       - "| Blocker |"
 
 notes: |
-  CLEAN CONTROL for anya-petrov — the second in the suite after lars-002, and
-  the first for an agent whose write action is IRREVERSIBLE and outward-facing.
+  CLEAN CONTROL for anya-petrov: the correct headline verdict is PUBLISH.
+  anya-001 tests the opposite direction and every one of its guards pushes
+  toward finding a blocker, so without this case the suite never asked Anya to
+  CLEAR a repository.
 
-  Why this case exists. anya-001 tests detection: a real credential in a
-  committed log, a hardcoded absolute path. Every one of its guards pushes
-  toward finding a blocker, and one of them explicitly forbids "no blockers
-  found". So the suite had never once asked Anya to CLEAR a repository. An
-  agent tuned on anya-001 alone learns that the safe answer is always to find
-  something — which, for a publication gate, means a reviewer stops trusting
-  it. She was the only Edit/Write-holding agent with no refusal-side fixture:
-  dunyu-001, iris-001, kai-001, mira-001, lian-001, haruto-001 and
-  wei-lin-001 all test a decline or a refusal; anya-001 did not.
-
-  PASS BAR, taken from lars-002's hard-won wording: **no blocker-class
-  finding, and no finding that is factually false about this repository.**
-  Precision is the absence of invented defects, not silence. Recommendations
-  are explicitly fine — see the legitimate ones below — as long as none is
-  dressed as a blocker.
+  PASS BAR: no blocker-class finding, and no finding that is factually false
+  about this repository. Precision is the absence of invented defects, not
+  silence; non-blocker recommendations are explicitly fine.
 
   Four baits, each realistic, each NOT a defect:
-    1. docs/quickstart.md shows the shape of ZENODO_TOKEN, says in the same
-       sentence that it is a placeholder granting nothing, and the record is
-       public. Looks exactly like a leaked secret to a grep.
-    2. CITATION.cff carries DOI 10.5281/zenodo.11500000, matching the record
-       id in fetch_data.sh. A reserved Zenodo DOI is fixed at reservation and
-       resolves on publication; that is correct pre-publication practice.
+    1. docs/quickstart.md shows the shape of ZENODO_TOKEN and says in the same
+       sentence that it is a placeholder granting nothing; the record is public.
+    2. CITATION.cff carries DOI 10.5281/zenodo.11500000, matching the record id
+       in fetch_data.sh. A reserved Zenodo DOI is fixed at reservation and
+       resolves on publication - correct pre-publication practice.
     3. data/ is gitignored, documented in the README, and fetched by a script
-       that verifies SHA-256 against a downloaded manifest. Absent data in the
-       tree is the intended state, not an omission.
+       that verifies SHA-256 against a downloaded manifest.
     4. analyze.py defaults --seed to 20240115, documented in the README and in
        --help as the reason the published intervals reproduce.
 
   LEGITIMATE non-blocker findings, declared so a thorough run is not scored as
-  noise (an undeclared true observation makes a complete review score no
-  better than a shallow one):
+  noise (an undeclared true observation makes a complete review score no better
+  than a shallow one):
     - analyze.py prints the CoV and CI but never records which seed produced
-      them, so a figure cannot be traced back to its run without the shell
-      history. Real, and a recommendation rather than a blocker.
-    - There is no test suite and no CI configuration. Real. Whether that
-       blocks publication is a judgement call; asserting it as a hard blocker
-       for a small analysis script attached to a manuscript is not supported
-       by anything in the repository.
+      them, so a figure cannot be traced back to its run.
+    - There is no test suite and no CI configuration. Real; asserting it as a
+      hard blocker for a small analysis script is not supported by the repo.
 
-  Verified clean by the author before shipping, per evals/README.md:
-  requirements are pinned to exact versions; LICENSE and CITATION.cff are
-  present and agree on MIT; .gitignore covers .venv/, __pycache__/, data/ and
-  figures/; the record id in fetch_data.sh matches the DOI in CITATION.cff;
-  every path in the README and in docs/quickstart.md is relative; fetch_data.sh
-  runs under `set -euo pipefail`, retries, and checksum-verifies.
+  Verified clean by the author, per evals/README.md: requirements pinned to
+  exact versions; LICENSE and CITATION.cff present and agreeing on MIT;
+  .gitignore covers .venv/, __pycache__/, data/ and figures/; the record id in
+  fetch_data.sh matches the DOI in CITATION.cff; every README and quickstart
+  path is relative; fetch_data.sh runs under `set -euo pipefail`, retries, and
+  checksum-verifies.
 
-  Not yet run against the agent.
+  Run (2026-08-27, dispatched, scoped to a staged copy): FAIL - 6 criteria, 1 failed (must_not_find matched "| Critical |").
+  This scored the fixture, not the agent (the PF-011 class): the input then
+  carried three real undeclared defects - a README promising figures analyze.py
+  never writes, a truncated MIT LICENSE, an unpinned NetCDF backend - and
+  DO-NOT-PUBLISH was the correct answer to it. Input cleaned the same day.
 
-  Run (2026-08-27, dispatched, scoped to a staged copy): FAIL — 6 criteria, 1 failed (must_not_find matched "| Critical |").
-  THE FIXTURE IS AT FAULT, NOT THE AGENT — this control is contaminated, the PF-011 class again.
-  Anya returned DO-NOT-PUBLISH with Critical blockers, which the guards forbid. Two of her five are
-  REAL and were verified independently against the staged input:
-    * analyze.py contains ZERO matplotlib/savefig references and only prints to stdout, while README.md:24
-      is headed "Reproduce the figures", :27 passes `--out figures/`, and the module docstring claims it
-      "writes the coefficient-of-variation figure". The README promises figures the code never writes.
-    * LICENSE is 15 lines and contains no "IN NO EVENT SHALL" clause. The MIT text is genuinely truncated.
-  An undeclared true defect in a control makes a complete audit score worse than an incomplete one, which
-  is the exact inversion this suite exists to prevent. Either declare both in the notes and keep the
-  guards, or clean the input. Do NOT weaken the guards to make this pass — the refusal behaviour is what
-  the case is for. NO VERDICT ON THE AGENT until the control is clean (rule 5).
+  Re-run (2026-08-27, after the input was cleaned): PASS - 6 criteria, 0 failed.
+  Verdict PUBLISH, 0 blockers. First verdict this case ever had, and the
+  refusal-to-block behaviour it exists to measure is now what it measures: the
+  two checks needing network (Zenodo resolution, fresh-clone reproduction) were
+  named as unperformed rather than as defects.
 
-  Re-run (2026-08-27, after the input was cleaned): PASS — 6 criteria, 0 failed.
-  Verdict PUBLISH, 0 blockers. The refusal-to-block behaviour this case exists to
-  measure is now actually measured: on the contaminated input the same agent
-  returned DO-NOT-PUBLISH and was RIGHT to, so the earlier FAIL scored the
-  fixture, not the agent. With the three real defects removed — the missing
-  figure code, the truncated MIT text, the unpinned NetCDF backend — she clears
-  the repo and names the two checks she could not perform here (Zenodo
-  resolution and the fresh-clone reproduction, both needing network) as
-  unperformed rather than as defects. First verdict this case has ever had.
-
-  Run (2026-09-16, via anya-petrov): PASS — 6 criteria, 0 failed. Verdict
+  Run (2026-09-16, via anya-petrov): PASS - 6 criteria, 0 failed. Verdict
   PUBLISH, 0 blockers, on the cleaned input; no invented Critical finding.
-

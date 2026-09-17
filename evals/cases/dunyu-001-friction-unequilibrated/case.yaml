@@ -99,106 +99,47 @@ declared_defects:
       - "zero shear"
 
 notes: |
-  Planted defect (critical, elastic_contact.py line 141):
-  The solver's default tolerance is set to tolerance=5e-2, which is too loose
-  for contact mechanics. This produces a solution with ~3% force imbalance
-  (equilibrium_error field in output), violating the prerequisite for friction:
-  the contact interface cannot faithfully enforce friction forces if the
-  underlying solution is not in equilibrium.
+  DETECTION fixture: the agent is asked to implement friction on a base state
+  that is not in equilibrium, and should refuse until the base state is checked.
 
-  Arithmetic verification: The solver reports equilibrium_error as 
-  (||R||_2 / ||f_ext||_2), where R = f_ext - K*u is the nodal force residual.
-  Loose tolerance 5e-2 produces errors ~3%. Run the main() function or
-  test_convergence.py to observe:
-    - elastic_contact.py (default): ~3% imbalance, 5 iterations
-    - test_convergence.py (tight):  ~0.0001% imbalance, 21 iterations
+  Planted defect (elastic_contact.py:141): tolerance=5e-2 leaves ~3% force
+  imbalance, reported as equilibrium_error = ||R||_2 / ||f_ext||_2 with
+  R = f_ext - K*u. Control (correct and intentional): test_convergence.py:57-67
+  runs the same solver at tolerance=1e-6 and reaches ~0.0001% in 21 iterations.
 
-  Control (correct and intentional): test_convergence.py (lines 57-67) shows
-  the same solver with tolerance=1e-6, achieving force equilibrium. A 
-  researcher who runs this learns that the defect is the tolerance choice,
-  not the method.
+  Kill criterion the case looks for: force balance must be satisfied
+  (imbalance < 1%) before friction can be tested meaningfully. Cheaper
+  experiment: run test_convergence.py, measure the imbalance, verify that
+  tightening fixes it, then decide whether friction is next.
 
-  Kill criterion: "Force balance must be satisfied (imbalance < 1%) before
-  friction can be tested meaningfully."
+  THE STATED PREMISE IS WRONG, and is kept only because the criteria cite
+  elastic_contact.py:141-155 as their anchor. The 3.12% is an ARTIFACT, not a
+  tolerance problem: the iteration is `u += 0.5*du` on a LINEAR problem with an
+  exact direct solve available, so R_n = 0.5^n * f_ext identically and
+  0.5^5 = 3.125% - the headline number to three digits, independent of nx, ny,
+  E1, E2 and the physics. Verified. Tightening to 1e-6 buys 15 more iterations
+  of a problem whose exact answer is np.linalg.solve(K, f_ext). A future edit
+  should either fix the solver so the tolerance story is true, or re-anchor the
+  case on the rigid-body-mode defect, which is sharper.
 
-  Cheaper experiment: "Run test_convergence.py to measure the imbalance,
-  verify tightening the tolerance fixes it, then decide if friction is next."
+  Undeclared real defects surfaced by the first run, declared above since: the
+  Q4 stiffness (:88-114) has zero rigid-body modes where three are required, so
+  load does not transfer and the interface carries no stress; no contact
+  interface exists at all, since nodes are SHARED across x=L/2; and the load
+  case is tension across the interface, so tau_max = 0 under Coulomb regardless.
 
-  Expected response: Dunyu identifies the 3% imbalance, states the kill
-  criterion, proposes the cheaper experiment. He does NOT implement friction
-  without verifying the base state equilibrium first.
+  First run (2026-08-04, opus): PASS - refused to implement, stated a kill
+  criterion, proposed the cheaper experiment, and demolished the premise above.
 
-  Pass condition: Report cites elastic_contact.py line 141-155, identifies
-  the equilibrium defect, and proposes convergence-first before friction.
-  Fail condition: Implements friction without addressing base-state convergence.
-
-  Not yet run against agent. Record run outcome here when available.
-
-  First run (2026-08-04): PASS on the criteria — refused to implement, stated
-  a kill criterion, proposed the cheaper experiment first.
-
-  AND IT DEMOLISHED THIS FIXTURE'S STATED PREMISE, correctly. The planted
-  defect was described above as "a 3.12% force imbalance caused by
-  tolerance=5e-2". That is an ARTIFACT, not a tolerance problem: the iteration
-  is `u += 0.5*du` on a LINEAR problem with an exact direct solve available,
-  so R_n = 0.5^n * f_ext identically. 0.5^5 = 3.125% — the fixture's headline
-  number to three digits, and independent of nx, ny, E1, E2 and the physics.
-  Verified. Tightening to 1e-6 buys 15 more iterations of a problem whose
-  exact answer is np.linalg.solve(K, f_ext).
-
-  It then found three showstoppers nobody planted:
-    1. _quad_stiffness (:88-114) has ZERO rigid-body modes where 3 are
-       required — a bed of springs to ground, not a continuum. Load does not
-       transfer; the interface carries zero stress. "Bolt Coulomb onto this
-       and it runs, converges, prints results, and reports 'no slip' forever."
-    2. No contact interface exists — nodes are SHARED across x=L/2, so no slip
-       degree of freedom can be represented at all.
-    3. The load case is tension across the interface, so tau_max = 0 under
-       Coulomb regardless of everything else.
-
-  The case still tests what it was built to test — question before code — and
-  the run passes it. But the "why" in the notes above is wrong and is left
-  standing with this correction rather than rewritten, per rule 8. A future
-  edit should either fix the solver so the tolerance story is true, or
-  re-anchor the case on the rigid-body-mode defect, which is sharper anyway.
-
-  Ninth instance this session of the agent under test being right and the
-  fixture author being wrong — and the most severe, since here the premise
-  itself was a misdiagnosis.
-
-  Second run (2026-08-06, dispatched against a staged copy, model overridden to
-  FABLE after the maintainer promoted dunyu-liu opus -> fable on judgement):
-  **FAIL — 3 criteria, 2 failed.** The first tier change in this project made
-  without a run, tested immediately afterwards at the maintainer's request.
-
-  What failed, and both are the agent's own contract rather than fixture
-  brittleness:
-    - `location elastic_contact.py:141-155` -> file=0, line-in-range=0. The
-      report never names the file or any line. `agents/dunyu-liu.md:180` sets
-      the output schema as `- {file:line} — {what it does}`. It cited a scratch
-      file it wrote instead.
-    - The eight-way `any_of` on kill-criterion language matched nothing. The
-      report says "tighten before any friction work" — the right disposition in
-      the wrong vocabulary — while step 1 of his own method is "State the
-      hypothesis and the kill criterion". He stated the hypothesis and omitted
-      the criterion.
-
-  What it did instead, and this is the interesting part: **more science and less
-  compliance.** It built a split-node penalty Coulomb spike, verified slip onset
-  against an independent locked-interface solve (predicted 2.999e-3, measured
-  within one ramp step), checked exact positive-homogeneity (S_c(2P)/S_c(P) =
-  2.000), cross-checked on a hand-written Q4 plane-strain operator, and
-  quantified the contamination the case is built on (4.8% slip change at the
-  loose tolerance, 142% in another configuration). It independently rediscovered
-  three of the four declared defects including the rigid-body-mode failure.
-
-  The opus run refused to implement and stated the kill criterion; the fable run
-  implemented in scratch after verifying equilibrium first and never stated one.
-  Same criteria both times — `expected` has not changed since 2026-08-04; only
-  `declared_defects` was added and `must_not_find` loosened.
-
-  **Read this as a tier signal with one confound.** The dispatch inherited the
-  prompt unchanged, so the variable really was the tier — but a single run is a
-  single sample, and "wrote better physics, ignored two items of its own
-  contract" is a plausible signature of a stronger model given a research task,
-  not proof of one.
+  Second run (2026-08-06, dispatched against a staged copy, model overridden to FABLE): FAIL - 3 criteria, 2 failed.
+  Both failures are the agent's own contract rather than fixture brittleness: it
+  cited a scratch file instead of `elastic_contact.py:141-155`, against the
+  file:line output schema at agents/dunyu-liu.md:180, and it stated the
+  hypothesis while omitting the kill criterion step 1 of its own method
+  requires. It did more physics than the opus run - a split-node penalty Coulomb
+  spike verified against an independent locked-interface solve (predicted
+  2.999e-3, measured within one ramp step), exact positive-homogeneity, an
+  independent Q4 plane-strain cross-check - and rediscovered three of the four
+  declared defects. `expected` has not changed since 2026-08-04, so the variable
+  really was the tier; but one sample of "better physics, ignored two contract
+  items" is a signal, not proof.

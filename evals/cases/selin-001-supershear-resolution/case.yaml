@@ -111,7 +111,7 @@ must_not_find:
 notes: |
   DETECTION fixture. Full derivation, the four controls (C1-C4, first three
   guarded by must_not_find), and the adversarial-pass writeup live in this
-  case's README.md — not duplicated here. Summary: manuscript.md Section 2.5
+  case's README.md - not duplicated here. Summary: manuscript.md Section 2.5
   (lines 94-107) justifies a 250 m on-fault grid via nodes-per-shear-
   wavelength (arithmetically correct, wrong physics) instead of the
   breakdown-zone width Lambda_0 = (9 pi/32) mu* Dc/(tau_p-tau_r), which
@@ -123,39 +123,34 @@ notes: |
 
   Deliberately absent from the input, so the reviewer must supply them: the
   words "cohesive zone", "process zone", "breakdown zone", "S-ratio",
-  "resolution test", "grid-dependent". Detection here cannot be string
-  matching.
+  "resolution test", "grid-dependent". Detection here cannot be string matching.
 
-  Run (2026-09-16, via selin-aydin). FAIL 6/9 (`bash evals/run.sh grade
-  selin-001-supershear-resolution <report>`). Substance was largely right:
+  Note for the record: the fixture's 423 and 317 are mode II and mode III of one
+  estimate (423.5/317.6 = 1.3333 = 1/(1-nu) at nu=0.25) - two conventions, not
+  three.
+
+  Run (2026-09-16, via selin-aydin): FAIL - 6 of 9. Substance was largely right:
   the report independently identified the ~1.3-cell cohesive-zone
-  under-resolution, named the wave-vs-rupture-resolution-criterion
-  conflation, and flagged the single-doubling convergence test as scored on
-  the wrong (insensitive) observable -- but it never cited a manuscript.md
-  line number inside either planted range (94-101, 103-107), so both
-  `location` criteria failed on `line-in-range=0` despite the right keyword
-  matching. It also computed its own cohesive-zone estimate (~318 m) rather
-  than the fixture's expected arithmetic band (420-430 m) -- a genuine
-  numeric discrepancy worth a second look at either the review's formula or
-  the fixture's expected constants, not something resolved here. All four
-  must_not_find guards passed (no cherry-picking flag, no cheap-shot pass).
+  under-resolution, named the wave-vs-rupture-resolution-criterion conflation,
+  and flagged the single-doubling convergence test as scored on the wrong
+  (insensitive) observable - but it never cited a manuscript.md line inside
+  either planted range (94-101, 103-107), so both `location` criteria failed on
+  `line-in-range=0` despite the right keyword matching. It computed its own
+  ~318 m estimate rather than the fixture's expected 420-430 m band, a genuine
+  numeric discrepancy worth a second look at either the formula or the
+  fixture's constants. All four must_not_find guards passed.
 
-  Later run (2026-09-16, via selin-aydin). FAIL — 9 criteria, 1 failed
-  (`bash evals/run.sh grade selin-001-supershear-resolution <report>`). The
+  Later run (2026-09-16, via selin-aydin): FAIL - 9 criteria, 1 failed. The
   `any_of` arithmetic block (case.yaml lines 39-49, accepting
   423/420/425/430/317/320/1.69/1.27) failed: the agent computed 739 m / ~3.0
-  nodes from `L0 = (9*pi/32)*mu*Dc*(tau_p - tau_r)/(tau_p - tau_0)^2`, rather
+  nodes from `L0 = (9*pi/32)*mu*Dc*(tau_p - tau_r)/(tau_p - tau_0)^2` rather
   than the Palmer-Rice/Andrews `L0 = (9*pi/32)*mu*Dc/(tau_p - tau_r)` = 317.6 m
   = 1.27 cells at dx=250 m. Adjudicated AGENT defect, criterion stands, on an
-  invariant the manuscript itself fixes: Table 1 gives ONE global sigma_n,
-  mu_s, mu_d, Dc, so the breakdown-zone width is the same everywhere on the
-  fault and cannot be a function of prestress -- the agent's form makes it one
-  and then called the asperity "adequately resolved" at a claimed 16 nodes. It
-  also understated the defect (1.27 cells became 3.0).
+  invariant the manuscript itself fixes: Table 1 gives ONE global sigma_n, mu_s,
+  mu_d, Dc, so the breakdown-zone width is the same everywhere on the fault and
+  cannot be a function of prestress - the agent's form makes it one, then called
+  the asperity "adequately resolved" at a claimed 16 nodes, understating 1.27
+  cells as 3.0.
 
-  Note for the record: the fixture's 423 and 317 are mode II and mode III of
-  one estimate (423.5/317.6 = 1.3333 = 1/(1-nu) at nu=0.25) -- two conventions,
-  not three.
-
-  Diagnostic only: the agent led with the tau_0a circularity, which the case
-  notes state was scrubbed in the adversarial pass.
+  Diagnostic only: the agent led with the tau_0a circularity, which this case's
+  README records as scrubbed in the adversarial pass.

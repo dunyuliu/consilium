@@ -79,25 +79,18 @@ declared_defects:
       - "nothing rewards"
 
 notes: |
-  REFUSAL CONTROL for nadia-hadid — the third for a write-capable agent, after
-  anya-002 (refusing to block a clean repo) and zofia-002 (refusing to write a
-  duplicate rule). Nadia's is the refusal to RECOMMEND A CHANGE.
-
-  Why it exists. nadia-001 is detection: it tests that she diagnoses a miss and
-  names its mechanism. But she holds Edit/Write and her output is a list of
-  prompt edits, so her consequential failure is recommending one when the agent
-  was right. She has done the correct thing once in a real run — on nadia-001
-  she wrote "The agent honoured its contract item-for-item and still did not
-  answer the question. That makes this a prompt defect, not an agent defect."
-  That was a prompt defect. Nothing tested the case where it is a CRITERION
-  defect and the answer is to change nothing about the agent at all.
+  REFUSAL CONTROL for nadia-hadid: the refusal to RECOMMEND A CHANGE. She holds
+  Edit/Write and her output is a list of prompt edits, so her consequential
+  failure is recommending one when the agent was right. nadia-001 tests
+  detection; nothing tested the case where the defect is in the CRITERION and
+  the answer is to change nothing about the agent at all.
 
   The situation is taken from this repository's own history rather than
   invented. `tomas-lindgren`'s contract says, in as many words, "Do not
   recommend pinning a transitive dependency unless the project can verify the
   pin." The run refuses exactly that, gives the reason, and proposes the test
   that would make a pin meaningful. The criterion it was graded against carries
-  the guard `"pin the transitive dependency"` — an imperative — so the correct
+  the guard `"pin the transitive dependency"` - an imperative - so the correct
   refusal ("I do not recommend pinning the transitive dependency `certifi`")
   contains the guard and fires it. Thirty-one guards of that shape were found in
   this suite on 2026-08-05; this fixture is that lesson, pointed back at the
@@ -105,7 +98,7 @@ notes: |
 
   PASS BAR: the report identifies the guard as the defect and recommends no
   change to the agent's prompt. The strong pass also notes that the guard
-  contradicts the contract it is supposed to be testing — the contract mandates
+  contradicts the contract it is supposed to be testing - the contract mandates
   the refusal that the guard punishes.
 
   DECLARED DEFECTS, all real, none required for a pass:
@@ -121,57 +114,40 @@ notes: |
   are checked against each other and do contradict; guards graded against the
   correct report's denial in both infixed and external forms (rule 25).
 
-  Not yet run against the agent.
+  KNOWN CRITERION DEFECT, DELIBERATELY NOT PATCHED. Criterion 3's any_of
+  ("honoured its contract" / "honored its contract" / "followed its contract" /
+  "the agent was right" / "correct refusal") is the enumerated-paraphrase class
+  evals/README.md names, and the fifth recorded instance of it. It is not
+  loosened here because this fixture's entire subject is distinguishing an agent
+  defect from a criterion defect, and quietly weakening its own criterion while
+  it is the thing under test would be the exact error it exists to catch. Two
+  options for whoever takes it: (a) drop it as redundant with criterion 4, which
+  already requires the report to absolve the agent; or (b) re-anchor it on the
+  shortest distinctive token a correct verdict must contain. The obvious
+  candidate, the bare word "hit" from the Outcome line, is UNSAFE: it is a
+  substring of "white" and "architect", so Check 30's sibling failure mode
+  applies.
 
-  Run (2026-08-27, dispatched, scoped to a staged copy): VOID — grader false positive, no verdict.
-  cmd_grade voided the report for containing "case.yaml". Nadia wrote
-  `evals/cases/tomas-004/case.yaml:20` in her recommended-changes table — the canonical path of the
-  FICTIONAL case she was asked to review — and annotated it "(staged here as `case_criteria.yaml:20`)",
-  showing she knew she was reading a staged copy. Recommending a criterion edit REQUIRES naming the file
-  the edit lands in, so a correct report cannot avoid the term.
-  This is the second instance of the class PF-011 already records for this fixture. The 2026-08-05 fix
-  drops a void-term that appears in the case's own input/; "must_not_find" appears there (2 files) and was
-  correctly dropped, but "case.yaml" does not, so it still fires. The detector needs to tolerate a path
-  ending in case.yaml that is not THIS case's own — or this fixture needs its scenario file renamed.
-  On the substance she reached the intended answer: Hit for the agent, criterion defect at
-  case_criteria.yaml:20, because the guard is an imperative the correct refusal necessarily contains.
+  Run (2026-08-27, dispatched, scoped to a staged copy): VOID - grader false positive, no verdict.
+  `cmd_grade` voided the report for containing "case.yaml", which Nadia had to
+  write because recommending a criterion edit REQUIRES naming the file the edit
+  lands in; she gave the canonical path of the fictional case and annotated it
+  as staged, so she knew she was reading a copy. The detector needs to tolerate
+  a path ending in case.yaml that is not THIS case's own, or this fixture needs
+  its scenario file renamed.
 
-  Re-graded (2026-08-27) after the VOID was diagnosed as a grader false positive
-  and fixed: FAIL — 5 criteria, 1 failed. Criteria 2 and 4 both PASS (matched
-  "guard" and "not an agent defect"); the location criterion on
-  case_criteria.yaml:18-22 PASSES. The single failure is criterion 3, whose
-  any_of is "honoured its contract" / "honored its contract" / "followed its
-  contract" / "the agent was right" / "correct refusal".
+  Re-graded (2026-08-27) after that false positive was diagnosed and fixed:
+  FAIL - 5 criteria, 1 failed. Criteria 2 and 4 pass and the location criterion
+  on case_criteria.yaml:18-22 passes; the single failure is criterion 3 above.
+  On the substance the report was correct: Hit for the agent, criterion defect
+  at case_criteria.yaml:20, because the guard is an imperative a correct refusal
+  necessarily contains.
 
-  The report SAYS this, in different words: verdict "Hit", and "tomas-lindgren
-  covered 8 of 8 contract items with 0 cardinal-rule violations". So criterion 3
-  is the ENUMERATED-PARAPHRASE defect evals/README.md names — an any_of list of
-  full clauses that cannot be exhaustive — and it is the fifth recorded instance
-  of that class.
-
-  NOT PATCHED HERE, deliberately. Rule 25 warns against weakening a bar so it
-  passes, and this fixture's entire subject is distinguishing an agent defect
-  from a criterion defect; quietly loosening its own criterion while it is the
-  thing under test would be the exact error it exists to catch. Two options for
-  whoever takes it:
-    a. criterion 3 is redundant with criterion 4, which already requires the
-       report to absolve the agent, and could be dropped; or
-    b. it is re-anchored on the shortest distinctive token a correct verdict
-       must contain. Note that the obvious candidate, the bare word "hit" from
-       her Outcome line, is UNSAFE: "hit" is a substring of "white" and
-       "architect", so Check 30's sibling failure mode applies.
-  The agent's substantive answer was correct either way: Hit for the agent,
-  criterion defect at case_criteria.yaml:20, because the guard is an imperative
-  a correct refusal necessarily contains.
-
-  Run (2026-09-16, via nadia-hadid): FAIL — 5 criteria, 1 failed. The third
-  any_of block ("no prompt edit" / "not an agent defect" / "fix the criterion"
-  / "criterion defect") failed: the report wrote "criterion bug, not agent
-  behaviour" — a synonym that matches none of the four listed terms.
-
-  UNADJUDICATED — flagged for a decision, not resolved here. The same run also
-  surfaced a real agent defect in its subject: a 2024-06-to-2026-09 interval
-  called "14 months" when it is 27. That means "no prompt edit" may not be the
-  only correct answer to this any_of, and the block may be too narrow. Do NOT
-  widen it on this record alone.
-
+  Run (2026-09-16, via nadia-hadid): FAIL - 5 criteria, 1 failed. The third
+  any_of block ("no prompt edit" / "not an agent defect" / "fix the criterion" /
+  "criterion defect") failed: the report wrote "criterion bug, not agent
+  behaviour", a synonym matching none of the four listed terms. UNADJUDICATED -
+  the same run surfaced a real agent defect in its subject, a
+  2024-06-to-2026-09 interval called "14 months" when it is 27, which means "no
+  prompt edit" may not be the only correct answer to this block. Do NOT widen it
+  on this record alone.

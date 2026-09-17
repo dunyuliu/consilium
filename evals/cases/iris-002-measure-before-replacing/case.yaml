@@ -200,140 +200,56 @@ declared_defects:
 
 notes: |
   Origin: PF-017 follow-up. lian-zhao landed rule 26's portable half in
-  agents/iris-vermeulen.md's "### 6. Audit the existing tests" section and
-  agents/wei-lin.md's merge gate, and named the gap: no case in iris-*/
-  wei-lin-* exercised "measure before removing a signal" -- landing the
-  prompt text invalidated their currency without proving the new text
-  changes agent behaviour. This case is that fixture.
+  agents/iris-vermeulen.md ("### 6. Audit the existing tests") and in
+  agents/wei-lin.md's merge gate, and named the gap: no iris-*/wei-lin-* case
+  exercised "measure before removing a signal", so landing the prompt text
+  invalidated their currency without proving it changed agent behaviour.
 
-  Deliberately a different domain from the rule 26 incident it is modeled
-  on (that incident is evals/run.sh's own STALE date-vs-SHA comparison,
-  documented in PROJECT_RULES.md rule 26 itself) -- an invoice
-  backdate-by-calendar-date check standing in for the same failure shape
-  (date comparison cannot order two same-day events) so a correct run has
-  to actually count this corpus rather than recognize and recite the
-  rule's own worked example.
+  Deliberately a different domain from the rule 26 incident it is modeled on
+  (that incident is evals/run.sh's own STALE date-vs-SHA comparison, documented
+  in PROJECT_RULES.md rule 26 itself) - an invoice backdate-by-calendar-date
+  check standing in for the same failure shape, so a correct run has to actually
+  count this corpus rather than recognize and recite the rule's worked example.
 
-  PASS BAR: the report states it ran/counted backdate_check.sh against
-  invoices.csv (5 of 20 flagged: INV-002, INV-004, INV-007, INV-012,
-  INV-016), states that 0 of the 20 records are same-day (issued_date ==
-  paid_date) -- the specific failure mode the proposal is worried about has
-  no members in the real corpus -- and on that basis declines the wholesale
-  replacement, proposing instead a narrow same-day rule added to the
-  existing check (confirmed by mutating one record to same-day and watching
-  it flip). A report that replaces the check, observes the flagged count,
-  and reports the result as an improvement without ever stating the 5/0
-  measurement has done exactly the wrong thing this case exists to catch.
+  PASS BAR: the report states it ran backdate_check.sh against invoices.csv
+  (5 of 20 flagged: INV-002, INV-004, INV-007, INV-012, INV-016), states that 0
+  of the 20 records are same-day (issued_date == paid_date) - the failure mode
+  the proposal is worried about has no members in the real corpus - declines the
+  wholesale replacement on that basis, and confirms whatever narrower boundary
+  it proposes by mutating one real record and restoring it. A report that
+  replaces the check, observes the flagged count, and reports the result as an
+  improvement without ever stating the 5/0 measurement has done exactly the
+  wrong thing this case exists to catch.
 
-  contested: not set. The measurement (5 flagged, 0 same-day) is a
-  reproducible fact about input/invoices.csv -- confirmed here by actually
-  running `bash input/backdate_check.sh input/invoices.csv` -- not a
-  judgement call, so this does not meet rule 25d's bar for `contested: true`.
+  `contested:` is deliberately not set: the 5-flagged / 0-same-day measurement
+  is a reproducible fact about input/invoices.csv, confirmed by running
+  `bash input/backdate_check.sh input/invoices.csv`, not a judgement call, so it
+  does not meet rule 25d's bar.
 
-  Run (2026-09-16, via iris-vermeulen, prompt 306f1cc): FAIL — 6 criteria, 3
-  failed. Report ran `backdate_check.sh` against the real corpus, counted
+  Criterion 5 grades the mutation-confirmation act the agent's own contract
+  already requires (agents/iris-vermeulen.md:205-206), split into three ANDed
+  sub-criteria: mutation performed / boundary outcome observed / record
+  restored. It deliberately does NOT grade remedy SHAPE. input/README.md:37
+  hedges its own example with "e.g.", so the needs-review addition is one
+  illustration and not the only correct shape; and per rule 10 a fixture is not
+  where a new expectation gets introduced - if interim coverage is a behaviour
+  the agent should perform, that is a prompt change via lian-zhao, never "the
+  agent failed to do it" recorded in a criterion the prompt never asked for.
+
+  Run (2026-09-16, via iris-vermeulen, prompt 306f1cc): FAIL - 6 criteria, 3
+  failed. The report ran `backdate_check.sh` against the real corpus, counted
   5/20 flagged and named all five IDs, counted 0 same-day pairs, read
-  `gateway_note.md` and correctly identified the same-day failure mode as
-  structurally absent from this corpus (legacy ACH clearing takes >=1
-  business day), and refused the wholesale replacement. SUPERSEDED as a
-  verdict by the criterion changes below (rule 5's consequence) -- this
-  case needs re-dispatch at the current SHA before a new verdict is
-  recorded; do not treat 6/1 or 6/0 against this same report as a fresh
-  run, since a report is not re-dispatched by re-grading it against a
-  criterion it never saw. Kept here, not deleted, because it is the record
-  that found the two grader defects fixed below and the substantive
-  question decided in criterion 5.
+  `gateway_note.md`, identified the same-day failure mode as structurally absent
+  from this corpus, and refused the wholesale replacement. SUPERSEDED as a
+  verdict: two of its three failing criteria were grader defects, fixed
+  2026-09-17, and criterion 5 was rebuilt the same day. A report is not
+  re-dispatched by re-grading it against criteria it never saw, so RE-DISPATCH
+  AT THE CURRENT SHA IS NEEDED before this case has a current verdict.
 
-  Failed criterion 2 (same-day count measured): report wrote "occur
-  **0 times**" / "zero members", neither matching any listed term. FIXED
-  2026-09-17 (Iris Vermeulen): widened from six fixed-order
-  quantifier-adjacent-to-"same-day" strings to sixteen, along two axes --
-  both orderings of the compact same-day-adjacent phrasing, and the
-  standalone "quantifier + times/instances/members" shape a report reaches
-  for when the quantifier and "same-day" are joined by a clause rather than
-  sitting side by side (this report's actual construction). Not simply the
-  two strings this run used -- "0 times" and "zero members" are each one
-  member of a wider class, and samples/pass.md was rewritten to a report
-  using "zero instances" (a member of the class neither this run nor the
-  original criteria ever wrote), proving the fix generalizes rather than
-  re-encoding this run's exact wording. Verified: iris-002-run1 (the report
-  above) now PASSes this criterion (matched "0 times"); a hand-written
-  denial reusing "backdate_check.sh should be retired" plus an unrelated
-  bold decoration still FAILs it (no same-day/zero construction present);
-  samples/fail.md still FAILs (6/6, unchanged).
-
-  Failed criterion 4 (the verdict): report wrote "do not replace
-  `backdate_check.sh` wholesale" and "keep `backdate_check.sh` running
-  as-is" -- the backtick between the verb and the filename breaks the
-  plain-text adjacency the three filename-bearing terms required, the same
-  rendering mechanism as zofia-004's fix. FIXED 2026-09-17 (Iris
-  Vermeulen): added the backtick- and bold-wrapped rendering of the
-  filename next to each of the three verb phrases that name it (nine terms
-  total in place of three), rather than adding only the one backtick
-  string this run produced. Verified: iris-002-run1 now PASSes (matched
-  "do not replace `backdate_check.sh`"); samples/pass.md was rewritten to
-  use "`backdate_check.sh` **wholesale**" and "should not be retired" (no
-  reuse of the original bare-string terms) and still PASSes 6/0; a
-  hand-written denial recommending the swap with **backdate_check.sh** in
-  bold still FAILs this criterion (5/6 failed overall, must_not_find still
-  PASSes).
-
-  Criterion 5 (the narrow fix) -- SUPERSEDED 2026-09-17. The note directly
-  above this one (written 2026-09-17, same day) recorded "decided, not
-  repaired" and reasoned from an uncovered interval between gateway launch
-  and `timestamp_check.sh` passing its own fixtures, concluding the
-  needs-review addition was the one remedy with zero-length exposure and
-  that this run's alongside-with-fixtures plan left a real gap open. That
-  reasoning does not survive rereading input/gateway_note.md, which was
-  the premise's only possible source: the note fixes when the gateway
-  goes live and says nothing about when a replacement check can be built
-  or tested. The "interval" was invented, not read. Sent to Nadia Hadid
-  for adjudication; she ruled the criterion too narrow on three grounds,
-  each checked directly: (1) the two prior runs are not the same remedy --
-  run 1 gated on a synthetic same-day pair (buildable today, zero-length
-  interval by construction); a second run's report gated on an actual
-  same-day pair, which is where the argument actually turns; reporting
-  "two runs converged" on this point was wrong, it was one data point
-  read as two. (2) input/gateway_note.md never says when the check can be
-  built, so the "uncovered interval" premise has no support in input/ at
-  all -- it blocked production data, which is why run 1 reached for a
-  synthetic pair, not development. (3) input/README.md:37 hedges its own
-  example with "e.g." -- the answer key names the needs-review addition
-  as ONE illustration, not the only correct shape, and the prior
-  criterion encoded it as the only pass. Per rule 10, a fixture is not
-  where a new expectation gets introduced: if interim-coverage is a
-  behaviour the agent should perform, it is a prompt change
-  (agents/iris-vermeulen.md, via lian-zhao), never "the agent failed to
-  do it" recorded in a criterion the prompt never asked for. REPAIRED the
-  same day: criterion 5 no longer grades remedy SHAPE at all. It now
-  grades the mutation-confirmation act the agent's own contract already
-  requires (agents/iris-vermeulen.md:205-206, "confirm the new boundary
-  by mutation: take one real record, move it across the boundary by hand,
-  watch it flip, restore it, confirm nothing else moved"), split into
-  three ANDed sub-criteria (mutation performed / boundary outcome
-  observed / record restored), each widened by class rather than by the
-  wording this repair wrote first -- see the criteria block above for the
-  full reasoning and term lists.
-
-  Both prior run reports were graded against the repaired criteria
-  (2026-09-17): neither performed a mutation, so both still FAIL
-  criterion 5 (5a) even though both are otherwise strong reports -- this
-  is not the same failure the superseded note recorded (remedy shape) but
-  a different, narrower one (no boundary test was run at all). Their
-  overall verdicts from 2026-09-16/17 remain SUPERSEDED per rule 5 -- a
-  report is not re-dispatched by re-grading it against criteria it never
-  saw. Re-dispatch needed at the current SHA to get a current verdict for
-  either.
-
-  samples/pass.md and samples/fail.md re-graded via `bash evals/run.sh
-  grade` after the criterion-5 repair (Check 15): pass.md PASS 8/0,
-  fail.md FAIL 8/8 (criteria count grew 6 -> 8: the old single criterion 5
-  is now three ANDed sub-criteria 5a/5b/5c, net +2). Both prior run
-  reports (iris-002-run1.md, iris-002-run2.md) re-graded the same day:
-  each now FAILs 8/3 -- criteria 1-4 (measurement, count, IDs, verdict)
-  still PASS on both, but 5a/5b/5c all FAIL on both, since neither report
-  performed a mutation. A hand-written denial adopting the proposal
-  wholesale FAILs 8/7 (only must_not_find trips, as expected -- a report
-  approving the swap never has occasion to describe mutating a record to
-  prove a gap it doesn't believe exists). An empty report FAILs 8/7 (only
-  must_not_find passes, trivially, on silence).
+  Present state of the grading, measured 2026-09-17 with `bash evals/run.sh
+  grade`: 8 criteria. samples/pass.md PASS 8/0, samples/fail.md FAIL 8/8
+  (Check 15). Both stored run reports FAIL 8/3 - criteria 1-4 (measurement,
+  count, IDs, verdict) pass on both, 5a/5b/5c fail on both, because neither
+  performed a mutation. A hand-written denial adopting the proposal wholesale
+  FAILs 8/7, and an empty report FAILs 8/7 (only must_not_find passes,
+  trivially, on silence).

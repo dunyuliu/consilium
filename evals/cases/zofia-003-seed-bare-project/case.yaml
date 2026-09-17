@@ -103,16 +103,12 @@ declared_defects:
       - "evidence"
 
 notes: |
-  MODE A CONTROL for zofia-kaminska — the first fixture in the suite that
-  reaches her seeding mode at all.
-
-  Why it exists. b9e02d6 shipped her root-document whitelist and recorded its
-  own gap in the commit message: "Mode A is 33% of this file and has no fixture
-  at all, so none of this is verified in either direction." That note sat in
-  git history — append-only, which rule 21 says is exactly where a standing
-  claim goes stale — and no board row tracked it. On 2026-09-16 a user reported
-  the predicted failure from a real run: seeding produced no CLAUDE.md and no
-  board. zofia-001 tests discovery and zofia-002 tests refusal, both Mode B.
+  MODE A CONTROL for zofia-kaminska - the first fixture in the suite that
+  reaches her seeding mode at all. zofia-001 tests discovery and zofia-002 tests
+  refusal, both Mode B; b9e02d6 shipped her root-document whitelist while
+  recording its own gap ("Mode A is 33% of this file and has no fixture at
+  all"), and on 2026-09-16 a user reported the predicted failure from a real
+  run, where seeding produced no CLAUDE.md and no board.
 
   The trap is in the input, not the prompt, and there are two of them.
   CONTRIBUTING.md is a plausible rule-book candidate that is really a page of
@@ -129,7 +125,7 @@ notes: |
   invariants it dropped and why.
 
   WHAT THIS CASE DOES NOT TEST. The harness stages read-only and grades the
-  report, so it cannot see the filesystem — and cannot let the agent touch one.
+  report, so it cannot see the filesystem - and cannot let the agent touch one.
   A run that says it would create CLAUDE.md is indistinguishable here from one
   that would actually do it. That limit is the harness's and applies to every
   case whose deliverable is a file; writable staging is on evals/README.md's
@@ -141,20 +137,15 @@ notes: |
   criterion is satisfiable by echo; `make test` appears in the Makefile and in
   CONTRIBUTING.md, deliberately, because that criterion tests adaptation rather
   than discovery; every guard was graded against the correct report's negation
-  before shipping (rule 25), and one was removed for failing that test — the
+  before shipping (rule 25), and one was removed for failing that test - the
   removal is recorded above the guard it replaced.
 
-  Run (2026-09-16, via a fresh zofia-kaminska dispatch). FAIL 6/7
-  (`bash evals/run.sh grade zofia-003-seed-bare-project <report>`): named
-  CLAUDE.md and PROJECT_RULES.md as files to create, adapted rule 5's
-  calibrated metric, and correctly proposed folding TODO.md into
-  PATHWAY_FORWARD.md as one move rather than seeding a second board -- but
-  never used "rename"/"renaming" or otherwise phrased that fold as a single
-  move in those terms, so that criterion failed on a real gap in the
-  report's wording, not a missing idea (the substance -- "TODO.md itself
-  would be moved/retired, not left beside it" -- is present, but the
-  specific "propose the rename as a single move" framing this case anchors
-  on is not). All four declared defects were independently found (readme
-  design-doc framing, TODO.md's uncommanded claims, the hand-regenerated
-  baseline, the evidence/scratch mixing in runs/) and no must_not_find guard
-  tripped.
+  Run (2026-09-16, via a fresh zofia-kaminska dispatch): FAIL - 6 of 7. Named
+  CLAUDE.md and PROJECT_RULES.md as files to create, adapted rule 5's calibrated
+  metric, correctly proposed folding TODO.md into PATHWAY_FORWARD.md as one move
+  rather than seeding a second board, independently found all four declared
+  defects (readme design-doc framing, TODO.md's uncommanded claims, the
+  hand-regenerated baseline, the evidence/scratch mixing in runs/), and tripped
+  no must_not_find guard. The one failure is wording, not substance: the fold is
+  described ("TODO.md itself would be moved/retired, not left beside it") but
+  never as a rename, which is the term that criterion anchors on.
