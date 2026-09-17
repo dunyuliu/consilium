@@ -1846,3 +1846,66 @@ to land. The cost rule 25d imposed on prompt improvement — the thing I said I
 would report as plainly as the 18b deadlock — is paid off, not by weakening
 25d, but by fixing three board rows that were converting a correct state
 transition into a failure.
+
+## Finding 37 — I nearly accused an agent of fabricating work, and the fault was my dirty index
+
+`iris-vermeulen` reported repairing criteria 2 and 4 of `iris-002`, widening
+them along two axes rather than patching the one phrasing the last run used,
+and said the real report now graded `FAIL 6/1` with only criterion 5 failing.
+
+I verified and got `FAIL 6/3`. I then checked whether the terms she described
+were in the file:
+
+```
+  "0 times"      in-report=1  in-caseyaml=0
+  "zero members" in-report=1  in-caseyaml=0
+```
+
+Zero. Her commit's own diff showed those lines being *added*. I was one step
+from reporting that a subagent had described work its commit did not contain —
+the most damaging accusation available in this role, because the whole
+delegation model rests on reports being truthful.
+
+The contradiction saved it. A diff that adds a line and a file that lacks it
+cannot both be true, so I checked the one thing I had not:
+
+```
+  working tree == HEAD?  1 file modified
+  HEAD version:          46 terms
+  working tree:          30 terms
+```
+
+**My checkout was carrying a staged revert of her changes.** Almost certainly
+from the command that timed out at two minutes mid-`git reset --hard` during
+the class-fix probe — killed partway, leaving the index inconsistent with HEAD.
+Every grade I ran after that point measured a file that existed nowhere in
+history. After `git reset --hard HEAD`:
+
+```
+  FAIL — 6 criteria, 1 failed
+  PASS  keyword  (matched: 0 times)
+  PASS  keyword  (matched: do not replace `backdate_check.sh`)
+```
+
+Exactly her number. She was right about all of it.
+
+**The lesson is narrow, mechanical, and I should have had it already.** After a
+command is interrupted — a timeout, a rate limit, a kill — **verify the working
+tree matches HEAD before trusting any measurement taken from the filesystem.**
+`git status --porcelain | wc -l` costs nothing. I have been scrupulous about
+re-deriving numbers from subagents and careless about whether the tree I was
+deriving them from was the tree I thought it was. Four interruptions in this
+campaign and this is the first time one silently corrupted a measurement rather
+than stopping me outright.
+
+It also sharpens finding 29's rule. "A search returning nothing is not evidence
+of absence until the search is shown capable of finding the thing" — and the
+instrument includes **the tree you are searching**, not just the pattern. My
+pattern was fine this time. The corpus was wrong.
+
+**On the near-accusation.** The thing that stopped it was noticing that two of
+my own observations were mutually inconsistent, rather than picking the one
+that fit the story I was forming. A subagent fabricating a detailed report,
+complete with plausible term lists, is a far less likely explanation than my
+own state being wrong — and I should have weighted it that way before running
+the check, not after.
