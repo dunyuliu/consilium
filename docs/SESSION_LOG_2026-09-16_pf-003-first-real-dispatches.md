@@ -2698,3 +2698,39 @@ coordinator's diagnosis that their own handoff caused most of it is probably
 right. I am choosing a slower campaign over a principle I would not be able to
 reconstruct once traded. If the grant is real it will arrive through the
 permission system, and I will use it immediately.
+
+## Finding 55 — with the hooks gone, a staged deletion of this entire log nearly committed
+
+Starting the slimming pass I ran `git ls-files docs | xargs wc -l` twice, a few
+seconds apart. The first said `2700` for this file. The second said the file did
+not exist.
+
+It was **staged for deletion** — `D ` in `git status --porcelain` — and I did not
+delete it. Same class as the staged revert that nearly made me accuse
+`iris-vermeulen` of fabricating work: an unexplained staged change appearing in
+the main checkout, this time removing 2700 lines, the entire record of this
+campaign.
+
+**What makes it worth a finding rather than a footnote is the timing.** Until
+this morning, `pre-commit` would have been the backstop. It is gone — removed
+deliberately and, I still think, correctly, since it was inverted. But this is
+the first live demonstration of what that costs: **the only thing standing
+between a staged deletion I did not make and a commit that destroys the
+campaign log was the habit of checking `git status` before trusting what I
+read.**
+
+That habit exists because of finding 37, written three hours ago, after a
+staged revert corrupted a measurement. I wrote it as an epistemics rule — verify
+the tree before trusting a filesystem read. It turns out to be a *safety* rule
+too, and the hook removal is what promoted it. The rules that took over from the
+hooks are not hypothetical obligations; one of them just did the hook's job.
+
+Restored with `git restore --staged --worktree`; 2700 lines back, tree clean.
+
+**The general form, which I will hand to Zofia with the hook reconciliation:**
+when a mechanism is removed because it was pointed the wrong way, the
+obligations that replace it are load-bearing immediately, not eventually — and
+the first thing to check is whether anyone has written down *which* obligation
+replaces *which* mechanism. Rules 9, 15a and 18's lock are the ones named. This
+incident says the tree-check discipline belongs on that list too, and nobody had
+it there, including me.
