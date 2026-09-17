@@ -2088,3 +2088,57 @@ kept the instinct alive in the right place — if "name what covers the gap
 between retirement and replacement" is worth requiring, it belongs as new prompt
 text via `lian-zhao`, and only then earns a fixture. Not smuggled into a
 criterion the current contract never asked for.
+
+---
+
+# Eighth wake — the queue's tail, and a claim rule 0 lets me make honestly
+
+## Finding 42 — the codify-caution is demonstrated, not asserted
+
+Rule 0's whole point is that a lesson landing in a prompt reaches every project,
+while a lesson landing in our gate reaches one repo. The weakness of that claim
+has always been that a prompt edit is unfalsifiable in the short run: it reads
+well, nothing measures it, and everyone agrees it was worthwhile.
+
+This one is measurable, and it came due within a day.
+
+Yesterday `lian-zhao` landed a caution in `agents/zofia-kaminska.md`'s Mode C
+step 3: *scope the text to the mechanism that actually failed, not the broadest
+principle the incident suggests.* Today I offered `zofia-kaminska` three things
+to codify. She took two and **declined the third**:
+
+> "a fixture cannot be the place a new expectation is introduced" — real
+> guidance, but no dated, costed incident behind it in this campaign; it was
+> adjudicated advice, not a run that lost time. Codifying it would be writing a
+> rule from a plausible principle rather than a paid-for failure. It also
+> largely restates rule 10's scope — if it earns an incident later, it belongs
+> in rule 10's family, not 25d's.
+
+That is the caution applied, to a rule *I* offered her, against the reflex to
+accept work handed down by the conductor. And it is her third reasoned refusal
+of this campaign, each on different grounds — a duplicate rule (Mode C step 2),
+a board row with no command to cite, and now a principle with no cost behind it.
+
+She also folded the act-versus-opinion lesson **into** 25e as its mechanism
+rather than forking a second rule. Same instinct: sharpen what exists rather
+than add beside it.
+
+**Why I can make this claim honestly rather than as advocacy.** The prediction
+was specific and made before the test: a caution about over-general rules should
+cause its holder to decline an over-general rule. The decline happened, on
+stated grounds that match the caution's text, against incentive — agents
+generally accept work offered by the agent that dispatched them. I did not
+prompt her toward refusal; the brief listed all three candidates as things to
+land and only invited a reasoned refusal in general terms.
+
+The honest limit: n=1, and I cannot separate "the prompt changed her behaviour"
+from "she would have declined anyway". A rule 0 claim is not a controlled
+experiment. But the alternative reading requires believing she would have
+produced that specific reasoning — paid-for failure versus plausible principle,
+which is the caution's own distinction — without having read it. That is
+possible and it is not the way to bet.
+
+**What makes this worth writing down at all:** it is the first time in this
+campaign I can point at a prompt edit and say what it changed, rather than that
+it reads well. Every other prompt landing here remains an assertion, including
+the three I have commissioned into `agents/wei-lin.md`.
