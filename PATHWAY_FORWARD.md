@@ -57,7 +57,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-017 | `agents/` | write fixtures for the autopilot cycle, the release gate and zofia's patch path | OPEN | 2026-09-16 | 14 | P1 |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | published-release row landed in the gate, skipping without credentials or a pushed tag | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-020 | `release_notes_v1.21.0.md` | push the v1.21.0 tag from a machine that may create tags | BROKEN | 2026-09-16 | 7 | P1 |
+| PF-020 | `tests/check.sh` Check 27 | the mechanism that fails an untagged release note still exists in the gate, independent of v1.21.0's own tag state | VERIFIED | 2026-09-17 | 30 | P2 |
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-023 | `tests/lock.sh` | the lock resolves to the SAME shared file from a main checkout and from any linked worktree | VERIFIED | 2026-09-16 | 14 | P2 |
@@ -67,6 +67,8 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against and a contested case cites its sample count (rule 25d) — built by `iris-vermeulen`, verified independently including a mutation test | VERIFIED | 2026-09-16 | 14 | P1 |
 | PF-028 | `install.sh` | install a working `pre-commit`/`pre-push`/`post-merge` hook set from inside a linked worktree, not only a main checkout (owner: `iris-vermeulen`, rule 19) | BROKEN | 2026-09-17 | 14 | P1 |
 | PF-029 | `PROJECT_RULES.md` | every index row has body prose somewhere in the file, not only a one-line index claim | OPEN | 2026-09-17 | 60 | P3 |
+| PF-030 | `install.sh` | `pre-push` skips the gate for a push whose ref updates are all deletions (rule 9a; owner: `iris-vermeulen`, rule 19) | OPEN | 2026-09-17 | 30 | P2 |
+| PF-031 | `tests/check.sh` Check 28 | a deletion permitted under rule 8a has its two conditions checkable from the commit message, not just asserted in prose | OPEN | 2026-09-17 | 30 | P3 |
 
 ## Items
 
@@ -2030,46 +2032,31 @@ grep -c "^ROWS=(audit correctness conciseness fixes docs refactor tree ci publis
 # → 1
 ```
 
-### PF-020 — `release_notes_v1.21.0.md` — BROKEN
+### PF-020 — `tests/check.sh` Check 27 — VERIFIED
 
-`main` carries a release note with no tag on the remote, so Check 27 fails in
-CI and will keep failing for everyone until the tag is pushed. Rule 15's
-sequence is satisfied locally — the tag exists in this clone and the gate is
-green at 1319 — but `git push origin refs/tags/v1.21.0` returns
-`RPC failed; HTTP 403` from this environment. Branch pushes are permitted here
-and tag pushes are not, which is a platform policy, not a repo fault: the proxy
-guidance says report a 403 rather than retry it, and Haruto's hard rules say a
-rejected push is reported, not defeated.
+**Re-scoped 2026-09-17, fourth instance of the shape rule 21a names.** The
+original row asserted `git tag --list 'v1.21.0' | wc -l` → `0` — the
+**absence** of the tag, as a stand-in for "the release isn't cut yet." The tag
+is about to be created for the actual v1.21.0 milestone: the moment it lands,
+this command flips to `1`, Check 17 reports drift against the recorded `0`,
+and the row goes red for the very reason the release is good news. A row that
+reddens on success blocks the release it exists to track.
 
-One command closes this, from a machine with tag rights:
+Same fix as PF-021/022/024: replace "is the untagged state still there" with
+"does the mechanism that would catch an untagged note still exist." Check 27
+already enforces "every release note has a matching tag" mechanically on
+every run (rule 15) — that is the row's real, durable claim, and it holds
+regardless of whether v1.21.0 specifically is tagged yet.
 
-    git push origin v1.21.0
-
-Then CI on `main` goes green, because the only failing assertion is the one the
-tag satisfies (run 35112672757 failed 1 of 1319, and that one was Check 27).
-
-**This row's evidence is local by necessity.** Rule 21b forbids a board command
-that reaches the network, so nothing here can prove the remote state — the
-command below only shows the tag exists in this clone. Closing the row needs a
-human to confirm the push landed and CI went green, and the 7-day interval is
-deliberately short because an untagged note reddens the gate for every clone.
+**What happens after the release**: once `v1.21.0` is tagged and pushed,
+Check 27 reads it directly and this row's command is untouched by that —
+it asserts the check's own source line exists, not any note's tag state. No
+follow-up edit to this row is needed when the tag lands.
 
 ```bash
-git tag --list 'v1.21.0' | wc -l | tr -d ' '
-# → 0
+grep -c "no matching tag" tests/check.sh
+# → 2
 ```
-
-**2026-09-16**: Re-ran the evidence command in this checkout — it printed `0`,
-not the `1` previously recorded (Check 17 was failing on the stale value).
-Root cause: the `1` was recorded from a session/machine where `v1.21.0` was
-created as a **local, never-pushed** tag; that tag was never shared, so any
-other clone or worktree reproduces `0` for this same command. That makes this
-evidence command inherently clone-dependent, not just network-blind — rule
-21b already forbids reaching the network here, but the deeper issue is that
-"tag exists" is being asserted from local repo state that isn't shared across
-checkouts. The row stays BROKEN: the tag genuinely is not on the remote, and
-nothing about the underlying blocker changed, only the recorded number was
-corrected to match a real re-run.
 
 ### PF-021 — `tests/check.sh` — VERIFIED
 
@@ -2663,6 +2650,37 @@ for r in 5b 13a 21b 23a 25b; do grep -qx "## $r\." PROJECT_RULES.md || grep -q "
 # → 21b: no ## heading
 # → 23a: no ## heading
 # → 25b: no ## heading
+```
+
+### PF-030 — `install.sh` — OPEN
+
+Rule 9a proposes that `pre-push` skip the gate when every ref update in the
+push is a deletion (`<new>` all-zero on the hook's stdin), so a pure tag/branch
+deletion is never forced through `--no-verify`. Not built: today the hook runs
+`tests/check.sh` unconditionally regardless of what the push contains.
+
+Incident: deleting the fabricated tag `v9.9.9` needed a push; the gate was red
+because of that same tag; the hook refused; the maintainer used `--no-verify`
+(2026-09-17). Third instance of a terminal-rather-than-corrective gate.
+`install.sh` is `iris-vermeulen`'s surface (rule 19) — not fixed here.
+
+```bash
+grep -c "all-zero\|deletion-only\|ref-delete" install.sh
+# → 0
+```
+
+### PF-031 — `tests/check.sh` Check 28 — OPEN
+
+Rule 8a lets a human delete a release note whose tag never legitimately
+existed, under three named conditions, but nothing today checks that a
+deletion claiming this carve-out actually names those conditions. Check 28
+currently only detects that a once-tracked note vanished; it cannot yet read
+a deletion commit's message and confirm it cites the fabricated tag and both
+conditions from rule 8a.
+
+```bash
+grep -c "rule 8a" tests/check.sh
+# → 0
 ```
 
 ## Deferral log

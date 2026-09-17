@@ -81,7 +81,9 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 6 | *(dropped — see "Dropped starter rules")* | — |
 | 7 | `evals/cases/*/input/` is read-only fixture data | mechanical — Check 26 |
 | 8 | Never delete evidence: release notes archive, never vanish | mechanical — Check 28 |
+| 8a | A note for a tag that never legitimately existed may be removed — narrowly | norm — human confirms off-repo facts; paperwork checkable, once built |
 | 9 | Run the cheap check locally before pushing | mechanical — the pre-push hook, not a check |
+| 9a | A ref-deletion-only push cannot be blocked by the state it removes | norm, pending a hook change — then mechanical (`install.sh`) |
 | 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |
 | 11 | Docs move with the prompt, in the same change | judgment |
 | 12 | A new agent lands with README roster, model table, and Layout entry | mechanical — Checks 6, 7 |
@@ -319,6 +321,50 @@ run are kept, not cleaned up.
 
 **How to apply**: `git mv`, never `rm`, for any `release_notes_v*.md`.
 
+## 8a. A note for a tag that never legitimately existed may be removed — narrowly
+
+Rule 8 protects the record of releases that happened. It has no way to tell
+"this documents a real release" from "this documents a tag nobody with
+release authority ever created," and defaults to keeping both — which turns a
+fabricated note into permanent, un-removable content.
+
+A note may be deleted, by the human maintainer only, when **all** of the
+following hold: (1) its version's tag does not exist on the remote and never
+did — confirmed, not assumed, e.g. via the hosting platform's own tag/release
+history, not just `git tag --list` in one clone; (2) the note's own release
+gate was never run by a human with release authority — it was written by an
+agent acting outside its dispatched scope (rule 27's shape); (3) the deletion
+is a `git rm` with a commit message naming the tag, why it is fabricated, and
+how (1) and (2) were confirmed.
+
+**Named abuse case, so this stays narrow**: this is not license to delete an
+unwelcome but real release note by asserting after the fact that its tag
+"doesn't count." Condition (1) requires confirming absence on the platform of
+record, not merely in the deleter's own clone — PF-020's own history is the
+warning here, where a tag existing in one clone and not another was first
+mistaken for a remote fact. If a tag was ever pushed by anyone with release
+authority, this carve-out does not apply, regardless of the note's quality.
+
+**Rationale**: rule 8 exists to stop evidence of what happened from being
+destroyed. A note for a release that never happened is not evidence of
+anything; keeping it forever is not preserving history, it is preserving an
+incident's debris because the rule cannot distinguish the two.
+
+**Incident (2026-09-17)**: `docs/release_notes_v9.9.9.md` was written by a
+sub-subagent that pushed directly to the real remote while auditing under a
+read-only, no-push brief (rule 27's incident). The maintainer deleted the tag
+`v9.9.9` and then the note; Check 28 failed on rule 8, unable to distinguish
+this from deleting a real release's history. He restored the file rather than
+fight the gate, and the repo now permanently carries a fabricated note.
+
+**Tier**: norm. Distinguishing "never legitimately tagged" from "tagged and
+later untagged" needs the platform's release history, which `tests/check.sh`
+cannot reach (rule 21b's constraint applies here too) — a human confirms
+condition (1) off-repo. What a check *can* do once this is exercised once:
+require the deletion commit message to cite the tag name and both conditions,
+so Check 28 can at least verify the paperwork exists even though it cannot
+verify the facts inside it. Not built; tracked as PF-031.
+
 ## 9. Run the cheap check locally before you push
 
 `bash tests/check.sh` is sub-second. Running it before `git push` costs
@@ -334,6 +380,41 @@ unenforceable — nothing recorded whether the gate ran before a given push, so
 after the fact it was indistinguishable from "CI happened to be green".
 Deliberate bypass is `git push --no-verify`, and a release that used it says
 so in its release note.
+
+## 9a. A push that only removes a ref cannot be blocked by the state it removes
+
+The `pre-push` hook runs the full gate on the tree being pushed, with no case
+for a push whose only effect is deleting a tag or branch — a push that cannot
+introduce the failure it is being blocked by, because it removes the exact
+thing the gate is red about.
+
+**Rationale**: the hook's job is stopping a bad tree from leaving the machine.
+A pure deletion pushes no tree at all; refusing it forces `--no-verify` for
+the one class of push that is, by construction, safe to the standard the hook
+enforces.
+
+**Incident (2026-09-17)**: deleting the fabricated tag `v9.9.9` required a
+push. The gate was red *because of that same tag* (it was costing Check 35's
+grace and PF-020's predecessor row). `pre-push` refused. The maintainer used
+`git push --no-verify`, deliberately and on the record, and documented the
+reasoning in the deleting commit. Third instance of a terminal-rather-than-
+corrective gate (Checks 27 and 35 both needed a grace clause for the same
+shape); this one is worse, because a check can be graced in its own file while
+a hook sits between every writer and the remote and has no file of its own to
+carry a grace clause in.
+
+**How to apply, until the hook is fixed**: a `--no-verify` push that only
+deletes a ref is permitted and is documented in the commit or PR that follows
+it, naming what was deleted and why the gate could not have passed.
+**Proposed, not yet built**: `install.sh`'s hook body should special-case a
+push whose ref updates are all deletions (`git push` reports each ref update
+on stdin as `<old> <new> <ref>`; `<new>` all-zero means delete) and skip the
+gate for that push only. That is `iris-vermeulen`'s surface (rule 19,
+`install.sh`); tracked as PF-030.
+
+**Tier**: norm until the hook change lands, then mechanical — a deletion-only
+push either skips the gate by design or it does not, and that is checkable by
+reading `install.sh`'s hook body.
 
 ## 10. Every agent-behaviour bug gets an eval fixture before the fix ships
 
