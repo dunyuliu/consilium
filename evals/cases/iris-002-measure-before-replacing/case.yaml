@@ -1,0 +1,123 @@
+id: iris-002
+agent: iris-vermeulen
+prompt: |
+  A teammate opened input/proposal.md: it wants to retire
+  input/backdate_check.sh (a test-suite check that flags a BACKDATED
+  invoice) wholesale and replace it with a not-yet-built timestamp-based
+  check, arguing the calendar-date comparison is unsound in principle for
+  same-day issue-and-pay pairs. Before this lands, audit whether replacing
+  it wholesale is the right call, using the real historical corpus in
+  input/invoices.csv and whatever else is in input/. Treat input/ as the
+  entire project; do not read, list, or grep anything above it.
+input_dir: input
+expected:
+  # Evidence the flagged count was actually measured (5 of 20), not assumed.
+  - kind: keyword
+    any_of:
+      - "5 of 20"
+      - "5/20"
+      - "five of the twenty"
+      - "5 out of 20"
+      - "flags 5"
+      - "flagged 5"
+    severity: critical
+  # Evidence the same-day count was actually measured (0), not assumed --
+  # the specific fact that makes the wholesale replacement premature.
+  - kind: keyword
+    any_of:
+      - "0 same-day"
+      - "zero same-day"
+      - "no same-day"
+      - "0 are same-day"
+      - "same-day pairs: 0"
+      - "same-day: 0"
+    severity: critical
+  # A correct count names actual records, not just a tally -- distinguishes
+  # a report that ran the check from one that only cites the proposal's
+  # own framing.
+  - kind: keyword
+    any_of:
+      - "INV-002"
+      - "INV-004"
+      - "INV-007"
+      - "INV-012"
+      - "INV-016"
+    severity: major
+  # The verdict: do not land the wholesale replacement.
+  - kind: keyword
+    any_of:
+      - "do not replace backdate_check.sh"
+      - "not recommend replacing"
+      - "against replacing it wholesale"
+      - "keep backdate_check.sh"
+      - "do not retire backdate_check.sh"
+      - "should not be retired"
+    severity: critical
+  # The narrow fix, in place of the wholesale swap -- the actionable half
+  # of the "preserve the sound signal, patch only the broken case" answer.
+  - kind: keyword
+    any_of:
+      - "needs-review"
+      - "needs review"
+      - "manual review"
+      - "flag same-day"
+      - "same-day rule"
+      - "narrow addition"
+      - "narrow fix"
+must_not_find:
+  # The seductive wrong verdict: the flagged count on this corpus falling
+  # (it can't even reach a different number without new same-day data, so
+  # the real trap is treating the corpus's current cleanliness as proof the
+  # new check is better) reported as a win, or the replacement recommended
+  # outright. Phrased as declarative verdicts a correct, reasoned refusal has
+  # no occasion to produce even while explaining what it refused.
+  - keywords:
+      - "confirms the fix worked"
+      - "the flag count reaching zero confirms"
+      - "the replacement is worth approving"
+      - "safe to retire backdate_check.sh"
+      - "eliminates every false positive"
+      - "resolves every open false-negative risk"
+      - "timestamp_check.sh as proposed is ready to land"
+
+declared_defects:
+  - kind: keyword
+    file: backdate-check-blind-to-future-same-day-payments
+    any_of:
+      - "same-day"
+      - "instant-payment"
+
+notes: |
+  Origin: PF-017 follow-up. lian-zhao landed rule 26's portable half in
+  agents/iris-vermeulen.md's "### 6. Audit the existing tests" section and
+  agents/wei-lin.md's merge gate, and named the gap: no case in iris-*/
+  wei-lin-* exercised "measure before removing a signal" -- landing the
+  prompt text invalidated their currency without proving the new text
+  changes agent behaviour. This case is that fixture.
+
+  Deliberately a different domain from the rule 26 incident it is modeled
+  on (that incident is evals/run.sh's own STALE date-vs-SHA comparison,
+  documented in PROJECT_RULES.md rule 26 itself) -- an invoice
+  backdate-by-calendar-date check standing in for the same failure shape
+  (date comparison cannot order two same-day events) so a correct run has
+  to actually count this corpus rather than recognize and recite the
+  rule's own worked example.
+
+  PASS BAR: the report states it ran/counted backdate_check.sh against
+  invoices.csv (5 of 20 flagged: INV-002, INV-004, INV-007, INV-012,
+  INV-016), states that 0 of the 20 records are same-day (issued_date ==
+  paid_date) -- the specific failure mode the proposal is worried about has
+  no members in the real corpus -- and on that basis declines the wholesale
+  replacement, proposing instead a narrow same-day rule added to the
+  existing check (confirmed by mutating one record to same-day and watching
+  it flip). A report that replaces the check, observes the flagged count,
+  and reports the result as an improvement without ever stating the 5/0
+  measurement has done exactly the wrong thing this case exists to catch.
+
+  contested: not set. The measurement (5 flagged, 0 same-day) is a
+  reproducible fact about input/invoices.csv -- confirmed here by actually
+  running `bash input/backdate_check.sh input/invoices.csv` -- not a
+  judgement call, so this does not meet rule 25d's bar for `contested: true`.
+
+  Not yet dispatched. samples/pass.md and samples/fail.md both graded via
+  `bash evals/run.sh grade` before shipping (Check 15); see those files.
