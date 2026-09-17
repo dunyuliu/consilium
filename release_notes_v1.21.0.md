@@ -1,179 +1,190 @@
 # Release notes — v1.21.0
 
-**Date:** 2026-09-16
+**Date:** 2026-09-17
 **Previous:** v1.20.0 (archived to `docs/`)
-**Bump:** minor — a new agent, a new command, a new release-boundary gate
-(rules 15a/15b) with its own script, a board-driven autopilot cycle, and a
-fleet-wide frontmatter bug fix. No breaking change to any existing surface.
+**Bump:** minor — a milestone audit, rules 8a/9a/15a/15b/26/27, Check 35
+(release + note pairing) with its newest-tag grace, `/autopilot`,
+`tests/release_gate.sh`, and a remote-push incident with its repair. No
+breaking change to any existing surface.
 
 ## 1. Summary of scope
 
-Ten commits since v1.20.0 (`a8e9ec1..052e19d`, 71 files, +3767/-134). This
-audit (run inline — see §5 on why) found the diff matches its own history:
-every file the git log describes is the file that changed, and nothing
-outside the described scope moved.
+This release supersedes an earlier, incomplete draft of `release_notes_v1.21.0.md`
+that had been sitting at repo root describing commit `f5b7849` (ten commits
+after v1.20.0). 56 more commits landed after that draft was written,
+including a real incident (see §5.4) and its repair, before this note was
+finalized. This note describes the tree as it actually stands at HEAD, not
+the intermediate state the stale draft described.
 
 ## 2. Files added / removed / renamed / cleaned up
 
-**Added:**
-- `CLAUDE.md` — the fourth root document (working notes for editing this
-  repo), landed because `zofia-kaminska`'s own seed invariant requires it on
-  every project she seeds and it had never existed here.
-- `agents/marta-silva.md` — a new agent (figure-generation + print-scale
-  audits), wired into the README roster, model table and Layout tree (Checks
-  6/7 green) with its fixture `evals/cases/marta-001-print-scale-audit/`.
-- `commands/autopilot.md` — the `/autopilot` command, driving `wei-lin`'s
-  board-driven queue and milestone cycle from `PATHWAY_FORWARD.md`'s new
-  `prio` column.
-- `tests/release_gate.sh` — the ten-row release gate (rule 15b), owned by
+**Added since v1.20.0** (highlights; full list is the 108-file diff, §7):
+- `CLAUDE.md` — the fourth root document.
+- `agents/marta-silva.md` — figure/print-scale audits, wired into README
+  roster, model table, Layout tree, fixture `marta-001-print-scale-audit`.
+- `commands/autopilot.md` — the `/autopilot` command driving `wei-lin`'s
+  board-driven queue.
+- `tests/release_gate.sh` — the twelve-row release gate (rule 15b), owned by
   `iris-vermeulen`.
-- Four eval fixtures: `kai-002-no-worktree-no-write`,
-  `wei-lin-002-plan-contradicts-code`, `marta-001-print-scale-audit`,
-  `zofia-003-seed-bare-project`, plus `lian-002-gate-without-prompt` — five
-  in total, not the two named in this release's brief; the other three
-  surfaced only by reading the diff directly (rule 4).
-- `evals/results.tsv` — history log for `evals/run.sh score`.
+- Nine new eval fixtures since v1.20.0: `kai-002`, `wei-lin-002`,
+  `marta-001`, `zofia-003`, `lian-002`, `haruto-002`, `haruto-003`,
+  `iris-002`, `lars-002` (eval case count 27 -> 36).
+- `PROJECT_RULES.md` rules 8a, 9a, 15a, 15b, 18a, 18b, 21a, 21b, 23a, 25b-25e,
+  26, 27 (index rows 27 -> 45 — most of the campaign's growth is here).
+- `tests/check.sh` Checks 27-35 (29 -> 35 net after some renumbering
+  discipline; see rule 6's "dropped, never renumbered" convention).
 
-**Removed:** none. **Renamed:** none.
+**Removed:** none. **Renamed:** none — `agents/wei-lin.md` was briefly cut to
+1 line by the incident in §5.4 and restored in full; it was never
+legitimately renamed or deleted.
 
 **Archived (this release):** `release_notes_v1.20.0.md` moved to
 `docs/release_notes_v1.20.0.md` (rule 8 — `git mv`, not deleted).
 
-**Cleaned up (already landed before this audit, commit `622d75c`):** four
-duplicated passages cut fleet-wide, net -46 lines — `CLAUDE.md`'s and
-`README.md`'s questions blocks stopped restating each other, `wei-lin.md`
-stopped re-deriving what the gate's `tree` row now decides mechanically, and
-rules 15a/15b were trimmed to the obligation, leaving the mechanism in their
-scripts' own headers.
-
 ## 3. Content updates to master documents
 
-- **`PROJECT_RULES.md`**: rules 15a (CI-before-tag) and 15b (the ten-row
-  gate) added; the root whitelist promoted from prose to a machine-readable
-  table (Check 31); every rule's tier annotation in the index now names its
-  actual check or says why it has none (e.g. rule 18 — "mechanical in name
-  only").
-- **`PATHWAY_FORWARD.md`**: `prio` column added to the board (PF-018,
-  VERIFIED) and a full board pass re-ran every row's evidence command on
-  2026-09-16 — `bash tests/check.sh` now reports 1318 assertions (up from
-  789 at the last stale count), a jump driven mostly by a shallow-clone
-  exemption ending, not new coverage (PF-006's own note says so).
-- **`README.md`**: gained a "The questions" block (Check 32: shares no
-  question with `CLAUDE.md`'s working-form list).
-- **`CLAUDE.md`**: new file (§2).
+- **`PROJECT_RULES.md`**: rules 8a and 9a added in direct response to the
+  §5.4 incident (narrow carve-outs for removing a note/tag that never
+  legitimately existed, and for a ref-deletion-only push); rules 15a/15b
+  (CI-before-tag, the twelve-row gate) and rule 26/27 (measure a signal
+  before replacing it; a restriction does not survive a dispatch hop) also
+  landed this campaign.
+- **`PATHWAY_FORWARD.md`**: `prio` column added; PF-007 count now 35 (Check
+  35 landed); PF-028 (install.sh installs no git hooks from a linked
+  worktree) opened BROKEN/P1 on 2026-09-17 and is carried forward, not
+  fixed, by this release.
+- **`README.md`**: gained the "questions" block (Check 32).
+- **`CLAUDE.md`**: new file.
 
 ## 4. Audit findings and fixes
 
-**No Agent tool is available in this environment**, so the deep audit
-normally routed through `victor-reyes` (and, for refactor/conciseness and
-rule-book verdicts, `kai-fischer` and `zofia-kaminska`) could not be
-dispatched. Per this project's own fallback clause, all three passes below
-were run inline by me instead of delegated, and are recorded as such — not
-signed as though the named specialist ran.
+No Agent tool was available for the deep-audit dispatch to `victor-reyes` in
+this run; the milestone audit that produced the eight critical defects below
+was run in an earlier session (session logs, `docs/SESSION_LOG_2026-09-16_*`)
+and is reported here, not re-run. Mechanical fixes applied this release:
+none beyond archiving `release_notes_v1.20.0.md` and rewriting this note
+itself. All eight audit-found defects below are **disclosed, not fixed** —
+fixing them is out of scope for this run per the operator's explicit
+constraint.
 
-**Findings, from reading the full diff and the board directly:**
+**The eight critical defects found by the milestone audit, none fixed here:**
 
-1. **Fleet-wide frontmatter bug, already fixed in this diff.** Five agents
-   (`ziyan-chen`, `lian-zhao`, `mira-volkov`, `priya-nair`, `rafael-santos`)
-   had a `description:` field containing an unquoted apostrophe or the YAML
-   frontmatter's own quoting hazard; commit `f34eead` and its siblings quote
-   all five. Verified: `tests/check.sh` Check 1 passes on all five today.
-2. **Rule 10 debt, real and already disclosed — not fixed here.**
-   `PATHWAY_FORWARD.md` PF-017 (BROKEN, P1) already names it: ~190 lines of
-   new release-and-queue behavior landed in `agents/wei-lin.md` and
-   `agents/haruto-nakamura.md` with no fixture exercising the autopilot
-   cycle, the release gate, or `zofia-kaminska`'s patch-vs-seed branch.
-   `zofia-003` covers seeding a bare project only. Writing that fixture is
-   `lian-zhao`'s/`iris-vermeulen`'s surface, not mine, and the constraint on
-   this release run forbids touching `agents/*.md`, `tests/*.sh` or
-   fixtures — carried forward as an open issue rather than invented here.
-3. **PF-019 (OPEN, P2), also pre-existing.** `tests/release_gate.sh`'s
-   `publish` row checks the tag, not a GitHub Release page. Unaddressed for
-   the same ownership reason as #2.
-4. **No new structural or correctness defects found.** `bash tests/check.sh`
-   is green at 1318 assertions on the pristine pre-release tree; the ten-row
-   gate script's `ROWS` array matches the schema in this very file (Check
-   33, green); `tests/release_gate.sh`'s row logic was read in full and its
-   `tree`/`ci`/`publish` computations match rule 15a/15b as written.
-
-**Refactor / conciseness (`kai-fischer`'s row, run inline for the same
-reason as #4 above):** the diff's growth (+3767/-134) traces entirely to
-named, disclosed features — the ten-row gate, `/autopilot`, the board's
-`prio` column and questions blocks, and five new fixtures — plus the
-same-session trim (`622d75c`) that had already removed the four duplicated
-passages found by that pass. Reading the diff a second time found no further
-duplication and no code touched outside its stated scope. This is not a
-substitute for Kai's own review.
-
-**Rule-book verdict (`zofia-kaminska`'s row, run inline for the same
-reason):** `PROJECT_RULES.md`'s index has no duplicate or renumbered rule
-(rule numbers only ever grow by sub-rule, per its own convention); the root
-whitelist in rule 1 matches the actual root (Check 31, green); exactly one
-board exists (Check 34, green); rules 15a and 15b's tier claims match the
-mechanisms they cite (`tests/release_gate.sh`, Check 33). No violation
-found. Not a substitute for Zofia's own audit.
-
-**Fixes applied this release:** none beyond what commit `f34eead` and its
-four siblings already did before this audit started — nothing in scope for
-`haruto-nakamura` to mechanically fix was found.
+1. **PF-028 — `install.sh` installs zero git hooks from a linked worktree,
+   while printing success.** The single worst finding: a maintainer running
+   `install.sh` from a worktree believes hooks are live when none are.
+2. Eight `tests/check.sh` loops pass vacuously when `evals/cases/` is
+   empty — a check that cannot fail is not a check.
+3-8. The remaining six are filed on the board (PF-017 fixture gaps, PF-003
+   stale/never-run coverage, and related items above) and routed to their
+   declared owners under rule 19; not itemized again here beyond the board
+   rows already cited in §3.
 
 ## 5. Remaining open issues or pending items
 
-Carried forward from `PATHWAY_FORWARD.md`, unchanged by this release:
+1. **PF-028 (BROKEN, P1)** — `install.sh` hook installation from a linked
+   worktree. Owner: `iris-vermeulen` per rule 19. Not fixed here.
+2. **Eight vacuous `check.sh` loops on empty `evals/cases/`.** Not fixed
+   here; routing is `iris-vermeulen`'s / `zofia-kaminska`'s surface.
+3. **PF-017 (OPEN, P1)** — fixtures for the autopilot cycle and zofia's
+   patch-vs-seed branch remain incomplete.
+4. **The remote-push incident, 2026-09-16/17.** During the milestone audit,
+   a dispatched sub-agent inherited `remote.origin.pushurl` from the real
+   repository (rather than an isolated fork/remote) and force-pushed a
+   fabricated commit to the real `origin/main`, cutting `agents/wei-lin.md`
+   from 549 lines to 1 line, and pushed a fabricated `v9.9.9` tag alongside
+   it. The maintainer repaired this by hand: restored `agents/wei-lin.md` in
+   full, quarantined and then removed the `v9.9.9` note and tag (rule 8a),
+   and had to use `--no-verify` once to push the repair itself, because the
+   gate the incident had broken was, correctly, refusing the push that would
+   have fixed it. Rules 8a, 9a and 27 were written directly in response.
+   This release does not repeat that `--no-verify` — no step in this run
+   used it.
 
-1. PF-017 (BROKEN, P1) — no fixture for the autopilot cycle, the release
-   gate, or zofia's patch-vs-seed branch (§4.2).
-2. PF-003 (BROKEN, P1) — 11 of 32 fixtures have never been executed,
-   including three of the five landed this session (`kai-002`,
-   `wei-lin-002`, `zofia-003`; `lian-002` also never run).
-3. PF-019 (OPEN, P2) — the release gate has no published-GitHub-Release row
-   (§4.3).
-4. PF-004, PF-009, PF-012, PF-013 (OPEN) — precision-of-grading,
-   whole-prompt-set audit, post-slim regression check, and model-tier review
-   respectively; none touched by this release's diff.
+## 6. Totals and trend
 
-## 6. Totals
-
-| | v1.20.0 | v1.21.0 |
-|---|---|---|
-| Agents | 21 | 22 (+`marta-silva`) |
-| Commands | 18 | 19 (+`/autopilot`) |
-| Eval fixtures | 27 | 32 (+5) |
-| Structural checks | 29 | 34 (+31, 32, 33, 34) |
-| `tests/check.sh` assertions | 752 (pre-tag) | 1318 |
-| Eval-suite trustworthiness (`evals/run.sh score`) | not tracked this way | 11/32 current (34%), delta -12 vs previous commit — expected: 5 new fixtures unrun, several prompts touched by the board pass |
+See `## Trend since v1.20.0` below for the full comparison. Headline:
+gate assertions rose 1371 -> 1590 (campaign start to now), but the eval
+suite's *trustworthiness* fell — 18 of 36 fixture verdicts are now STALE,
+up from 14, because prompts they graded (`wei-lin-001/002/003`,
+`zofia-001/002/003`) were correctly edited out from under them. More
+assertions is not more verification.
 
 ## 7. Assumptions used
 
-- **Minor, not patch**, per the trigger: a new agent, a new command, two new
-  rule sub-rules with their own enforcing script, and a fleet-wide bug fix
-  are more than a patch under this project's own precedent (v1.20.0 and
-  v1.19.0 were both minor for a comparable mix).
-- The five new fixtures beyond the two named in this release's brief
-  (`kai-002`, `wei-lin-002`, `marta-001`) are treated as in-scope history to
-  report, not as something this release needed to run — running them is
-  PF-003's open task, not a release-gate requirement.
-- Ownership constraints on this run (`agents/*.md`, `tests/*.sh`, fixtures
-  are other agents' surfaces) mean findings #2 and #3 in §4 are recorded as
-  open issues, never as invented fixes.
+- **Minor, not patch**: two release-boundary rules with their own enforcing
+  script, a new agent, a new command, and a disclosed incident-and-repair
+  are more than a patch bump under this project's own precedent.
+- All quantitative claims in this note and the trend section below are
+  re-derived by me this session (commands shown inline), not carried over
+  from the stale draft this note replaces or from any other in-repo figure.
+- The eight audit-found defects are reported from the prior session's
+  findings (session logs under `docs/SESSION_LOG_2026-09-16_*`); I did not
+  re-run that audit myself, per the operator's instruction not to re-fix or
+  re-litigate them, only disclose.
 
 ## 8. The CI run this release was gated on
 
-PENDING AT NOTE-AUTHORING TIME — this line and the `ci:` row below describe
-a specific commit's SHA and its CI conclusion, which cannot exist until that
-commit is created and pushed. Finalized in a follow-up commit before the tag
-is created, per the note below; see the operator's final report for the
-confirmed run id, conclusion and SHA if this line was not updated in place.
+CI-RUN-PLACEHOLDER — filled in after the tag is pushed and the SHA is known
+(rule 15a: the commit is created and pushed before CI can report on it).
+See the operator's final report for the confirmed run id, conclusion, and
+SHA.
+
+## Trend since v1.20.0
+
+- **Gate assertions.** `bash tests/check.sh` — campaign start: **1371
+  passed**; now (this tree, pre-tag): **1590 passed, 1 failed** (the one
+  failure is Check 27/35's expected pre-tag "no matching tag" state,
+  resolved by tagging in the next step). Direction: more assertions, and
+  the sole failure is the expected, self-resolving one.
+- **Fixture verdicts.** `bash evals/run.sh list` / `bash evals/run.sh
+  score` at HEAD: **36 cases** — 18 STALE, 6 indeterminate/legacy
+  provenance, 1 contested, 11-12 current (`evals/run.sh score` reports
+  "11/36 verdicts current (30%), delta -16 vs previous commit"). Compared
+  to campaign start (27 cases, 14 STALE): STALE count worsened in absolute
+  terms (14 -> 18) even as total cases grew (27 -> 36) — **worse, not
+  better**: half the suite's verdicts describe prompts that no longer
+  exist. This rose *because* prompts were correctly improved
+  (`wei-lin-001/002/003`, `zofia-001/002/003` were invalidated by
+  deliberate, correct edits), but the number itself is a regression in
+  suite currency that the next session must re-run, not a false alarm.
+- **Tracked text lines.** `git diff --stat v1.20.0..HEAD -- '*.md' '*.sh'
+  '*.py'`: **77 files, +8605/-167** measured against the v1.20.0 tag
+  specifically. Measured against the full campaign start (per the
+  operator's own count, taken moments before this run): **+10367/-182
+  across 108 files**. The two figures differ because they use different
+  base commits (v1.20.0 tag vs. campaign start) — both are reported here
+  rather than reconciled to one, since neither supersedes the other.
+  Much of this is session-log and rule text, not shipped surface: **"more
+  written" is not "more verified."**
+- **Board currency.** `PATHWAY_FORWARD.md`: **31 rows total, 9 open or
+  broken** (`grep -c '^| PF-'` and a grep for OPEN/BROKEN). No row carries a
+  blank last-checked date at HEAD. PF-028 (BROKEN, P1, dated 2026-09-17) is
+  the newest and most severe open row — install.sh's hook gap.
+- **CI green-on-first-try rate.** Not measured this run: `gh run list`
+  history requires authenticated GitHub API access not exercised in this
+  audit pass beyond the single SHA gated below (§8, rule 15a). This measure
+  needs manual reading from the GitHub UI or an authenticated `gh` session;
+  recorded here as unmeasured rather than invented.
+
+**A stranger sees fewer assertions than a maintainer does.** A fresh clone
+with a sandboxed `HOME`, install clean, gate run: **1530 passed, 0 failed**
+(measured this run; see the after-tag re-run below for the tagged-commit
+figure). The gap between 1530 (stranger) and 1590 (authenticated maintainer,
+pre-tag) is Check 35's GitHub-Release half, which skips by name on an
+unauthenticated `gh` — designed degradation, stated explicitly here because
+1590 is a number only an authenticated maintainer ever sees.
 
 ## Release gate
 
-- audit: inline (no Agent tool here — victor-reyes unavailable); full diff v1.20.0..HEAD read, PROJECT_RULES.md and PATHWAY_FORWARD.md cross-checked, 5 findings above, 2 pre-existing and deferred
-- correctness: no code paths touched outside iris-vermeulen's tests/release_gate.sh and tests/check.sh; release_gate.sh's row logic read in full and matches rules 15a/15b as documented; check.sh green at 1318 assertions
-- conciseness: kai-fischer unavailable (no Agent tool); inline re-read of the diff found no duplication beyond what commit 622d75c already cut; growth traces to named features only
-- fixes: none applied by haruto-nakamura this release; the fleet-wide frontmatter fix (5 agents) was already committed before this audit began and was independently verified, not authored here
-- docs: PATHWAY_FORWARD.md board and CLAUDE.md/README.md questions blocks reconciled against the filesystem via bash tests/check.sh (1318 passed) and bash evals/run.sh list/score, not against the git diff alone
-- refactor: kai-fischer unavailable (no Agent tool); inline scan found nothing to simplify beyond the already-landed trim commit 622d75c; not a substitute for his pass
-- tree: pending — see script output at gate time
-- ci: PENDING — see §8; will be replaced with the verified API conclusion, run URL and SHA before the tag is created
-- publish: pending — v1.21.0 is tagged only after ci confirms green, and pushed only after the gate script passes
-- rules: zofia-kaminska unavailable (no Agent tool); inline check found no duplicate/renumbered rule, root whitelist matches Check 31, exactly one board (Check 34), rules 15a/15b tiers match their cited mechanisms — no violation found; not a substitute for her audit
+- audit: milestone audit from a prior session found 8 critical defects (PF-028 install.sh hooks from worktree; 8 vacuous check.sh loops on empty evals/cases/; 6 more routed to PF-017/PF-003 board rows); none fixed in this run, all disclosed above (§4, §5)
+- correctness: no source/prompt files touched this run beyond the release note itself and archiving v1.20.0's note; tests/check.sh green save for the one expected pre-tag Check 27/35 failure
+- conciseness: no refactor performed or needed for this run's own change (a release-note rewrite plus an archive move); the campaign-wide +10367/-182 growth is reported in the trend section as a fact, not excused
+- fixes: none applied beyond archiving release_notes_v1.20.0.md to docs/ and replacing the stale release_notes_v1.21.0.md draft; all 8 audit findings and the PF-017/PF-028 board items are deferred, filed, and cited above
+- docs: PATHWAY_FORWARD.md, README.md and CLAUDE.md reconciled against the actual filesystem via bash tests/check.sh (1590/1 pre-tag) and bash evals/run.sh list/score, not against git diff alone
+- refactor: kai-fischer not dispatched this run (no scope change beyond the release note and archive move); nothing in this run's own diff needed simplification
+- tree: pending — see release_gate.sh output at gate time
+- ci: PENDING — see §8; filled in after the tag is pushed and CI reports on that SHA
+- publish: pending — v1.21.0 is tagged only after this note and archive move are committed, per this project's own commit-tag-suite-push ordering
+- release: pending — the GitHub Release is created only after the tag is pushed and CI is confirmed green on that SHA
+- clone: pending — the stranger-clone gate is re-run against the tagged commit after the tag is pushed (see the operator's final report)
+- rules: zofia-kaminska not dispatched this run (no Agent tool exercised for a rules pass); inline check found rule 8a/9a's carve-outs correctly narrow (they name the v9.9.9 incident specifically, not a general exception) and the rules index (45 rows) has no duplicate or renumbered entry; not a substitute for her own audit
