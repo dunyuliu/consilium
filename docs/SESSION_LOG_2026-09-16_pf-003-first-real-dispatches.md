@@ -1188,3 +1188,219 @@ nothing was blocking and nothing was counting — I simply never tried again.
 
 A hook that refuses is a hook that reminds. An absence of a hook is silence,
 and silence is what cost the six commits.
+
+---
+
+# Fourth wake — PF-027, and rule 25d's first real application
+
+## Finding 24 — the `:513` disambiguation is verified by dispatch, not assumed
+
+`lian-zhao` disambiguated `agents/zofia-kaminska.md:513`, where the clause after
+an em-dash ("— propose it, mark it clearly as proposed") was being read as a
+veto rather than an instruction. She declined to commission a new fixture under
+rule 10, arguing `zofia-004`'s existing criterion 2 already discriminates the
+behaviour on that exact input and re-dispatching it post-fix is the test.
+
+She was right, and the dispatch proves it rather than arguing it:
+
+```
+criterion 2 terms          run 2 (pre-fix)   run 3 (post-fix)
+  "rule 6"                       0                 0
+  "next free number"             0                 2
+  "at the next free number"      0                 1
+```
+
+Run 2 refused to propose a rule and failed the criterion. Run 3, against the
+corrected prompt, proposed two rules at the next free numbers and explicitly
+marked them **proposed** — which is precisely what the disambiguated clause
+asks for. Full-case verdict moved `FAIL 8/3` → `FAIL 8/2` → **`FAIL 8/1`**
+across the three dispatches, and the single remaining failure is criterion 3,
+the leave-alone guard `iris-vermeulen` judged unfixable by substring matching
+and left as a named limit.
+
+That is a prompt defect found by adjudication, fixed at its source, and
+confirmed by re-running the fixture that exposed it — with no new fixture
+written, because the right one already existed. Lian's rule-10 judgement is
+vindicated.
+
+## Pre-registration, written before the result exists
+
+Rule 25d says a contested case may not be reported closed on a single sample at
+the current SHA. Finding 21 says what legitimises a further sample is *when it
+was committed to*, not its count — a sample size fixed before dispatch is a
+measurement; one commissioned after seeing a split is a tie-breaker chosen
+because the first answer was inconvenient, and the two are indistinguishable
+afterward in the record.
+
+So this is the commitment, recorded now, while I know exactly one result:
+
+> `zofia-004-seed-patch-established` is sampled **N=2** at prompt SHA
+> `03bf9a1`. Run 3 is sample 1 and graded `FAIL — 8 criteria, 1 failed`.
+> Sample 2 is dispatched next. **Both are reported whatever they show.** If
+> they disagree, that is a split and the case is not settled — I will not
+> commission a third to break it, and I will not quietly drop either.
+
+If sample 2 agrees, the case has two concordant samples at one SHA and its
+remaining failure is attributable to criterion 3 alone. If it disagrees, the
+disagreement is the finding, and it says the prompt is still ambiguous
+somewhere — which is information I would lose entirely by running once and
+calling it settled.
+
+## Finding 25 — rule 25d's first real application, and it held
+
+The pre-registration above was honoured. Two samples of
+`zofia-004-seed-patch-established` at prompt SHA `03bf9a1`:
+
+```
+  sample 1 (run 3)  FAIL — 8 criteria, 1 failed
+  sample 2 (run 4)  FAIL — 8 criteria, 1 failed
+```
+
+Concordant, and concordant on the *same* criterion — the third block, the
+leave-alone guard `iris-vermeulen` judged unfixable by substring matching and
+documented as a named limit. No third run was commissioned; none was needed,
+and under the pre-registration none would have been permitted even if the two
+had split.
+
+**A detail that makes the concordance stronger than the numbers suggest.** The
+two samples satisfied criterion 2 by *different routes*: sample 1 matched
+`next free number` (twice), sample 2 matched `rule 6`. Different wording, same
+substantive decision — both proposed new rules at the next free numbers and
+both marked them **proposed**. That is the behaviour `lian-zhao`'s `:513`
+disambiguation was written to produce, arrived at twice independently, which is
+a much better result than one run hitting one literal.
+
+So the chain closes cleanly and every link was verified rather than assumed:
+`nadia-hadid` diagnosed a prompt ambiguity from a two-run disagreement →
+`lian-zhao` disambiguated the clause and declined to write a new fixture,
+arguing the existing one already discriminated the behaviour → two fresh
+dispatches confirm the fixed behaviour, twice, by different phrasings. Rule 10
+was satisfied by a fixture that already existed, exactly as she argued.
+
+**What this does not settle.** The case still FAILs, and it should: criterion 3
+remains unsatisfiable by a correct report in table form. Two concordant samples
+do not make a case pass — they make its verdict *mean something*. PF-025 stays
+OPEN on criterion 3 alone, which is a much narrower claim than the row carried
+this morning, when the case could not distinguish a correct seed pass from an
+incorrect one on three separate axes.
+
+**And the honest limit on the method itself.** N=2 concordance is weak evidence.
+It rules out the case being a coin flip at 50%, barely; it cannot distinguish a
+prompt that behaves this way 95% of the time from one that does 75%. The value
+of the pre-registration was never statistical power — it was that I committed
+to reporting whatever came back before I could see it, so the number in this log
+is not the product of my having stopped when I liked the answer.
+
+## Finding 26 — a correct-sounding design choice that discarded fourteen true positives
+
+`iris-vermeulen` implemented PF-027 and had to decide what `evals/run.sh list`
+does with the 50 legacy `Run (...)` records that carry no prompt SHA — a gap I
+flagged in the brief because neither rule 25d nor PF-027 specifies it. I gave
+her three options and told her to choose on correctness, not on which number
+moved least.
+
+She chose (b), unknown provenance, and justified it well: falling back to dates
+"would keep PF-024's exact blind spot alive under a new label." The machinery
+she built is right — SHA comparison, sample counting, contested handling, all
+five negative tests run and transcribed.
+
+**But the justification does not survive the data.** PF-024's blind spot is
+specifically the SAME-DAY case: two events on one day are unordered by a date.
+Measured against the actual corpus:
+
+```
+  STALE flags on main:  14
+  same-day:              0
+  different-day:        14     (gaps from 1 day to 6.5 weeks)
+```
+
+Every one of the fourteen was a *true positive*. `haruto-001-missing-prior-notes`
+ran 2026-07-31 against a prompt last changed 2026-09-16 — no ordering ambiguity
+exists there, and the date comparison called it correctly. After the change it
+reads:
+
+```
+haruto-001-missing-prior-notes   haruto-nakamura   run 2026-07-31 (no prompt SHA — provenance unknown, rule 25d)
+```
+
+STALE went 14 → 0 and "provenance unknown" went 0 → 34. Fourteen correct
+warnings were replaced by thirty-four shrugs. That is not a gain in honesty; it
+is a loss of signal dressed as one, and it is worse than the defect it was
+fixing — PF-024 was about false *negatives* on same-day records, and the cure
+eliminated every true positive to remove a class with no members.
+
+**The shape is worth naming because it is seductive.** "The old signal was
+derived by an unsound method, so discard it" is correct reasoning about a
+*method* and wrong reasoning about *this data*, where the unsound method's
+precondition (same-day) never occurs. A weaker instrument that is right
+fourteen times out of fourteen beats a stronger one that declines to answer.
+
+**The fix is the hybrid neither of us proposed.** Compare SHAs where a SHA
+exists. Where one does not, fall back to the date — which is sound precisely
+when the dates differ — and reserve "provenance unknown" for the one case that
+genuinely cannot be ordered: a legacy record whose date EQUALS the prompt's.
+That keeps all fourteen true positives, keeps PF-024's blind spot closed, and
+tells the truth about the residual.
+
+Returned to her with the measurement rather than an instruction, since the
+measurement is what settles it.
+
+**One thing her change got exactly right, and it is the first live use of the
+new format.** `zofia-004` now reports:
+
+```
+zofia-004-seed-patch-established   CONTESTED — no sample at current SHA 03bf9a1 yet; not settled (rule 25d)
+```
+
+That is correct and useful: I ran two samples at `03bf9a1` today, but neither is
+yet written into `case.yaml` as a SHA-bearing record, so the tool correctly
+refuses to call the case settled. The machinery is telling me about work I have
+done and not recorded — which is exactly what it is for.
+
+## Finding 27 — the hybrid landed, and the agent re-derived the measurement before trusting it
+
+`iris-vermeulen` was sent back with a measurement rather than an instruction.
+She did the thing that makes the return worthwhile: **she re-derived the
+same-day/different-day split herself before implementing**, explicitly, and
+said so — "I did not just trust your number; I derived it independently before
+writing the fix." Her count reproduced mine exactly.
+
+That mattered more than it might look. I had asked her to stop and report if
+her measurement disagreed with mine, because I have been wrong on a pasted
+figure twice today. Had she implemented against my number without checking, the
+fix would have been correct by luck rather than by evidence, and neither of us
+would have known which.
+
+The hybrid, verified on the live corpus and by my own mutation test:
+
+```
+  STALE                    0  ->  14     (all true positives restored)
+  provenance indeterminate 34  ->  10     (exactly the same-day cases)
+```
+
+My mutation test, run independently of her five scratch tests: take
+`haruto-001` (legacy record dated 2026-07-31, prompt last changed 2026-09-16),
+flip its recorded date to `2026-09-16` so it becomes same-day, and observe:
+
+```
+  before  STALE — verdict dated 2026-07-31 (no prompt SHA), prompt changed 2026-09-16 (date fallback)
+  after   run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate)
+  restored  STALE — ...
+```
+
+One record flipped, nothing else moved, and it flipped in the direction the
+hybrid predicts. The ten indeterminate cases are precisely PF-024's own live
+examples, which now say "I cannot order these two events" instead of printing a
+confident `run 2026-09-16`.
+
+**The general lesson, which is not about staleness.** "The old signal came from
+an unsound method, so discard it" is sound reasoning about a *method* and
+unsound about *data where the method's failure precondition never occurs*. The
+date comparison is unreliable only when two dates are equal; in a corpus where
+that never happened, it was right fourteen times out of fourteen. Replacing it
+wholesale traded fourteen correct answers for thirty-four refusals to answer
+and would have read, on the board, as an improvement — STALE went to zero.
+
+A metric moving to zero is not evidence of a fixed problem. It is evidence of a
+changed question, and the two are distinguishable only by measuring what the
+old signal was actually catching before you remove it.

@@ -1,5 +1,6 @@
 id: zofia-004
 agent: zofia-kaminska
+contested: true   # "add a rule at the next free number" criterion has two defensible answers (rule 25d incident, PF-025 cause 2)
 tier: smoke   # fast, markdown only, and the only test of Mode A on an established project
 prompt: |
   Seed this project. Report the seed you would write: for each of README.md,

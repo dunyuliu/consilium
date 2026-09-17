@@ -61,10 +61,10 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no longer reddens for a worktree-isolated dispatch | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter description no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-023 | `tests/lock.sh` | the lock resolves to the SAME shared file from a main checkout and from any linked worktree | VERIFIED | 2026-09-16 | 14 | P2 |
-| PF-024 | `evals/run.sh` | STALE compares dates, not the prompt SHA a verdict was produced against — same-day edit+run is invisible | OPEN | 2026-09-16 | 14 | P2 |
-| PF-025 | `evals/cases/zofia-004-seed-patch-established` | fixture cannot yet distinguish a correct Mode A seed pass from an incorrect one | OPEN | 2026-09-16 | 14 | P2 |
+| PF-024 | `evals/run.sh` | STALE now compares the prompt SHA a verdict was graded against, not the date — same-day edit+run is now reported as indeterminate, not silently current (rule 25d, landed via PF-027) | VERIFIED | 2026-09-16 | 14 | P2 |
+| PF-025 | `evals/cases/zofia-004-seed-patch-established` | causes 1 and 2 fixed (`iris-vermeulen`, verified independently); the row now rests on criterion 3 alone — the README/CLAUDE leave-alone guard, a named limit on substring grading, not a gap | OPEN | 2026-09-16 | 14 | P2 |
 | PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-16 | 30 | P1 |
-| PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against and a contested case cites its sample count (rule 25d) — format specified, not yet built | OPEN | 2026-09-16 | 14 | P1 |
+| PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against and a contested case cites its sample count (rule 25d) — built by `iris-vermeulen`, verified independently including a mutation test | VERIFIED | 2026-09-16 | 14 | P1 |
 
 ## Items
 
@@ -2073,7 +2073,7 @@ grep -q 'git rev-parse --git-common-dir' tests/lock.sh && test -d "$(git rev-par
 # → OK: lock.sh routes LOCK through git-common-dir, and it resolves to a real directory here
 ```
 
-### PF-024 — `evals/run.sh` — OPEN
+### PF-024 — `evals/run.sh` — VERIFIED
 
 STALE is decided by comparing calendar dates: `evals/run.sh:320` and `:354`
 both run `[[ "$last" < "$touched" ]]` on `YYYY-MM-DD` strings, where `touched`
@@ -2105,20 +2105,36 @@ Cross-reference: PF-012 counts STALE cases through this same code path, so
 any of its counts where the run and the prompt edit shared a day are read
 through this blind spot too (noted there, not repeated here).
 
+Original evidence, kept as history rather than as a live fence (Check 17
+re-runs every fenced command in this row, and this exact output is what the
+fix below replaced — it cannot reproduce, on purpose, once the fix landed):
+
+    bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
+    # → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16
+    # → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16
+    # → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16
+    # → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16
+
+**Fix specified 2026-09-16, then built 2026-09-16 by `iris-vermeulen` — see
+PF-027.** The date-vs-SHA fix sketched above is `PROJECT_RULES.md` rule 25d:
+record the prompt file's SHA in every `Run (...)` line and compare SHAs in
+`list`, not dates. Filed as one row rather than two because the same field
+also closes half of PF-025's exposure (sample count).
+
+**Closed 2026-09-16, verified independently, not on author prose.** The exact
+same four cases this row's evidence command names — the ones that had no way
+to order a same-day run against a same-day prompt edit — now print
+`provenance indeterminate` instead of a bare, falsely-confident `run
+2026-09-16`. That is the honest answer for a legacy record with no SHA field:
+neither current nor stale, visibly unresolved rather than silently current.
+
 ```bash
 bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
-# → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16
-# → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16
-# → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16
-# → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16
+# → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+# → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+# → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+# → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
 ```
-
-**Fix specified 2026-09-16, not yet built — see PF-027.** The date-vs-SHA fix
-sketched above is now `PROJECT_RULES.md` rule 25d: record the prompt file's
-SHA in every `Run (...)` line and compare SHAs in `list`, not dates. Filed as
-one row rather than two because the same field also closes half of PF-025's
-exposure (sample count). This row closes when PF-027 lands the SHA comparison
-in `evals/run.sh`.
 
 ### PF-025 — `evals/cases/zofia-004-seed-patch-established` — OPEN
 
@@ -2220,6 +2236,28 @@ grep -c '"rules 1-5"' evals/cases/zofia-004-seed-patch-established/case.yaml; gr
 # → 1
 ```
 
+**Narrowed further 2026-09-16.** Two pre-registered samples dispatched against
+prompt SHA `03bf9a1` (after `agents/zofia-kaminska.md:513`'s disambiguation)
+both graded `FAIL — 8 criteria, 1 failed`, failing the same criterion by two
+different routes — one report matched on "next free number", the other on
+"rule 6" — and both correctly proposed a rule at the next free number, marked
+**proposed**, exactly the behaviour :513 was written to produce. That confirms
+criterion 2 twice, on top of criterion 1's earlier fix. The row now rests on
+criterion 3 alone (the README/CLAUDE leave-alone guard, already named above as
+a documented limit rather than a gap), which is why it stays OPEN but no
+longer carries the two-cause description this row opened with.
+
+**Not written into `case.yaml` here.** The two `03bf9a1` samples are evidence
+for this row's narrative, not a landed record — recording them as `Run (...)`
+lines with a SHA and closing PF-024/PF-027's sample-count exposure through
+them is `iris-vermeulen`'s surface (`evals/cases/**`), not this board's, and
+is a separate landing.
+
+```bash
+grep -c '03bf9a1' evals/cases/zofia-004-seed-patch-established/case.yaml
+# → 0
+```
+
 ### PF-026 — `tests/lock.sh` / working pattern — VERIFIED
 
 **A workflow finding, not a code defect** — `tests/lock.sh` itself is sound
@@ -2268,7 +2306,7 @@ grep -c '^### 18a\. Acquire only for the write step' PROJECT_RULES.md; bash test
 # → free
 ```
 
-### PF-027 — `evals/cases/*/case.yaml`, `evals/run.sh` — OPEN
+### PF-027 — `evals/cases/*/case.yaml`, `evals/run.sh` — VERIFIED
 
 **The finding, stated once here rather than split across PF-024 and PF-025.**
 Every verdict in `evals/cases/*/case.yaml`, and every board row that cites one,
@@ -2328,6 +2366,23 @@ did not perform.
 grep -c '^## 25d\. Every verdict records the prompt SHA' PROJECT_RULES.md
 # → 1
 ```
+
+**Built 2026-09-16 by `iris-vermeulen`, verified independently — not on author
+prose.** `evals/run.sh` now records `Run (<date>, <agent>, prompt <short-SHA>)`,
+compares SHAs rather than dates, derives sample count by counting same-SHA
+records, and honours `contested: true`. `zofia-004-seed-patch-established` is
+marked contested and, with zero samples at its current SHA, reports itself
+unsettled rather than either PASS or FAIL by default — the live proof of the
+contested path this row specified. I re-ran her five negative tests plus a
+sixth of my own (a mutation to the SHA-comparison branch) and all six held.
+
+```bash
+bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
+# → zofia-004-seed-patch-established           zofia-kaminska         CONTESTED — no sample at current SHA 03bf9a1 yet; not settled (rule 25d)
+```
+
+PF-024 and PF-025 close (respectively: fully, and narrowed to criterion 3)
+through this row, per the plan above — see each for the closing evidence.
 
 ## Deferral log
 

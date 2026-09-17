@@ -39,6 +39,147 @@ STAGE_ROOT="${TMPDIR:-/tmp}/consilium-evals"
 
 die() { echo "error: $1" >&2; exit 2; }
 
+# --- rule 25d: prompt-SHA provenance for "Run (...)" records ----------------
+# A record written under rule 25d reads:
+#   Run (<date>, <agent>, prompt <short-SHA>). <VERDICT> — <k> criteria, <m> failed.
+# Records written before 25d landed name no SHA and are NEVER backfilled — an
+# invented SHA is a guess wearing a receipt (PF-027). A SHA-bearing record is
+# always compared by SHA: match -> CURRENT, mismatch -> STALE.
+#
+# A SHA-less (legacy) record falls back to the date comparison this repo ran
+# before 25d landed, but ONLY when that fallback can actually order the two
+# events. Measured 2026-09-16 (session log, finding 26): of the legacy records
+# with a run history, every one whose date differs from its agent prompt's
+# last-commit date is EARLIER (14 cases) or LATER (10 cases) — never same-day
+# in this corpus, i.e. PF-024's blind spot (same-day edit, no way to order by
+# date) has zero known members here, and reserving UNKNOWN PROVENANCE for
+# every legacy record regardless of date converted those 14 true STALE
+# positives into shrugs. So:
+#   - date differs, legacy record EARLIER than the prompt's last commit
+#     -> STALE, exactly as the pre-25d comparison called it.
+#   - date differs, legacy record LATER than the prompt's last commit
+#     -> the record postdates every known prompt edit, so nothing here
+#     contradicts it; reported as CURRENT (no SHA to sample-count, but
+#     nothing proves it stale either).
+#   - date EQUAL to the prompt's last commit -> the one case a date genuinely
+#     cannot order (same-day edit-then-dispatch). This is the only case
+#     UNKNOWN PROVENANCE is reserved for now.
+agent_current_sha() {
+    # $1 = agent name as it appears in case.yaml's `agent:` field.
+    git -C "$REPO_DIR" log -1 --format=%h -- "agents/$1.md" 2>/dev/null || true
+}
+
+agent_current_date() {
+    # $1 = agent name. Date (YYYY-MM-DD) of the prompt file's last commit —
+    # the same value the pre-25d date comparison called "prompt changed".
+    git -C "$REPO_DIR" log -1 --format=%ad --date=short -- "agents/$1.md" 2>/dev/null || true
+}
+
+run_record_lines() {
+    # $1 = case.yaml path. One raw physical line per "Run (...)" record —
+    # every record observed so far fits its date/agent/SHA/verdict on the
+    # first physical line even when the surrounding prose wraps.
+    grep -iE 'run \(' "$1" 2>/dev/null || true
+}
+
+run_record_date() {
+    printf '%s' "$1" | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | head -1 || true
+}
+
+run_record_sha() {
+    # Empty for a legacy record with no ", prompt <sha>)" clause.
+    printf '%s' "$1" | grep -oE 'prompt [0-9a-f]{4,40}\)' | head -1 \
+        | sed -E 's/^prompt //; s/\)$//' || true
+}
+
+run_record_verdict() {
+    printf '%s' "$1" | grep -oE '\b(PASS|FAIL|VOID)\b' | head -1 || true
+}
+
+# Classifies one case's run history against its agent's current prompt SHA.
+# Prints one '|'-delimited line: STATUS|N|DATE|V1|V2|CUR_SHA|OLD_SHA
+#   STATUS: NEVER | UNKNOWN | STALE | CURRENT | CONTESTED_UNSETTLED
+#   N:      count of Run(...) records naming the CURRENT sha (sample count,
+#           rule 25d — never a stored field, always derived by counting)
+#   OLD_SHA: for a STALE sha-mismatch, the mismatched sha. For a STALE
+#           legacy-date fallback, "date:<record-date>->_<prompt-date>" —
+#           still plain text, never a fabricated sha (see header above).
+classify_case() {
+    local d="$1" agent contested=0 cur_sha cur_date lines
+    agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
+    if grep -q '^contested: true' "$d/case.yaml" 2>/dev/null; then contested=1; fi
+    cur_sha="$(agent_current_sha "$agent")"
+    cur_date="$(agent_current_date "$agent")"
+    lines="$(run_record_lines "$d/case.yaml")"
+
+    if [ -z "$lines" ]; then
+        echo "NEVER|0||||$cur_sha|"
+        return
+    fi
+
+    local n_cur=0 n_stale=0
+    local last_cur_date="" last_stale_sha="" last_legacy_date=""
+    local v1="" v2=""
+    while IFS= read -r line; do
+        [ -z "$line" ] && continue
+        local sha date verdict
+        sha="$(run_record_sha "$line")"
+        date="$(run_record_date "$line")"
+        verdict="$(run_record_verdict "$line")"
+        if [ -z "$sha" ]; then
+            # Legacy record — no SHA was ever recorded. Track only the most
+            # recent one; an earlier legacy run superseded by a later run
+            # (or by a later SHA-bearing run, handled below) doesn't matter.
+            last_legacy_date="$date"
+        elif [ "$sha" = "$cur_sha" ]; then
+            n_cur=$((n_cur + 1))
+            last_cur_date="$date"
+            if [ -z "$v1" ]; then
+                v1="$verdict"
+            elif [ "$verdict" != "$v1" ] && [ -z "$v2" ]; then
+                v2="$verdict"
+            fi
+        else
+            n_stale=$((n_stale + 1))
+            last_stale_sha="$sha"
+        fi
+    done <<< "$lines"
+
+    if [ "$contested" = 1 ]; then
+        # A contested case is never reported settled on one current-SHA
+        # sample, and a disagreement between two current-SHA samples is
+        # reported as a split, not resolved by a tiebreaker (rule 25d).
+        if [ "$n_cur" -ge 2 ] && [ -z "$v2" ]; then
+            echo "CURRENT|$n_cur|$last_cur_date|$v1||$cur_sha|"
+        else
+            echo "CONTESTED_UNSETTLED|$n_cur|$last_cur_date|$v1|$v2|$cur_sha|"
+        fi
+        return
+    fi
+
+    if [ "$n_cur" -gt 0 ]; then
+        echo "CURRENT|$n_cur|$last_cur_date|$v1||$cur_sha|"
+        return
+    fi
+    if [ "$n_stale" -gt 0 ]; then
+        echo "STALE|0||||$cur_sha|$last_stale_sha"
+        return
+    fi
+    if [ -n "$last_legacy_date" ]; then
+        # No SHA-bearing record at all. Fall back to the date comparison —
+        # see the header above for exactly which of the three cases this is.
+        if [ -n "$cur_date" ] && [ "$last_legacy_date" = "$cur_date" ]; then
+            echo "UNKNOWN|0|$last_legacy_date|||$cur_sha|"
+        elif [ -n "$cur_date" ] && [[ "$last_legacy_date" < "$cur_date" ]]; then
+            echo "STALE|0||||$cur_sha|date:${last_legacy_date}->${cur_date}"
+        else
+            echo "LEGACY_CURRENT|0|$last_legacy_date|||$cur_sha|"
+        fi
+        return
+    fi
+    echo "NEVER|0||||$cur_sha|"
+}
+
 resolve_case() {
     local id="$1" hit
     [ -d "$CASES_DIR/$id" ] && { echo "$CASES_DIR/$id"; return; }
@@ -327,35 +468,66 @@ cmd_smoke() {
 }
 
 # --- list ------------------------------------------------------------------
-# A verdict is only about the prompt that produced it. When an agent's file
-# changes after its last recorded run, the recorded PASS describes an agent that
-# no longer exists — and nothing said so at the point of use. The 2026-08-04
-# slimming pass left 13 of 25 cases in exactly that state and it was visible only
-# on the board (PF-012). Comparing per-agent beats a global cutoff: an agent
-# untouched since its run is not stale just because a different one changed.
+# A verdict is only about the prompt that produced it. A SHA-bearing "Run
+# (...)" line names the prompt file's SHA at dispatch time and `list`
+# compares it against `agents/<agent>.md`'s SHA now, so a same-day
+# edit-then-dispatch (invisible to a date compare, PF-024) is caught.
+#
+# Records that existed before rule 25d landed name no SHA, and rule 25d
+# forbids backfilling one — annotating a verdict with a SHA nobody recorded
+# is inventing data. Such a record falls back to the date comparison this
+# repo ran before 25d, but only where a date can actually order the two
+# events — see the header above `classify_case` for the measurement that
+# settled this (session log, finding 26 / PF-027 follow-up):
+#   - legacy date EARLIER than the prompt's last commit -> STALE.
+#   - legacy date LATER -> CURRENT (nothing known contradicts it).
+#   - legacy date EQUAL -> UNKNOWN PROVENANCE, the one case a date genuinely
+#     cannot order.
+#
+# A `contested: true` case cites its sample count next to the verdict and is
+# never reported settled on a single current-SHA sample; two current-SHA
+# samples that disagree print as an unresolved split, not a tiebreak.
 cmd_list() {
     printf '%-42s %-22s %s\n' CASE AGENT "RUN RECORD"
     for d in "$CASES_DIR"/*/; do
-        local id agent run last touched
+        local id agent status n date v1 v2 cur_sha old_sha run
         id="$(basename "$d")"
         agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
-        last="$(grep -oiE 'run \(20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$d/case.yaml" 2>/dev/null \
-                | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | sort | tail -1 || true)"
-        # `|| true` is load-bearing: grep exits 1 for a case with no run record,
-        # which is the NORMAL case here, and under `set -euo pipefail` the
-        # assignment inherits that status and kills the loop after the header.
-        # Third time this trap has been hit in this file's family (Checks 17, 18).
-        if [ -z "$last" ]; then
-            run="NEVER RUN"
-        else
-            touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
-                       -- "agents/${agent}.md" 2>/dev/null)"
-            if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
-                run="STALE — ran $last, prompt changed $touched"
-            else
-                run="run $last"
-            fi
-        fi
+        IFS='|' read -r status n date v1 v2 cur_sha old_sha <<< "$(classify_case "$d")"
+        case "$status" in
+            NEVER)
+                run="NEVER RUN" ;;
+            UNKNOWN)
+                run="run $date (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)" ;;
+            STALE)
+                case "$old_sha" in
+                    date:*)
+                        local legd touchd
+                        legd="${old_sha#date:}"; legd="${legd%%->*}"
+                        touchd="${old_sha##*->}"
+                        run="STALE — verdict dated $legd (no prompt SHA), prompt changed $touchd (date fallback, rule 25d)" ;;
+                    *)
+                        run="STALE — verdict at prompt $old_sha, agent's prompt is now $cur_sha" ;;
+                esac
+                ;;
+            LEGACY_CURRENT)
+                run="run $date (no prompt SHA, dated after the prompt's last change — current, date fallback, rule 25d)" ;;
+            CURRENT)
+                local plural="s"
+                [ "$n" = 1 ] && plural=""
+                run="run $date (SHA $cur_sha current, n=$n sample${plural})" ;;
+            CONTESTED_UNSETTLED)
+                if [ "$n" -eq 0 ]; then
+                    run="CONTESTED — no sample at current SHA $cur_sha yet; not settled (rule 25d)"
+                elif [ "$n" -eq 1 ]; then
+                    run="CONTESTED — 1 sample at current SHA $cur_sha ($v1); needs a second dispatch (rule 25d)"
+                else
+                    run="CONTESTED — SPLIT at current SHA $cur_sha: $v1 vs $v2 (n=$n), unresolved"
+                fi
+                ;;
+            *)
+                run="?" ;;
+        esac
         printf '%-42s %-22s %s\n' "$id" "${agent:-?}" "$run"
     done
 }
@@ -396,24 +568,20 @@ cmd_list() {
 cmd_score() {
     local record=0
     [ "${1:-}" = "--record" ] && record=1
-    local d id agent last touched total=0 current=0 stale=0 never=0
+    local d id status n date v1 v2 cur_sha old_sha
+    local total=0 current=0 stale=0 never=0 unknown=0 contested_unsettled=0
     for d in "$CASES_DIR"/*/; do
         [ -f "$d/case.yaml" ] || continue
         total=$((total + 1))
         id="$(basename "$d")"
-        agent="$(grep -m1 '^agent:' "$d/case.yaml" 2>/dev/null | sed 's/^agent: *//')"
-        last="$(grep -oiE 'run \(20[0-9]{2}-[0-9]{2}-[0-9]{2}' "$d/case.yaml" 2>/dev/null \
-                | grep -oE '20[0-9]{2}-[0-9]{2}-[0-9]{2}' | sort | tail -1 || true)"
-        if [ -z "$last" ]; then
-            never=$((never + 1)); continue
-        fi
-        touched="$(git -C "$REPO_DIR" log -1 --format=%ad --date=short \
-                   -- "agents/${agent}.md" 2>/dev/null || true)"
-        if [ -n "$touched" ] && [[ "$last" < "$touched" ]]; then
-            stale=$((stale + 1))
-        else
-            current=$((current + 1))
-        fi
+        IFS='|' read -r status n date v1 v2 cur_sha old_sha <<< "$(classify_case "$d")"
+        case "$status" in
+            NEVER)                       never=$((never + 1)) ;;
+            UNKNOWN)                     unknown=$((unknown + 1)) ;;
+            STALE)                       stale=$((stale + 1)) ;;
+            CURRENT|LEGACY_CURRENT)      current=$((current + 1)) ;;
+            CONTESTED_UNSETTLED)         contested_unsettled=$((contested_unsettled + 1)) ;;
+        esac
     done
 
     [ "$total" -gt 0 ] || die "no cases with a case.yaml under $CASES_DIR"
@@ -446,8 +614,10 @@ cmd_score() {
     fi
 
     echo "suite trustworthiness: $current/$total verdicts current (${pct}%)"
-    echo "  stale (prompt changed since the run): $stale"
-    echo "  never run:                            $never"
+    echo "  stale (verdict names a prompt SHA that no longer matches):  $stale"
+    echo "  never run:                                                 $never"
+    echo "  unknown provenance (legacy verdict, no prompt SHA, rule 25d): $unknown"
+    echo "  contested, not settled on a single current-SHA sample:     $contested_unsettled"
     if [ -n "$prev_pct" ]; then
         delta=$(( pct - prev_pct ))
         if   [ "$delta" -gt 0 ]; then echo "  delta vs previous commit: +${delta} points"
