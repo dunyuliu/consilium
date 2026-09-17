@@ -65,6 +65,8 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | causes 1 and 2 fixed (`iris-vermeulen`, verified independently); the row now rests on criterion 3 alone — the README/CLAUDE leave-alone guard, a named limit on substring grading, not a gap | OPEN | 2026-09-16 | 14 | P2 |
 | PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-16 | 30 | P1 |
 | PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against and a contested case cites its sample count (rule 25d) — built by `iris-vermeulen`, verified independently including a mutation test | VERIFIED | 2026-09-16 | 14 | P1 |
+| PF-028 | `install.sh` | install a working `pre-commit`/`pre-push`/`post-merge` hook set from inside a linked worktree, not only a main checkout (owner: `iris-vermeulen`, rule 19) | BROKEN | 2026-09-17 | 14 | P1 |
+| PF-029 | `PROJECT_RULES.md` | every index row has body prose somewhere in the file, not only a one-line index claim | OPEN | 2026-09-17 | 60 | P3 |
 
 ## Items
 
@@ -2598,6 +2600,70 @@ PF-024 and PF-025 close (respectively: fully, and narrowed to criterion 3)
 through this row, per the plan above — see each for the closing evidence.
 Neither of their own evidence commands cites `zofia-004`'s per-edit settled
 state, so neither inherits this defect.
+
+### PF-028 — `install.sh` — BROKEN
+
+All three hook-install guards — `post-merge` (line 74), `pre-push` (line 88),
+`pre-commit` (line 120) — gate on `[ -d "$ROOT/.git/hooks" ]`. In a linked
+worktree, `.git` at `$ROOT` is a **file** holding a gitdir pointer, not a
+directory, so the guard is false, every hook-install block is skipped, and
+the script still exits 0 printing success. An agent working all day in a
+worktree — which is every agent dispatched in this project (PF-023's own
+finding) — has no pre-commit lock guard (rule 18) and no pre-push gate (rule
+9) and is told everything is fine. Found 2026-09-17, routing a fix attempt at
+an unowned surface (now closed: rule 19 assigns `install.sh` to
+`iris-vermeulen`). Not fixed here — code is outside this agent's write
+surface (rule 19); routed to `iris-vermeulen`.
+
+```bash
+test -d "$(git rev-parse --git-common-dir)/hooks" && echo "hooks dir exists (shared)" || echo "no shared hooks dir"
+# → hooks dir exists (shared)
+```
+
+`git worktree list | wc -l` (→ `2` here) confirms this checkout is itself a
+linked worktree — the environment the defect only manifests in.
+
+The fix likely resolves hook paths via `git rev-parse --git-common-dir`
+(shared across worktrees, per PF-023's own resolution for `tests/lock.sh`)
+rather than `$ROOT/.git/hooks`, but that is `iris-vermeulen`'s call to make.
+
+### PF-029 — `PROJECT_RULES.md` — OPEN
+
+Eight index rows cite prose that may not exist under its own heading: `0`,
+`5b`, `13a`, `21b`, `23a`, `25a`, `25b`, `25c`. Not uniform on inspection:
+
+- `0` has full prose — under `## Rule 0 — Always eat what you cook` rather
+  than a `## 0.` heading. A formatting quirk, not a content gap.
+- `5a`, `25d`, `25e` are unaffected (not in this list; named for contrast) —
+  each has its own full `##`/`###` heading.
+- `25a` and `25c` have real content, but only embedded as bullets inside rule
+  25's own body (the "Guards are declarative, never imperative" and "Silence
+  must not satisfy a case" paragraphs) — substantive, findable by a careful
+  reader, but not under a `## 25a.` or `## 25c.` heading a reader jumping from
+  the index would land on.
+- `5b`, `13a`, `21b`, `23a`, `25b` have **no prose anywhere in the file** —
+  the index line and a Check number are the entire rule. `21b` in particular
+  is cited substantively elsewhere in this board (its Check-21 mechanism is
+  load-bearing) with no definition in the rule book at all.
+
+Read as a gap, not a convention: the book's dominant pattern gives named
+sub-rules full sections (`5a`, `15a`, `15b`, `18a`, `18b`, `21a`, `25d`,
+`25e`), so five rows with zero prose look like an omission rather than a
+deliberate house style. Not written into the rule book this pass — the real
+rationale and incident for each of the five belong to whoever wrote the
+originating Check (19, 20, 21, 22, 23, 25), and inventing one here would be
+exactly the placeholder rule 2 forbids. Left as a board item for whoever next
+touches Checks 19–23 or 25 to close by writing the missing section, not by
+deleting the index row.
+
+```bash
+for r in 5b 13a 21b 23a 25b; do grep -qx "## $r\." PROJECT_RULES.md || grep -q "^## $r\." PROJECT_RULES.md || echo "$r: no ## heading"; done
+# → 5b: no ## heading
+# → 13a: no ## heading
+# → 21b: no ## heading
+# → 23a: no ## heading
+# → 25b: no ## heading
+```
 
 ## Deferral log
 

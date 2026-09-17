@@ -112,6 +112,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical — Check 14 |
 | 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
 | 26 | Before removing, weakening, or replacing a signal, measure what it currently catches | mechanical in part — a check could require a before/after count in the commit message; whether the count was measured against the real corpus is judgment |
+| 27 | A restriction does not survive a dispatch hop — restate it in every sub-brief | norm — no mechanism logs dispatch briefs today |
 
 ---
 
@@ -995,6 +996,7 @@ the machine-readable source of truth, not documentation of one.
 | `PATHWAY_FORWARD.md` (the inspection log) | `zofia-kaminska` |
 | `agents/*.md` (the prompts themselves) | `lian-zhao` |
 | `commands/*.md` (trigger wrappers invoking those prompts) | `lian-zhao` |
+| `install.sh` (the installer, and the git hooks it wires) | `iris-vermeulen` |
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
@@ -1012,6 +1014,23 @@ same as `agents/*.md`, is what a directory-wide surface means (rule 19's own
 header). Gap found 2026-09-16: a dispatched `lian-zhao` correctly refused to
 edit `commands/autopilot.md` because this table had no row for `commands/*.md`
 at all — a whole directory with no enforced owner, invisible to Check 10.
+
+**`install.sh` is `iris-vermeulen`'s, found the same way `commands/*.md` was.**
+An audit trying to route a fix — `install.sh` installs zero git hooks when run
+from a linked worktree, because all three `[ -d "$ROOT/.git/hooks" ]` guards
+assume `.git` is a directory, and a worktree's `.git` is a file — found no row
+for `install.sh` at all: a Check-10-invisible unscoped surface, same shape as
+the `commands/*.md` gap above, found by the same method (trying to route work
+at it). Assigned to `iris-vermeulen` rather than treated as human-owned like
+`README.md`/`CLAUDE.md`: the file's load-bearing content is the `pre-commit`,
+`pre-push`, and `post-merge` git hooks that make rules 3, 9, and 18
+mechanical — gate infrastructure, the same class as `tests/lock.sh` and
+`tests/check.sh`, both already hers under "test files, fixtures, CI config."
+The symlink-reconciliation half of the script is delivery, not product — it
+does not carry prompt content the way `agents/*.md` and `commands/*.md` do,
+so it does not belong to `lian-zhao`. That six of its commits were
+historically all by the human is not evidence it must stay unowned; it is
+evidence nobody had assigned it yet (incident found 2026-09-17).
 
 **Human-owned surfaces.** `README.md` and `CLAUDE.md` have no agent owner and
 are not an oversight: they are maintained by hand. An agent proposes a change
@@ -1275,6 +1294,47 @@ checkable: none of this repo's tooling can currently distinguish "I counted
 the real corpus" from "I wrote a plausible number", so the count itself stays
 a norm; only its *presence* in the commit message is mechanizable, and is not
 yet built.
+
+## 27. A restriction does not survive a dispatch hop — restate it in every sub-brief
+
+An agent with routing authority that is given a constraint — read-only, no
+lock, no worktree, no push — does not merely obey it itself: every sub-brief
+it writes for a further dispatch restates that constraint in full, in that
+sub-brief's own text. A constraint carried only in the top-level dispatch is
+invisible to a second-hop agent, which sees only the brief it was itself
+given.
+
+**Rationale**: authority to route work is authority to lose a restriction that
+was written down once. A sub-agent has no access to its dispatcher's own
+brief — only to what the dispatcher chose to pass on.
+
+**Incident (2026-09-16)**: `victor-reyes` was dispatched for a technical audit
+with "READ-ONLY, audit, do not fix, do not take the lock, do not open a
+worktree" stated explicitly. He has routing authority and dispatched four
+specialists; the restriction did not survive that second hop. One sub-agent,
+testing release machinery, repointed `origin`'s fetch URL in a scratch copy
+but inherited `remote.origin.pushurl` from the real repository, and pushed to
+it. `origin/main` was fast-forwarded to a fabricated "test note" commit that
+deleted 548 of 549 lines from `agents/wei-lin.md` — served live through
+`install.sh`'s symlinks — and a fabricated tag `v9.9.9` was pushed that still
+cannot be removed without maintainer action, costing a permanent gate failure
+(Check 35's grace) until then. Two legitimate commits were swept into `main`
+outside their PR boundary. The maintainer repaired `main` with
+`git push --no-verify` — a deliberate, documented rule violation, accepted as
+the lesser harm over a red `main`. Recovery consumed a full cycle.
+
+**How to apply**: when writing a brief for a further dispatch, copy every
+restriction from your own brief into it verbatim — never assume inheritance.
+A router that cannot list the constraints its own mission carries has not
+read its brief closely enough to redispatch it.
+
+**Tier**: norm. A sub-brief leaves no artifact in this repo — agents are
+prompted, not scripted, the same limit rule 18a and 18b both state for their
+own mechanisms — so nothing here can check after the fact whether a
+constraint was restated. What would make it partly mechanical: logging
+dispatch briefs (as 18a's own proposed lock-history fix would do for holds),
+so a check could grep a sub-brief for the restrictions named in the brief that
+spawned it. Nothing in this repo logs dispatch briefs today.
 
 ---
 
