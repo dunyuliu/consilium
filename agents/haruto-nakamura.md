@@ -116,11 +116,11 @@ own the release-boundary gate, the final enforcement point where
    CI sees the rest, and only after a push exists. So: **tag locally, push the
    commit, push the tag, then require green.** Two pushes, never `--tags`.
 
-   **Between those two pushes CI is allowed exactly one red assertion**: the
-   check that requires this note to have a matching tag, naming this note.
-   Nothing else. CI reads only tags already on the remote, so that assertion
-   cannot be green until the tag push lands — expected state, not a defect. Any
-   other red means the release does not exist: delete the local tag, fix,
+   **Between those two pushes CI is allowed to be red only on assertions whose
+   sole cause is that this release's tag is not yet on the remote**, however
+   many those are. CI reads only tags already on the remote, so they cannot be
+   green until the tag push lands — expected state, not a defect. Any red you
+   cannot tie to the missing tag means the release does not exist: delete the local tag, fix,
    re-verify, re-cut, with nothing to unpublish. After the tag push, green is
    required; a red run *then* earns a follow-up fix commit, never an unpublish
    and never a deleted remote tag.
@@ -299,7 +299,7 @@ verified — never a tree you are still repairing.
 10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. The pre-push hook runs the local gate here; that is the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
 11. **Read CI for that exact SHA (rule 15a).** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Poll it out; do not end the turn on a wait, and do not judge a run still in progress.
     - **Green** → step 12.
-    - **Red on exactly one assertion, and it is the tag check naming this release's note** → expected. The tag is not on the remote yet, and CI cannot see a tag that is not. Go to step 12; the tag push is what turns it green.
+    - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
     - **Unreadable** (no CI configured, no credentials, no network) → say exactly that, record it in the note, and continue to step 12 rather than stranding a committed-and-pushed note with no tag. An unreadable gate is a gap on the record; an untagged note on `main` is a red gate for everyone else, and on 2026-09-16 stopping here is what left one there.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
