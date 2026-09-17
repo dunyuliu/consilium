@@ -1101,3 +1101,48 @@ Zofia wrote the exemption into the rule explicitly — marking a case contested
 is "not a retroactive audit obligation". Backfilling a sample count nobody
 measured would be inventing data, and it is the same failure as backfilling a
 `last-checked` date, which this board has forbidden since it was written.
+
+## Finding 22 — my brief contained a contradiction, and the agent obeyed the boundary rather than the instruction
+
+Briefing `iris-vermeulen` on PF-019, I wrote that she should write
+`tests/release_gate.sh` "plus whatever Check 33 requires for schema agreement",
+and in the same sentence forbade her from touching `agents/*.md`. Check 33
+compares the gate's row list against the schema documented in
+`agents/haruto-nakamura.md` — the only other file it reads. The two clauses are
+unsatisfiable together.
+
+She added the row, hit the failure, and **stopped at the ownership boundary**,
+reporting the conflict and naming the one-line edit someone else must make. The
+gate ended at `1485 passed, 2 failed` with the mismatch reported precisely.
+
+That is the right resolution and I want to be exact about why, because the
+tempting reading is that she was merely being literal. A brief is not a grant
+of surface. Rule 19's table is, and no sentence I write can extend it — if it
+could, then "do whatever the check requires" would be a universal write
+permission, which is precisely the failure mode the ownership table exists to
+prevent. An agent that resolved my contradiction by editing the other file
+would have been helpful once and would have established that briefs can hand
+out surfaces.
+
+**This is the third time today an agent has caught an error in my instructions**,
+and the pattern across the three is worth more than any one of them:
+
+- `zofia-kaminska` re-ran evidence I pasted, got different numbers, and refused
+  to close two rows — my paste came from an unpushed branch.
+- `lian-zhao` grepped for a line I said was in `agents/wei-lin.md`, found it
+  absent, and reported the premise false rather than inventing a quote — it was
+  in `CLAUDE.md`, which she may not edit.
+- `iris-vermeulen` hit a contradiction between two clauses of one sentence and
+  honoured the ownership boundary over the instruction.
+
+All three refused to comply. None of them stopped working. Each reported the
+conflict, did the part that was unambiguously theirs, and named the owner of
+the rest. That is what a specialist with a bounded surface is *for*, and it is
+the strongest argument I have seen for rule 19 being worth its overhead: the
+boundaries did not merely prevent collisions, they caught three defects in the
+conductor's own reasoning that no check in this repo could see.
+
+The corrective on my side is narrow and mechanical. Before dispatching, read
+the brief once asking a single question: **does every file this mission must
+touch belong to the agent I am sending?** If the answer is no, the mission is
+two missions. I did not ask that question and it cost a round trip.
