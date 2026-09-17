@@ -47,6 +47,7 @@
 #      (rule 15) — haruto's workflow tags and pushes but does not itself
 #      run `gh release create`, so this closes the gap that let 23 tagged
 #      releases exist with no Release object behind them.
+#  36. No tracked file contains a merge-conflict marker.
 #
 # Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
 # could be absent from the model table, the roster, or the tree with the
@@ -1382,6 +1383,33 @@ else
         fi
     done < <(git tag --list 'v*' | sort -V)
 fi
+
+echo
+echo "Check 36: no tracked file contains a merge-conflict marker"
+#
+# Structural, deterministic, and there is no runtime to catch it. A conflict
+# marker is valid text in every file this repo ships, so nothing downstream
+# objects: the board, the rule book and an agent prompt all parse and read as
+# normal until a human hits the marker weeks later.
+#
+# Incident (2026-09-17): a cherry-pick of a board compression left three
+# markers in PATHWAY_FORWARD.md. The suite reported 1538 passed, 0 failed with
+# them present, and the file was one `git commit` from main. The 47-rows-versus-
+# 34-blocks discrepancy it caused was noticed and explained away as a counting
+# artefact before the markers themselves were found.
+#
+# Scope is markers and nothing else. This does not read prose, does not judge
+# content, and must not grow: a check that starts policing file health is the
+# shape this suite just retired two checks for.
+conflicted=0
+while IFS= read -r f; do
+    if LC_ALL=C grep -qE '^(<<<<<<< |=======$|>>>>>>> )' "$f" 2>/dev/null; then
+        fail "$f contains a merge-conflict marker — a conflicted file parses as valid text and ships silently"
+        conflicted=$((conflicted + 1))
+    fi
+done < <(git ls-files -- '*.md' '*.sh' '*.yaml' '*.yml' '*.awk' '*.tsv')
+[ "$conflicted" -eq 0 ] && ok
+
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"
