@@ -40,7 +40,7 @@ evidence. `tests/check.sh` Check 12 parses both and fails if they disagree (rule
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | the pre-commit hook and hook versioning are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-002 | `agents/` | every agent has at least one eval fixture (rule 13) | VERIFIED | 2026-09-16 | 30 | P3 |
-| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, see PF-025 for the one criterion set still known-defective | OPEN | 2026-09-16 | 14 | P3 |
+| PF-003 | `evals/cases/` | every fixture carries a dispatch-and-grade record (no `NEVER RUN`); re-check whenever a fixture is added — this is coverage, not health, and a superseded record still counts as coverage, see PF-025 for the one criterion set still known-defective | VERIFIED | 2026-09-17 | 14 | P3 |
 | PF-004 | `evals/` | make grading measure precision, not only phrasing | OPEN | 2026-09-16 | 60 | P2 |
 | PF-005 | `docs/release_notes_*` | each release note matches its tag, or the divergence is recorded here | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-16 | 14 | P2 |
@@ -119,7 +119,7 @@ for d in evals/cases/*/; do [ -f "$d/case.yaml" ] && basename "$d"; done | sed '
 #   → 22 of 22 agents have at least one fixture
 ```
 
-### PF-003 — `evals/cases/` — OPEN
+### PF-003 — `evals/cases/` — VERIFIED
 
 The cited command no longer tells the truth: `evals/cases/lian-001-no-fixture-no-cut/`
 has no `case.yaml`, and `cmd_list` in `evals/run.sh` exits 2 partway through the
@@ -295,9 +295,33 @@ reads "Not yet dispatched." verbatim, and writing today's run record into it
 is `evals/cases/` work — `iris-vermeulen`'s surface, not this board's. This
 row stays as it is until that record lands.
 
+**Re-run 2026-09-17, VERIFIED, and I was handed the resolved figure twice
+before re-running it myself (rule 4).** `iris-vermeulen` recorded
+`iris-002-measure-before-replacing`'s first real dispatch as a SHA-bearing
+line in its own `case.yaml` (prompt `306f1cc`): `FAIL — 6 criteria, 3 failed`,
+marked SUPERSEDED in the same note because criteria 2 and 4 were repaired
+afterward and the verdict was produced against criteria that no longer exist
+(rule 5). Against the repaired criteria the same report grades `FAIL — 6
+criteria, 1 failed`; the sole remaining failure, criterion 5, is recorded as
+decided rather than repaired — Iris found from the fixture's own input (the
+timestamp field the alternative remedy would need does not exist until a
+future gateway ships) that the agent's miss is genuine, not a phrasing gap,
+and left the criterion as it stood.
+
+This row's claim is coverage, not health, and a superseded verdict still
+satisfies it: the fixture has been dispatched and graded, so the command
+below — which only asks whether a `run (<date>` line exists at all — correctly
+prints nothing. `iris-002` separately owes a re-dispatch for a *current*
+verdict, since the SUPERSEDED one was produced against retired criteria; that
+distinction belongs to the fixture's own history, not to this row, which does
+not distinguish current from superseded coverage and says so in its own
+wording now. Independently re-derived below, not inherited: I re-ran the
+detector on this branch myself rather than accept the "prints nothing" claim
+handed to me for the second time in this campaign.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
-# → iris-002-measure-before-replacing: NEVER RUN
+# →
 ```
 
 ### PF-004 — `evals/` — OPEN
