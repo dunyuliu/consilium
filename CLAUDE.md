@@ -68,9 +68,10 @@ None of them read a prompt for sense. Specifically uncovered:
 
 - Whether a prompt is any good — coherent persona, sane routing, no
   contradiction between two sections. That is `lian-zhao`'s job, not a check's.
-- Whole sections of a prompt that no fixture exercises. Check 25 proves each
-  agent *has* a fixture, never that its fixtures reach every mode the prompt
-  describes; `bash evals/run.sh list` is the honest inventory.
+- Whole sections of a prompt that no fixture exercises. Nothing asserts an
+  agent has a fixture at all since rule 13 was retired, and a fixture that
+  exists never proved it reaches every mode the prompt describes;
+  `bash evals/run.sh list` is the honest inventory.
 - Two checks disappear in a shallow clone (27 and 28: no tags, no history), and
   they say so rather than passing quietly. Green in a shallow clone is a weaker
   claim than green in a full one.

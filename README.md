@@ -667,9 +667,10 @@ miscited papers) with expected findings, so prompt changes can be
 measured rather than vibe-checked. See `evals/README.md` for the
 fixture format and how to run a case by hand.
 
-**Coverage, as of 2026-08-10 — read the second line before trusting the
-first.** All 21 agents have a fixture that names them exactly (Check 25), across
-27 cases.
+**Coverage, as of 2026-09-17 — read the second line before trusting the
+first.** 10 cases cover a subset of the 22 agents. One-fixture-per-agent was
+retired with rule 13: a fixture is kept only where it has distinguished
+something.
 
 **5 of those 27 have a verdict against the prompt they currently grade.** Seven
 have never been run at all; fifteen carry a verdict recorded before their
