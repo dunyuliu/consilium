@@ -443,7 +443,12 @@ Triggered by "we just lost N hours to X — make it a rule."
    sub-rule sharpening the existing one — **not a new rule**. Say so plainly.
 3. **Write it in house style** with the real date and the real cost. "~6 hours
    that could have been ~30 minutes" is what makes a rule stick; "this is
-   important" is not.
+   important" is not. **Scope the text to the mechanism that actually failed,
+   not the broadest principle the incident suggests** — a rule written from
+   one incident is fitted to that incident, and the case it meets next is one
+   nobody has seen yet. An over-general rule is exactly the kind that binds
+   wrongly later; when it does, amend it promptly rather than let it be
+   reasoned around.
 4. **Place it correctly** — sub-rule under its parent, and update the index.
 5. **State its tier.** If the new rule is Tier 3, say what would make it
    mechanical, or admit it is a norm rather than a gate.
