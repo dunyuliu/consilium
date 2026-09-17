@@ -895,3 +895,42 @@ push before every report. Routed as a board row; the check belongs in
 `tests/check.sh` only if it can be made to work offline, which it probably
 cannot — this may be a discipline rather than a gate, and should be written
 down as one rather than assumed.
+
+## Finding 18 — what one missing push actually cost, counted
+
+Finding 17 recorded the error. This records the bill, because the bill is the
+argument for the discipline.
+
+- **Two wasted agent dispatches.** A `zofia-kaminska` run produced a board that
+  correctly described `main` and incorrectly described the tree, because she
+  branched from the incomplete `main`. A second dispatch was needed purely to
+  reconcile. Neither run was wrong; both were spent.
+- **A duplicated board block.** Applying her draft over an earlier copy of
+  itself left PF-003 with two identical ```bash blocks, so Check 17 re-runs the
+  same command twice and reports the row twice. Visible in the gate only as a
+  doubled failure line, which reads like two problems and is one.
+- **A stale row created by fixing something.** PF-025's command greps for a
+  marker string in `zofia-004`'s `case.yaml`. Recording the verdict deleted the
+  marker, so the row's evidence now exits 1 while its claim remains true. The
+  row was written against a tree where the recording had not landed.
+- **My own report was wrong in public.** I told the maintainer PF-003's
+  never-run list was empty and PF-022 read `0`. Both were true on my local
+  branch and false on what had actually been merged. I reported local state as
+  landed state.
+
+The last one is the worst of the four, and it is the same failure as the first
+three seen from the other end: **I was treating my working tree as the project.**
+A branch with an open PR is not the project until it is pushed; a local commit
+is a private note. Everything downstream — the agent's base, the board's
+accuracy, the maintainer's picture — derives from the remote, and I was
+deriving mine from the filesystem in front of me.
+
+The discipline is one line and needs no tooling: **push in the same action that
+commits, and re-read the remote before quoting any state to anyone.** The
+cheaper habit is the second half. `git log --oneline -1 origin/main` costs
+nothing and would have caught this the first time I claimed a number.
+
+`zofia-kaminska` caught it from her side, by re-running the evidence I had
+pasted and refusing to close two rows when her run disagreed with my claim. The
+rule that saved this was hers, applied against me: a verdict is what the
+command printed, not what the person who dispatched you said it printed.
