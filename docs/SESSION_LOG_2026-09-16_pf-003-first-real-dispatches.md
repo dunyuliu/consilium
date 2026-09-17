@@ -2042,3 +2042,49 @@ samples); dispatches agreeing *against the criterion* is evidence the criterion
 is wrong (repair or split it). Marking the second case contested "would be a
 place to park a defective criterion instead of fixing it, and would quietly
 lower the bar on the criteria around it that are factual."
+
+## Finding 41 — the repaired criterion grades the act, not the reasoning about it
+
+`iris-vermeulen` rebuilt criterion 5 as three ANDed sub-criteria drawn from her
+own contract at `:205-206` — 5a the mutation performed, 5b the boundary outcome
+observed, 5c the record restored — each widened by class rather than by
+instance.
+
+My grades reproduce hers exactly: `pass.md` 8/0, `fail.md` 8/8, both prior runs
+8/3 (neither performed a mutation), a wholesale-swap denial 8/7, an empty report
+8/7.
+
+**The test worth running was the one neither of us had:** a report that *reasons*
+about the boundary without touching a record. I wrote one — correct counts,
+correct verdict, and "the check still passes such a row silently and is blind to
+same-day ordering... I did not need to try it; the comparison is lexicographic
+on equal strings."
+
+```
+  FAIL — 8 criteria, 2 failed
+  5a (mutation performed)  FAIL
+  5b (boundary outcome)    PASS  (matched "still passes")
+  5c (record restored)     FAIL
+```
+
+Exactly the right shape. 5b alone is weak — a reasoning-only report produces it
+naturally, which is precisely what `nadia-hadid` warned about when she flagged
+`"silently passes"` as close to something a hollow report could say about any
+check. The AND across three sub-criteria is what converts a weak signal into a
+strong one: **you can argue your way to the outcome, but not to having mutated a
+row and put it back.**
+
+That is a better criterion than the one it replaced in a way worth naming. The
+old one asked *what remedy do you propose* — a design opinion, gradeable only by
+enumerating acceptable opinions. The new one asks *what did you do* — an act,
+with residue. Criteria that grade acts are cheap to widen safely; criteria that
+grade opinions are the ones that have cost this campaign four repair rounds.
+
+**Iris conceded her own premise**, and the sentence is worth keeping verbatim
+because it is the hardest kind to write: *"I invented the premise, not read
+it."* She had argued the uncovered interval from the input; on re-reading she
+agreed `gateway_note.md` never says when a replacement can be built. She also
+kept the instinct alive in the right place — if "name what covers the gap
+between retirement and replacement" is worth requiring, it belongs as new prompt
+text via `lian-zhao`, and only then earns a fixture. Not smuggled into a
+criterion the current contract never asked for.
