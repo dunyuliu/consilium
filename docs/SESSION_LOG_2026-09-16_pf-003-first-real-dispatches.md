@@ -2543,3 +2543,75 @@ defect largely evaporates, and repairing it would make the hooks *more* binding,
 which is the rejected alternative. **PF-028 is held, not dispatched**, pending
 the hook removal. Zofia will need to re-scope or close it as part of the
 reconciliation.
+
+## Correction to the hook decision — my recorded framing was wrong
+
+The entry above records the hook removal as *"trading pre-push prevention for
+post-push detection"* and says we are *"choosing that exposure deliberately
+instead of suffering it accidentally."* **Both are wrong and the board row must
+not say them.** Corrected here rather than by rewriting the original, because
+the original is what I actually believed an hour ago and that is the record.
+
+**There was no prevention to trade away.** The hooks were **inverted**.
+`install.sh` guards every hook install on `[ -d "$ROOT/.git/hooks" ]`, and a
+linked worktree's `.git` is a *file* — so hooks were installed in the main
+checkout and absent in **every worktree**. Which means:
+
+- they blocked careful work on `main` three times today, including refusing the
+  push that deleted the fabricated tag;
+- and the one place an agent actually went rogue — a worktree — had **no hooks
+  at all**.
+
+**They obstructed the disciplined path and waved through the undisciplined
+one.** CI caught the rogue push, server-side, where no worktree can skip it.
+
+So removal costs nothing we actually had. The alternative — fixing `install.sh`
+so hooks install in worktrees too — would have made the **obstruction**
+universal rather than making the protection real, because the protection was
+never the binding part. CI already does that job.
+
+That also retires PF-028 as a defect worth fixing on its own terms: it
+describes the mechanism by which the control was inverted, which is now the
+argument for deleting the control rather than a bug to repair.
+
+**What survives from the original framing, unchanged:** rules 9, 15a and 18's
+lock rest on hooks that will not exist, and become obligations on the agent
+rather than mechanisms. Rule 0 argues for that independently — a hook reaches
+this repo, a prompt reaches every project we are pointed at.
+
+## Finding 52 — a guard present for the compliant and absent for the non-compliant
+
+The maintainer's general form, and it is worth more than the hook fix:
+
+> A guard that is present for the compliant and absent for the non-compliant is
+> **worse than no guard**, because it produces confident false assurance in
+> exactly the runs that need scrutiny.
+
+Worse than no guard, not merely useless. With no hooks, nobody believes their
+commits were checked. With inverted hooks, the careful agent is told it passed
+a gate and the rogue agent is told nothing at all — and the reviewer reading
+either transcript cannot tell which happened.
+
+**The same species is already in my audit findings**, which is why the shape is
+worth hunting rather than patching one instance:
+
+- **Eight `check.sh` loops pass vacuously on an empty `evals/cases/`** — no row
+  counter, so checks 15/16/19/22/23/24/26 contribute zero passes and zero
+  fails. Delete the fixtures and the gate reports success.
+- **`install.sh` prints `consilium installed: 22 agents, 19 commands` having
+  installed zero hooks** in a worktree. It was found earlier in this campaign
+  reporting 21 agents installed having installed **none**, and fixed by counting
+  links that resolve into the checkout — the same defect, in the same file,
+  recurring in a different field.
+- **Check 35 reads a `gh` failure as "no Release"**, so any non-GitHub `origin`
+  produces 22 false FAILs — the mirror image: absent for the compliant,
+  aggressive against the innocent.
+
+The unifying property is that **each one's output is indistinguishable between
+"checked and clean" and "not checked at all."** That is the thing to test for,
+and it is testable: for every check, ask what it prints when its subject is
+missing entirely. If the answer is "the same as when the subject is fine", it is
+this defect.
+
+Routing that as the frame for the vacuous-loop fix rather than a list of eight
+separate repairs.
