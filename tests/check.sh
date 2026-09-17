@@ -42,10 +42,11 @@
 #  32. The README and CLAUDE questions blocks exist and share no question.
 #  33. The release gate's rows and the documented note schema agree.
 #  34. Exactly one board carries the project forward (rule 21).
-#  35. Every tagged release has both a release note and a GitHub Release
-#      (rule 15) — haruto's workflow tags and pushes but does not itself
-#      run `gh release create`, so this closes the gap that let 23 tagged
-#      releases exist with no Release object behind them.
+#  35. Every tagged release has a release note, and every tag that is ON THE
+#      REMOTE also has a GitHub Release (rule 15) — haruto's workflow tags
+#      and pushes but does not itself run `gh release create`, so this
+#      closes the gap that let 23 tagged releases exist with no Release
+#      object behind them.
 #  36. No tracked file contains a merge-conflict marker.
 #
 # Checks 6 and 7 are separate because a bare mention is not membership: an
@@ -1292,6 +1293,28 @@ elif [ -z "$(git tag --list 'v*' 2>/dev/null || true)" ]; then
     echo "  no tags in this clone — rule 15 not checkable here"
     ok
 else
+    # The NOTE leg binds on EVERY tag, local or pushed. The RELEASE leg binds
+    # only on tags that exist on the remote: a local-only tag has no GitHub
+    # Release by definition and cannot be given one, so asserting otherwise
+    # asserts something unsatisfiable. That is not pedantry — haruto's
+    # workflow tags locally (step 9), pushes (12), then creates the Release
+    # (12a), and between 9 and 12a the pre-push hook runs this gate. A gate
+    # red on the local tag blocks the push, so the Release can never be
+    # created and the gate can never go green: a terminal refusal (rule 28).
+    # A PUSHED tag with no Release is the real defect and stays a hard fail.
+    #
+    # Enumeration is `git ls-remote --tags origin`, not a remote-tracking
+    # ref: git fetches tags into refs/tags/ alongside locally-created ones,
+    # so there is no local ref namespace that distinguishes the two. Asking
+    # the remote is the only sound answer to "is this tag pushed".
+    remote_tags=""
+    remote_reachable=1
+    if remote_raw=$(git ls-remote --tags origin 2>/dev/null); then
+        remote_tags=$(printf '%s\n' "$remote_raw" | sed 's#.*refs/tags/##; s/\^{}$//')
+    else
+        remote_reachable=0
+        echo "  cannot reach origin to list remote tags — rule 15's Release half not checkable here; the note half still binds"
+    fi
     while IFS= read -r tag; do
         [ -z "$tag" ] && continue
         if [ -f "release_notes_${tag}.md" ] || [ -f "docs/release_notes_${tag}.md" ]; then
@@ -1299,7 +1322,12 @@ else
         else
             fail "$tag has a git tag but no release_notes_${tag}.md in the root or docs/ (rule 15)"
         fi
-        if gh release view "$tag" >/dev/null 2>&1; then
+        if [ "$remote_reachable" -eq 0 ]; then
+            ok
+        elif ! printf '%s\n' "$remote_tags" | grep -qxF "$tag"; then
+            echo "  $tag is local-only (not on origin) — a Release cannot exist for an unpushed tag; the Release half binds once it is pushed"
+            ok
+        elif gh release view "$tag" >/dev/null 2>&1; then
             ok
         else
             fail "$tag has a git tag but no GitHub Release — a pushed tag with no Release object is not a published release (rule 15)"

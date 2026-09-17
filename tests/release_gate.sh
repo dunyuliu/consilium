@@ -64,14 +64,11 @@ fi
 # extends the same "is the published artifact real" question one step further
 # than `publish` does. `publish` only checks that a tag exists, points at
 # HEAD, and is on the remote — a tag is not a release a user can find. Check
-# 35 already asserts every tag has a GitHub Release, but it grants the
-# NEWEST tag grace (an autonomous cut deliberately withholds the Release
-# until a human reviews it, per agents/haruto-nakamura.md step 12a), so the
-# tag being cut right now is exactly the one Check 35 does not assert.
-# `release_gate.sh` runs at a human-invoked release, where the Release
-# SHOULD already exist by the time this gate runs -- that is the hole
-# `release` closes, and it is not redundant with Check 35's grace because
-# the two never assert the same tag at the same time. `clone` is what a
+# 35 asserts that every tag ON THE REMOTE has a GitHub Release, so it cannot
+# speak for a tag that is still local: this gate runs mid-cut, before or just
+# after the push, and `release` is the row that names the missing Release
+# object for the tag being cut right now rather than leaving it to the next
+# suite run. `clone` is what a
 # brand-new user actually experiences once a Release exists, so it comes
 # next; both belong beside the row they depend on rather than after `rules`,
 # which is a human-judgement row about the project as a whole and has
