@@ -1245,3 +1245,48 @@ remaining failure is attributable to criterion 3 alone. If it disagrees, the
 disagreement is the finding, and it says the prompt is still ambiguous
 somewhere — which is information I would lose entirely by running once and
 calling it settled.
+
+## Finding 25 — rule 25d's first real application, and it held
+
+The pre-registration above was honoured. Two samples of
+`zofia-004-seed-patch-established` at prompt SHA `03bf9a1`:
+
+```
+  sample 1 (run 3)  FAIL — 8 criteria, 1 failed
+  sample 2 (run 4)  FAIL — 8 criteria, 1 failed
+```
+
+Concordant, and concordant on the *same* criterion — the third block, the
+leave-alone guard `iris-vermeulen` judged unfixable by substring matching and
+documented as a named limit. No third run was commissioned; none was needed,
+and under the pre-registration none would have been permitted even if the two
+had split.
+
+**A detail that makes the concordance stronger than the numbers suggest.** The
+two samples satisfied criterion 2 by *different routes*: sample 1 matched
+`next free number` (twice), sample 2 matched `rule 6`. Different wording, same
+substantive decision — both proposed new rules at the next free numbers and
+both marked them **proposed**. That is the behaviour `lian-zhao`'s `:513`
+disambiguation was written to produce, arrived at twice independently, which is
+a much better result than one run hitting one literal.
+
+So the chain closes cleanly and every link was verified rather than assumed:
+`nadia-hadid` diagnosed a prompt ambiguity from a two-run disagreement →
+`lian-zhao` disambiguated the clause and declined to write a new fixture,
+arguing the existing one already discriminated the behaviour → two fresh
+dispatches confirm the fixed behaviour, twice, by different phrasings. Rule 10
+was satisfied by a fixture that already existed, exactly as she argued.
+
+**What this does not settle.** The case still FAILs, and it should: criterion 3
+remains unsatisfiable by a correct report in table form. Two concordant samples
+do not make a case pass — they make its verdict *mean something*. PF-025 stays
+OPEN on criterion 3 alone, which is a much narrower claim than the row carried
+this morning, when the case could not distinguish a correct seed pass from an
+incorrect one on three separate axes.
+
+**And the honest limit on the method itself.** N=2 concordance is weak evidence.
+It rules out the case being a coin flip at 50%, barely; it cannot distinguish a
+prompt that behaves this way 95% of the time from one that does 75%. The value
+of the pre-registration was never statistical power — it was that I committed
+to reporting whatever came back before I could see it, so the number in this log
+is not the product of my having stopped when I liked the answer.
