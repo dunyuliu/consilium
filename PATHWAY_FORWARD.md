@@ -1417,10 +1417,8 @@ cases off STALE — this is the count improving because verdicts got fresher,
 not because the underlying claim narrowed. The row's own claim (no regression
 proven fleet-wide) is unchanged.
 
-```bash
-bash evals/run.sh list | grep -c STALE
-# → 14
-```
+    bash evals/run.sh list | grep -c STALE
+    # → 14
 
 **Note, 2026-09-16.** This count is read through the same-day blind spot
 PF-024 now names: `evals/run.sh` compares dates, not the prompt SHA a
@@ -1429,6 +1427,22 @@ calendar day reads current here whether or not it actually is. Filed as its
 own row rather than folded in, because the defect is in `evals/run.sh`
 itself and fixing it changes what this count measures, not the other way
 round.
+
+**Re-scoped 2026-09-17 — the same defect PF-027 was found to have, swept for
+here rather than assumed absent.** `bash evals/run.sh list | grep -c STALE`
+moves every time ANY agent's prompt changes, including edits this row has no
+stake in: touching `agents/zofia-kaminska.md` for an unrelated reason
+reclassifies her cases and reddens this row's pinned `14`, coupling this row
+to work nobody assigned it (confirmed live: appending a commit to that file
+moves two cases from same-day-indeterminate to genuinely STALE, changing the
+count). Re-scoped to what must remain true while the fleet is unverified —
+that the gap is still open — not to the exact number, which is expected to
+drift and was never this row's claim.
+
+```bash
+[ "$(bash evals/run.sh list | grep -c STALE)" -gt 0 ] && echo "fleet re-verification gap still open (STALE > 0)"
+# → fleet re-verification gap still open (STALE > 0)
+```
 
 ### PF-013 — `agents/` — OPEN
 
@@ -2160,12 +2174,34 @@ to order a same-day run against a same-day prompt edit — now print
 2026-09-16`. That is the honest answer for a legacy record with no SHA field:
 neither current nor stale, visibly unresolved rather than silently current.
 
+Historical, kept as a record rather than as a live fence — pinning four named
+legacy cases the same way this row's own text criticises: `evals/run.sh
+list`'s per-case classification of a legacy (no-SHA) record depends on
+whether its run date and its prompt's last-touch date still match, and mere
+time passing, or any future edit to `agents/haruto-nakamura.md` or
+`agents/wei-lin.md`, moves one of these four off "same day" and into plain
+STALE without touching PF-024's own claim at all:
+
+    bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
+    # → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+    # → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+    # → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+    # → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+
+**Re-scoped 2026-09-17, same sweep as PF-012.** Confirmed live: editing
+`agents/zofia-kaminska.md` today moves `zofia-002` and `zofia-003` off the
+"same calendar day" branch (their 2026-09-16 legacy date now precedes the
+prompt's 2026-09-17 touch date) and into genuinely-STALE wording, breaking
+the pinned block above for reasons unrelated to whether the fix works. The
+row's real claim is the mechanism — a same-day legacy record reports itself
+`provenance indeterminate`, never falsely `current` — which is a property of
+`evals/run.sh` itself, not of which four cases happen to sit on a shared
+calendar day today:
+
 ```bash
-bash evals/run.sh list | grep -E 'haruto-002-tag-before-gate|wei-lin-002-plan-contradicts-code|zofia-002-rule-already-exists|zofia-003-seed-bare-project'
-# → haruto-002-tag-before-gate                 haruto-nakamura        run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
-# → wei-lin-002-plan-contradicts-code          wei-lin                run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
-# → zofia-002-rule-already-exists              zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
-# → zofia-003-seed-bare-project                zofia-kaminska         run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate, rule 25d)
+grep -c 'provenance indeterminate' evals/run.sh; grep -c 'date fallback, rule 25d' evals/run.sh
+# → 1
+# → 2
 ```
 
 ### PF-025 — `evals/cases/zofia-004-seed-patch-established` — OPEN
