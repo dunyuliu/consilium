@@ -972,3 +972,82 @@ my own context window, which is the one place I had not thought to apply it.
 
 Recorded here rather than routed: there is nothing to fix in the repo. The
 correction is to how I write briefs.
+
+---
+
+# Third wake — verdict provenance
+
+## Finding 20 — the adjudicator's proposed fix, verified by execution, and my own near-miss
+
+`nadia-hadid` was dispatched on PF-025's agent-versus-criterion call. Her
+report is the strongest single piece of analysis this campaign has produced,
+and she closed it by listing what she had NOT checked — including that she took
+my line references on trust and never read `evals/run.sh`. That list is what
+made the verification below cheap to target.
+
+**Q1 — agent defect, on an ambiguous contract. Verified.** She found a real gap
+in the fixture's input: its rule book has five rules and **zero** mentions of a
+board or `PATHWAY_FORWARD` (`grep -cE '^## [0-9]'` → 5, `grep -ci 'board\|PATHWAY'`
+→ 0), and `case.yaml` already declares it as `rule-book-has-no-board-invariant`.
+So run 2's "nothing to add without inventing a rule the project didn't ask for"
+is factually wrong on that input, and the criterion stands.
+
+But she located *why* a competent agent said it, and that is the useful half.
+Four clauses in `agents/zofia-kaminska.md` collide, and I confirmed the text at
+511-514 reads exactly as she quotes:
+
+```
+- Never invent a rule the project did not agree to — propose it, mark it
+  clearly as proposed, and let the user decide.
+```
+
+The remedy sits after an em-dash. Read quickly it is a prohibition; read fully
+it is an instruction to propose. Run 1 proposed; run 2 collapsed it into a veto.
+The fix is one sentence making the Mode A interaction explicit — *how* you add,
+not *whether*. Owner `lian-zhao`.
+
+**Q2 — enumeration cannot win, and her replacement is sound. Verified in four
+directions, because she explicitly did not grade it.** She proposed replacing
+nine Markdown renderings with *consequence* terms — counts of the existing
+rules, which only a report that correctly classified the book as present has
+reason to write. Tested:
+
+```
+  run 1 (proposed rule 6)   -> MATCHES "five existing rules"
+  run 2 (refused)           -> MATCHES "5 rules"
+  samples/pass.md           -> MATCHES "rules 1-5"
+  samples/fail.md           -> matches NONE
+  a denial ("PROJECT_RULES.md is absent; there is no existing rule book")
+                            -> matches NONE
+```
+
+Accepts every correct classification regardless of rendering, rejects the wrong
+answer, and is negation-safe. This is the first criterion repair in this case's
+history that was tested against *real agent output* rather than against the
+fixture author's own prose — which is precisely why the three previous rounds
+failed. Owner `iris-vermeulen`.
+
+**My own near-miss, recorded because it nearly became a false finding.** I first
+tested five of her nine terms, saw run 1 match none of those five, and was one
+sentence away from reporting that her fix "inverts the verdict — it accepts the
+run she called defective and rejects the better one". I tested the remaining
+four before writing it. Run 1 matches `five existing rules`; there is no
+inversion. A partial test of a disjunction is not a test of the disjunction, and
+an `any_of` is exactly the shape where sampling the terms gives a confidently
+wrong answer. The same error as quoting a SHA from memory (finding 16) and
+quoting a file I had not grepped (finding 19): asserting from a sample I had
+not completed.
+
+**Q3 — the one the maintainer elevated.** Her answer: a single dispatch on a
+judgement case is an opinion with a date on it. Point estimate 0.5 from 1-of-2,
+with an interval wide enough to span "leave the prompt alone" and "rewrite the
+clause" — two opposite actions. Her proposal is N=3 with the verdict recorded
+as `k/N`, never a bare word, and a 2/1 split treated **not as a pass** but as a
+finding that the prompt is ambiguous at that point.
+
+Her deeper claim is the one worth keeping: **resolve the policy in the contract
+first, and a judgement case reverts to a defect-finding case.** PF-025's root
+cause is neither the criterion nor the agent — it is that a judgement was left
+undecided in the prompt, and a fixture then decided it by implication, so the
+agent was graded on a disagreement between two documents rather than on its own
+behaviour.
