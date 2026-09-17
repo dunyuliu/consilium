@@ -1755,3 +1755,55 @@ before committing.
 
 Routed to `zofia-kaminska`: re-scope PF-027's evidence to the mechanism, which
 unblocks prompt editing for every agent with a contested fixture.
+
+## Finding 35 — the fix was instance-level; the class survived, and I found it by finishing the test
+
+`zofia-kaminska` re-scoped PF-027's evidence to assert the mechanism rather
+than one case's current settled state, and wrote the general test into rule
+21a: *"An evidence command should assert what must remain true, not what
+happens to be true."*
+
+I then finished the decisive test I had been cut off during — edit
+`agents/zofia-kaminska.md`, is the gate still green?
+
+```
+  zofia-004   CONTESTED — no sample at current SHA cbaaeaf yet; not settled
+  FAIL: PF-012: recorded evidence no longer reproduces
+  FAIL: PF-024: recorded evidence no longer reproduces
+  Summary: 1528 passed, 2 failed
+```
+
+**PF-027 is fixed and the gate still goes red.** The failure moved to two other
+rows. Editing a prompt today (2026-09-17) makes that agent's legacy verdicts —
+all dated 2026-09-16 — *different-day* rather than same-day, so they reclassify
+from `provenance indeterminate` to STALE. That is `evals/run.sh` behaving
+exactly correctly. PF-012 pins the STALE count; PF-024 pins the four same-day
+cases' output strings. Both are transient states recorded as invariants.
+
+So the rule was written and applied to the instance that produced it. The other
+two rows carrying the same defect were not swept, and nothing in the change
+looked for them. **That is finding 31 recurring at one remove**: a lesson
+derived from an incident got fitted to that incident, this time in the shape of
+a fix rather than a rule.
+
+I am partly to blame for the scope. My brief asked her to re-scope PF-027 and
+asked whether the general test was worth writing down. It did not ask the
+obvious follow-up — *which other rows have this shape?* — and a brief that
+commissions a principle without commissioning its application is half a job.
+
+**The cost this leaves in place is the one worth reporting to the maintainer,
+because it is unchanged.** Improving any agent prompt still reddens the gate,
+just via different rows, and still costs board work before anything can land.
+An agent facing that price will quietly not improve the prompt. The `zofia-
+kaminska.md` half of the codify-caution is *still* unlanded for exactly this
+reason — a documented, tracked debt now two findings old.
+
+Routed back with the class, not the instance: sweep every board row whose
+evidence pins a value that a legitimate prompt edit changes, and re-scope each
+to its mechanism.
+
+**Method note, and a small win.** My check for 21a's new sentence returned zero
+on an exact match and I did *not* report it missing — I ran the loose pattern
+first, per finding 29's corrective, and found it at line 862 wrapping across
+two lines. Same trap as before, caught by the habit rather than by luck. The
+positive control cost one extra pattern and saved a false finding.
