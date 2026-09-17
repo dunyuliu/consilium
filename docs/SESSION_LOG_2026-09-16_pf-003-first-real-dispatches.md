@@ -1051,3 +1051,53 @@ cause is neither the criterion nor the agent — it is that a judgement was left
 undecided in the prompt, and a fixture then decided it by implication, so the
 agent was graded on a disagreement between two documents rather than on its own
 behaviour.
+
+## Finding 21 — two agents disagreed on how to handle a split, and the synthesis is the useful answer
+
+`nadia-hadid` and `zofia-kaminska` were asked adjacent questions and returned
+different sampling protocols. Recording both, per the rule that a conductor
+synthesizes rather than picks.
+
+**`nadia-hadid`**: N=3 dispatches, verdict recorded as `k/N`, majority wins; a
+2/1 split is *not* a pass but a finding routed to `lian-zhao`, and "a 5th
+dispatch" could resolve it.
+
+**`zofia-kaminska`**, in rule 25d as written: a contested case needs "a second
+dispatch at that same SHA agreeing with the first. A disagreement is reported
+as a split (both verdicts, both criteria that diverged), **never resolved by a
+third tie-breaking run picked to prefer one side.**"
+
+They agree on the thing that matters — a split is not a pass — and differ on N,
+and on whether a further run may break a tie.
+
+**The synthesis, which neither stated and which I think is the actual rule.**
+What makes a third run legitimate is not its number but *when it was decided
+on*. A sample size fixed **before** dispatch is a pre-registration: N=3 taken
+regardless of what the first two say is a measurement. A third run commissioned
+**after** seeing 1-1 is a tie-breaker chosen because the result was
+inconvenient, and it converts a genuine 50% into a reported 2/3 pass. Those two
+are indistinguishable in the recorded output — `3/3` and `2/3` look the same
+whether pre-registered or not — which is exactly why the discipline has to live
+in the protocol and not in the record.
+
+Zofia's wording already forbids the bad case precisely ("picked to prefer one
+side") and her N=2 default is the cheaper pre-registration. Nadia's N=3 is
+legitimate *only* if fixed in advance, which her phrasing does not require and
+her "5th dispatch" clause actively undermines.
+
+So 25d as written is the binding text and it is correct. What is missing from
+it is the reason — that the protection is pre-registration, not the count — and
+without that reason a future reader will reasonably ask "why not just run a
+third one?" and will have no answer in the rule.
+
+Not fixed here, and deliberately: I am not the owner of that file, the rule is
+not wrong, and the addition is one sentence of rationale rather than a
+correction. Handed to `zofia-kaminska` as a follow-up with this note. The
+contradiction is cited rather than papered over, which is the whole obligation.
+
+**One thing both got right and I want on the record.** Neither proposed
+retroactively annotating the twenty-odd existing verdicts with sample counts.
+Zofia wrote the exemption into the rule explicitly — marking a case contested
+is "not a retroactive audit obligation". Backfilling a sample count nobody
+measured would be inventing data, and it is the same failure as backfilling a
+`last-checked` date, which this board has forbidden since it was written.
