@@ -1356,3 +1356,51 @@ That is correct and useful: I ran two samples at `03bf9a1` today, but neither is
 yet written into `case.yaml` as a SHA-bearing record, so the tool correctly
 refuses to call the case settled. The machinery is telling me about work I have
 done and not recorded — which is exactly what it is for.
+
+## Finding 27 — the hybrid landed, and the agent re-derived the measurement before trusting it
+
+`iris-vermeulen` was sent back with a measurement rather than an instruction.
+She did the thing that makes the return worthwhile: **she re-derived the
+same-day/different-day split herself before implementing**, explicitly, and
+said so — "I did not just trust your number; I derived it independently before
+writing the fix." Her count reproduced mine exactly.
+
+That mattered more than it might look. I had asked her to stop and report if
+her measurement disagreed with mine, because I have been wrong on a pasted
+figure twice today. Had she implemented against my number without checking, the
+fix would have been correct by luck rather than by evidence, and neither of us
+would have known which.
+
+The hybrid, verified on the live corpus and by my own mutation test:
+
+```
+  STALE                    0  ->  14     (all true positives restored)
+  provenance indeterminate 34  ->  10     (exactly the same-day cases)
+```
+
+My mutation test, run independently of her five scratch tests: take
+`haruto-001` (legacy record dated 2026-07-31, prompt last changed 2026-09-16),
+flip its recorded date to `2026-09-16` so it becomes same-day, and observe:
+
+```
+  before  STALE — verdict dated 2026-07-31 (no prompt SHA), prompt changed 2026-09-16 (date fallback)
+  after   run 2026-09-16 (no prompt SHA, same day as the prompt's last change — provenance indeterminate)
+  restored  STALE — ...
+```
+
+One record flipped, nothing else moved, and it flipped in the direction the
+hybrid predicts. The ten indeterminate cases are precisely PF-024's own live
+examples, which now say "I cannot order these two events" instead of printing a
+confident `run 2026-09-16`.
+
+**The general lesson, which is not about staleness.** "The old signal came from
+an unsound method, so discard it" is sound reasoning about a *method* and
+unsound about *data where the method's failure precondition never occurs*. The
+date comparison is unreliable only when two dates are equal; in a corpus where
+that never happened, it was right fourteen times out of fourteen. Replacing it
+wholesale traded fourteen correct answers for thirty-four refusals to answer
+and would have read, on the board, as an improvement — STALE went to zero.
+
+A metric moving to zero is not evidence of a fixed problem. It is evidence of a
+changed question, and the two are distinguishable only by measuring what the
+old signal was actually catching before you remove it.
