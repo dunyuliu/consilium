@@ -1980,3 +1980,65 @@ disagree with the first". Here the two dispatches **agree with each other and
 disagree with the criterion**. That is a third state 25d does not name, and if
 it is a gap it is a gap in a rule written yesterday — finding 31 again, on
 schedule.
+
+## Finding 40 — the adjudicator corrected me, and the correction was checkable
+
+`nadia-hadid` ruled criterion 5 **too narrow** and refuted my framing directly.
+All three of her load-bearing claims verify:
+
+**1. The two runs are not the same remedy.** I reported that two independent
+dispatches "converged on the same alternative", and treated that as evidence
+about the criterion. She read the reports more carefully than I did:
+
+```
+run 1: "gated by a fixture with at least one SYNTHETIC same-day pair"
+run 2: "gated behind a fixture with an ACTUAL same-day pair"
+```
+
+A synthetic pair is buildable today, so under run 1's plan the uncovered
+interval is length **zero**. Run 2's leaves one. They differ precisely where
+the argument turns. **"Two independent dispatches converged" was one data
+point, not two**, and I built a case on the word "converged" without checking
+whether the convergence survived the detail.
+
+**2. The interval premise is not in the input.** `gateway_note.md` fixes when
+the gateway goes live and says nothing about when `timestamp_check.sh` can be
+built or tested. The timestamp field's absence blocks production data, not
+development — which is exactly why run 1 proposed a synthetic pair. A criterion
+resting on `contested: false` must stand on facts the input contains, and this
+one rested on a scheduling contingency the reviewer supplied.
+
+**3. The decisive tell was inside the case all along.** Its own `README.md:37`
+says the correct answer is a narrow addition "**e.g.**, treat
+`issued_date == paid_date` as NEEDS-REVIEW". The author marked it an example;
+the criterion encodes it as the only pass. That is the `zofia-004` shape —
+a fixture deciding by implication a judgement the contract left open.
+
+Her replacement is the **mutation confirmation**, and I checked her reason for
+choosing it: it is in `agents/iris-vermeulen.md:205-206` verbatim — "take one
+real record, move it across the boundary by hand, watch it flip, restore it,
+confirm nothing else moved". So it grades a behaviour the contract actually
+demands, which is the test criterion 5 failed.
+
+Her cardinal point, which I want kept because it governs every future fixture
+here: **a fixture cannot be the place a new expectation is introduced.** If an
+agent *should* do something its prompt never asks for, the recommendation is a
+prompt change, never "the agent failed to do it". Rule 10's fixture-first order
+governs behaviour the prompt already demands.
+
+**Method, and it is my fourth line-wrap false negative today.** My check for the
+mutation text returned 0 on an exact phrase; it wraps across two lines. I ran
+the loose pattern first and did not report it missing. Finding 29's corrective
+has now caught four of these, which is the only reason none became a false
+finding — including one that would have been a false accusation against
+Nadia's reasoning.
+
+**On 25d's gap, she was sharper than my question.** I asked whether
+dispatches-agreeing-against-a-criterion makes a case contested after the fact.
+Her answer: no, and do not close the gap by widening 25d's trigger. The two
+shapes route to opposite remedies — dispatches disagreeing with *each other*
+means the answer is genuinely a judgement call (`contested: true`, more
+samples); dispatches agreeing *against the criterion* is evidence the criterion
+is wrong (repair or split it). Marking the second case contested "would be a
+place to park a defective criterion instead of fixing it, and would quietly
+lower the bar on the criteria around it that are factual."
