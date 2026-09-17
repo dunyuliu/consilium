@@ -2300,3 +2300,67 @@ detector that claims to understand descriptions.
 Routed to `iris-vermeulen` as a proposal carrying that caveat — not dispatched
 yet; PF-004 and PF-012 are ahead of it and the check is worth doing only if
 those leave room.
+
+---
+
+# Ninth wake — the milestone audit
+
+## Finding 46 — the stranger-clone gate passes, and the number a stranger sees is not the number we quote
+
+Run before the audits, because it needs nothing from them and it is the only
+gate that reads this project as someone who has never seen it.
+
+Cloned `168ea7b` fresh into an empty directory, sandboxed `HOME` so the real
+`~/.claude` could not be touched, and executed exactly what `README.md`
+documents — the fenced block under `## Install`, then the next fenced block
+after it:
+
+```
+git clone https://github.com/dunyuliu/consilium.git ~/consilium
+bash ~/consilium/install.sh      -> consilium installed: 22 agents, 19 commands
+bash tests/check.sh              -> Summary: 1530 passed, 0 failed
+```
+
+**PASS.** No error, no missing prerequisite, no step the README leaves implicit.
+A second install reports identically (idempotent) and leaves zero broken
+symlinks — PF-010's lesson, which cost a "21 agents installed" success line
+that had installed none.
+
+**The detail worth carrying into the release note: a stranger sees 1530, we
+quote 1575.** The 45-assertion gap is Check 35's Release half skipping by name
+because `gh` is unauthenticated in a fresh environment. That is designed
+degradation — the check says so aloud rather than passing silently — but it
+means **"1575 green" is a figure only an authenticated maintainer ever sees**,
+and a release note quoting it without that context overstates what a new user
+can verify. The honest form is both numbers with the reason.
+
+## Milestone trend data, gathered before the audits could change it
+
+Against `v1.20.0`, for item 5's per-release eval:
+
+```
+  gate assertions       1371 -> 1575     (campaign start -> now)
+  checks                  29 -> 35
+  eval cases              27 -> 36
+  rules and sub-rules     27 -> 34
+  fixtures never run      12 -> 0
+  STALE verdicts          14 -> 18
+  board rows                   27 total, 6 open/broken, 0 never-audited
+  tracked text          +9557 / -177 across 93 files
+```
+
+Two of those are not improvements and will be reported as such.
+
+**STALE 14 → 18** is the one the maintainer singled out, and he is right that it
+is the most important number here. Eighteen of thirty-six cases now carry a
+verdict describing a prompt that no longer exists — **half the suite**. It rose
+*because* we improved prompts: `wei-lin-001/002/003` and `zofia-001/002/003`
+were invalidated by edits this campaign made deliberately and correctly. A
+release note reporting 1575 green assertions and omitting this would be telling
+the flattering half of the truth.
+
+**+9557 lines** against 177 removed. The maintainer has a leanness pass parked;
+per standing instruction I report the trend and do not act on it. But it should
+be stated plainly: this campaign made the repo substantially bigger, and while
+much of that is session log and rule text rather than machinery, "more verified"
+and "more written" are different claims and only the first is worth a release.
