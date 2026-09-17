@@ -9,7 +9,6 @@
 #   2. Every commands/*.md Invokes an agent that actually exists.
 #   3. The README commands table lists exactly the commands present on
 #      disk.
-#   4. Every agent file is mentioned at least once in the README.
 #   5. Every README backtick-quoted agent-shaped reference resolves to
 #      an existing agent file (catches stale references from past
 #      renames). Command stems and NON_AGENT_TERMS are skipped.
@@ -48,9 +47,9 @@
 #      releases exist with no Release object behind them.
 #  36. No tracked file contains a merge-conflict marker.
 #
-# Checks 6 and 7 exist because check 4 passes on a bare mention: an agent
-# could be absent from the model table, the roster, or the tree with the
-# gate green. Every check here was negative-tested when added — a check
+# Checks 6 and 7 are separate because a bare mention is not membership: an
+# agent could be absent from the model table, the roster, or the tree with
+# the gate green. Every check here was negative-tested when added — a check
 # that has never failed is not known to be a gate.
 #
 # Usage: bash tests/check.sh
@@ -179,16 +178,6 @@ else
     comm -23 <(echo "$readme_cmds") <(echo "$disk_cmds") | sed 's/^/    /' >&2
 fi
 
-# --- Check 4: every agent is mentioned in README -----------------------
-echo "Check 4: every agent appears in README"
-for stem in "${AGENTS[@]}"; do
-    if grep -q "$stem" README.md; then
-        ok
-    else
-        fail "agents/$stem.md not mentioned in README"
-    fi
-done
-
 # --- Check 5: backtick-quoted agent-shaped references in README resolve
 #
 # An "agent-shaped" reference is a backtick-quoted token matching exactly
@@ -218,9 +207,9 @@ done
 
 # --- Check 6: README model table lists every agent, with the right model ---
 #
-# PROJECT_RULES.md rule 12. Check 4 only proves an agent is *mentioned*
-# somewhere in the README, which passes even when the model table is missing
-# a row — that gap let two agents drift out of the table before this existed.
+# PROJECT_RULES.md rule 12. A bare mention anywhere in the README passes even
+# when the model table is missing a row — that gap let two agents drift out
+# of the table before this existed.
 # Here we parse the table rows (| opus | `a`, `b`, ... |) and require every
 # agent to appear exactly once, under the model its own frontmatter declares.
 echo "Check 6: README model table matches agent frontmatter"
