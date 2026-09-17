@@ -284,6 +284,17 @@ choice this row made for `haruto-003`/`wei-lin-003`/`zofia-004` earlier today.
 Closes again the same way it always has: dispatch and grade `iris-002`, paste
 empty here.
 
+**Re-run 2026-09-16 (this pass), unchanged, and correctly so.** I was told
+`iris-002-measure-before-replacing` was dispatched for the first time today
+and graded FAIL 6/3. Per rule 4 I do not take that as evidence: this row's
+own established discipline (the `haruto-003`/`wei-lin-003`/`zofia-004` episode
+above) is that `evals/run.sh grade` does not write the verdict back into
+`case.yaml`, and a run that exists only as a paste handed to me is not a
+recorded run. `evals/cases/iris-002-measure-before-replacing/case.yaml` still
+reads "Not yet dispatched." verbatim, and writing today's run record into it
+is `evals/cases/` work — `iris-vermeulen`'s surface, not this board's. This
+row stays as it is until that record lands.
+
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 # → iris-002-measure-before-replacing: NEVER RUN
@@ -2402,15 +2413,56 @@ contested path this row specified. I re-ran her five negative tests plus a
 sixth of my own (a mutation to the SHA-comparison branch) and all six held.
 
 **Re-run 2026-09-16 (this pass): the two pre-registered samples landed since,
-and the row now reports settled, not CONTESTED.**
+and the row now reports settled, not CONTESTED.** Superseded below — kept as
+history, not live evidence, for the reason the next paragraph explains.
+
+    bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
+    # → zofia-004-seed-patch-established           zofia-kaminska         run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
+
+**Re-scoped 2026-09-16, and the previous evidence line was the defect, not
+`agents/zofia-kaminska.md`.** `lian-zhao` landed a caution in
+`agents/wei-lin.md` and `agents/zofia-kaminska.md` together and reverted only
+the second half, because landing it turned this row's recorded `# →` line
+into a lie: any commit touching `agents/zofia-kaminska.md` changes that
+file's SHA, so `zofia-004`'s two `03bf9a1` samples stop being current-SHA
+samples and the case reports CONTESTED again — correctly, per rule 25d. That
+is the mechanism working. The defect was citing "this named case is settled
+at this SHA today" as the row's board evidence: a fact that is true only
+until the next edit to a file this row does not own, and false the moment
+someone does the very thing rule 25d exists to make safe. Re-scoped to assert
+the mechanism instead — that `zofia-004` is authored `contested: true` and
+that `evals/run.sh` implements the SHA-pinned, contested-refusal branch —
+none of which depends on which SHA `agents/zofia-kaminska.md` happens to be
+at right now. This is the third time this shape of fix has been needed on
+this board (PF-021, PF-022); the general form is worth keeping and is now in
+rule 21a.
 
 ```bash
-bash evals/run.sh list | grep 'zofia-004-seed-patch-established'
-# → zofia-004-seed-patch-established           zofia-kaminska         run 2026-09-16 (SHA 03bf9a1 current, n=2 samples)
+grep -c 'contested: true' evals/cases/zofia-004-seed-patch-established/case.yaml; grep -c 'CONTESTED_UNSETTLED' evals/run.sh; grep -c 'prompt <short-SHA>' evals/run.sh
+# → 2
+# → 4
+# → 1
 ```
+
+**On the dispatch-cost consequence, not just the gate defect.** Before this
+re-scoping, keeping this row's evidence reproducing required re-earning two
+fresh same-SHA samples of `zofia-004` every time anyone edited
+`agents/zofia-kaminska.md` — two dispatches paid by whoever touched the
+prompt next, for no reason connected to their own change. That is what made
+`lian-zhao`'s revert the cheaper move. The re-scoped command above removes
+that coupling: this row now asserts only that the mechanism exists, so
+editing the prompt correctly flips `evals/run.sh list`'s live answer for
+`zofia-004` to CONTESTED without reddening the gate. Resettling `zofia-004` —
+two fresh same-SHA dispatches — is only owed at the point someone wants to
+*cite it as settled again* (PF-025, if it reopens on cause 3's own terms),
+never merely to land an unrelated edit to the same file. No change to rule
+25d itself: the pin and the refusal are correct as specified; only this
+row's choice of what to cite as evidence was wrong.
 
 PF-024 and PF-025 close (respectively: fully, and narrowed to criterion 3)
 through this row, per the plan above — see each for the closing evidence.
+Neither of their own evidence commands cites `zofia-004`'s per-edit settled
+state, so neither inherits this defect.
 
 ## Deferral log
 
