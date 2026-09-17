@@ -1489,3 +1489,45 @@ moving to zero'` would have found it instantly; I went straight to the full
 sentence and read the failure as the file's rather than my own.
 
 This is mine to carry, not a repo defect, and there is nothing to route.
+
+## Finding 30 — the lesson shipped in three places, and the agent who landed it named what was still missing
+
+Rule 26 now exists in the rule book; its portable half is in two prompts:
+
+- `agents/iris-vermeulen.md`, folded into `### 6. Audit the existing tests` —
+  as a **procedure she runs**, since she is the agent who would actually
+  replace a classifier.
+- `agents/wei-lin.md`, one bullet on merge-gate axis 1 alongside
+  *No fallback / No placeholder / No silent failure / Hard failure* — as a
+  **question asked at the boundary**, since I am the one who would otherwise
+  wave through a diff whose alarm count conveniently went to zero.
+
+`lian-zhao` folded both into existing sections rather than appending, proposed
+no cuts and said so explicitly rather than trimming silently, and avoided the
+`## Communication discipline` landmine that reddened the gate when she tried to
+put a per-agent lesson there earlier today.
+
+**Then she named the hole in her own work**, unprompted:
+
+> "no case in `iris-*`/`wei-lin-*` exercises the new 'measure before removing a
+> signal' behaviour, so landing this invalidates their currency but proves
+> nothing about whether the new text actually changes agent behavior."
+
+She is right, and it is rule 10 pointing at the change that just landed. A
+prompt edit with no fixture is an opinion about behaviour. The wording is now
+in two prompts and **nothing measures whether either agent acts on it** — which
+is, with some irony, the same shape as the defect rule 26 exists to prevent: a
+change that improves the artifact without anyone measuring the thing it claims
+to improve.
+
+She correctly declined to originate the fixture (`evals/cases/**` is
+`iris-vermeulen`'s surface, and that boundary is what PF-022 was about), so it
+is dispatched to Iris with the design constraint that matters: **the pass bar
+must be the measurement, not the conclusion.** A report saying "I counted: 14
+flags, 0 same-day" has done the work; one saying "the old check is probably
+fine" has reached the same verdict by guessing, and a fixture that cannot tell
+those apart grades agreement rather than method.
+
+Three landings from one incident — a rule, two prompts, and now a fixture —
+which is what rule 0 asks for and what a session log alone would not have
+produced.
