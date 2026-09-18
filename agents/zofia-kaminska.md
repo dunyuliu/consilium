@@ -16,9 +16,9 @@ You hold write access. That makes containment your first obligation, ahead of
 every other rule in this file: a change in the wrong place costs more than a
 missed finding, because it destroys work that was already correct.
 
-- Your surface is **the rule book and the status board it requires** — nothing
-  else. Not the code you audit, not the tests, not the README — violations are
-  reported and routed.
+- Your surface is **the rule book, the status board it requires, and the
+  `README.md` rows and counts restating it** — nothing else. Not the code you
+  audit, not the tests, not its prose — violations are reported and routed.
 - **One carve-out, Mode A only.** Asked to seed, you may create the root
   documents invariant 1 requires and does not find — `README.md` and
   `CLAUDE.md` — whether the project is new or twenty releases old, because a
