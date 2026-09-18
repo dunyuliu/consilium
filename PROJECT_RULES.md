@@ -293,13 +293,20 @@ one is a debt that lands before the next version tag.
 
 ## 11. Docs move with the prompt, in the same change
 
-`README.md` is the living doc. Any change to an agent's name, scope, model,
-routing, or command wrapper updates the README in the same commit — the roster
-table, the routing table, the model table, the Layout tree, and the headline
-specialist count, whichever are affected. Never as a follow-up.
+`README.md` is the living doc. Any change to a surface the README describes
+updates the README in the same commit: an agent's name, scope, model, routing
+or command wrapper (the roster table, the routing table, the model table, the
+Layout tree, the headline specialist count), and equally `install.sh`, the
+hooks it wires and the gate they run (the Install and CI sections). A README
+still promising a `pre-push` hook that `86f4b5d` removed is the same defect as
+a stale model row, and it went unrouted because this rule named only prompts.
+Never as a follow-up. README prose that restates another surface is owned by
+that surface's owner, not by the human (rule 19).
 
 **How to apply**: `grep -n <agent-name> README.md` before you call an agent
-change done, and re-read the count in the opening paragraph.
+change done, and re-read the count in the opening paragraph; for a change to
+`install.sh` or the hooks, re-read README's Install and CI sections against
+what the script now wires.
 
 ---
 
@@ -731,11 +738,23 @@ gate infrastructure, the same class as `tests/lock.sh`, already hers — while
 `install.sh`'s symlink half carries no prompt content and so is not
 `lian-zhao`'s.
 
-**Human-owned surfaces.** `README.md` and `CLAUDE.md` have no agent owner and
-are not an oversight: they are maintained by hand. An agent proposes a change
-and routes it — `zofia-kaminska` refuses to edit them while auditing,
+**Human-owned surfaces — and the half of `README.md` that is not.** README
+prose that restates another surface is owned by that surface's owner and moves
+in the same commit under rule 11: the model-roster line is `lian-zhao`'s,
+because what falsified it was `agents/nadia-hadid.md`'s frontmatter, and the
+Install section is `iris-vermeulen`'s, because what falsified it was
+`install.sh` no longer wiring the hook the section promised. The carve-out
+below is how such an edit lands in one commit without a red window. The
+remainder of `README.md` — what consilium is, how to use it, the narrative
+around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
+maintained by hand, they drift by design, and nothing guards them but the
+fresh-clone walk at a release, which is the only pass in this campaign that
+caught any of that drift. An agent proposes a change to that remainder and
+routes it — `zofia-kaminska` refuses to edit them while auditing,
 `sophia-okafor` reports their drift without fixing it. Declared here because
 Check 10 walks agents to surfaces and cannot see a surface with nobody on it.
+This settles the v1.24.0 disclosure-2 dispute: the roster edit was a rule 11
+miss, not a rule 19 violation, and needs no rule 19a.
 
 **Precedence when surfaces touch.** CI config is `iris-vermeulen`'s; a port
 needing a CI change asks her rather than editing it. Production code is
@@ -986,3 +1005,9 @@ actual artifacts.
   without naming `bash tests/check.sh` is unenforceable and does not belong
   here.
 - **Update the index** when adding a rule, including its tier.
+- **A rule that only forgives is not a rule.** If nothing in it can be
+  violated — it grants permission and imposes no obligation, condition or
+  named consequence — delete it instead of numbering it, and state the
+  permission as a carve-out inside the rule it excepts. This is why
+  `README.md`'s human half lives in rule 19 and there is no rule 19a
+  (2026-09-18).
