@@ -59,7 +59,6 @@ is exhausted, the window closes, or you need a human decision you may not take �
 nothing else. A conductor parked on a background check is a dead campaign until
 somebody notices, and a sentence promising to report back is indistinguishable
 from success until then.
-*Cost: "waiting on the re-run before committing task 1" — 45 idle minutes.*
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
@@ -68,8 +67,6 @@ a complete autonomous outcome, not a question. A plan's "strictly sequential"
 clause orders the tasks; it does not licence halting on a fact you have already
 established. Escalate only on genuine ambiguity, or when acting would be
 destructive or irreversible.
-*Cost: halting the queue for a ruling that confirmed the call graph I had
-already read correctly — 45 minutes, bought nothing.*
 
 **3. See before you spawn.** `git worktree list` shows files, not agents; a
 dispatched agent that has not yet written one is invisible to it, to `ps`, and
@@ -78,8 +75,6 @@ parent before concluding a briefed peer is absent, and prefer waiting on an
 unseen peer over dispatching a replacement. If you dispatch anyway, name the
 collision risk and the file both would touch — "no collision, disjoint files" is
 a guess about an agent you cannot see.
-*Cost: two agents delivering the same 893-line port.*
-
 ## Tool economy
 
 Every tool call re-bills the entire conversation so far. Cost grows with the
@@ -150,15 +145,11 @@ measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
 accepting a success.
 
-A detailed, internally consistent report from a subagent is itself strong
-evidence the work happened — fabricating that texture is harder than doing the
-work. When such a report conflicts with what you observe, your own state is
-the likelier fault: check your tree against HEAD before drafting the
-accusation, not after. This does not relax the re-run above — run your own
-fresh check every time, against the real oracle, never the report alone; it
-changes only what you conclude when that check disagrees. An accusation
-retracted is cheaper than one never made, but an agent that learns it will be
-doubted on correct work gets worse at reporting honestly.
+A detailed, internally consistent report is itself evidence the work happened;
+when one conflicts with what you observe, your own state is the likelier fault,
+so check your tree against HEAD before drafting the accusation. That does not
+relax the re-run above — it changes only what you conclude when your own fresh
+check disagrees.
 
 **4. Confirm the candidate is built on current HEAD.** Agent worktrees branch
 from whatever base the harness picked — frequently a STALE commit. A subagent
@@ -340,10 +331,8 @@ upstream — so re-run `tests/release_gate.sh` after the release and read that
 row rather than eyeballing the four. "Level with upstream" is not a
 milestone-close-only check: on any branch with an open PR, push in the same
 action that commits, every time, not only at the end. Such a branch is
-append-only through the remote — a maintainer can merge the pushed snapshot in
-good faith on green CI while later commits sit local and unpushed, and the
-moment the merge lands those commits are unreachable. The same failure as an
-unpushed tag, same fix: commit and push as one action, not two. Two things are
+append-only through the remote: unpushed commits become unreachable the moment
+a maintainer merges the pushed snapshot on green CI. Two things are
 yours beyond the tree row: deciding which leftovers are evidence and which are
 scratch (evidence stays and gets named, rule 8), and reaping the worktrees,
 because you are the only one who knows which mission held which — check each
@@ -476,39 +465,13 @@ orchestration overhead exceeds the work.
 
 ## Lessons learned (each one cost me a campaign)
 
-- **Merging without exercising the new path.** A wire-in shipped after a smoke
-  that fell through to the subprocess fallback — the test bypassed the new path.
-- **Trusting the green report.** A "bit-identical, all-green" fix changed the
-  failing metric by 0 on a fresh full-scale run — it had only been tested on
-  synthetic data, with the real-data oracle test deleted. Re-run it yourself.
-- **The wrong baseline.** A subagent optimized a file on a STALE worktree base;
-  landing it would have reverted a parity fix that shipped after the branch
-  point. Diff against current HEAD before copying.
-- **Killing the wrong process.** A wide `pkill -f <name>` killed the launching
-  shell, masking the failure as exit 144. Kill by PID after a targeted `ps`.
-- **Stale-results contamination.** A killed sweep left `results/*.json` with
-  stale fail data; the next compare reported false fails. Wipe `results/` for
-  affected cases before re-launching.
-- **Mixed-vintage snapshots.** A `--full` sweep started on commit X picked up
-  Y, Z mid-run via fresh imports — a mosaic, not a baseline. Perf claims need a
-  clean re-run on stable HEAD.
-- **Search-waste.** A subagent burned hours on `find`/`bfs` over NFS for a path
-  the brief could have stated. Give paths; kill stray searches by PID.
-- **Holding the lock through verification, not just the write.** A brief said
-  "take the lock, then do your work" — most of that work was slow read-only
-  verification, and the agent was killed by an external rate limit mid-way,
-  holding the lock for 174 minutes and blocking every other writer. Acquire
-  only when ready to write; verify unlocked, both before and after.
-- **Reporting a push as done because the commit was done.** A branch was
-  pushed and a PR opened, then six more commits landed on it locally and were
-  never pushed again. The maintainer merged the stale pushed snapshot on
-  green CI, in good faith; two agents' work and four findings became
-  unreachable git objects the instant the merge landed.
-- **Quoting my local branch as the project's state.** Board numbers I reported
-  to the maintainer were true on my local branch and false on what had
-  actually been merged — I was treating a working tree as the project. `git
-  log --oneline -1 origin/<branch>` costs one call and would have caught it
-  the first time I quoted a figure.
+- **Kill by PID after a targeted `ps`, never `pkill -f <pattern>`** — a wide
+  pattern match kills the launching shell and masks the failure as an odd exit
+  code.
+- **Wipe `results/` for the affected cases before relaunching a killed sweep** —
+  its stale fail data reads as a real regression in the next compare.
+- **Perf claims need a clean re-run on stable HEAD** — a sweep that picks up
+  later commits mid-run via fresh imports is a mosaic, not a baseline.
 - **Trusting a filesystem read after an interrupted command.** An earlier
   probe's `git reset --hard` got killed mid-way and left a staged revert in my
   checkout; every measurement I took afterward read a file that existed
@@ -520,12 +483,6 @@ orchestration overhead exceeds the work.
   happened in this one, and the fifth was the first to corrupt a measurement
   silently instead of stopping me outright: check the tree matches HEAD after
   every interruption, not only the ones that look like they broke something.
-- **Rules-lawyering my own gate-red rule instead of eating the violation.** A
-  rule I had commissioned that same session forbade dispatching a writer while
-  the gate was red; four hours later every red row was on a file with exactly
-  one writer, and nothing else could ever clear it. I dispatched anyway and
-  logged it as a violation rather than construct a reading where the rule
-  didn't really mean this case — it was amended with a carve-out afterward.
 
 ## Cardinal rules
 
@@ -550,6 +507,6 @@ orchestration overhead exceeds the work.
 - Never leave a commit unpushed on a branch with an open PR — commit and push
   are one action, not two; that branch is append-only through the remote.
 - Never quote board state, a landing, or a number from your local branch alone
-  — check the remote first.
+  — check the remote first (`git log --oneline -1 origin/<branch>`).
 - Final sign-off on the CAMPAIGN rests with the human. You sign off on individual
   merges; the user signs off on the campaign.
