@@ -43,7 +43,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 0 | **Always eat what you cook** — apply every discipline here first | judgment |
 | 1 | Minimal changes; no new files; the root is a whitelist | judgment; root table mechanical — Check 31 |
 | 2 | No silent fallbacks or swallowed errors | judgment |
-| 3 | `bash tests/check.sh` is the gate; green before merge | mechanical — the pre-push hook, not a check |
+| 3 | `bash tests/check.sh` is the gate; green before merge | norm locally — no `pre-push` hook enforces it; CI (`.github/workflows/check.yml`) checks after the push, not before |
 | 4 | Only fresh runs are evidence | judgment |
 | 5 | One definition of "pass" — `check.sh` exit 0, `evals/README.md` criteria | mechanical — Checks 15, 16, 24 |
 | 5a | The answer key is never inside `input/` | mechanical — Check 18 |
@@ -52,19 +52,19 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 7 | `evals/cases/*/input/` is read-only fixture data | mechanical — Check 26 |
 | 8 | Never delete evidence: release notes archive, never vanish | mechanical — Check 28 |
 | 8a | A note for a tag that never legitimately existed may be removed — narrowly | norm — human confirms off-repo facts; paperwork checkable, once built |
-| 9 | Run the cheap check locally before pushing | mechanical — the pre-push hook, not a check |
-| 9a | A ref-deletion-only push cannot be blocked by the state it removes | norm, pending a hook change — then mechanical (`install.sh`) |
+| 9 | Run the cheap check locally before pushing | norm — no `pre-push` hook exists; nothing local enforces it |
+| 9a | *(retired 2026-09-18 — see rule body)* | — |
 | 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |
 | 11 | Docs move with the prompt, in the same change | judgment |
 | 12 | A new agent lands with README roster, model table, and Layout entry | mechanical — Checks 6, 7 |
 | 13 | *(retired 2026-09-17 — see rule body)* | — |
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
-| 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — the pre-push hook enforces the local half; see the rule |
+| 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — no local mechanism enforces it; see the rule |
 | 15b | Five rows the gate decides; seven obligations the release engineer owes | mechanical for the five — `tests/release_gate.sh`, held to the schema by Check 33; the seven are norm |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 |
 | 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
-| 18 | One writer per repo — never run two mutating workflows at once | mechanical in name only — the pre-commit hook exists only where install.sh ran; nothing in the repo checks it |
+| 18 | One writer per repo — never run two mutating workflows at once | norm — no `pre-commit` hook exists; `tests/lock.sh` is a label, not an enforced mechanism |
 | 18a | Acquire only for the write step; verify unlocked, before and after | norm — `tests/lock.sh status` reports hold *age* mechanically; whether the hold was write-only is not checkable after the fact |
 | 18b | Never dispatch a writer while the gate is red; track and push local commits in the same action that turns it green | norm — nothing checks a dispatch decision after the fact; `bash tests/check.sh`'s exit code is the mechanical signal it says to consult |
 | 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
@@ -258,25 +258,28 @@ count it prints matches `ls agents/*.md | wc -l`.
 
 **How to apply**: local green → push. Not push → check CI.
 
-**Mechanical**: `install.sh` wires a `pre-push` hook that runs
-`tests/check.sh` and aborts the push on failure. Deliberate bypass is
-`git push --no-verify`, and a release that used it says so in its note.
+**Norm, not mechanical**: `install.sh` no longer wires a `pre-push` hook
+(removed in `86f4b5d`) — nothing local stops a red push from leaving the
+machine. `.github/workflows/check.yml` runs the same gate in CI, but only
+after the push lands; a red run there is discovered, not prevented.
 
-## 9a. A push that only removes a ref cannot be blocked by the state it removes
+## 9a. *(retired 2026-09-18)*
 
-The `pre-push` hook runs the full gate on the tree being pushed, with no case
-for a push whose only effect is deleting a tag or branch — a push that cannot
-introduce the failure it is blocked by, because it removes the exact thing the
-gate is red about. The hook's job is stopping a bad tree from leaving the
-machine; a pure deletion pushes no tree at all.
+Number kept; rule numbers never move (see Conventions).
 
-**How to apply, until the hook is fixed**: a `--no-verify` push that only
-deletes a ref is permitted and is documented in the commit or PR that follows
-it, naming what was deleted and why the gate could not have passed.
-**Proposed, not built**: `install.sh`'s hook should special-case a push whose
-ref updates are all deletions (all-zero `<new>` on stdin) and skip the gate for
-that push only — `iris-vermeulen`'s surface (rule 19), PF-030. Norm until then,
-mechanical after, since the skip is readable in the hook body.
+**What it required**: a carve-out from the `pre-push` hook's full-gate run for
+a push whose only effect is deleting a tag or branch — a push that cannot
+introduce the failure the gate is red about, because it removes the exact
+thing the gate was red on.
+
+**Why it is gone**: the `pre-push` hook this rule carved an exception into no
+longer exists (`install.sh`, `86f4b5d`) — nothing local runs the gate on push
+at all, so nothing can wrongly block a ref-deletion push either. The proposed
+hook special-case this rule described was never built and is now moot with it.
+
+**What replaces it**: nothing. A ref-deletion push, like any other push, is
+unguarded locally; `.github/workflows/check.yml` runs after it lands, same as
+rule 9.
 
 ## 10. Every agent-behaviour bug gets an eval fixture before the fix ships
 
@@ -360,8 +363,9 @@ unreleased commit count makes the last note misleading.
 ## 15a. Nothing red is ever pushed, and the tag is pushed last
 
 Create the tag **locally, before any push**, so the local gate sees it: Check
-27 reads `refs/tags/<version>` in the working clone, and the pre-push hook
-enforces green-before-anything-leaves-the-machine. Then push in two commands —
+27 reads `refs/tags/<version>` in the working clone. Running `bash
+tests/check.sh` green before pushing is on the release engineer — no
+`pre-push` hook enforces it locally (rule 9). Then push in two commands —
 the commit, then the tag. Never `--tags`, never `--follow-tags`: a tag must not
 ride along on a push that could be rejected.
 
@@ -380,9 +384,9 @@ cause, at most once, and treat the second failure as real. If CI cannot be read
 at all, say so and record it — a release that assumes a gate it could not see
 is rule 2's silent fallback wearing a version number.
 
-**Rationale**: the local hook proves one machine and one checkout, often a
-shallow one where checks reading history or tags skip themselves; CI sees the
-rest, and only after a push. The reverse ordering ("push, wait for CI green,
+**Rationale**: a local run of `tests/check.sh` proves one machine and one
+checkout, often a shallow one where checks reading history or tags skip
+themselves; CI sees the rest, and only after a push. The reverse ordering ("push, wait for CI green,
 then tag") is unsatisfiable here and deadlocks against Check 27 — **a rule that
 cannot be obeyed does not get obeyed loosely; it gets obeyed until the work
 stops.**
@@ -719,10 +723,13 @@ at a directory with no row.** `commands/*.md` is `lian-zhao`'s: a command file
 is a trigger wrapper for one `agents/*.md` invocation, and splitting ownership
 by which agent a command invokes would leave nobody able to keep the
 trigger-to-mode mapping consistent. `install.sh` is `iris-vermeulen`'s: its
-load-bearing content is the `pre-commit`, `pre-push` and `post-merge` hooks
-that make rules 3, 9 and 18 mechanical — gate infrastructure, the same class as
-`tests/lock.sh`, already hers — while its symlink half carries no prompt
-content and so is not `lian-zhao`'s.
+load-bearing content is the `post-merge` hook that syncs the `~/.claude`
+symlinks — `pre-commit` and `pre-push` were removed in `86f4b5d`, so rules 3,
+9 and 18 have no local mechanism left, and `.github/workflows/check.yml`
+(also hers) is what now runs the gate, after a push rather than before one —
+gate infrastructure, the same class as `tests/lock.sh`, already hers — while
+`install.sh`'s symlink half carries no prompt content and so is not
+`lian-zhao`'s.
 
 **Human-owned surfaces.** `README.md` and `CLAUDE.md` have no agent owner and
 are not an oversight: they are maintained by hand. An agent proposes a change
@@ -757,8 +764,10 @@ its transcript mtime, or message it. An empty to-do list is not evidence that
 an agent stopped, and a long-running agent that fans out to subagents may not
 notify for many minutes because notification waits on its children.
 
-**Mechanical**: `tests/lock.sh` takes a named lock and the `pre-commit` hook
-installed by `install.sh` refuses a commit from anyone else while it is held.
+**Norm, not mechanical**: `tests/lock.sh` takes a named lock, but `install.sh`
+no longer wires a `pre-commit` hook to refuse a commit from anyone else while
+it is held (removed in `86f4b5d`) — the lock is a label and a convention now,
+not an enforced mechanism.
 
 ```bash
 export CONSILIUM_LOCK_OWNER=<who-you-are>
@@ -770,11 +779,12 @@ Ownership is a **label, not a pid**: agents run each command in a fresh shell,
 so no pid outlives the work it protects. A lock is never auto-cleared, however
 old — "probably stale" is precisely the reasoning that caused the incident.
 
-**The scope may not be the repo root.** `acquire` takes path prefixes and the
-`pre-commit` hook refuses anything staged outside them; a lock scoped to `.`,
-or to no prefix at all, turns that guard off, so a `git add -A` sweeps in
-whatever else is in the tree. Name the files you intend to write; widen by
-re-acquiring, never by scoping to root.
+**The scope may not be the repo root, as a matter of discipline — nothing
+enforces it now.** `acquire` takes path prefixes; with the `pre-commit` hook
+gone, nothing refuses a commit staged outside them, so scoping to `.` or to no
+prefix at all no longer turns off a guard — there is none — it only removes
+the one signal a reviewer has of what the writer meant to touch. Name the
+files you intend to write; widen by re-acquiring, never by scoping to root.
 
 **How to apply**: one release at a time. If a workflow appears stuck, stop it
 explicitly and confirm it stopped before taking over its work.
@@ -939,13 +949,12 @@ same file as the refusal. A gate fixed only in an incident write-up will do the
 same thing to the next writer.
 
 **Known corrective paths**, so a refusal is recognisable as non-terminal:
-`pre-commit`'s lock-holder refusal → 18a's recorded force-release;
-`pre-commit`'s scope-guard refusal → re-acquire with a wider path list;
-`pre-push` → rule 9's `--no-verify`; red-gate dispatch → 18b step 5;
-`tests/release_gate.sh`'s `row_skip` paths → `--accept-skips`;
-`tests/lock.sh acquire` refusing a second holder → the same force-release.
-`evals/run.sh` and CI gate nothing terminally. Check 35's newest-tag grace has
-no override today — board row PF-033.
+red-gate dispatch → 18b step 5; `tests/release_gate.sh`'s `row_skip` paths →
+`--accept-skips`; `tests/lock.sh acquire` refusing a second holder → a
+recorded force-release (18a). `pre-commit` and `pre-push` no longer exist
+(`install.sh`, `86f4b5d`), so their refusals are no longer cases this list
+needs to cover. `evals/run.sh` and CI gate nothing terminally. Check 35's
+newest-tag grace has no override today — board row PF-033.
 
 **Tier**: norm, since whether a blocked action was *correct* is a judgment
 call. What would make the general rule checkable: grepping every hard-refusal
