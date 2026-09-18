@@ -87,6 +87,15 @@ checks above; see disclosure item 3 below.
 - The rule-19 disagreement over the `README.md` model-roster edit (disclosure
   item 2 below) is unresolved and stays unresolved in this release; no rule
   19a exists to decide it either way.
+- **New this cut, found in the post-tag fresh-clone walk:** `README.md`'s
+  `## Install` section (around the "The installer also wires two git hooks"
+  paragraph) still documents a `pre-push` hook that runs `tests/check.sh`
+  and a `pre-commit` hook that checks the repo lock. Neither exists in
+  `install.sh` after this release's own hook-removal commits
+  (`86f4b5d`, `ac714f2`, `492ea83`). Only `post-merge` is wired. Not fixed
+  here — no agent owns `README.md` under rule 19, and this release already
+  carries one open rule-19 dispute over exactly this kind of edit. Flagged
+  for the maintainer to decide who closes it and how.
 
 ## Totals or cost changes
 
@@ -144,15 +153,31 @@ checks above; see disclosure item 3 below.
 
 ## CI
 
-**The run this release is gated on:** to be filled in after the commit push,
-before the tag push, per rule 15a — see the Release gate section below for
-the actual run id, URL, conclusion, and SHA once available.
+**The run this release is gated on:** run `35365735881`,
+https://github.com/dunyuliu/consilium/actions/runs/35365735881, conclusion
+`success`, workflow `structural-invariants`, SHA
+`3392dbc5780fecb57071ca8443d365e88f98c846` — the release commit. Triggered
+by the tag push.
+
+**The run right after the commit push was red, on the same two assertions
+v1.23.0's note already named the cause of.** Run `35365509112`, same SHA,
+triggered by the commit push (before the tag existed on the remote), failed
+on:
+
+1. `release_notes_v1.24.0.md has no matching tag 'v1.24.0'` (Check 27, rule 15)
+2. `the root release note is 'release_notes_v1.24.0.md' but the newest tag is
+   v1.23.0` (Check 31d, rule 8)
+
+Both have one cause — the tag not yet existing on the remote — named in this
+release per rule 15a and the caveat lian-zhao's amendment (filed as F9 last
+release) exists to cover. Both went green with no other change once the tag
+was pushed.
 
 ## Release gate outcome
 
-To be filled in after `bash tests/release_gate.sh release_notes_v1.24.0.md`
-runs in the window where HEAD is the tagged commit and the remote agrees —
-see the Release gate section below.
+`bash tests/release_gate.sh release_notes_v1.24.0.md`, run in the window
+where HEAD is the tagged commit `3392dbc5` and the remote agrees: **5 passed,
+0 failed.** No red rows this cut.
 
 ## Trend since v1.23.0
 
@@ -210,9 +235,22 @@ the prompt whose fixture verdict is now unverified against the new text.
 
 ## Release gate
 
-- tree: to be filled in from `tests/release_gate.sh` output
-- ci: to be filled in from `tests/release_gate.sh` output
-- publish: to be filled in from `tests/release_gate.sh` output
-- release: to be filled in from `tests/release_gate.sh` output
-- clone: to be filled in from `tests/release_gate.sh` output plus this
-  agent's own fresh-clone walk of `README.md`
+- tree: clean, one worktree, no lock, level with upstream
+- ci: green on `3392dbc5` (run `35365735881`)
+- publish: v1.24.0 pushed and pointing at `3392dbc5`
+- release: GitHub Release exists for v1.24.0 —
+  https://github.com/dunyuliu/consilium/releases/tag/v1.24.0
+- clone: `tests/release_gate.sh`'s own fresh-clone check passed (README's
+  install block and its first following command both exited 0); this agent
+  additionally cloned `v1.24.0` into an isolated directory by hand, ran
+  `bash install.sh` (`consilium installed: 22 agents, 19 commands, 1/1 hooks
+  wired`, exit 0), and ran the README's first documented test command,
+  `bash tests/check.sh` (797 passed, 0 failed against the tag plus its
+  fetched history). One finding from that walk, not blocking: the README's
+  "Install" section (the `pre-push`/`pre-commit` hook bullets under
+  `## Install`) still documents hooks this release's own commits removed
+  from `install.sh` — drift introduced by this release, not caught by any
+  check, and not fixed here because `README.md` has no agent owner under
+  rule 19 and this release already carries one unresolved rule-19 dispute
+  (see Disclosures). Flagged for the maintainer rather than edited
+  unilaterally.
