@@ -81,79 +81,6 @@ HOOK_EOF
     chmod +x "$HOOK"
 fi
 
-# Wire a pre-push hook so the gate runs before anything leaves the machine
-# (PROJECT_RULES.md rule 9). Without it, "the check ran locally" is a claim
-# nobody can verify after the fact.
-PREPUSH="$ROOT/.git/hooks/pre-push"
-if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PREPUSH" ] || ! grep -q "$HOOK_VERSION" "$PREPUSH"; }; then
-    cat > "$PREPUSH" << 'HOOK_EOF'
-#!/usr/bin/env bash
-# Auto-installed by consilium/install.sh — runs the structural gate before push.
-# Bypass deliberately with `git push --no-verify` (and say so in the release note).
-REPO=$(cd "$(dirname "$0")/../.." && pwd -P)
-# A MISSING gate is not a passing gate. This used to be wrapped in
-# `if [ -f ... ]`, so a working tree without tests/check.sh pushed silently with
-# exit 0 — and the change most certainly guaranteed to bypass the gate was a
-# commit that DELETED it. Demonstrated 2026-08-05: `mv tests/check.sh aside`,
-# commit, push, "main -> main", exit 0, no warning.
-# Rule 2: a gate that cannot run is worse than no gate, so say so and stop.
-if [ ! -f "$REPO/tests/check.sh" ]; then
-    echo "pre-push: tests/check.sh is missing from the working tree — refusing." >&2
-    echo "  A missing gate is not a passing gate. If you are deliberately pushing" >&2
-    echo "  a tree without it, use: git push --no-verify (and say so in the note)." >&2
-    exit 1
-fi
-if ! bash "$REPO/tests/check.sh"; then
-    echo "pre-push: tests/check.sh FAILED — push aborted." >&2
-    exit 1
-fi
-HOOK_EOF
-    printf '# %s\n' "$HOOK_VERSION" >> "$PREPUSH"
-    chmod +x "$PREPUSH"
-fi
-
-# Wire a pre-commit hook enforcing one-writer-per-repo (rule 18). The lock
-# guards WHO may commit; a declared scope guards WHAT — the v1.10.0 incident
-# was the holder's own `git add -A` swallowing an author agent's in-flight
-# files. See tests/lock.sh.
-PRECOMMIT="$ROOT/.git/hooks/pre-commit"
-if [ -d "$ROOT/.git/hooks" ] && { [ ! -e "$PRECOMMIT" ] || ! grep -q "$HOOK_VERSION" "$PRECOMMIT"; }; then
-    cat > "$PRECOMMIT" << 'HOOK_EOF'
-#!/usr/bin/env bash
-# Auto-installed by consilium/install.sh — one writer per repo (rule 18).
-REPO=$(cd "$(dirname "$0")/../.." && pwd -P)
-LOCK="$REPO/.git/consilium.lock"
-[ -f "$LOCK" ] || exit 0
-holder=$(sed -n '1p' "$LOCK"); what=$(sed -n '2p' "$LOCK"); since=$(sed -n '3p' "$LOCK")
-me="${CONSILIUM_LOCK_OWNER:-${USER:-unknown}}"
-if [ "$me" != "$holder" ]; then
-    echo "pre-commit: repo is held by '$holder' since $since — $what" >&2
-    echo "  Rule 18: one writer per repo. Wait, or stop it and confirm it stopped," >&2
-    echo "  then: bash tests/lock.sh release --force" >&2
-    exit 1
-fi
-scope=$(sed -n '4p' "$LOCK")
-[ -n "$scope" ] || exit 0
-outside=""
-while IFS= read -r f; do
-    [ -z "$f" ] && continue
-    ok=0
-    for pre in $scope; do case "$f" in "$pre"*) ok=1; break ;; esac; done
-    [ "$ok" = 0 ] && outside="$outside  $f"$'\n'
-done < <(git diff --cached --name-only)
-if [ -n "$outside" ]; then
-    echo "pre-commit: staged files fall OUTSIDE the declared lock scope." >&2
-    echo "  scope: $scope" >&2
-    printf '%s' "$outside" >&2
-    echo "  Stage explicit paths, or re-acquire the lock with a wider scope." >&2
-    exit 1
-fi
-exit 0
-HOOK_EOF
-    printf '# %s\n' "$HOOK_VERSION" >> "$PRECOMMIT"
-    chmod +x "$PRECOMMIT"
-fi
-
 # Count what this checkout actually linked, not what happens to sit in the
 # target directory. `ls | wc -l` counted every entry there — foreign symlinks
 # that were skipped, real files that were refused, and hand-written agents that
@@ -172,16 +99,18 @@ linked_count() {
 
 # Hooks live in $ROOT/.git/hooks, which only exists when $ROOT/.git is a real
 # directory (a normal checkout). In a linked worktree, .git is a FILE pointing
-# at the main checkout's git-dir, so that path never exists, zero hooks get
-# wired, and a script that reported plain success hid it: an agent pushed with
-# no pre-push gate and deleted 548 of 549 lines from agents/wei-lin.md on main.
-# Incident: 2026-09-17. Local hooks stay checkout-only by deliberate decision
-# (commit 56ec728, scheduled for removal) — this does not resolve the real
-# hooks dir for a worktree, it only stops the script from lying about it.
+# at the main checkout's git-dir, so that path never exists and zero hooks get
+# wired. A script that reported plain success once hid that: an agent pushed
+# with no pre-push gate and deleted 548 of 549 lines from agents/wei-lin.md on
+# main (incident 2026-09-17).
+#
+# Only post-merge is wired now. Commit 56ec728 recorded the decision to drop
+# pre-commit and pre-push local enforcement; this commit carries it out. The
+# guard below still matters for post-merge and for reporting the worktree case
+# honestly — it does not resolve the real hooks dir for a worktree, it only
+# stops the script from lying about what got wired.
 hooks_wired=0
 [ -e "$ROOT/.git/hooks/post-merge" ] && hooks_wired=$((hooks_wired + 1))
-[ -e "$ROOT/.git/hooks/pre-push" ]   && hooks_wired=$((hooks_wired + 1))
-[ -e "$ROOT/.git/hooks/pre-commit" ] && hooks_wired=$((hooks_wired + 1))
 if [ ! -d "$ROOT/.git/hooks" ]; then
     echo "no hooks wired: $ROOT/.git is a file, not a directory (linked worktree)" >&2
     echo "  — hooks live in the main checkout; run install.sh there instead" >&2
@@ -189,7 +118,7 @@ fi
 
 agents_linked=$(linked_count "$CLAUDE/agents")
 commands_linked=$(linked_count "$CLAUDE/commands")
-echo "consilium installed: $agents_linked agents, $commands_linked commands, $hooks_wired/3 hooks wired"
+echo "consilium installed: $agents_linked agents, $commands_linked commands, $hooks_wired/1 hooks wired"
 [ "$skipped" -gt 0 ] && echo "$skipped item(s) skipped — re-run with --force to replace them" >&2
 
 if [ "$agents_linked" -eq 0 ] && [ "$commands_linked" -eq 0 ] && [ "$hooks_wired" -eq 0 ]; then
