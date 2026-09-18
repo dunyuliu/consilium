@@ -37,10 +37,10 @@ moved is the history behind an already-settled claim, not the claim or the row.
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | ~~the pre-commit hook and its version marker are committed, not only installed locally~~ — retired 2026-09-18, ground (c): there is no pre-commit hook; the same decision that retired PF-028 and PF-030 removed it | RETIRED | 2026-09-18 | — | — |
 | PF-002 | `agents/` | ~~every agent has at least one eval fixture (rule 13)~~ — rule 13 retired 2026-09-17, headcount is no longer a claim this board makes | RETIRED | 2026-09-17 | — | — |
-| PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-17 | 14 | P2 |
+| PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-18 | 14 | P2 |
 | PF-004 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
 | PF-005 | `docs/release_notes_*` | ~~no divergence between a release note and its tag goes unrecorded~~ — retired 2026-09-18, ground (b): the command read a tag's immutable content and printed the same 6 forever; v1.10.0's divergence stays recorded in the block below | RETIRED | 2026-09-18 | — | — |
-| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-17 | 14 | P2 |
+| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-18 | 14 | P2 |
 | PF-007 | `tests/check.sh` | the header's live `Verifies:` entries are exactly the checks the body runs, by number | VERIFIED | 2026-09-18 | 30 | P3 |
 | PF-008 | `tests/check.sh` | ~~checks 1–5 have been negative-tested~~ — retired 2026-09-18, ground (b): a historical fact about one day's work, watched by a green-suite command that cannot go red for it | RETIRED | 2026-09-18 | — | — |
 | PF-009 | `agents/` | ~~no agent prompt's body contradicts its own frontmatter or another agent's prompt~~ — retired 2026-09-18, ground (b): one string in one of 22 files standing in for a fleet-wide semantic claim | RETIRED | 2026-09-18 | — | — |
@@ -144,6 +144,10 @@ carries no command and no interval.
 ### PF-003 — `evals/cases/` — VERIFIED
 Coverage only — a superseded or FAILing verdict still counts. See PF-004 for
 precision and PF-025 for the one known-defective criterion set.
+
+Run 2026-09-18, after `f1289f6` rewrote every case's `notes:` block and
+`b1b1ad8` cut the suite from ten cases to nine: no output, exit 0 — all nine
+surviving cases still carry a dated `Run (...)` line.
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 ```
@@ -170,7 +174,8 @@ rule 21, carries no command or interval.
 
 ### PF-006 — `tests/check.sh` — VERIFIED
 Green means the checks pass, not that the repo is correct (PF-008).
-`794 passed, 0 failed` at `18c9cef` on 2026-09-17, the v1.23.0 release base.
+`Summary: 796 passed, 0 failed`, run 2026-09-18 on base `b1b1ad8` after the
+rule-book slim in this worktree.
 ```bash
 bash tests/check.sh | tail -1
 ```
@@ -187,9 +192,10 @@ against the check numbers the body actually echoes. It reddens on either side
 moving alone, which is what must remain true rather than what happens to be
 true today.
 
-Run 2026-09-18 at HEAD: `header and body agree: 32 live checks` — 36 header
-entries, 4 marked retired, 32 live, matching the body. Exit 0; a mismatch
-prints the diff and exits 1.
+Run 2026-09-18 on base `b1b1ad8`: `header and body agree: 31 live checks` — 36
+header entries, 5 marked retired, 31 live, matching the body. It was 32 until
+`7973539` merged Check 5 into Check 8 the same day. Exit 0; a mismatch prints
+the diff and exits 1.
 ```bash
 diff <(sed -n '/^# Verifies:/,/^# Checks 6 and 7/p' tests/check.sh | grep -oE '^# +[0-9]+\. \(retired|^# +[0-9]+\.' | grep -v retired | grep -oE '[0-9]+') <(grep -oE '^echo "Check [0-9]+' tests/check.sh | grep -oE '[0-9]+') && echo "header and body agree: $(grep -c '^echo "Check' tests/check.sh) live checks"
 ```

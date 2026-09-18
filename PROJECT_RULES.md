@@ -62,12 +62,12 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
 | 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — no local mechanism enforces it; see the rule |
 | 15b | Five rows the gate decides; seven obligations the release engineer owes | mechanical for the five — `tests/release_gate.sh`, held to the schema by Check 33; the seven are norm |
-| 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 |
-| 17 | Cross-references between agents must resolve | mechanical — Checks 5, 8 |
+| 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 (structure only; description *quality* stays judgment) |
+| 17 | Cross-references between agents must resolve | mechanical — Checks 2, 8 |
 | 18 | One writer per repo — never run two mutating workflows at once | norm — no `pre-commit` hook exists; `tests/lock.sh` is a label, not an enforced mechanism |
-| 18a | Acquire only for the write step; verify unlocked, before and after | norm — `tests/lock.sh status` reports hold *age* mechanically; whether the hold was write-only is not checkable after the fact |
+| 18a | Acquire only for the write step; verify unlocked, before and after | norm — `tests/lock.sh status` reports hold *age* mechanically; whether the hold was write-only is not checkable after the fact, because agents are prompted, not scripted, and leave no invocation boundary for a check to sit between — the same limit 18b, 25d and 27 hit |
 | 18b | Never dispatch a writer while the gate is red; track and push local commits in the same action that turns it green | norm — nothing checks a dispatch decision after the fact; `bash tests/check.sh`'s exit code is the mechanical signal it says to consult |
-| 19 | One owner per write surface | mechanical — Check 10 (agents only; human-owned surfaces are declared in the rule) |
+| 19 | One owner per write surface | mechanical — Check 10 (agents only; it parses the table, not README prose, so a second writer on a multi-surface README sentence is undetected; human-owned surfaces are declared in the rule) |
 | 20 | Every writer declares isolation first; merge is judged by someone else | mechanical — Check 11 |
 | 21 | Standing claims are re-checked on a schedule and cite a command | mechanical — Checks 12, 34 |
 | 21a | The board cites a command; it does not paste and byte-diff the command's output | norm — Check 17 retired 2026-09-17 |
@@ -81,11 +81,11 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 24 | Never audit a moving target; brief with ranges, not whole files | judgment |
 | 25 | A fixture proves its criteria are executable, and absorbs every miss | mechanical — Checks 15, 16 |
 | 25a | must_not_find guards are declarative, never imperative | mechanical — Check 19 |
-| 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical — Check 14 |
+| 23 | Every agent declares tool economy; dispatchers declare dispatch cost | mechanical — Check 14, section presence only; whether a dispatch-capable agent states the multiplier inside it is not gated |
 | 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
 | 26 | Before removing, weakening, or replacing a signal, measure what it currently catches | mechanical in part — a check could require a before/after count in the commit message; whether the count was measured against the real corpus is judgment |
 | 27 | A restriction does not survive a dispatch hop — restate it in every sub-brief | norm — no mechanism logs dispatch briefs today |
-| 28 | A gate that blocks a correct action is a P1 defect in the machinery, not a reason to wait | norm — the override for two of three incidents already exists and is named; the third is open as PF-033 |
+| 28 | A gate that blocks a correct action is a P1 defect in the machinery, not a reason to wait | norm, since whether a blocked action was *correct* is a judgment call — the override for two of three incidents already exists and is named; the third is open as PF-033 |
 
 ---
 
@@ -185,7 +185,7 @@ output look wrong, which is why it must be checked rather than noticed.
 
 ## 5a. The answer key is never inside `input/`
 
-Tier: mechanical (Check 18). No file under `evals/cases/*/input/` may contain
+No file under `evals/cases/*/input/` may contain
 fixture-authoring language — a phrase an author writes *about* a fixture,
 addressed at a reader. `evals/run.sh stage` isolates `input/` **from** the
 answer key; it copies `input/` verbatim, so it cannot help when the key is *in*
@@ -431,9 +431,6 @@ equals the filename stem; `model` is one of `{opus, fable, sonnet, haiku}`. The
 `description` field is load-bearing — `victor-reyes` and `elena-hartmann` route
 on it, so a vague description silently breaks routing.
 
-**Tier 1**: Check 1 enforces structure only; description *quality* stays
-judgment.
-
 ## 17. Cross-references between agents must resolve
 
 An agent that routes work to another names it by its exact stem
@@ -442,7 +439,7 @@ An agent that routes work to another names it by its exact stem
 every agent-to-agent reference inside `agents/*.md` and `commands/*.md` bodies
 must resolve to a file in `agents/`.
 
-**Tier 1**: Checks 2, 5 and 8. Checks 5 and 8 skip command stems and a short
+Check 8 skips command stems and a short
 allowlist of hyphenated technical terms (`NON_AGENT_TERMS`). Every allowlist
 entry is a hole, so keep the list short — but a gate that cries wolf on correct
 prose trains the reader to work around it.
@@ -473,8 +470,6 @@ case.** Corollaries, each paid for:
 - **A fixture is never finished.** When a run finds something real the case did
   not declare, declare it — do not delete it to keep the case tidy. An
   undeclared true defect makes a thorough audit score worse than a shallow one.
-- **When the agent and the fixture disagree, the fixture is the more likely
-  defendant.** A failing case is a hypothesis about who erred, not a verdict.
 - **Fix the criterion where the criterion is wrong, and never the reverse.**
   Weakening a case to make an agent pass destroys the only instrument that can
   tell you whether the next prompt edit helped. Loosening a `must_not_find`
@@ -548,10 +543,6 @@ indistinguishable from a settled measurement (PF-025). One field closes both.
 one-line reason when authoring a case whose pass bar is a judgement call; quote
 the sample count beside the verdict when a board row cites a contested case.
 
-**Tier**: mechanical in part — `evals/run.sh` can derive the same-SHA count and
-refuse to report a `contested: true` case as closed on count 1. Deciding
-whether a case *should* be contested is judgement, the same limit 18a states.
-
 ### 25e. Two dispatches agreeing against the criterion is a criterion defect, not the contested shape
 
 25d's trigger for `contested: true` is *"a second dispatch is found to disagree
@@ -576,9 +567,6 @@ cannot be widened without re-litigating each addition.** Every repair round so
 far has been on an opinion-shaped criterion; the repair rebuilds it as ANDed
 sub-criteria, each a fact about what happened rather than an opinion about what
 should have happened.
-
-**Tier**: judgment. Telling the shapes apart requires reading both dispatches
-against the criterion text; nothing mechanizes beyond 25d's SHA/count tooling.
 
 ## 24. Never audit a moving target, and brief with ranges not whole files
 
@@ -653,7 +641,7 @@ that the command was really run.
 
 ## 21a. The board cites a command; it does not paste and byte-diff the command's output
 
-Tier: norm. Every row's evidence block names one command whose output would
+Every row's evidence block names one command whose output would
 settle the claim. That is the requirement in full — a claim with no command is
 not verified, it is remembered (rule 21). The command is read by whoever
 re-checks the row on its interval; nothing re-executes and byte-diffs it on
@@ -763,10 +751,6 @@ wrong, the eligible owner listed **first in the table above** takes it and the
 others leave it alone. "Any of them may take it" was the wording here through
 v1.25.0, and it is the two-writer shape this rule exists to prevent — both
 owners correctly concluding the line is theirs, neither seeing the other.
-**Tier**: norm. Check 10 parses the table, not README prose, so nothing
-detects a second writer on a multi-surface sentence; making it mechanical
-would need a check that maps each README line to the surfaces it restates
-and rejects an edit from an owner who is not first among them.
 
 The remainder of `README.md` — what consilium is, how to use it, the narrative
 around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
@@ -855,13 +839,6 @@ repo-wide block, and shortening the window is the only lever left.
    naming the holder and the reason; a silent one is indistinguishable from a
    lock that never worked.
 
-**Tier**: norm. `tests/lock.sh status` prints hold age (`age_of()`) — that half
-is mechanical. Whether the held time was spent writing or reading is not
-determinable afterward: the lock file records only who holds it and since when,
-and agents are prompted, not scripted, so there is no invocation boundary for a
-check to sit between. What would make it checkable: a lock-history log, a line
-per acquire and release, diffable against gate invocation timestamps.
-
 ### 18b. Never dispatch a writer while the gate is red; if commits sit local, track them and push in the same action that turns it green
 
 A red gate means the pushed remote and the local branch disagree about what
@@ -894,12 +871,6 @@ sit.
    every such brief names the branch and tells the agent to verify and
    fast-forward before doing anything else.
 
-**Tier**: norm. Nothing here detects after the fact that a writer was
-dispatched onto a red gate, because dispatch leaves no artifact (agents are
-prompted, not scripted — the same limit 18a states). Mechanical and already
-present: `bash tests/check.sh`'s exit code as the go/no-go signal, and
-`git status` / `git log @{u}..` for the count step 2 asks be tracked.
-
 ## 23. Every agent declares tool economy; dispatchers declare dispatch cost
 
 Every `agents/*.md` carries a `## Tool economy` section. A dispatch re-bills
@@ -908,10 +879,6 @@ of tool calls, not with prompt size — measured here: under 7 calls ≈ 19k
 tokens, over 10 ≈ 75k, against ~2k to read a file directly. An agent that
 dispatches subagents states that multiplier explicitly; every agent states the
 discipline of batching, reading once, and not re-confirming a finding it has.
-
-**Tier 1**: Check 14 enforces presence of the section on every agent. **Limit,
-stated rather than papered over**: it does not verify that a dispatch-capable
-agent states the multiplier inside it — that half is judgment, not gated.
 
 ## 26. Before removing, weakening, or replacing a signal, measure what it currently catches
 
@@ -938,12 +905,6 @@ the real corpus and record the split (how many flags, on what basis each fired)
 in the commit message or the entry the change lands beside. Then mutate one
 real record across the new boundary and confirm the flip.
 
-**Tier**: mechanical in part. A commit removing or changing a check in
-`tests/check.sh` or `evals/run.sh` could be required to name a before/after
-count in its message — cheap, and gameable, since nothing verifies the count
-was measured rather than invented to match the diff. The count stays a norm;
-only its *presence* is mechanizable, and is not yet built.
-
 ## 27. A restriction does not survive a dispatch hop — restate it in every sub-brief
 
 An agent with routing authority given a constraint — read-only, no lock, no
@@ -957,12 +918,6 @@ lose a restriction that was written down once.
 sub-brief verbatim — never assume inheritance. A router that cannot list the
 constraints its own mission carries has not read its brief closely enough to
 redispatch it.
-
-**Tier**: norm. A sub-brief leaves no artifact here — agents are prompted, not
-scripted — so nothing can check after the fact whether a constraint was
-restated. What would make it partly mechanical: logging dispatch briefs, so a
-check could grep a sub-brief for the restrictions named in the brief that
-spawned it. Nothing logs them today.
 
 ---
 
@@ -997,13 +952,6 @@ recorded force-release (18a). `pre-commit` and `pre-push` no longer exist
 (`install.sh`, `86f4b5d`), so their refusals are no longer cases this list
 needs to cover. `evals/run.sh` and CI gate nothing terminally. Check 35's
 newest-tag grace has no override today — board row PF-033.
-
-**Tier**: norm, since whether a blocked action was *correct* is a judgment
-call. What would make the general rule checkable: grepping every hard-refusal
-site (`exit 1` in a hook, a `row_fail` in `tests/release_gate.sh`) for a paired
-override keyword (`--no-verify`, `--force`, `--accept-skips`, a named
-force-procedure) in the same file — which catches a gate shipped with no escape
-at all, though never whether the escape covers the case that needed it.
 
 ---
 
