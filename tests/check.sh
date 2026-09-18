@@ -10,13 +10,14 @@
 #   3. The README commands table lists exactly the commands present on
 #      disk.
 #   4. (retired 2026-09-17 — README agent listing, subsumed by Checks 6 and 7.)
-#   5. Every README backtick-quoted agent-shaped reference resolves to
-#      an existing agent file (catches stale references from past
-#      renames). Command stems and NON_AGENT_TERMS are skipped.
+#   5. (retired 2026-09-18 — README agent-shaped references, merged into
+#      Check 8, which ran the identical scan over every other document and
+#      names the file in its failure message.)
 #   6. The README model table lists every agent exactly once, under the
 #      model its own frontmatter declares, with no stale rows.
 #   7. Every agent has a README roster-table row and a Layout-tree line.
-#   8. Agent references inside agents/*.md, commands/*.md and CLAUDE.md resolve.
+#   8. Every backtick-quoted agent-shaped reference in README.md, CLAUDE.md,
+#      agents/*.md and commands/*.md resolves to an agent that exists.
 #   9. Every eval fixture's line_range still brackets its declared anchor.
 #  10. The rule-19 write-surface ownership table is complete and exclusive.
 #  11. Every write-surface owner declares isolation as its first section.
@@ -101,7 +102,7 @@ is_command() {
 
 # Hyphenated terms that are legitimately backticked in prose and are not
 # agent references. Keep this list short and specific: every entry is a hole
-# in Check 5, so add one only when the term is genuinely unavoidable.
+# in Check 8, so add one only when the term is genuinely unavoidable.
 NON_AGENT_TERMS=(
     post-merge      # git hook wired by install.sh
     no-verify       # git push flag
@@ -182,33 +183,6 @@ else
     comm -23 <(echo "$readme_cmds") <(echo "$disk_cmds") | sed 's/^/    /' >&2
 fi
 
-# --- Check 5: backtick-quoted agent-shaped references in README resolve
-#
-# An "agent-shaped" reference is a backtick-quoted token matching exactly
-# the lowercase first-last pattern used by consilium agent filenames:
-# one hyphen, alphabetic on both sides, nothing else. Tokens with two or
-# more hyphens (e.g. claim-vs-abstract, end-to-end) are not agent-shaped
-# and are ignored.
-#
-# Two classes of token are agent-shaped but legitimately not agents: command
-# stems (`enforce-rules`) and a short allowlist of technical terms
-# (`post-merge`). Both are skipped. Without this the check false-positives on
-# correct prose, which trains the reader to work around the gate rather than
-# trust it — it blocked twice during the v1.2.0 cycle for exactly this.
-echo "Check 5: README backtick agent references resolve"
-mapfile -t refs < <(grep -oE '`[a-z]+-[a-z]+`' README.md \
-    | sed 's/^`//; s/`$//' \
-    | sort -u)
-for ref in "${refs[@]}"; do
-    if is_agent "$ref"; then
-        ok
-    elif is_command "$ref" || is_non_agent_term "$ref"; then
-        continue    # legitimately backticked, not an agent reference
-    else
-        fail "README references '$ref' but no agents/$ref.md exists"
-    fi
-done
-
 # --- Check 6: README model table lists every agent, with the right model ---
 #
 # PROJECT_RULES.md rule 12. A bare mention anywhere in the README passes even
@@ -284,25 +258,31 @@ for stem in "${AGENTS[@]}"; do
     fi
 done
 
-# --- Check 8: agent-to-agent references inside prompt bodies resolve ------
+# --- Check 8: agent-shaped references resolve, in every document ----------
 #
-# PROJECT_RULES.md rule 17. Check 5 scans README.md only, so a rename could
-# break every routing line inside agents/*.md and commands/*.md silently —
-# and routing is the one cross-reference that changes agent behaviour rather
-# than just documentation.
+# PROJECT_RULES.md rule 17. A rename can break every routing line inside
+# agents/*.md and commands/*.md silently — and routing is the one
+# cross-reference that changes agent behaviour rather than just documentation.
 #
-# The same skip rules as Check 5 apply. Measured before writing this: of 22
-# backticked hyphen-tokens across all prompt bodies, exactly one was neither
-# an agent nor a command, so the naive scan is accurate enough to be a gate
-# without a large allowlist.
+# An "agent-shaped" reference is a backtick-quoted token matching exactly the
+# lowercase first-last pattern of a consilium agent filename: one hyphen,
+# alphabetic on both sides. Tokens with two or more hyphens (claim-vs-abstract,
+# end-to-end) are not agent-shaped and are ignored. Two classes are
+# agent-shaped but legitimately not agents — command stems (`enforce-rules`)
+# and NON_AGENT_TERMS (`post-merge`) — and are skipped. Without those skips the
+# check false-positives on correct prose, which trains the reader to work
+# around the gate rather than trust it; it blocked twice in the v1.2.0 cycle
+# for exactly that. Measured before this was written: of 22 backticked
+# hyphen-tokens across all prompt bodies, exactly one was neither an agent nor
+# a command, so the naive scan is accurate enough to be a gate.
 #
-# CLAUDE.md joined the list when it landed (2026-09-16). A root document that
-# names agents — who owns which surface, who to route a finding to — is the
-# same hole as a prompt that does, and Check 5 reads README.md only. Its
-# absence is Check 31's finding, not this one's, so it is skipped rather than
-# erroring here.
-echo "Check 8: agent references inside agents/, commands/ and CLAUDE.md resolve"
-for f in agents/*.md commands/*.md CLAUDE.md; do
+# CLAUDE.md joined the list when it landed (2026-09-16) and README.md when
+# Check 5 merged in here (2026-09-18): a root document that names agents — who
+# owns which surface, who to route a finding to — is the same hole as a prompt
+# that does. A missing root document is Check 31's finding, not this one's, so
+# it is skipped rather than erroring here.
+echo "Check 8: agent-shaped references resolve in README, CLAUDE.md, agents/ and commands/"
+for f in README.md CLAUDE.md agents/*.md commands/*.md; do
     [ -e "$f" ] || continue
     mapfile -t body_refs < <(grep -oE '`[a-z]+-[a-z]+`' "$f" \
         | sed 's/^`//; s/`$//' \
