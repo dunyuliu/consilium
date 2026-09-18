@@ -35,7 +35,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 
 | id | area | to do, or claim to keep true | state | last-checked | interval | prio |
 |---|---|---|---|---|---|---|
-| PF-001 | `install.sh` | the pre-commit hook and its version marker are committed, not only installed locally | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-001 | `install.sh` | ~~the pre-commit hook and its version marker are committed, not only installed locally~~ — retired 2026-09-18, ground (c): there is no pre-commit hook; the same decision that retired PF-028 and PF-030 removed it | RETIRED | 2026-09-18 | — | — |
 | PF-002 | `agents/` | ~~every agent has at least one eval fixture (rule 13)~~ — rule 13 retired 2026-09-17, headcount is no longer a claim this board makes | RETIRED | 2026-09-17 | — | — |
 | PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-17 | 14 | P2 |
 | PF-004 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
@@ -44,10 +44,10 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-007 | `tests/check.sh` | the header comment's check count matches the checks that exist | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 | P3 |
 | PF-009 | `agents/` | no agent prompt's body contradicts its own frontmatter or another agent's prompt | VERIFIED | 2026-09-17 | 30 | P3 |
-| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-08-05 | 60 | P3 |
+| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-09-18 | 60 | P3 |
 | PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-012 | `agents/` | ~~no fleet-wide fixture-verdict staleness against the prompt it grades~~ — retired with PF-017 2026-09-18, ground (a): covered by production evidence, ceiling recorded | RETIRED | 2026-09-18 | — | — |
-| PF-013 | `agents/` | every agent runs on the cheapest model tier that passes its fixture | OPEN | 2026-09-17 | 60 | P1 |
+| PF-013 | `agents/` | ~~every agent runs on the cheapest model tier that passes its fixture~~ — retired 2026-09-18, ground (b): unsatisfiable for the only three agents it has left, and the measurable part is done | RETIRED | 2026-09-18 | — | — |
 | PF-014 | `agents/` | ~~no agent is missing the fixture its name implies~~ — rule 13 retired 2026-09-17, same reason as PF-002 | RETIRED | 2026-09-17 | — | — |
 | PF-015 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12) and no residue of the retired byte-diff mechanism (Check 17) remains | VERIFIED | 2026-09-17 | 30 | P3 |
 | PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
@@ -61,7 +61,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-024 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-09-16 | 14 | P3 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | causes 1–2 fixed (`iris-vermeulen`); rests on criterion 3 alone — a named substring-grading limit, not a gap, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-17 | 30 | P3 |
-| PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | a verdict names the prompt SHA it was graded against; a contested case cites its sample count (rule 25d) | VERIFIED | 2026-09-16 | 14 | P3 |
+| PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | ~~a verdict names the prompt SHA it was graded against; a contested case cites its sample count (rule 25d)~~ — retired 2026-09-18, ground (a): the SHA half is PF-024's mechanism and no contested case survives the 36→10 cut | RETIRED | 2026-09-18 | — | — |
 | PF-028 | `install.sh` | ~~install a working hook set from inside a linked worktree, not only a main checkout~~ — retired 2026-09-18, ground (c): the maintainer decided to remove local hooks entirely (090ce70), not fix their reach | RETIRED | 2026-09-18 | — | — |
 | PF-029 | `PROJECT_RULES.md` | ~~every live index row has body prose in the file, not only a one-line index claim~~ — retired 2026-09-18, ground (b): the rule book auditing its own formatting; nothing downstream depends on it | RETIRED | 2026-09-18 | — | — |
 | PF-030 | `install.sh` | ~~`pre-push` skips the gate for a push whose ref updates are all deletions~~ — retired 2026-09-18, ground (c): same hook-removal decision as PF-028, there will be no `pre-push` hook to special-case | RETIRED | 2026-09-18 | — | — |
@@ -71,18 +71,21 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-034 | `README.md` question 2 | the gate decides five rows and haruto owes seven; the stale "all ten things a release owes" heading is fixed, human-owned prose, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | PF-035 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — mechanized in Check 31 (`632c439`) | VERIFIED | 2026-09-17 | 30 | P3 |
 
-**Retirement pass, 2026-09-18 (fourth pass).** 1 P1 / 2 P2 / 19 P3 across 22
-live rows, plus 13 RETIRED (all marked with the state's own `RETIRED`; the
+**Retirement pass, 2026-09-18 (fifth pass).** 0 P1 / 2 P2 / 17 P3 across 19
+live rows, plus 16 RETIRED (all marked with the state's own `RETIRED`; the
 prose in each block says whether it was never bound, covered, obsolete by
-decision, or simply done). Twelve rows were open or broken going
-in; eight of those were already done, obsoleted by a decision, or simulating
-judgement, and are retired or closed below rather than carried forward. Only
-one row — PF-013 — returns anything actionable, and it is promoted to P1.
-**P1** is PF-013 (every agent on the cheapest model tier that passes its
-fixture): the only open row that saves the maintainer money, and it sat at P3
-through a housekeeping campaign. **P2** is active work and the claims worth
-rechecking often: PF-003, PF-006. **P3** is settled, stable claims on long
-intervals — checked for drift, not because they matter less in kind.
+decision, or simply done). The fourth pass left one P1 and three rows green on
+a command that no longer reached anything. This pass retires all four: PF-001
+and PF-027 passed on a marker and a file that a deletion elsewhere had already
+removed, PF-013's criterion can never be met by the agents it has left, and
+PF-010's grep was a proxy that could not fail — it alone is kept, re-pointed at
+the walk it always claimed. **No P1 stands.** **P2** is active work and the
+claims worth rechecking often: PF-003, PF-006. **P3** is settled, stable claims
+on long intervals — checked for drift, not because they matter less in kind.
+**A green row is not a checked row**: three of these four were green on every
+pass since the thing they watched was deleted, which is what re-running a
+command and reading what it reaches — rather than reading its exit status —
+is for.
 
 **On the board's own size.** The retirement discipline already given to the
 rule book (rule 13, retired for headcount over evidence) and the eval suite
@@ -103,12 +106,15 @@ Each item names its command; run it to close or re-check the row. Full prior
 history (every past run, investigation and superseded claim) is compressed out
 of this file and lives at git SHA `b9430a3` — see the note above.
 
-### PF-001 — `install.sh` — VERIFIED
-Hook source and its version marker are tracked in `install.sh`, not only in a
-local `.git/hooks/`.
-```bash
-grep -c 'PRECOMMIT\|HOOK_VERSION' install.sh
-```
+### PF-001 — `install.sh` — RETIRED
+
+Ground (c), obsolete by decision, 2026-09-18. There is no pre-commit hook:
+`86f4b5d` removed it, under the same decision that retired PF-028 and PF-030.
+The row stayed green because its command counted `HOOK_VERSION`, which now
+belongs to the `post-merge` symlink-sync convenience at `install.sh:38` — a
+marker for a different hook, and not a gate. A row that passes on a proxy for
+a thing that no longer exists is worse than no row. Kept per rule 21, carries
+no command or interval.
 
 ### PF-002 — `agents/` — RETIRED
 Rule 13 (`PROJECT_RULES.md`) is retired: it mandated a fixture per agent by
@@ -172,9 +178,27 @@ grep -c "Commissions and enforces project rules" agents/wei-lin.md
 ```
 
 ### PF-010 — `install.sh` — VERIFIED
-Executed 2026-08-05 against a real clean clone under a sandboxed `HOME`.
+Re-pointed 2026-09-18. The old command grepped `CLAUDE=${HOME}/.claude` out of
+`install.sh` — a variable assignment is not evidence that an install works, and
+the proxy was regex-fragile besides: it returned 0 on a box whose grep reads
+the `$` before `{` as an anchor, while `install.sh:20` is exactly that line. A
+proxy that cannot fail for the right reason and can fail for the wrong one is
+not evidence either way.
+
+The claim is unchanged and the command now performs the walk it always
+described: clone this repo into a temp directory, install under a `HOME` that
+has never seen it, and count the agent symlinks that appear. It reaches the
+real failure — an install that links nothing, or that depends on state in the
+developer's `HOME`. Verified 2026-09-18 by `wei-lin` against a stranger clone
+of `https://github.com/dunyuliu/consilium.git` at `31660df` under a sandboxed
+`HOME`: `consilium installed: 22 agents, 19 commands, 1/1 hooks wired`, exit 0,
+22 symlinks, and `bash tests/check.sh` green in that clone.
 ```bash
-grep -c 'CLAUDE=${HOME}/.claude' install.sh
+d=$(mktemp -d)
+git clone -q "$(git rev-parse --show-toplevel)" "$d/clone"
+(cd "$d/clone" && HOME="$d/home" bash install.sh)
+ls "$d/home/.claude/agents" | wc -l
+rm -rf "$d"
 ```
 
 ### PF-011 — `evals/cases/*/input/` — VERIFIED
@@ -197,16 +221,31 @@ fixture would only approximate. The staleness ceiling is now a recorded known
 property, not a reopenable gap. Kept per rule 21, carries no command or
 interval.
 
-### PF-013 — `agents/` — OPEN
+### PF-013 — `agents/` — RETIRED
 
-**Promoted to P1, 2026-09-18.** The only open row on this board that returns
-anything — it saves the maintainer money — and it sat at P3 through a
-housekeeping campaign. Owner: `lian-zhao`. Model tier per agent has never been
-checked against "cheapest tier that still passes its fixture" — only assigned
-by judgment at creation time.
-```bash
-grep -h '^model:' agents/*.md | awk '{c[$2]++} END{for(k in c) printf "%d %s\n", c[k], k}' | sort -k2
-```
+Ground (b), never bound, adjudicated 2026-09-18 rather than re-checked.
+
+Tiers today: 15 sonnet, 3 haiku, 3 opus, 1 fable. The measurable part of this
+row is done — `nadia-hadid` moved opus→sonnet on a graded run (v1.24.0), which
+is the one move this claim ever produced. What is left is the three opus
+agents, `elena-hartmann`, `victor-reyes` and `marco-bianchi`, and for exactly
+those three the row's own wording — "the cheapest tier that passes **its
+fixture**" — can never be satisfied: none has a fixture, and `lian-zhao`
+refuses by prompt to touch an agent that has none. PF-019 already states the
+principle this falls under: a row whose command can never go green is not a
+row.
+
+The two ways out are both worse than retiring. Building three fixtures to
+unblock a demotion is the headcount reflex rule 13 was retired for. Keeping the
+row on its current command is keeping a census — `grep '^model:'` prints a tier
+distribution, which is a fact, never a pass or a fail, and a command that
+cannot go red is the same defect as PF-001's.
+
+So the remainder is recorded here as a judgement, not carried as a task: three
+agents run on opus by assignment at creation time and nothing has tested a
+cheaper tier for them. That is a known property of the fleet, not an open item.
+It becomes a row again if and when one of the three gets a fixture — with that
+fixture, and not before. Kept per rule 21, carries no command or interval.
 
 ### PF-014 — `agents/` — RETIRED
 Same rule-13 retirement as PF-002: this row measured headcount-by-name
@@ -265,7 +304,6 @@ here rather than as a new row: it is a property of this row's surface, and a
 row whose command can never go green is not a row.
 ```bash
 grep -qE '^ROWS=\(.* release .*\)' tests/release_gate.sh && grep -c 'row_skip release' tests/release_gate.sh
-# → 2
 ```
 
 ### PF-020 — `tests/check.sh` Check 27 — VERIFIED
@@ -307,10 +345,21 @@ should not be read as such (that was the failure mode this amendment removed).
 grep -c '^### 18a\. Acquire only for the write step' PROJECT_RULES.md
 ```
 
-### PF-027 — `evals/cases/*/case.yaml`, `evals/run.sh` — VERIFIED
-```bash
-grep -c 'contested: true' evals/cases/zofia-004-seed-patch-established/case.yaml
-```
+### PF-027 — `evals/cases/*/case.yaml`, `evals/run.sh` — RETIRED
+
+Ground (a), covered, 2026-09-18. The row's command read
+`evals/cases/zofia-004-seed-patch-established/case.yaml`, which `124ee36`
+deleted when the fixture suite was cut 36→10; the command now errors rather
+than returning a count, so the VERIFIED state had stopped meaning anything.
+Both halves are gone as claims. `grep -rl 'contested: true' evals/cases/`
+matches nothing in the surviving ten, so "a contested case cites its sample
+count" has no instance to be true or false about — the sample-count mechanism
+itself lives in `evals/run.sh` (`CONTESTED_UNSETTLED`) and is exercised when a
+contested case next exists. The prompt-SHA half is PF-024's surface, verbatim:
+`run_record_sha` and the SHA-not-date comparison are what that row keeps true,
+and re-pointing this one at the same mechanism would put one claim on two rows,
+which is the failure Check 34 exists to prevent one file up. Kept per rule 21,
+carries no command or interval.
 
 ### PF-028 — `install.sh` — RETIRED
 
