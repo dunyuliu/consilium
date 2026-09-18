@@ -21,9 +21,10 @@ repo:
   that, and closed it.
 - **`tests/check.sh`** — the structural gate, numbered with retired checks
   keeping their numbers; every check negative-tested by breaking the thing it guards and confirming the intended
-  message. A check that has never failed is not known to be a gate. Checks 1–5
-  are the exception worth naming: they predated that convention by several
-  releases and were negative-tested retroactively, six mutations on 2026-08-04.
+  message. A check that has never failed is not known to be a gate. The
+  lowest-numbered checks are the exception worth naming: they predated that
+  convention by several releases and were negative-tested retroactively, six
+  mutations on 2026-08-04.
 - **`evals/cases/`** — regression fixtures covering a subset of the
   agents. Prompt edits are measurable instead of vibe-checked — but see the
   coverage figures below: most verdicts are older than the prompt they
@@ -684,12 +685,12 @@ dispatches.
 
 Most test *detection* — can the agent find a planted defect. A smaller set
 tests *refusal*, which is the harder half to write and the easier half to get
-wrong: `lars-002` is correct code where any invented finding fails; `lian-001`
-makes the tempting cut the one with no fixture; `dunyu-001` poses a request that
-is implementable and meaningless. Three more exist for the agents whose wrong
-move is irreversible — `anya-002` refuses to block a clean repository,
-`zofia-002` refuses to write a rule that already exists, `nadia-002` refuses to
-recommend a change when the agent under review was right.
+wrong: `lars-002` is correct code where any invented finding fails;
+`lian-002` grades a prompt edit that ships without a fixture; `dunyu-001` poses
+a request that is implementable and meaningless. Two more exist for the agents
+whose wrong move is irreversible — `anya-002` refuses to block a clean
+repository, and `nadia-002` refuses to recommend a change when the agent under
+review was right.
 
 Each case ships `samples/pass.md` and `samples/fail.md`, and Check 15
 grades both — a criterion that rejects a report written to satisfy it is a
