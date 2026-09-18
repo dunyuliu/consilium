@@ -175,6 +175,25 @@ Campaign context: 33,085 tracked lines at campaign start, 19,605 this morning,
 
 ## 9. CI run this release was gated on
 
+Run **`35405748621`**, conclusion **success**, on SHA
+`4f477d7cbce7450433e9a38b40323a47160e8b10` —
+https://github.com/dunyuliu/consilium/actions/runs/35405748621. This is the
+tag-push run; the commit-push run on the same SHA, **`35405677909`**
+(https://github.com/dunyuliu/consilium/actions/runs/35405677909), concluded
+**failure** on exactly and only the two rule-15a tag-absence assertions and
+nothing else, quoted verbatim from its log:
+
+```
+FAIL: release_notes_v1.27.0.md has no matching tag 'v1.27.0' — a release note with no tag is not a release (rule 15)
+FAIL: the root release note is 'release_notes_v1.27.0.md' but the newest tag is v1.26.0 — the current release's note belongs at the root and the older one in docs/ (rule 8)
+Summary: 738 passed, 2 failed
+```
+
+Both went green the moment the tag reached the remote, with no code change
+between the two runs — the same SHA, read twice. The tag was created only after
+that red was read line by line and tied to the missing tag; nothing else was
+failing.
+
 **Structural residue, stated rather than faked.** A release note cannot carry
 the id of the CI run for its own commit: the run does not exist until the note
 is committed and pushed, and the SHA it runs against is determined by the note's
@@ -191,10 +210,9 @@ here, and the rule-15a reading it satisfies:
    a **follow-up commit** on top of the tag, which is the only commit in this
    release that is not itself tagged.
 
-Until step 4 lands, this section's answer is: *the release commit's run was read
-and was green before the tag existed; its id is recorded by the follow-up commit
-whose subject begins `release note: v1.27.0`.* That is an absence on the record
-with its cause named, not a silence and not a guess.
+Step 4 has landed: the numbers at the head of this section were written by that
+follow-up commit, and the tagged version of this file carried the disclosure
+rather than a guess or a blank.
 
 ## 10. Trend since v1.26.0
 
@@ -270,20 +288,23 @@ gap. This section reports it; it does not gate on it.
 
 ## Release gate
 
-Same residue as §9, same treatment: `tests/release_gate.sh` cannot pass its
-`tree`, `publish`, `release` or `clone` rows until this commit is pushed and the
-tag and Release exist, so the rows it prints at the tag are transcribed by the
-follow-up commit named in §9. The gate **is** run — at the tag, after the
-Release is created, and its verdict decides whether this release stands. It is
-not run before this file is written, because it cannot be.
+`bash tests/release_gate.sh release_notes_v1.27.0.md` at the tag, after the
+GitHub Release was created: **5 passed, 0 failed, 0 skipped**, exit 0.
+Transcribed verbatim.
 
-- tree: transcribed by the follow-up commit — clean, one worktree, no lock,
-  level with upstream, all four confirmed by hand before this commit was made
-- ci: transcribed by the follow-up commit — green on the release commit,
-  confirmed before the tag was created (§9)
-- publish: transcribed by the follow-up commit — note version v1.27.0, tag
-  v1.27.0, pushed to origin and resolving to the release commit
-- release: transcribed by the follow-up commit — GitHub Release created from
-  this file with `gh release create --verify-tag`
-- clone: transcribed by the follow-up commit — fresh clone of the pushed tag,
-  running exactly what `README.md` documents
+- tree: PASS — clean, one worktree, no lock, level with upstream
+- ci: PASS — green on `4f477d7c` (run `35405748621`, the tag-push run)
+- publish: PASS — v1.27.0 pushed and pointing at `4f477d7c`
+- release: PASS — GitHub Release exists for v1.27.0,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.27.0
+- clone: PASS — fresh clone of v1.27.0; README's install block and its first
+  following command both exited 0
+
+`bash tests/check.sh` at the tag: `Summary: 799 passed, 0 failed` (796 at the
+pristine pre-release tree; the +3 are Check 35's per-tag Release assertions for
+v1.27.0 itself).
+
+The tagged version of this file carried five `transcribed by the follow-up
+commit` rows in place of these five; the follow-up commit named in §9 replaced
+them. No row was ever left blank, guessed, or written before the gate printed
+it.
