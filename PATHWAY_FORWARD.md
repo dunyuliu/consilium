@@ -39,18 +39,18 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-002 | `agents/` | ~~every agent has at least one eval fixture (rule 13)~~ — rule 13 retired 2026-09-17, headcount is no longer a claim this board makes | RETIRED | 2026-09-17 | — | — |
 | PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-17 | 14 | P2 |
 | PF-004 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
-| PF-005 | `docs/release_notes_*` | no divergence between a release note and its tag goes unrecorded (v1.10.0's known divergence stays recorded, uncorrectable per rule 8) | VERIFIED | 2026-09-16 | 30 | P3 |
+| PF-005 | `docs/release_notes_*` | ~~no divergence between a release note and its tag goes unrecorded~~ — retired 2026-09-18, ground (b): the command read a tag's immutable content and printed the same 6 forever; v1.10.0's divergence stays recorded in the block below | RETIRED | 2026-09-18 | — | — |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-17 | 14 | P2 |
-| PF-007 | `tests/check.sh` | the header comment's check count matches the checks that exist | VERIFIED | 2026-09-17 | 30 | P3 |
-| PF-008 | `tests/check.sh` | checks 1–5 have been negative-tested | VERIFIED | 2026-08-04 | 60 | P3 |
-| PF-009 | `agents/` | no agent prompt's body contradicts its own frontmatter or another agent's prompt | VERIFIED | 2026-09-17 | 30 | P3 |
-| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it | VERIFIED | 2026-09-18 | 60 | P3 |
-| PF-011 | `evals/cases/*/input/` | fixture inputs contain no undeclared real defects | VERIFIED | 2026-09-17 | 30 | P3 |
+| PF-007 | `tests/check.sh` | the header's live `Verifies:` entries are exactly the checks the body runs, by number | VERIFIED | 2026-09-18 | 30 | P3 |
+| PF-008 | `tests/check.sh` | ~~checks 1–5 have been negative-tested~~ — retired 2026-09-18, ground (b): a historical fact about one day's work, watched by a green-suite command that cannot go red for it | RETIRED | 2026-09-18 | — | — |
+| PF-009 | `agents/` | ~~no agent prompt's body contradicts its own frontmatter or another agent's prompt~~ — retired 2026-09-18, ground (b): one string in one of 22 files standing in for a fleet-wide semantic claim | RETIRED | 2026-09-18 | — | — |
+| PF-010 | `install.sh` | a clean-clone install works on a machine that has never run it, and the gate is green in that clone | VERIFIED | 2026-09-18 | 60 | P2 |
+| PF-011 | `evals/cases/*/input/` | ~~fixture inputs contain no undeclared real defects~~ — retired 2026-09-18, ground (b): the command counted case directories and nothing about it could go red for the reason the claim would go false | RETIRED | 2026-09-18 | — | — |
 | PF-012 | `agents/` | ~~no fleet-wide fixture-verdict staleness against the prompt it grades~~ — retired with PF-017 2026-09-18, ground (a): covered by production evidence, ceiling recorded | RETIRED | 2026-09-18 | — | — |
 | PF-013 | `agents/` | ~~every agent runs on the cheapest model tier that passes its fixture~~ — retired 2026-09-18, ground (b): unsatisfiable for the only three agents it has left, and the measurable part is done | RETIRED | 2026-09-18 | — | — |
 | PF-014 | `agents/` | ~~no agent is missing the fixture its name implies~~ — rule 13 retired 2026-09-17, same reason as PF-002 | RETIRED | 2026-09-17 | — | — |
 | PF-015 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12) and no residue of the retired byte-diff mechanism (Check 17) remains | VERIFIED | 2026-09-17 | 30 | P3 |
-| PF-016 | `.github/workflows/` | CI runs the same gate a developer runs, with the same result | VERIFIED | 2026-09-16 | 14 | P3 |
+| PF-016 | `.github/workflows/` | ~~CI runs the same gate a developer runs, with the same result~~ — retired 2026-09-18, ground (b): the command reached a checkout depth and never "the same result"; the divergence it meant to catch is inspected by PF-010's clone-and-run walk | RETIRED | 2026-09-18 | — | — |
 | PF-017 | `agents/` | ~~fixtures exist for the autopilot cycle, the release gate and zofia's patch path, and have been dispatched~~ — retired with PF-012 2026-09-18, ground (a): v1.23.0's stranger-clone, CI-green release is the behavioural evidence a fixture would only approximate | RETIRED | 2026-09-18 | — | — |
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-16 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-09-17 | 30 | P3 |
@@ -100,6 +100,23 @@ decided to remove. None of that was found by waiting — it was found by
 reading each row against what it actually catches. A row earns its place by
 returning something on re-check, not by having once seemed important.
 
+**Sixth pass, 2026-09-18 — read what a command reaches, not what it returns.**
+0 P1 / 3 P2 / 11 P3 across 14 live rows, plus 21 RETIRED. Five rows retired on
+ground (b), all the same defect and none of it visible from a row's state: the
+command returned something, so the row was green, but nothing it read could
+change for the reason the claim would go false. PF-011 counted directories,
+PF-016 read a checkout depth, PF-005 read a tag's immutable content, PF-009
+grepped one sentence in one of 22 files for a fleet-wide semantic claim, and
+PF-008 borrowed PF-006's green suite to stand for a mutation run once in
+August. **A frozen command is a record, not an inspection** — it cannot go red,
+so re-running it is reading a receipt. PF-007 had the same one-sided shape and
+is repaired rather than retired, because the claim is worth keeping and a
+two-sided command exists. PF-010 is extended, not duplicated: it now runs the
+gate inside the clone it already makes, and rises to P2 as the only row on this
+board whose command has ever gone red for a real defect. **Nothing was added** —
+no row, no rule, no check. Five rows left and none arrived; 14 live against 35
+ever opened.
+
 ## Items
 
 Each item names its command; run it to close or re-check the row. Full prior
@@ -139,13 +156,17 @@ instrument (a grader) checking a soft instrument (a grader). That is
 judgement-simulation, not a mechanism; there is no reverse check to build. Kept
 per rule 21, carries no command or interval.
 
-### PF-005 — `docs/release_notes_*` — VERIFIED
-Claim deliberately narrowed 2026-08-05 from "matches the tag" (false forever
-for v1.10.0, uncorrectable under rule 8) to "no divergence goes unrecorded."
-v1.10.0's six undisclosed `anya-001` files stay recorded here, permanently.
-```bash
-git show --stat v1.10.0 --name-only | grep -c anya-001
-```
+### PF-005 — `docs/release_notes_*` — RETIRED
+
+Ground (b), never bound, 2026-09-18. The command read `v1.10.0`, an immutable
+tag: it printed `6` on every pass since 2026-08-05 and will print `6` forever,
+so the row could not go red for the reason the claim would go false — it was a
+record wearing an inspection's clothes. `anya-001` is not among the ten
+surviving fixtures either, so the string it counted no longer names anything
+live. **The disclosure itself is not retired, only the pretence of re-checking
+it**: v1.10.0 shipped six undisclosed `anya-001` files, that divergence is
+uncorrectable under rule 8, and this block is where it stays recorded. Kept per
+rule 21, carries no command or interval.
 
 ### PF-006 — `tests/check.sh` — VERIFIED
 Green means the checks pass, not that the repo is correct (PF-008).
@@ -155,27 +176,51 @@ bash tests/check.sh | tail -1
 ```
 
 ### PF-007 — `tests/check.sh` — VERIFIED
-No longer self-maintaining now that Check 17 is retired (PF-015) — recheck on
-interval like any other row. 32 checks as of the v1.23.0 cut.
+
+**Repaired 2026-09-18, not retired.** The claim is worth keeping and was true;
+the command was one-sided. `grep -c '^echo "Check'` counted the body alone, so
+a header naming a check the body had dropped — or a body running one the header
+never names — was invisible to it, which is the whole of what the row claims to
+watch. The replacement compares the two sides by number: the header's live
+`Verifies:` entries (entries marked retired excluded, they are deliberate gaps)
+against the check numbers the body actually echoes. It reddens on either side
+moving alone, which is what must remain true rather than what happens to be
+true today.
+
+Run 2026-09-18 at HEAD: `header and body agree: 32 live checks` — 36 header
+entries, 4 marked retired, 32 live, matching the body. Exit 0; a mismatch
+prints the diff and exits 1.
 ```bash
-grep -c '^echo "Check' tests/check.sh
+diff <(sed -n '/^# Verifies:/,/^# Checks 6 and 7/p' tests/check.sh | grep -oE '^# +[0-9]+\. \(retired|^# +[0-9]+\.' | grep -v retired | grep -oE '[0-9]+') <(grep -oE '^echo "Check [0-9]+' tests/check.sh | grep -oE '[0-9]+') && echo "header and body agree: $(grep -c '^echo "Check' tests/check.sh) live checks"
 ```
 
-### PF-008 — `tests/check.sh` — VERIFIED
-Closed 2026-08-04: six mutations run against checks 1–5, each produced its
-intended failure message, each restored.
-```bash
-bash tests/check.sh | tail -1
-```
+### PF-008 — `tests/check.sh` — RETIRED
 
-### PF-009 — `agents/` — VERIFIED
-Closed 2026-09-17 (`sophia-okafor`): all 22 prompts read against three
-questions — description-vs-body, cross-prompt contradiction, stale claims.
-One drift found and fixed (`agents/wei-lin.md`'s description vs. its `:248`
-delegation). Point-in-time; nothing re-checks this mechanically between reads.
-```bash
-grep -c "Commissions and enforces project rules" agents/wei-lin.md
-```
+Ground (b), never bound, 2026-09-18. The claim is a historical fact — on
+2026-08-04 six mutations were run against checks 1–5, each produced its
+intended failure message, each was restored — and a fact about one day's work
+cannot come due again. Worse, the command watching it was
+`bash tests/check.sh | tail -1`, which is PF-006 verbatim: a green suite says
+nothing about whether any mutation was ever run, so the row was green on
+another row's evidence. The record of the negative-testing stays here; the
+standing obligation that every new check be negative-tested when added is
+stated in `tests/check.sh`'s own header, not re-asked by a board row. Kept per
+rule 21, carries no command or interval.
+
+### PF-009 — `agents/` — RETIRED
+
+Ground (b), never bound, 2026-09-18. The claim is fleet-wide and semantic — no
+prompt contradicts its own frontmatter or another prompt — and the command was
+`grep -c` for one sentence in one of 22 files. It could only ever have gone red
+if that one description line changed, which is not the failure the claim
+describes. It came within an hour of demonstrating this: `agents/wei-lin.md`
+was slimmed 555→512 lines in `c387444` and the counted string survived by luck,
+not because the claim held. The row's real content was the 2026-09-17 read by
+`sophia-okafor` — all 22 prompts against three questions, one drift found and
+fixed in `agents/wei-lin.md` — which is dated judgement work, not a standing
+claim a command settles. `CLAUDE.md` already names reading a prompt for sense
+as `lian-zhao`'s job and explicitly outside the gate. Kept per rule 21, carries
+no command or interval.
 
 ### PF-010 — `install.sh` — VERIFIED
 Re-pointed 2026-09-18. The old command grepped `CLAUDE=${HOME}/.claude` out of
@@ -193,18 +238,44 @@ developer's `HOME`. Verified 2026-09-18 by `wei-lin` against a stranger clone
 of `https://github.com/dunyuliu/consilium.git` at `31660df` under a sandboxed
 `HOME`: `consilium installed: 22 agents, 19 commands, 1/1 hooks wired`, exit 0,
 22 symlinks, and `bash tests/check.sh` green in that clone.
+
+**Extended 2026-09-18 — the gate now runs inside the clone.** The fresh-clone
+walk is the only source still catching defects the in-checkout gate cannot see,
+and today it caught one: at the pre-fix commit, `bash tests/check.sh` in a plain
+clone printed `778 passed, 28 failed` while the same commit printed
+`806 passed, 0 failed` in the maintainer's checkout — Check 35 was resolving
+GitHub Releases through a non-GitHub origin (fixed in `227bf9e`). That
+divergence was found because somebody thought to clone, which is not an
+interval. Running the gate inside the clone this row already makes puts it on
+one, for one line. It is an extension of this row and not a second row: the
+claim was always about what a stranger's machine does, and an install that
+links 22 symlinks into a clone whose gate is red is not a working clone.
+
+Run 2026-09-18 in this worktree, literal output: `consilium installed: 22
+agents, 19 commands, 1/1 hooks wired`, then `22`, then
+`Summary: 806 passed, 0 failed`; exit 0. Raised to P2: it is the only row whose
+command has ever gone red for a real defect, and 60 days is already the
+longest interval on the board's one live detector.
 ```bash
 d=$(mktemp -d)
 git clone -q "$(git rev-parse --show-toplevel)" "$d/clone"
 (cd "$d/clone" && HOME="$d/home" bash install.sh)
 ls "$d/home/.claude/agents" | wc -l
+(cd "$d/clone" && bash tests/check.sh | tail -1)
 rm -rf "$d"
 ```
 
-### PF-011 — `evals/cases/*/input/` — VERIFIED
-```bash
-ls evals/cases | wc -l | tr -d ' '
-```
+### PF-011 — `evals/cases/*/input/` — RETIRED
+
+Ground (b), never bound, 2026-09-18. The command was `ls evals/cases | wc -l`:
+it counts case directories, so it reddens when a fixture is added or cut — the
+36→10 cut would have tripped it — and never when an input acquires a real
+defect nobody declared. Nothing it reads can change for the reason the claim
+would go false. The claim as written also needs a reader: whether a defect in
+an input is undeclared is a comparison of prose to prose. The two mechanizable
+neighbours already exist and are not this row — Check 18 (no answer-key
+language in an input) and Check 26 (no generated artefact written into one).
+Kept per rule 21, carries no command or interval.
 
 ### PF-012 — `agents/` — RETIRED
 
@@ -268,10 +339,17 @@ is a standing claim a command can settle, and drops to P3 accordingly.
 grep -c 'section=evidence' tests/check.sh
 ```
 
-### PF-016 — `.github/workflows/` — VERIFIED
-```bash
-grep -c '^ *fetch-depth: 0$' .github/workflows/check.yml
-```
+### PF-016 — `.github/workflows/` — RETIRED
+
+Ground (b), never bound, 2026-09-18. `grep -c '^ *fetch-depth: 0$'` reaches the
+checkout depth of the CI job and stops there. The load-bearing half of the
+claim — *with the same result* — was never touched by it, and a workflow that
+fetched full history while running a different command, or no command, would
+have kept this row green. The half that can be inspected on an interval is
+checkout-versus-clone divergence, and PF-010 now runs the gate inside the clone
+it already makes; the half that cannot is whether GitHub's runner agrees with a
+developer's box, which only a real CI run reports and which reports itself,
+red, on every push. Kept per rule 21, carries no command or interval.
 
 ### PF-017 — `agents/` — RETIRED
 
