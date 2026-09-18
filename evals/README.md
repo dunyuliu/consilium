@@ -1,10 +1,18 @@
 # Evals
 
-Small, hand-crafted fixtures for regression-testing the agents.
+Small, hand-crafted fixtures. **What this suite is, measured against what it
+has actually caught:** a lint for criteria and a smoke test for the harness.
+Every defect it has ever found was a defect in the eval system itself — an
+answer-key leak that reshaped `run.sh`'s isolation, a criterion that rejected a
+correct report, a `cmd_grade` false positive, three rounds of grader repair.
+Not one was a defect in an agent, and it cannot become one: grading is
+substring matching on prose, a verdict costs a human pasting a staged prompt
+into a live session, and two dispatches of one prompt to one agent have
+produced different judgements, so every verdict is n=1. Agent quality is
+judged by the humans and agents who read the work, not here.
 
-The point: when you tighten a prompt in `agents/lars-eriksson.md`, you should
-be able to tell whether the change helped or hurt. Without fixtures, every
-prompt edit is a vibes-based diff.
+That is worth keeping. A criterion that cannot be satisfied by a correct report
+is a real bug, and nothing else in this repo can find one.
 
 ## What lives here
 
@@ -254,36 +262,38 @@ will honour it. `dunyu-001` carried `tier: dev` from its authoring and nothing
 ever acted on it.
 
 Membership is **fixed**, not selected by staleness — a tier whose membership
-moves with history cannot be compared across edits. The nine members are the
-five original fast cases plus the three refusal controls and the clean control,
-which are the cases most likely to break when a prompt is edited: an edit that
-makes an agent keener breaks a refusal case before it breaks a detection one.
+moves with history cannot be compared across edits. The members are the
+original fast cases plus the refusal controls and the clean control, which are
+the cases most likely to break when a prompt is edited: an edit that makes an
+agent keener breaks a refusal case before it breaks a detection one.
 
-`smoke` prints each member's baseline state, and that is not decoration. As of
-2026-08-05 **seven of the nine have no verdict against the current prompt** —
-four never run, three stale. A green smoke run means "these cases pass today",
-not "nothing regressed", because for seven of them there is nothing to have
-regressed from.
+`smoke` prints each member's baseline state, and that is not decoration. A
+green smoke run means "these cases grade as recorded today", not "nothing
+regressed".
 
-## Scoring the suite
+## Verdict currency
 
 `bash evals/run.sh score` emits one number:
 
 ```
-suite trustworthiness: 4/29 verdicts current (13%)
-  stale (prompt changed since the run): 16
-  never run:                            9
-  delta vs previous commit: (no earlier row)
+verdict currency: 3/9 verdicts recorded against the current prompt (33%)
+  (currency only — this says nothing about agent quality; it falls whenever a prompt improves)
 ```
 
-**What it measures, exactly**: the fraction of cases whose recorded verdict still
-describes the prompt that case currently grades. It is a trustworthiness score
-for the *suite*, not a quality score for the *agents*, and the distinction is the
-whole point — at 13% the honest reading is that six verdicts in seven describe an
-agent that no longer exists in that form.
+**What it measures, exactly**: the fraction of cases whose recorded verdict
+still describes the prompt that case currently grades. That is all. It is not a
+quality score for the agents and never was one — see the top of this file for
+what this suite has actually caught.
 
-**Why it is not a quality score.** That would require the agents to be run, and
-`run.sh` deliberately does not invoke them. The only stored outputs are
+**It is not debt and it is not a target.** A verdict goes stale the moment its
+prompt improves, so the number falls when the work goes well and rises when the
+prompts sit still. Raising it means paying a human to re-paste staged prompts
+into live sessions, which buys currency of a measurement that was never
+load-bearing. It was never above 30% and there is no reading of the project
+under which that is a problem to fix.
+
+**Why it cannot become a quality score.** That would require the agents to be
+run, and `run.sh` deliberately does not invoke them. The only stored outputs are
 `samples/pass.md` and `samples/fail.md`, which the fixture author wrote to prove
 the criteria execute; grading those measures the criteria. Any score built on
 them would move only when somebody edited a sample — a number that looks like

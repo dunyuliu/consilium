@@ -162,7 +162,7 @@ published release and version control, and the rule book followed.
   claim that every agent is covered by one. **Most agent behaviour is
   now unmeasured, and rests on the judgement of whoever reviews the
   prompt.** The machinery to measure — `evals/run.sh`, the grader,
-  Check 30's keyword corpus — is kept intact and works at ten cases
+  Check 30's keyword corpus — is kept intact and works at nine cases
   exactly as it did at thirty-six, so the method is available when a
   question is worth the dispatch. It is now used on purpose rather
   than by mandate.

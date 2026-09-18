@@ -237,9 +237,19 @@ cmd_stage() {
     echo "STRICT: read-only — do not create, edit, or delete anything there."
     echo
     echo "--- agent ---"
-    grep -m1 '^agent:' "$dir/case.yaml" | sed 's/^agent: *//'
+    local agent; agent="$(grep -m1 '^agent:' "$dir/case.yaml" | sed 's/^agent: *//')"
+    echo "$agent"
     echo
     echo "Then: bash evals/run.sh grade $id <report-file>"
+    echo
+    # Rule 25d. The prompt SHA is knowable exactly here, at dispatch, and
+    # nowhere afterwards: once the prompt moves, a verdict recorded without one
+    # can only be compared by DATE, which cannot order a same-day edit against
+    # a same-day run. Printing the record line with the SHA already in it is
+    # the whole fix — nine of ten existing verdicts fall back to the date
+    # because nobody had the SHA in front of them when they wrote the record.
+    echo "--- paste this into the case's notes: when you have a verdict (rule 25d) ---"
+    echo "  Run ($(date -u +%Y-%m-%d), via $agent, prompt $(agent_current_sha "$agent")): VERDICT - N criteria, M failed."
 }
 
 # --- grade -----------------------------------------------------------------
@@ -537,8 +547,15 @@ cmd_list() {
 # the one before it instead of argued about.
 #
 # WHAT IT MEASURES, EXACTLY: the fraction of cases whose recorded verdict still
-# describes the prompt that case currently grades. Nothing else. It is a
-# TRUSTWORTHINESS score for the suite, not a quality score for the agents.
+# describes the prompt that case currently grades. Nothing else. It says
+# nothing about whether any agent is good — see evals/README.md on what this
+# suite has actually caught.
+#
+# IT IS NOT DEBT AND NOT A TARGET. A verdict goes stale the moment its prompt
+# is improved, so the number falls when the work goes well and rises when the
+# prompts sit still. Raising it means paying a human to re-paste staged prompts
+# into live sessions, which buys currency of a measurement that was never
+# load-bearing. Report it; do not chase it.
 #
 # WHAT IT CANNOT MEASURE, AND WHY. Scoring agent quality would need the agents
 # run, and this script deliberately does not invoke them (see the header: that
@@ -613,15 +630,16 @@ cmd_score() {
             "$today" "$commit" "$current" "$stale" "$never" "$total" "$pct" >> "$results"
     fi
 
-    echo "suite trustworthiness: $current/$total verdicts current (${pct}%)"
+    echo "verdict currency: $current/$total verdicts recorded against the current prompt (${pct}%)"
+    echo "  (currency only — this says nothing about agent quality; it falls whenever a prompt improves)"
     echo "  stale (verdict names a prompt SHA that no longer matches):  $stale"
     echo "  never run:                                                 $never"
     echo "  unknown provenance (legacy verdict, no prompt SHA, rule 25d): $unknown"
     echo "  contested, not settled on a single current-SHA sample:     $contested_unsettled"
     if [ -n "$prev_pct" ]; then
         delta=$(( pct - prev_pct ))
-        if   [ "$delta" -gt 0 ]; then echo "  delta vs previous commit: +${delta} points"
-        elif [ "$delta" -lt 0 ]; then echo "  delta vs previous commit: ${delta} points"
+        if   [ "$delta" -gt 0 ]; then echo "  delta vs previous commit: +${delta} points (not a goal)"
+        elif [ "$delta" -lt 0 ]; then echo "  delta vs previous commit: ${delta} points (expected after a prompt edit)"
         else                          echo "  delta vs previous commit: unchanged"
         fi
     else
