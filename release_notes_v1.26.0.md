@@ -173,11 +173,29 @@ What the audit confirmed, with evidence:
 
 ## CI
 
-**The run this release is gated on:** run `35400999575`,
-https://github.com/dunyuliu/consilium/actions/runs/35400999575, conclusion
+**The run this release is gated on:** run `35401993371`,
+https://github.com/dunyuliu/consilium/actions/runs/35401993371, conclusion
 `success`, workflow `structural-invariants`, SHA
-`b662eca0e1e330e2d06604fac20cb21c278abcfc` — already green on the exact
-pre-release-commit HEAD before this note or the tag existed, run on push.
+`fa6f818cb286e9843c7b2e68a872df73aa496fdf` — the release commit, triggered
+by the tag push.
+
+**The commit-push run on the same SHA was red, on tag absence and nothing
+else.** Run `35401958229`,
+https://github.com/dunyuliu/consilium/actions/runs/35401958229, conclusion
+`failure`, 750 passed / 2 failed, both assertions reading:
+
+1. `release_notes_v1.26.0.md has no matching tag 'v1.26.0'` (rule 15,
+   Check 27)
+2. `the root release note is 'release_notes_v1.26.0.md' but the newest tag
+   is v1.25.0` (rule 8, Check 31)
+
+One cause — `v1.26.0` was not yet on the remote when that run read the
+refs — named here per rule 15a, the same pair v1.23.0 through v1.25.0
+named. Both went green on the tag-push run with no other change. Separately
+and unrelated to the tag-absence pair: the pre-release-commit HEAD
+(`b662eca`) was itself already green on push, run `35400999575`, before
+this note or the tag existed — the ordinary development-branch signal, not
+the gate this release is cut against.
 
 ## Trend since v1.25.0
 
@@ -245,10 +263,14 @@ open issues section), not closed.
 ## Release gate
 
 `bash tests/release_gate.sh release_notes_v1.26.0.md`, run with HEAD at the
-tagged commit and the remote in agreement.
+tagged commit `fa6f818c` and the remote in agreement: **5 passed, 0 failed, 0
+skipped.** Transcribed verbatim (re-run after this agent released its own
+`tests/lock.sh` hold, which the first run correctly flagged as a held lock):
 
-- tree: (transcribed below, verbatim)
-- ci: (transcribed below, verbatim)
-- publish: (transcribed below, verbatim)
-- release: (transcribed below, verbatim)
-- clone: (transcribed below, verbatim)
+- tree: PASS — clean, one worktree, no lock, level with upstream
+- ci: PASS — green on `fa6f818c` (run `35401993371`, the tag-push run)
+- publish: PASS — v1.26.0 pushed and pointing at `fa6f818c`
+- release: PASS — GitHub Release exists for v1.26.0,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.26.0
+- clone: PASS — fresh clone of v1.26.0; README's install block and its
+  first following command both exited 0
