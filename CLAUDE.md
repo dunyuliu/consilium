@@ -37,16 +37,18 @@ after the prompt changed.
 1. **Take the lock** if the change is mutating and spans files:
    `export CONSILIUM_LOCK_OWNER=<you>`, then
    `bash tests/lock.sh acquire "<what>" <path-prefix>…`. The path prefixes are
-   the scope guard — the pre-commit hook refuses anything staged outside them,
-   which is what stops a `git add -A` from swallowing another writer's
-   half-finished work. A lock is never auto-cleared, however stale it looks
-   (rule 18).
+   the scope guard — but nothing enforces them. The pre-commit hook that
+   refused out-of-scope staging was removed with the rest on 2026-09-17, so
+   the lock is a label one writer leaves for another and a `git add -A` will
+   still swallow a neighbour's half-finished work. A lock is never
+   auto-cleared, however stale it looks (rule 18).
 2. **Edit one surface.** Rule 19's table says which agent owns which; rule 1
    says keep the edit small and prefer sharpening a rule to adding one.
 3. **Fixture before fix** for anything an agent actually got wrong (rule 10).
    A prompt edit with no fixture is an opinion about behaviour.
-4. **Run the gate locally, then smoke** (rule 9). The pre-push hook runs the
-   gate anyway; `--no-verify` is a deliberate act, not a shortcut.
+4. **Run the gate locally, then smoke** (rule 9). Nothing runs it for you —
+   the pre-push hook is gone, so CI is the first thing that will disagree
+   with you, and it disagrees after the push rather than before.
 5. **Move the docs in the same commit** (rule 11). A new agent owes a README
    roster row, a model-table row, a Layout line (rule 12) and a fixture that
    names it only where that fixture would distinguish something — rule 13's
