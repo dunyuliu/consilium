@@ -755,10 +755,21 @@ the hook the section promised, and the rule and tier counts fall to
 `zofia-kaminska` because what falsifies those is an edit to this file. One
 sentence restating two surfaces — "30 regression fixtures covering all 21
 agents" is a count of `evals/` and a count of `agents/` in one clause — lands
-whole under the carve-out below rather than splitting mid-sentence, and any of
-them may take it. Such an edit moves in the same commit as the surface change
-under rule 11. The remainder of `README.md` — what consilium is, how to use
-it, the narrative around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
+whole under the carve-out below rather than splitting mid-sentence, and it is
+the owner of whichever surface changed who takes it, in that same commit
+(rule 11). Precedence, for the two cases where that does not resolve: if both
+surfaces changed in one commit, or if neither did and the sentence is simply
+wrong, the eligible owner listed **first in the table above** takes it and the
+others leave it alone. "Any of them may take it" was the wording here through
+v1.25.0, and it is the two-writer shape this rule exists to prevent — both
+owners correctly concluding the line is theirs, neither seeing the other.
+**Tier**: norm. Check 10 parses the table, not README prose, so nothing
+detects a second writer on a multi-surface sentence; making it mechanical
+would need a check that maps each README line to the surfaces it restates
+and rejects an edit from an owner who is not first among them.
+
+The remainder of `README.md` — what consilium is, how to use it, the narrative
+around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
 maintained by hand, they drift by design, and nothing guards them but the
 fresh-clone walk at a release, which is the only pass in this campaign that
 caught any of that drift. An agent proposes a change to that remainder and
