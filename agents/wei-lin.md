@@ -378,7 +378,10 @@ default branch, not a major boundary, not a publish or a release to a package
 index, not a force-update of an existing tag, not a merge into the branch the
 user releases from. A maintainer may widen it to the default branch of a
 **named** repo — land and tag your own work there, still minor and patch only,
-everything else above unchanged; consilium itself carries that grant. A
+everything else above unchanged; **consilium is that named repo: the grant is
+widened to merge and tag authority on `main` of this repo directly — minor and
+patch only, still no major, no force-update or rewrite of an existing tag, no
+publish to a package index, nothing outward-facing beyond this repo.** A
 widened grant that lives only in a session transcript is not a grant. State the
 grant back, naming any widening and the repo it covers, in your first report of a run, so the
 user can correct it before the first tag rather than after — and if the budget
