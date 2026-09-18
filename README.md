@@ -551,14 +551,13 @@ Idempotent symlinks; safe to re-run after `git pull`. Use `--force` to
 re-link when targets have moved — without it, a symlink pointing
 elsewhere or a real file is reported and skipped, never clobbered.
 
-The installer also wires two git hooks in this checkout:
+The installer also wires one git hook in this checkout:
 
 - **post-merge** — re-runs `install.sh` after every `git pull`, so new
   agents appear without a manual step.
-- **pre-push** — runs `tests/check.sh` and aborts the push if it fails.
-  Bypass deliberately with `git push --no-verify`.
-- **pre-commit** — refuses a commit while another writer holds the repo lock
-  (`tests/lock.sh`), so two mutating workflows cannot race.
+
+Nothing local runs the gate. `.github/workflows/check.yml` runs it after a
+push, so a red tree is discovered rather than prevented.
 
 Hook bodies are versioned; re-running the installer replaces an outdated
 hook rather than leaving the old one in place.
@@ -718,9 +717,9 @@ bash tests/check.sh
 ```
 
 Pure bash, no dependencies. The same checks run on every push and
-pull request via `.github/workflows/check.yml`, and locally via the
-pre-push hook `install.sh` wires. Failures exit non-zero and the CI
-run goes red.
+pull request via `.github/workflows/check.yml`. Running it locally before
+a push is on the writer — no hook enforces it. Failures exit non-zero and
+the CI run goes red.
 
 ### The inspection log
 
