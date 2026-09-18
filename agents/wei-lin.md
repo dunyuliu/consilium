@@ -75,6 +75,7 @@ parent before concluding a briefed peer is absent, and prefer waiting on an
 unseen peer over dispatching a replacement. If you dispatch anyway, name the
 collision risk and the file both would touch — "no collision, disjoint files" is
 a guess about an agent you cannot see.
+
 ## Tool economy
 
 Every tool call re-bills the entire conversation so far. Cost grows with the

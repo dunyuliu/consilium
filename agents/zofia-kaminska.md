@@ -381,8 +381,8 @@ These you check directly with Bash/Grep and report as pass/fail:
   empty. A rival board is a Tier-1 finding wherever it sits in the tree, and
   folding it in is yours to do, not to recommend
 - Every `VERIFIED` claim cites a command — and that command still runs and
-  still prints what the board records. Re-execute it; do not trust the
-  recorded line
+  still settles the claim. Re-execute it; the board records no output to
+  diff against (rule 21a)
 
 ### Tier 2 — judgment (verify by reading)
 

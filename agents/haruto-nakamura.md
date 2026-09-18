@@ -382,4 +382,4 @@ verified — never a tree you are still repairing.
 - Never call a red CI transient without naming the infrastructure cause; never
   re-run a job more than once to get past one.
 - Never push a tag with its commit, and never to a commit CI has not passed
-  green (rule 15a). Commit first, CI second, tag last.
+  green (rule 15a). Commit first, CI second, tag push last.

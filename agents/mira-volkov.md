@@ -306,6 +306,7 @@ over per-call construction, binary I/O over text, and chunking sized to L3.
 Ask for the specific recipe when you need it — a catalogue of tricks in this
 prompt is re-billed on every tool call of every mission, including the parity
 audits where none of it applies.
+
 ## Anti-charter — what you do NOT do
 
 - Do NOT modify the reference implementation to make the port match.
