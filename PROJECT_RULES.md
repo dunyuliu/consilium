@@ -301,7 +301,10 @@ hooks it wires and the gate they run (the Install and CI sections). A README
 still promising a `pre-push` hook that `86f4b5d` removed is the same defect as
 a stale model row, and it went unrouted because this rule named only prompts.
 Never as a follow-up. README prose that restates another surface is owned by
-that surface's owner, not by the human (rule 19).
+that surface's owner, not by the human (rule 19's table) — and that ownership
+does not lapse between changes: a README line that is *already* false with
+nobody currently touching its surface is that same owner's to repair when it is
+reported, not the reporter's and not the human's.
 
 **How to apply**: `grep -n <agent-name> README.md` before you call an agent
 change done, and re-read the count in the opening paragraph; for a change to
@@ -721,6 +724,8 @@ the machine-readable source of truth, not documentation of one.
 | `agents/*.md` (the prompts themselves) | `lian-zhao` |
 | `commands/*.md` (trigger wrappers invoking those prompts) | `lian-zhao` |
 | `install.sh` (the installer, and the git hooks it wires) | `iris-vermeulen` |
+| `README.md` rows and counts restating `agents/` or `commands/` | `lian-zhao` |
+| `README.md` rows and counts restating `tests/`, `evals/` or the installer | `iris-vermeulen` |
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
@@ -738,13 +743,18 @@ gate infrastructure, the same class as `tests/lock.sh`, already hers — while
 `install.sh`'s symlink half carries no prompt content and so is not
 `lian-zhao`'s.
 
-**Human-owned surfaces — and the half of `README.md` that is not.** README
-prose that restates another surface is owned by that surface's owner and moves
-in the same commit under rule 11: the model-roster line is `lian-zhao`'s,
-because what falsified it was `agents/nadia-hadid.md`'s frontmatter, and the
-Install section is `iris-vermeulen`'s, because what falsified it was
-`install.sh` no longer wiring the hook the section promised. The carve-out
-below is how such an edit lands in one commit without a red window. The
+**Human-owned surfaces — and the half of `README.md` that is not.** The two
+`README.md` rows above are the whole statement of who owns a README line; this
+paragraph explains them and does not extend them. They split on *what would
+falsify the line*: the model-roster and headline counts fall to `lian-zhao`
+because what falsified them was `agents/nadia-hadid.md`'s frontmatter, the
+Install and CI sections and every check or fixture count fall to
+`iris-vermeulen` because what falsified those was `install.sh` no longer wiring
+the hook the section promised. One sentence restating two surfaces — "30
+regression fixtures covering all 21 agents" is a count of `evals/` and a count
+of `agents/` in one clause — lands whole under the carve-out below rather than
+splitting mid-sentence, and either owner may take it. Such an edit moves in the
+same commit as the surface change under rule 11. The
 remainder of `README.md` — what consilium is, how to use it, the narrative
 around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
 maintained by hand, they drift by design, and nothing guards them but the
