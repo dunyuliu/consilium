@@ -56,10 +56,11 @@ after the prompt changed.
    carrying its tier. A new
    check owes the `Verifies:` list in the header of `tests/check.sh` and the
    board row that counts them.
-6. **Close the board row you touched**: run its command, paste the literal
-   stdout on the `# →` line, set the date (rule 21a). Check 17 re-runs every
-   board command on every suite run and byte-diffs the result, so a date bump
-   without a run reddens the gate the same day.
+6. **Close the board row you touched**: run its command, set the date, and
+   write the command so it asserts what must remain true rather than what is
+   true today (rule 21a). No `# →` output line, and nothing re-runs the command
+   for you — Check 17 did until 2026-09-17 and is retired. A date bumped
+   without a run is invisible to the gate; it rests on you.
 
 ## What the gate cannot see
 

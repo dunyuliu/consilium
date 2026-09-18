@@ -741,13 +741,13 @@ interval. Deferring is legitimate and costs one line in the deferral log with
 a reason; letting an inspection lapse silently is not. The gate reddens on an
 undecided item, never on a date alone.
 
-Check 12 verifies that a `VERIFIED` claim *cites* a command. Check 17 runs it:
-every fenced evidence command is executed on every suite run and byte-diffed
-against its recorded `# →` output, so a row cannot be date-bumped without being
-re-derived. On its first run five of thirteen rows had drifted — including two
-whose recorded "literal stdout" was only the first line of a multi-line output.
-Commands must be one line; rows whose command is `bash tests/check.sh` are named
-and skipped rather than silently dropped (rule 21a).
+Check 12 verifies that a `VERIFIED` claim *cites* a command. Nothing runs it.
+Check 17 did — every fenced command executed on every suite run and byte-diffed
+against a recorded `# →` output — and it was retired on 2026-09-17 with rule
+21a, because a recorded output pins whatever happened to be true the day it was
+pasted and reddens on a legitimate change. What remains is that a row names the
+command that would settle it, and that whoever re-checks the row on its
+interval runs that command. Whether they did is not mechanized (rule 21a).
 
 Add new structural checks to `tests/check.sh` when they cost less
 than the rule they enforce. `iris-vermeulen`'s default applies here
