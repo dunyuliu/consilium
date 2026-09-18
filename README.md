@@ -1,13 +1,13 @@
 # Consilium
 
 > An AI specialist team to accelerate scientific innovation — and the
-> test suite that keeps it honest. Twenty-one agents that build, port,
-> audit, review and ship scientific software; thirty regression
-> fixtures and thirty-three structural checks that measure whether they
+> test suite that keeps it honest. Twenty-two agents that build, port,
+> audit, review and ship scientific software; ten regression fixtures
+> and thirty-two structural checks that measure whether they
 > actually did. Most collections of prompts are a wish. This one carries
 > the evidence.
 
-Twenty-one specialists organised into three teams and a quality bench,
+Twenty-two specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
 Claude Code; installs by symlink and follows you across machines.
 
