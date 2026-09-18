@@ -169,6 +169,31 @@ linked_count() {
     done
     echo "$n"
 }
-echo "consilium installed: $(linked_count "$CLAUDE/agents") agents, $(linked_count "$CLAUDE/commands") commands"
+
+# Hooks live in $ROOT/.git/hooks, which only exists when $ROOT/.git is a real
+# directory (a normal checkout). In a linked worktree, .git is a FILE pointing
+# at the main checkout's git-dir, so that path never exists, zero hooks get
+# wired, and a script that reported plain success hid it: an agent pushed with
+# no pre-push gate and deleted 548 of 549 lines from agents/wei-lin.md on main.
+# Incident: 2026-09-17. Local hooks stay checkout-only by deliberate decision
+# (commit 56ec728, scheduled for removal) — this does not resolve the real
+# hooks dir for a worktree, it only stops the script from lying about it.
+hooks_wired=0
+[ -e "$ROOT/.git/hooks/post-merge" ] && hooks_wired=$((hooks_wired + 1))
+[ -e "$ROOT/.git/hooks/pre-push" ]   && hooks_wired=$((hooks_wired + 1))
+[ -e "$ROOT/.git/hooks/pre-commit" ] && hooks_wired=$((hooks_wired + 1))
+if [ ! -d "$ROOT/.git/hooks" ]; then
+    echo "no hooks wired: $ROOT/.git is a file, not a directory (linked worktree)" >&2
+    echo "  — hooks live in the main checkout; run install.sh there instead" >&2
+fi
+
+agents_linked=$(linked_count "$CLAUDE/agents")
+commands_linked=$(linked_count "$CLAUDE/commands")
+echo "consilium installed: $agents_linked agents, $commands_linked commands, $hooks_wired/3 hooks wired"
 [ "$skipped" -gt 0 ] && echo "$skipped item(s) skipped — re-run with --force to replace them" >&2
+
+if [ "$agents_linked" -eq 0 ] && [ "$commands_linked" -eq 0 ] && [ "$hooks_wired" -eq 0 ]; then
+    echo "install.sh: nothing installed — treating as failure, not success" >&2
+    exit 1
+fi
 exit 0
