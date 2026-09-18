@@ -9,6 +9,7 @@
 #   2. Every commands/*.md Invokes an agent that actually exists.
 #   3. The README commands table lists exactly the commands present on
 #      disk.
+#   4. (retired 2026-09-17 — README agent listing, subsumed by Checks 6 and 7.)
 #   5. Every README backtick-quoted agent-shaped reference resolves to
 #      an existing agent file (catches stale references from past
 #      renames). Command stems and NON_AGENT_TERMS are skipped.
@@ -24,10 +25,12 @@
 #  14. Every agent declares tool economy (section presence only).
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
 #  16. Fixture criteria are linted: no contradictions, no sentence-length keywords.
+#  17. (retired 2026-09-17 with the 21a amendment — board evidence byte-diffed.)
 #  18. No fixture input contains fixture-authoring language (answer-key leak).
 #  19. No must_not_find guard is an imperative (rule 25: guards are declarative).
 #  20. Every agent holding the Agent tool warns about dispatch cost, and no
 #      agent without it does.
+#  21. (retired 2026-09-17 with the 21a amendment — gate kept off the network.)
 #  22. Every case `tier:` value is one the tooling actually consumes.
 #  23. No fixture input contains a symlink (it would read out of the staged copy).
 #  24. An empty report fails every case (silence must not satisfy a case).

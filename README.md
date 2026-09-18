@@ -20,14 +20,16 @@ repo:
   2026-08-05 four of those 27 were mechanical in name only, with nothing
   enforcing them; that was found by reading the tier column against the checks
   that exist, and closed.
-- **`tests/check.sh`** — 33 checks producing upwards of 1,200 assertions, every
-  check negative-tested by breaking the thing it guards and confirming the
-  intended message. A check that has never failed is not known to be a gate. Checks 1–5
+- **`tests/check.sh`** — 32 live checks, numbered 1-36 with 4, 17, 21 and 25
+  retired, producing 804 assertions on a full clone; every check
+  negative-tested by breaking the thing it guards and confirming the intended
+  message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several
   releases and were negative-tested retroactively, six mutations on 2026-08-04.
-- **`evals/cases/`** — 30 regression fixtures covering all 21 agents. Prompt
-  edits are measurable instead of vibe-checked — but see the coverage figures
-  below: most verdicts are older than the prompt they graded.
+- **`evals/cases/`** — 10 regression fixtures covering a subset of the 22
+  agents. Prompt edits are measurable instead of vibe-checked — but see the
+  coverage figures below: most verdicts are older than the prompt they
+  graded.
 - **`PATHWAY_FORWARD.md`** — the inspection log: what is true *now*, by
   surface, with the date it was last checked and the command that checked
   it. A blank date means never audited, and stays blank.
@@ -670,17 +672,18 @@ miscited papers) with expected findings, so prompt changes can be
 measured rather than vibe-checked. See `evals/README.md` for the
 fixture format and how to run a case by hand.
 
-**Coverage, as of 2026-09-17 — read the second line before trusting the
+**Coverage, as of 2026-09-18 — read the second line before trusting the
 first.** 10 cases cover a subset of the 22 agents. One-fixture-per-agent was
 retired with rule 13: a fixture is kept only where it has distinguished
 something.
 
-**5 of those 27 have a verdict against the prompt they currently grade.** Seven
-have never been run at all; fifteen carry a verdict recorded before their
-agent's prompt last changed. `bash evals/run.sh list` prints the state of each,
-and `smoke` prints it for the fast tier — where eight of ten members have no
-current verdict. That is the accumulated cost of editing prompts faster than
-fixtures can be re-run: each prompt edit stales its agent's cases, and running
+**4 of those 10 have a verdict against the prompt they currently grade.** Four
+carry a verdict recorded before their agent's prompt last changed; the other
+two were graded the same day their prompt changed, with no prompt SHA recorded,
+so their provenance is indeterminate (rule 25d). `bash evals/run.sh list` prints
+the state of each, and `smoke` prints it for the fast tier — where three of its
+six members carry a stale verdict. That is the accumulated cost of editing
+prompts faster than fixtures can be re-run: each prompt edit stales its agent's cases, and running
 them needs real dispatches.
 
 Most test *detection* — can the agent find a planted defect. A smaller set
