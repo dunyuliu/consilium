@@ -1,41 +1,39 @@
 # Consilium
 
 > An AI specialist team to accelerate scientific innovation — and the
-> test suite that keeps it honest. Twenty-two agents that build, port,
-> audit, review and ship scientific software; ten regression fixtures
-> and thirty-two structural checks that measure whether they
-> actually did. Most collections of prompts are a wish. This one carries
-> the evidence.
+> test suite that keeps it honest. Named specialists that build, port,
+> audit, review and ship scientific software; regression fixtures and
+> structural checks that measure whether they actually did. Most
+> collections of prompts are a wish. This one carries the evidence.
 
-Twenty-two specialists organised into three teams and a quality bench,
+Specialists organised into three teams and a quality bench,
 each with a name, a CV, and a thing they refuse to let slide. Runs on
 Claude Code; installs by symlink and follows you across machines.
 
 **And the machinery that keeps them honest**, which is now most of the
 repo:
 
-- **`PROJECT_RULES.md`** — 42 live binding rules and sub-rules; 4 retired ones
+- **`PROJECT_RULES.md`** — the binding rules and sub-rules; retired ones
   keep their numbers so every citation still resolves. Each carries the
   incident that paid for it, and a tier column recording what enforces it and
   how far. Until 2026-08-05 four rules the index called mechanical had nothing
   enforcing them; reading the tier column against the checks that exist found
   that, and closed it.
-- **`tests/check.sh`** — 32 live checks, numbered 1-36 with 4, 17, 21 and 25
-  retired, producing 804 assertions on a full clone; every check
-  negative-tested by breaking the thing it guards and confirming the intended
+- **`tests/check.sh`** — the structural gate, numbered with retired checks
+  keeping their numbers; every check negative-tested by breaking the thing it guards and confirming the intended
   message. A check that has never failed is not known to be a gate. Checks 1–5
   are the exception worth naming: they predated that convention by several
   releases and were negative-tested retroactively, six mutations on 2026-08-04.
-- **`evals/cases/`** — 10 regression fixtures covering a subset of the 22
+- **`evals/cases/`** — regression fixtures covering a subset of the
   agents. Prompt edits are measurable instead of vibe-checked — but see the
   coverage figures below: most verdicts are older than the prompt they
   graded.
 - **`PATHWAY_FORWARD.md`** — the inspection log: what is true *now*, by
   surface, with the date it was last checked and the command that checked
   it. A blank date means never audited, and stays blank.
-- **`tests/lock.sh`** and three git hooks — one writer per repo, the gate
-  before every push, and a scope guard so a `git add -A` cannot sweep
-  another agent's in-flight work into your commit.
+- **`tests/lock.sh`** — one declared writer per repo at a time. It is a
+  label, not an enforcement: no hook refuses a commit outside a lock's
+  scope, and the only hook the installer wires is `post-merge`.
 
 Two of those exist because this repo audited itself and found it was
 shipping claims it could not support: a release note describing a hook
@@ -535,7 +533,8 @@ runs on haiku.
   a specific agent with a scoped prompt.
 - The orchestrators (Elena, Victor) spawn specialists via the Claude
   Code Agent tool, in parallel when independent.
-- Regression evals live in `evals/cases/`, one per agent. `evals/run.sh`
+- Regression evals live in `evals/cases/`, on the agents where a fixture
+  has distinguished something. `evals/run.sh`
   stages an isolated copy and grades a report mechanically; invoking the
   agent stays manual, because it needs API access and a gate that cannot
   run in CI is worse than no gate.
@@ -622,6 +621,7 @@ consilium/
 ├── tests/             # structural-invariant checks for consilium itself
 │   ├── check.sh            # pure-bash; runs in CI on every push/PR
 │   ├── release_gate.sh     # the five rows a release must satisfy (rule 15b)
+│   ├── parse_board.awk     #   board-row parser used by Check 12
 │   └── lock.sh             # one-writer-per-repo lock (rule 18)
 ├── .github/workflows/
 │   └── check.yml      # CI runner for tests/check.sh
@@ -672,19 +672,15 @@ miscited papers) with expected findings, so prompt changes can be
 measured rather than vibe-checked. See `evals/README.md` for the
 fixture format and how to run a case by hand.
 
-**Coverage, as of 2026-09-18 — read the second line before trusting the
-first.** 10 cases cover a subset of the 22 agents. One-fixture-per-agent was
-retired with rule 13: a fixture is kept only where it has distinguished
-something.
-
-**4 of those 10 have a verdict against the prompt they currently grade.** Four
-carry a verdict recorded before their agent's prompt last changed; the other
-two were graded the same day their prompt changed, with no prompt SHA recorded,
-so their provenance is indeterminate (rule 25d). `bash evals/run.sh list` prints
-the state of each, and `smoke` prints it for the fast tier — where three of its
-six members carry a stale verdict. That is the accumulated cost of editing
-prompts faster than fixtures can be re-run: each prompt edit stales its agent's cases, and running
-them needs real dispatches.
+**Coverage covers a subset of the agents, and most verdicts are older than
+the prompt they grade.** One-fixture-per-agent was retired with rule 13: a
+fixture is kept only where it has distinguished something. How many verdicts
+are current is a number that changes with every prompt edit, so it is not
+written here — `bash evals/run.sh score` prints it, `list` prints the state of
+each case, and `smoke` prints it for the fast tier. That staleness is the
+accumulated cost of editing prompts faster than fixtures can be re-run: each
+prompt edit stales its agent's cases, and re-running them needs real
+dispatches.
 
 Most test *detection* — can the agent find a planted defect. A smaller set
 tests *refusal*, which is the harder half to write and the easier half to get
@@ -708,7 +704,7 @@ they disagree, the fixture is the more likely defendant.
 
 ## Tests
 
-Thirty-three structural invariants of consilium itself — agent frontmatter,
+Structural invariants of consilium itself — agent frontmatter,
 command-to-agent references, README/filesystem sync, stale-reference
 detection, README completeness per agent, write-surface ownership,
 isolation-first prompts, tool-economy and communication declarations, the
@@ -762,7 +758,6 @@ required.
 
 ## Roadmap
 
-- ~~Expand `evals/` coverage across every specialist.~~ **Done** — 21 of 21.
 - ~~Automated eval harness.~~ **Partly** — `evals/run.sh` stages and grades;
   invoking the agent needs API access and stays manual.
 - **Measure precision, not just phrasing.** Half built. `declared_defects:`

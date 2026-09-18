@@ -1311,6 +1311,19 @@ else
     # the remote is the only sound answer to "is this tag pushed".
     remote_tags=""
     remote_reachable=1
+    # A clone whose origin is not the GitHub repo (a local-path clone, a
+    # mirror, a fork behind a different URL) cannot be asked about Releases:
+    # `gh release view` resolves the repo from origin and reports the failure
+    # the same way it reports a genuinely missing Release. Left unguarded
+    # this fails every pushed tag at once for an environment reason — it did,
+    # 28 false FAILs in a plain `git clone /path/to/consilium` on 2026-09-18.
+    gh_scope=1
+    origin_url=$(git remote get-url origin 2>/dev/null || true)
+    case "$origin_url" in
+        *github.com*) ;;
+        *)  gh_scope=0
+            echo "  origin is not a GitHub remote ($origin_url) — rule 15's Release half not checkable here; the note half still binds" ;;
+    esac
     if remote_raw=$(git ls-remote --tags origin 2>/dev/null); then
         remote_tags=$(printf '%s\n' "$remote_raw" | sed 's#.*refs/tags/##; s/\^{}$//')
     else
@@ -1324,7 +1337,7 @@ else
         else
             fail "$tag has a git tag but no release_notes_${tag}.md in the root or docs/ (rule 15)"
         fi
-        if [ "$remote_reachable" -eq 0 ]; then
+        if [ "$remote_reachable" -eq 0 ] || [ "$gh_scope" -eq 0 ]; then
             ok
         elif ! printf '%s\n' "$remote_tags" | grep -qxF "$tag"; then
             echo "  $tag is local-only (not on origin) — a Release cannot exist for an unpushed tag; the Release half binds once it is pushed"
