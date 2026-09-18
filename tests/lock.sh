@@ -2,8 +2,8 @@
 # tests/lock.sh — one writer per repo (PROJECT_RULES.md rule 18).
 #
 # A mutating workflow (a release, a merge, a multi-file refactor) takes the
-# lock for its duration. The pre-commit hook installed by install.sh refuses
-# a commit from anyone else while it is held.
+# lock for its duration. Nothing enforces it: the lock is a label that the
+# next writer is expected to read before starting (rule 18).
 #
 #   export CONSILIUM_LOCK_OWNER=wei-lin        # who you are
 #   bash tests/lock.sh acquire "release v1.7.0" [path-prefix ...]
@@ -29,10 +29,10 @@
 # task list looked empty, and it was very much alive.
 #
 # SCOPE. Optional path prefixes after the description declare what the holder
-# intends to touch; the pre-commit hook then refuses a commit that stages
-# anything outside them. This exists because the lock alone did not prevent
-# the v1.10.0 incident: the lock stops OTHER writers from committing, and does
-# nothing about the holder running `git add -A` and swallowing an author
+# intends to touch. Nothing refuses a commit outside them; the declaration is
+# there for another writer and a reviewer to read. It exists because the lock
+# alone did not prevent the v1.10.0 incident: the lock names WHO is writing and
+# says nothing about the holder running `git add -A` and swallowing an author
 # agent's half-written files. Six of them shipped inside a tagged release
 # whose notes did not mention them. Guarding "who may commit" is not the same
 # as guarding "what may be committed".
@@ -77,30 +77,30 @@ acquire)
     scope="$*"
     # A root-wide scope is not a scope guard. Rule 18 (amended 2026-09-17):
     # on 2026-09-17 a lock taken with a scope of `.` let a `git add -A` sweep
-    # an untracked root file into someone else's commit — the guard matched
-    # every path, so the hook had nothing to refuse. Name the directories.
+    # an untracked root file into someone else's commit — the scope matched
+    # every path, so it excluded nothing. Name the directories.
     for p in "$@"; do
         case "$p" in ""|"."|"./"|"/")
             echo "REFUSED: scope path '$p' covers the whole repo." >&2
-            echo "  Rule 18: a scope of '.' is not a scope guard — the pre-commit hook" >&2
-            echo "  would match every staged path and refuse nothing, which is how a" >&2
+            echo "  Rule 18: a scope of '.' is not a scope guard — it covers every" >&2
+            echo "  staged path, so it excludes nothing, which is how a" >&2
             echo "  \`git add -A\` swallowed an untracked root file (2026-09-17)." >&2
             echo "  Name the directories you intend to touch instead." >&2
             exit 2 ;;
         esac
     done
     # A path containing a space cannot be represented. The scope is stored as one
-    # space-separated line and the pre-commit hook splits it on whitespace, so
+    # space-separated line and every reader splits it on whitespace, so
     # `evals/cases/a b/` becomes the two prefixes `evals/cases/a` and `b/` — and
-    # the guard then ACCEPTS `b/anything`, which was never in scope. Demonstrated
-    # 2026-08-05: a commit of `b/anything.txt` under that scope succeeded. The
-    # guard fails OPEN, which is the wrong direction, so refuse the input rather
-    # than silently widen.
+    # `b/anything`, never in scope, then reads as covered. Demonstrated 2026-08-05,
+    # when the scope was still hook-enforced: a commit of `b/anything.txt` under
+    # that scope succeeded. It widens rather than narrows, the wrong direction, so
+    # refuse the input rather than record something untrue.
     for p in "$@"; do
         case "$p" in *[[:space:]]*)
             echo "REFUSED: scope path '$p' contains whitespace." >&2
-            echo "  The scope is one space-separated line and the pre-commit hook splits on" >&2
-            echo "  whitespace, so such a path would silently widen the guard rather than" >&2
+            echo "  The scope is one space-separated line, read by splitting on" >&2
+            echo "  whitespace, so such a path silently widens the scope rather than" >&2
             echo "  narrow it. Rename the path, or lock a parent directory instead." >&2
             exit 2 ;;
         esac
@@ -111,7 +111,7 @@ acquire)
             # Re-acquiring your own lock used to print "already held by you" and
             # exit 0 while DISCARDING the newly requested scope. Exit 0 plus that
             # wording reads as success, so the caller stages files in the scope it
-            # asked for and is refused by the hook with a scope it never chose.
+            # asked for while the lock records a scope it never chose.
             # Rule 18 governs concurrent WRITERS; one writer adjusting its own
             # scope is not a collision, so update it and say so.
             old_scope=$(sed -n '4p' "$LOCK")
@@ -134,7 +134,7 @@ acquire)
     printf '%s\n%s\n%s\n%s\n' "$OWNER" "$what" "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$scope" > "$LOCK"
     echo "acquired by '$OWNER' — $what"
     if [ -n "$scope" ]; then
-        echo "  scope: $scope (pre-commit refuses anything staged outside this)"
+        echo "  scope: $scope (declared intent — nothing refuses a commit outside it)"
     else
         echo "  scope: UNRESTRICTED — no path prefixes given." >&2
         echo "  If any author agent is live, declare a scope; \`git add -A\` will" >&2

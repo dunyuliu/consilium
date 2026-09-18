@@ -100,7 +100,6 @@ is_command() {
 # agent references. Keep this list short and specific: every entry is a hole
 # in Check 5, so add one only when the term is genuinely unavoidable.
 NON_AGENT_TERMS=(
-    pre-push        # git hook wired by install.sh
     post-merge      # git hook wired by install.sh
     no-verify       # git push flag
     fast-check      # JS property-testing library (agents/iris-vermeulen.md)
@@ -190,7 +189,7 @@ fi
 #
 # Two classes of token are agent-shaped but legitimately not agents: command
 # stems (`enforce-rules`) and a short allowlist of technical terms
-# (`pre-push`). Both are skipped. Without this the check false-positives on
+# (`post-merge`). Both are skipped. Without this the check false-positives on
 # correct prose, which trains the reader to work around the gate rather than
 # trust it — it blocked twice during the v1.2.0 cycle for exactly this.
 echo "Check 5: README backtick agent references resolve"
@@ -1298,9 +1297,9 @@ else
     # Release by definition and cannot be given one, so asserting otherwise
     # asserts something unsatisfiable. That is not pedantry — haruto's
     # workflow tags locally (step 9), pushes (12), then creates the Release
-    # (12a), and between 9 and 12a the pre-push hook runs this gate. A gate
-    # red on the local tag blocks the push, so the Release can never be
-    # created and the gate can never go green: a terminal refusal (rule 28).
+    # (12a), so between 9 and 12 the tag exists only here and GitHub has no
+    # ref to attach a Release to. Failing then demands an action nobody can
+    # take until the push: a terminal refusal (rule 28).
     # A PUSHED tag with no Release is the real defect and stays a hard fail.
     #
     # Enumeration is `git ls-remote --tags origin`, not a remote-tracking
