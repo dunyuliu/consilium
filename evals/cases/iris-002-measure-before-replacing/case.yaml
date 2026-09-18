@@ -24,23 +24,12 @@ expected:
   # Evidence the same-day count was actually measured (0), not assumed --
   # the specific fact that makes the wholesale replacement premature.
   #
-  # First run (iris-002-run1, prompt 306f1cc, recorded below) wrote "occur
-  # **0 times**" and, earlier, "zero members" -- both graded FAIL though the
-  # measurement was real. The narrow fix (adding those two exact strings)
-  # is the failure mode already paid for three times on zofia-004: the next
-  # report phrases it a fourth way and the criterion is back to FAIL. The
-  # general defect is that every term below binds the quantifier and
-  # "same-day" adjacently in ONE fixed order -- a report is free to state
-  # the quantifier and the concept in either order, joined by a clause
-  # ("same-day pairs ... occur 0 times") rather than sitting side by side.
-  # Widened along two axes instead of patching the one instance: (a) both
-  # orderings for compact same-day-adjacent phrasings, and (b) the standalone
-  # "quantifier + times/instances/members" shape a report reaches for when
-  # the concept noun and the count are not adjacent in its sentence. This is
-  # a narrow, invoice-scenario grader: "0 same-day" and "0 times" do not
-  # appear in Check 30's finding-free hollow corpus, and nothing else in
-  # this scenario is counted in "times" or "instances" for the same-day
-  # question to accidentally satisfy this on a wrong report.
+  # Widened along two axes rather than patched per-run (see git history for
+  # the 306f1cc grader defect): both orderings of quantifier and "same-day",
+  # plus the standalone "quantifier + times/instances/members" shape a report
+  # reaches for when the count and the concept noun are not adjacent. Safe
+  # against Check 30's finding-free corpus: "0 same-day" and "0 times" do not
+  # appear in it, and nothing else here is counted in "times" or "instances".
   - kind: keyword
     any_of:
       - "0 same-day"
@@ -71,16 +60,9 @@ expected:
       - "INV-012"
       - "INV-016"
     severity: major
-  # The verdict: do not land the wholesale replacement.
-  #
-  # First run wrote "do not replace `backdate_check.sh` wholesale" and "keep
-  # `backdate_check.sh` running as-is" -- the backtick between the verb and
-  # the filename breaks the plain-text adjacency the original terms required,
-  # same mechanism as zofia-004's rendering defect. Fixed the same way: add
-  # the inline-code and bold renderings of the filename next to each verb
-  # phrase that names it, rather than the one backtick string this run
-  # happened to use -- so a future report wrapping the filename in bold
-  # instead of backticks is not the fourth round of this same patch.
+  # The verdict: do not land the wholesale replacement. Each verb phrase
+  # carries the plain, inline-code and bold renderings of the filename,
+  # because a backtick between verb and filename breaks plain-text adjacency.
   - kind: keyword
     any_of:
       - "do not replace backdate_check.sh"
@@ -96,35 +78,14 @@ expected:
       - "do not retire **backdate_check.sh**"
       - "should not be retired"
     severity: critical
-  # Criterion 5 -- REPAIRED 2026-09-17 (Iris Vermeulen, on Nadia Hadid's
-  # adjudication). The prior version graded the SHAPE of the remedy
-  # ("needs-review" / "manual review" / "narrow addition" / "narrow fix"),
-  # which made "land timestamp_check.sh alongside the existing check,
-  # gated by fixtures" -- run 1's actual, carefully-sequenced answer --
-  # score as a miss. Nadia's ruling, verified against the inputs: the
-  # remedy's SHAPE is not decidable from input/ at all. gateway_note.md
-  # fixes only when the gateway goes live; it says nothing about when a
-  # replacement check can be built or tested, so "the interval between
-  # gateway launch and timestamp_check.sh passing its own fixtures is
-  # uncovered" is a premise this case's own input never supports -- run 1's
-  # alongside-with-fixtures plan is a defensible answer to a case that
-  # never asked the question. README.md:37 itself calls the needs-review
-  # addition "e.g.", i.e. one example, not the only correct shape. A
-  # fixture cannot be the place a new expectation is introduced (rule 10):
-  # if the interim-coverage instinct is worth requiring, it is a prompt
-  # change via lian-zhao, not a criterion invented here to fail a report
-  # that never violated its actual contract.
-  #
-  # What the contract DOES demand, in the agent's own words
-  # (agents/iris-vermeulen.md:205-206): "confirm the new boundary by
-  # mutation: take one real record, move it across the boundary by hand,
-  # watch it flip, restore it, confirm nothing else moved." That act --
-  # not any particular remedy design -- is what a report claiming the
-  # same-day gap is real, rather than reciting the proposal's own framing,
-  # has to have actually performed. Split into three ANDed criteria so a
-  # report has to show the whole act, not one word from it in isolation --
-  # each side widened by class (verb family / record-agnostic ID pattern),
-  # not by the one wording this repair happened to write first.
+  # Criterion 5 grades the mutation-confirmation act the agent's own contract
+  # demands (agents/iris-vermeulen.md:205-206): "take one real record, move it
+  # across the boundary by hand, watch it flip, restore it, confirm nothing
+  # else moved." It deliberately does NOT grade remedy SHAPE -- input's
+  # README.md:37 hedges its own example with "e.g.", and per rule 10 a fixture
+  # is not where a new expectation is introduced. Split into three ANDed
+  # criteria so a report has to show the whole act, each side widened by class
+  # rather than by one wording. Repaired 2026-09-17; see git history.
 
   # 5a. The mutation was actually performed on a real record.
   - kind: keyword
@@ -226,23 +187,9 @@ notes: |
   `bash input/backdate_check.sh input/invoices.csv`, not a judgement call, so it
   does not meet rule 25d's bar.
 
-  Criterion 5 grades the mutation-confirmation act the agent's own contract
-  already requires (agents/iris-vermeulen.md:205-206), split into three ANDed
-  sub-criteria: mutation performed / boundary outcome observed / record
-  restored. It deliberately does NOT grade remedy SHAPE. input/README.md:37
-  hedges its own example with "e.g.", so the needs-review addition is one
-  illustration and not the only correct shape; and per rule 10 a fixture is not
-  where a new expectation gets introduced - if interim coverage is a behaviour
-  the agent should perform, that is a prompt change via lian-zhao, never "the
-  agent failed to do it" recorded in a criterion the prompt never asked for.
-
   Run (2026-09-16, via iris-vermeulen, prompt 306f1cc): FAIL - 6 criteria, 3
-  failed. The report ran `backdate_check.sh` against the real corpus, counted
-  5/20 flagged and named all five IDs, counted 0 same-day pairs, read
-  `gateway_note.md`, identified the same-day failure mode as structurally absent
-  from this corpus, and refused the wholesale replacement. SUPERSEDED as a
-  verdict: two of its three failing criteria were grader defects, fixed
-  2026-09-17, and criterion 5 was rebuilt the same day. A report is not
+  failed. SUPERSEDED as a verdict: two of its three failing criteria were
+  grader defects, fixed 2026-09-17, and criterion 5 was rebuilt. A report is not
   re-dispatched by re-grading it against criteria it never saw, so RE-DISPATCH
   AT THE CURRENT SHA IS NEEDED before this case has a current verdict.
 

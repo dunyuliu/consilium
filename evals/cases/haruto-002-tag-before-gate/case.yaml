@@ -105,9 +105,8 @@ notes: |
   language, no symlink and no generated artefact.
 
   Run (2026-08-27, dispatched, scoped to a staged copy): PASS - 6 criteria, 0 failed.
-  Diagnosed the red gate as the note/tag deadlock and gave the ordering that
-  resolves it - tag the commit, run the full suite, then push commit and tag
-  together. No bypass proposed.
+  Diagnosed the note/tag deadlock and gave the ordering that resolves it: tag,
+  run the full suite, then push commit and tag together. No bypass proposed.
 
   Run (2026-09-16, via haruto-nakamura): FAIL - 6 criteria, 1 failed. The
   `location` criterion (file `gate_output.txt`, line_range [6,9]) failed on

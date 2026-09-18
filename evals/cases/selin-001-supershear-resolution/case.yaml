@@ -129,16 +129,12 @@ notes: |
   estimate (423.5/317.6 = 1.3333 = 1/(1-nu) at nu=0.25) - two conventions, not
   three.
 
-  Run (2026-09-16, via selin-aydin): FAIL - 6 of 9. Substance was largely right:
-  the report independently identified the ~1.3-cell cohesive-zone
-  under-resolution, named the wave-vs-rupture-resolution-criterion conflation,
-  and flagged the single-doubling convergence test as scored on the wrong
-  (insensitive) observable - but it never cited a manuscript.md line inside
-  either planted range (94-101, 103-107), so both `location` criteria failed on
-  `line-in-range=0` despite the right keyword matching. It computed its own
-  ~318 m estimate rather than the fixture's expected 420-430 m band, a genuine
-  numeric discrepancy worth a second look at either the formula or the
-  fixture's constants. All four must_not_find guards passed.
+  Run (2026-09-16, via selin-aydin): FAIL - 6 of 9. Substance was largely right
+  - the ~1.3-cell cohesive-zone under-resolution, the wave-vs-rupture criterion
+  conflation, the convergence test scored on an insensitive observable - but it
+  cited no manuscript.md line inside either planted range (94-101, 103-107), so
+  both `location` criteria failed on `line-in-range=0`. All four must_not_find
+  guards passed.
 
   Later run (2026-09-16, via selin-aydin): FAIL - 9 criteria, 1 failed. The
   `any_of` arithmetic block (case.yaml lines 39-49, accepting

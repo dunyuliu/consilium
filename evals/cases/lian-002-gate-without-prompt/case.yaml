@@ -131,11 +131,8 @@ notes: |
   negation before shipping (rule 25).
 
   Run (2026-09-16, via lian-zhao): FAIL - 3 of 6. Only criterion 1 (named
-  "tomas-lindgren") and both must_not_find guards passed. The report listed
-  `agents/tomas-lindgren.md` among the files it read but reasoned to a
-  different, also-real defect - "Check 6 runs against zero files and passes
-  vacuously" - and never located the step-8 sequence at all. A genuine miss of
-  the designed trap, not a criteria-quality false negative.
+  "tomas-lindgren") and both must_not_find guards passed; the report never
+  located the step-8 sequence. A genuine miss of the designed trap.
 
   Later run (2026-09-16, via lian-zhao): FAIL - 6 criteria, 2 failed.
     (a) the "reach" block ("every project" / "downstream" / "the product" /

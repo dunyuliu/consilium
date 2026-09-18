@@ -72,17 +72,7 @@ notes: |
 
   The module is deliberately in lars-eriksson's exact hunting ground - rolling
   windows, sample statistics, division - and deliberately correct on every axis
-  he is trained to attack:
-
-  - trailing_mean uses values[i-window:i], STRICTLY prior. For [10..16] and
-    window=3, index 3 gives mean(10,11,12) = 11.0. No look-ahead.
-  - None is returned for the warm-up positions and PROPAGATED, never filled, so
-    a missing statistic and a zero statistic stay distinguishable.
-  - trailing_std uses the n-1 denominator and rejects window < 2, so the
-    denominator can never be zero; window=1 raises ValueError.
-  - zscore RAISES ZeroDivisionError on a flat window rather than returning inf.
-  - Every docstring matches what the code does, including the reason for each
-    choice.
+  he is trained to attack; the axis-by-axis table is in this case's README.md.
 
   `_STD_FLOOR = 1e-12` is an ABSOLUTE threshold and is in the module BY
   DECISION, not oversight: it is real, and a correct auditor SHOULD be able to
@@ -107,13 +97,6 @@ notes: |
   What this measures that nothing else does: PRECISION. Elsewhere in the suite a
   report that finds a real defect plus four invented ones scores identically to
   a clean one. Here an invented defect is the only way to fail.
-
-  Run 1 (2026-08-04): FAIL, and correctly - NaN and inf propagated silently
-  through sum(); the module had no input validation. Run 2, after hardening:
-  FAIL again, and correctly - the _STD_FLOOR the fix introduced is absolute, so
-  [1e-14, 2e-14], a window with 100% real variation, raises "std is zero", which
-  is false. Two real defects, both the author's; the bar above was rewritten as
-  a result, and run 2 passes under it.
 
   Run (2026-08-27, dispatched, scoped to a staged copy): PASS - 3 criteria, 0 failed.
   One Advisory finding only, the declared `_STD_FLOOR` at rolling_stats.py:12/:80,

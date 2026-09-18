@@ -136,10 +136,6 @@ notes: |
   cited a scratch file instead of `elastic_contact.py:141-155`, against the
   file:line output schema at agents/dunyu-liu.md:180, and it stated the
   hypothesis while omitting the kill criterion step 1 of its own method
-  requires. It did more physics than the opus run - a split-node penalty Coulomb
-  spike verified against an independent locked-interface solve (predicted
-  2.999e-3, measured within one ramp step), exact positive-homogeneity, an
-  independent Q4 plane-strain cross-check - and rediscovered three of the four
-  declared defects. `expected` has not changed since 2026-08-04, so the variable
-  really was the tier; but one sample of "better physics, ignored two contract
-  items" is a signal, not proof.
+  requires. It did more physics than the opus run and rediscovered three of the
+  four declared defects. `expected` has not changed since 2026-08-04, so the
+  variable really was the tier; but one sample is a signal, not proof.
