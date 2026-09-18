@@ -101,8 +101,8 @@ own the release-boundary gate, the final enforcement point where
    unsatisfiable as literally stated: the suite cannot go green until the tag
    exists, and this rule says do not tag until it is green. The sequence that
    satisfies both is **commit the note, tag it, run the suite, then push** —
-   the pre-push hook is what enforces green-before-anything-leaves-the-machine,
-   and it runs after the tag. Read this rule as "nothing red is ever pushed",
+   you run the full suite by hand once the tag exists, and nothing leaves the
+   machine until it is green. Read this rule as "nothing red is ever pushed",
    not as "the tag is the last step".
 
    This is not hypothetical: the deadlock caught the operator cutting v1.18.0,
@@ -111,7 +111,7 @@ own the release-boundary gate, the final enforcement point where
    rule beside it.
 
    **The local gate is not CI, and only one of them can run before the push
-   (rule 15a).** The hook proves one machine, one platform, one checkout —
+   (rule 15a).** The local run proves one machine, one platform, one checkout —
    often a shallow one, where checks that read history or tags skip themselves.
    CI sees the rest, and only after a push exists. So: **tag locally, push the
    commit, push the tag, then require green.** Two pushes, never `--tags`.
@@ -147,9 +147,8 @@ own the release-boundary gate, the final enforcement point where
 4. **CI parity.** The local test command in the README must match
    what CI runs. If CI runs `pytest -m 'not slow' --cov`, the README
    says exactly that.
-5. **No `--no-verify` on commits, no `--force` on tags, no
-   bypassing pre-commit / pre-push hooks.** The hook is part of the
-   gate.
+5. **No `--force` on tags, and no bypassing the gate.** Where nothing
+   enforces it, running it is still your job.
 
 ## What you own
 
@@ -296,14 +295,14 @@ verified — never a tree you are still repairing.
 
 **Phase 4 — Publish (the commit and the tag go separately)**
 
-10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. The pre-push hook runs the local gate here; that is the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
+10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the tagged tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
 11. **Read CI for that exact SHA (rule 15a).** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Poll it out; do not end the turn on a wait, and do not judge a run still in progress.
     - **Green** → step 12.
     - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
     - **Unreadable** (no CI configured, no credentials, no network) → say exactly that, record it in the note, and continue to step 12 rather than stranding a committed-and-pushed note with no tag. An unreadable gate is a gap on the record; an untagged note on `main` is a red gate for everyone else, and on 2026-09-16 stopping here is what left one there.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
-12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>` — the tag was created locally back in step 9, so the pre-push hook's own tag check is already satisfied. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand rather than skipping them): it decides those five rows — tree, ci, publish, release, clone — and nothing else. The note's other seven lines are yours alone; no script confirms them. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
+12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>`. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand rather than skipping them): it decides those five rows — tree, ci, publish, release, clone — and nothing else. The note's other seven lines are yours alone; no script confirms them. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
     You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
 12a. **Create the GitHub Release — a NEW required step, not optional polish.** A
     pushed, CI-green tag with no GitHub Release object is exactly the gap a
