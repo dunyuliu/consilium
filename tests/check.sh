@@ -1319,11 +1319,34 @@ else
     # 28 false FAILs in a plain `git clone /path/to/consilium` on 2026-09-18.
     gh_scope=1
     origin_url=$(git remote get-url origin 2>/dev/null || true)
-    case "$origin_url" in
-        *github.com*) ;;
-        *)  gh_scope=0
-            echo "  origin is not a GitHub remote ($origin_url) — rule 15's Release half not checkable here; the note half still binds" ;;
-    esac
+    # Match github.com as the actual host, not as a substring anywhere in the
+    # URL: a local mirror path like /data/mirrors/github.com-consilium/ or a
+    # clone under ~/github.com-backups/ contains the string without being the
+    # GitHub remote, and a substring match misreads it as in-scope — which
+    # reproduces the exact false-FAIL failure mode this guard exists to
+    # prevent, just on a different clone shape.
+    #
+    # Recognised host positions, one case arm per URL scheme this repo's
+    # remotes actually use:
+    #   https://github.com/... or http://github.com/...
+    #   ssh://git@github.com/...  (or ssh://github.com/...)
+    #   git@github.com:...        (scp-like syntax, no scheme)
+    #   git://github.com/...
+    if [ -z "$origin_url" ]; then
+        gh_scope=0
+        echo "  no origin remote configured — rule 15's Release half not checkable here; the note half still binds"
+    else
+        case "$origin_url" in
+            https://github.com/*|https://github.com|\
+            http://github.com/*|http://github.com|\
+            ssh://*@github.com/*|ssh://*@github.com|\
+            ssh://github.com/*|ssh://github.com|\
+            git@github.com:*|\
+            git://github.com/*|git://github.com) ;;
+            *)  gh_scope=0
+                echo "  origin is not a GitHub remote ($origin_url) — rule 15's Release half not checkable here; the note half still binds" ;;
+        esac
+    fi
     if remote_raw=$(git ls-remote --tags origin 2>/dev/null); then
         remote_tags=$(printf '%s\n' "$remote_raw" | sed 's#.*refs/tags/##; s/\^{}$//')
     else
