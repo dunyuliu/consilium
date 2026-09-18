@@ -14,12 +14,12 @@ Claude Code; installs by symlink and follows you across machines.
 **And the machinery that keeps them honest**, which is now most of the
 repo:
 
-- **`PROJECT_RULES.md`** — 34 binding rules and sub-rules, 27 of them
-  mechanical: enforced by a check, a git hook or the grader rather than by
-  good intentions. Each carries the incident that paid for it. Until
-  2026-08-05 four of those 27 were mechanical in name only, with nothing
-  enforcing them; that was found by reading the tier column against the checks
-  that exist, and closed.
+- **`PROJECT_RULES.md`** — 42 live binding rules and sub-rules; 4 retired ones
+  keep their numbers so every citation still resolves. Each carries the
+  incident that paid for it, and a tier column recording what enforces it and
+  how far. Until 2026-08-05 four rules the index called mechanical had nothing
+  enforcing them; reading the tier column against the checks that exist found
+  that, and closed it.
 - **`tests/check.sh`** — 32 live checks, numbered 1-36 with 4, 17, 21 and 25
   retired, producing 804 assertions on a full clone; every check
   negative-tested by breaking the thing it guards and confirming the intended

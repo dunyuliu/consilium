@@ -726,6 +726,7 @@ the machine-readable source of truth, not documentation of one.
 | `install.sh` (the installer, and the git hooks it wires) | `iris-vermeulen` |
 | `README.md` rows and counts restating `agents/` or `commands/` | `lian-zhao` |
 | `README.md` rows and counts restating `tests/`, `evals/` or the installer | `iris-vermeulen` |
+| `README.md` rows and counts restating `PROJECT_RULES.md` | `zofia-kaminska` |
 
 Everyone not listed is read-only. An agent with `Edit` or `Write` in its
 frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
@@ -743,20 +744,21 @@ gate infrastructure, the same class as `tests/lock.sh`, already hers — while
 `install.sh`'s symlink half carries no prompt content and so is not
 `lian-zhao`'s.
 
-**Human-owned surfaces — and the half of `README.md` that is not.** The two
+**Human-owned surfaces — and the half of `README.md` that is not.** The three
 `README.md` rows above are the whole statement of who owns a README line; this
 paragraph explains them and does not extend them. They split on *what would
 falsify the line*: the model-roster and headline counts fall to `lian-zhao`
 because what falsified them was `agents/nadia-hadid.md`'s frontmatter, the
 Install and CI sections and every check or fixture count fall to
 `iris-vermeulen` because what falsified those was `install.sh` no longer wiring
-the hook the section promised. One sentence restating two surfaces — "30
-regression fixtures covering all 21 agents" is a count of `evals/` and a count
-of `agents/` in one clause — lands whole under the carve-out below rather than
-splitting mid-sentence, and either owner may take it. Such an edit moves in the
-same commit as the surface change under rule 11. The
-remainder of `README.md` — what consilium is, how to use it, the narrative
-around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
+the hook the section promised, and the rule and tier counts fall to
+`zofia-kaminska` because what falsifies those is an edit to this file. One
+sentence restating two surfaces — "30 regression fixtures covering all 21
+agents" is a count of `evals/` and a count of `agents/` in one clause — lands
+whole under the carve-out below rather than splitting mid-sentence, and any of
+them may take it. Such an edit moves in the same commit as the surface change
+under rule 11. The remainder of `README.md` — what consilium is, how to use
+it, the narrative around the tables — has no agent owner, and neither does `CLAUDE.md`: they are
 maintained by hand, they drift by design, and nothing guards them but the
 fresh-clone walk at a release, which is the only pass in this campaign that
 caught any of that drift. An agent proposes a change to that remainder and
