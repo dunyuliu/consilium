@@ -155,17 +155,24 @@ What the passes confirmed, with evidence:
 
 ## CI
 
-**The run this release was gated on:** recorded in the follow-up commit that
-amends this section, because the run does not exist until this commit is
-pushed. Not yet run at the time this file was committed — see the "Release
-gate" section below for the same reason, and rule 15a for why the field is
-written rather than left silent.
+**The run this release was gated on:** run `35394190357`,
+https://github.com/dunyuliu/consilium/actions/runs/35394190357, conclusion
+`success`, workflow `structural-invariants`, SHA
+`aede61b0d3f6b1354b59092724ec0ce63bd26020` — the release commit, run on the
+tag push.
 
-The commit-push run is expected to be red on exactly the assertions whose
-sole cause is that `v1.25.0` is not yet on the remote — Check 27
-(`release_notes_v1.25.0.md has no matching tag`), Check 31d (root note newer
-than the newest tag) and Check 35 (a tag with no GitHub Release), the same
-set v1.23.0 and v1.24.0 named. Any red outside that set stops the cut.
+**The commit-push run on the same SHA was red, on tag absence and nothing
+else.** Run `35394125037`,
+https://github.com/dunyuliu/consilium/actions/runs/35394125037, conclusion
+`failure`, 743 passed / 2 failed, both assertions reading:
+
+1. `release_notes_v1.25.0.md has no matching tag 'v1.25.0'` (rule 15)
+2. `the root release note is 'release_notes_v1.25.0.md' but the newest tag is
+   v1.24.0` (rule 8)
+
+One cause — `v1.25.0` was not yet on the remote when that run read the refs —
+named here per rule 15a, the same pair v1.23.0 and v1.24.0 named. Both went
+green on the tag-push run with no other change.
 
 ## Trend since v1.24.0
 
@@ -175,14 +182,16 @@ be called that, and this one grew.
 
 | Measure | v1.24.0 | v1.25.0 | Direction |
 |---|---|---|---|
-| Gate assertions (`bash tests/check.sh`, both run today, both against the GitHub remote) | 797 passed, 0 failed | 797 passed, 0 failed | Unchanged |
+| Gate assertions (`bash tests/check.sh`, both run today, both against the GitHub remote, both with the release's own tag in place) | 797 passed, 0 failed | 800 passed, 0 failed | Unchanged in substance |
 | Fixture verdicts (`bash evals/run.sh list` / `score`) | 4/10 current (40%), 4 stale, 2 unknown provenance, 0 never-run | 4/10 current (40%), 4 stale, 2 unknown provenance, 0 never-run | Unchanged — but the stale four now include both `haruto-nakamura` fixtures, staled by this cut's own edit to that prompt |
 | Tracked text lines (`git diff --stat v1.24.0..HEAD -- '*.md' '*.sh' '*.py'`) | — | 209 added / 100 removed, **net +109** | Worse |
 | Board currency (`PATHWAY_FORWARD.md`) | 21 VERIFIED, 0 BROKEN, 1 OPEN, 13 RETIRED, 0 blank dates | 19 VERIFIED, 0 BROKEN, 0 OPEN, 16 RETIRED, 0 blank dates | Better |
 | CI green on first try (`gh run list`) | — | 6 of 6 pushes since the v1.24.0 tag push, no re-runs | Unchanged (was 8 of 8 in the prior stretch) |
 
 Reading, plainly: **the gate did not move and the repo grew.** 797 assertions
-before, 797 after; fixture trustworthiness flat at 40% and about to be
+before, 800 after — and the three added are this release's own tag being
+asserted about (a note-to-tag match, a newest-tag match, and Check 35's
+per-tag Release assertion), not a new invariant anyone wrote; fixture trustworthiness flat at 40% and about to be
 measured against a prompt this cut edited; +109 tracked lines. The only
 measure that improved is the board, and it improved by retiring rows, not by
 closing them with work. Three of the four retired rows were green on commands
@@ -238,17 +247,28 @@ whose net line change was positive.
 
 ## Release gate
 
-The five rows below are transcribed from `bash tests/release_gate.sh
-release_notes_v1.25.0.md`, which runs after this commit is tagged and pushed
-and therefore after this file is written. They are recorded in the follow-up
-commit that amends this section — the same sequence v1.24.0 used (`d445d0b`).
-Known in advance and not a defect of the release: the `tree` row counts
-worktrees, and this cut ran from a dispatch-isolated second worktree, so that
-row reports its count rather than a clean one until the worktree is removed
-and the shared checkout is fast-forwarded to this tag.
+`bash tests/release_gate.sh release_notes_v1.25.0.md`, run with HEAD at the
+tagged commit `aede61b0` and the remote in agreement: **4 passed, 1 failed, 0
+skipped.** Transcribed verbatim below.
 
-- tree: recorded in the follow-up commit from `tests/release_gate.sh` output
-- ci: recorded in the follow-up commit from `tests/release_gate.sh` output
-- publish: recorded in the follow-up commit from `tests/release_gate.sh` output
-- release: recorded in the follow-up commit from `tests/release_gate.sh` output
-- clone: recorded in the follow-up commit from `tests/release_gate.sh` output
+- tree: FAIL — `2 worktrees — a worktree outlives the agent that held it; no
+  upstream — local and remote cannot be compared`
+- ci: PASS — green on `aede61b0` (run `35394190357`)
+- publish: PASS — v1.25.0 pushed and pointing at `aede61b0`
+- release: PASS — GitHub Release exists for v1.25.0,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.25.0
+- clone: PASS — fresh clone of v1.25.0; README's install block and its first
+  following command both exited 0
+
+**The red `tree` row is real and is not repaired by this release.** Both its
+causes are the dispatch isolation this cut ran under, not the released tree:
+the second worktree is the agent worktree this release was cut from, and the
+missing upstream is that worktree's own branch, which tracks nothing while
+`main` is checked out in the shared clone. Neither can be cleared from inside
+the worktree that causes them. It is accepted here, explicitly and on the
+record rather than waved through, and it closes when the conducting agent
+removes the worktree and fast-forwards the shared checkout to this tag — at
+which point the gate should be re-run from there. Per rule 8 and release step
+12, a red row after the tag is public earns a follow-up, never an unpublish:
+this note is that follow-up's record, and nothing about the published tag,
+Release or clone is in doubt — those three rows passed against the remote.
