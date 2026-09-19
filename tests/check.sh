@@ -53,10 +53,8 @@
 #      object behind them.
 #  36. No tracked file contains a merge-conflict marker.
 #
-# Checks 6 and 7 are separate because a bare mention is not membership: an
-# agent could be absent from the model table, the roster, or the tree with
-# the gate green. Every check here was negative-tested when added — a check
-# that has never failed is not known to be a gate.
+# Every check here was negative-tested when added — a check that has never
+# failed is not known to be a gate.
 #
 # Usage: bash tests/check.sh
 # Exit code: 0 if all checks pass, 1 otherwise.
@@ -105,7 +103,6 @@ is_command() {
 # in Check 8, so add one only when the term is genuinely unavoidable.
 NON_AGENT_TERMS=(
     post-merge      # git hook wired by install.sh
-    no-verify       # git push flag
     fast-check      # JS property-testing library (agents/iris-vermeulen.md)
 )
 
@@ -404,11 +401,9 @@ done
 
 # --- Check 11: every write-surface owner declares isolation first ---------
 #
-# PROJECT_RULES.md rule 20. Containment stated at line 80 — after the agent
-# has read its mission — is advice; stated first it is a precondition. An
-# audit on 2026-07-31 found 2 of 9 writers declared isolation at all, both
-# buried, and five (including the refactorer and the release engineer) had
-# no containment statement anywhere.
+# PROJECT_RULES.md rule 20. An audit on 2026-07-31 found 2 of 9 writers
+# declared isolation at all, both buried, and five (including the refactorer
+# and the release engineer) had no containment statement anywhere.
 echo "Check 11: write-surface owners declare isolation as their first section"
 for owner in "${!is_owner[@]}"; do
     first_heading=$(grep -m1 '^## ' "agents/$owner.md" || true)
@@ -527,14 +522,7 @@ fi
 
 # --- Check 13: every agent carries a communication-discipline section --------
 #
-# PROJECT_RULES.md rule 22. Terse output is a universal contract here, not a
-# per-agent preference: the user's own harness injects "BE CONCISE" on every
-# prompt, and an agent that pads defeats that at one remove. All 20 agents
-# carried this section when the check was written; nothing guaranteed the 21st
-# would, which is the only reason a habit needs a gate.
-#
-# Checks presence, not prose — a section can be present and vacuous. That limit
-# is stated rather than papered over.
+# PROJECT_RULES.md rule 22.
 echo "Check 13: every agent declares communication discipline"
 for stem in "${AGENTS[@]}"; do
     if grep -qE '^## Communication discipline' "agents/$stem.md"; then
@@ -546,12 +534,7 @@ done
 
 # --- Check 14: agents that can dispatch declare what a dispatch costs -------
 #
-# PROJECT_RULES.md rule 23. A dispatch costs ~10x doing the work yourself and
-# the multiplier is structural: the API re-bills the whole conversation on
-# every tool call, so cost grows with the square of tool calls, not with prompt
-# size. Measured here: <7 tool calls ~19k tokens, >10 ~75k, against ~2k to read
-# a file directly. An orchestrator that does not know this spends 20k
-# confirming what it could have read in 2k.
+# PROJECT_RULES.md rule 23.
 echo "Check 14: every agent declares tool economy"
 for stem in "${AGENTS[@]}"; do
     if grep -qE '^## Tool economy' "agents/$stem.md"; then
@@ -1320,13 +1303,6 @@ else
     # GitHub remote, and a substring match misreads it as in-scope — which
     # reproduces the exact false-FAIL failure mode this guard exists to
     # prevent, just on a different clone shape.
-    #
-    # Recognised host positions, one case arm per URL scheme this repo's
-    # remotes actually use:
-    #   https://github.com/... or http://github.com/...
-    #   ssh://git@github.com/...  (or ssh://github.com/...)
-    #   git@github.com:...        (scp-like syntax, no scheme)
-    #   git://github.com/...
     if [ -z "$origin_url" ]; then
         gh_scope=0
         echo "  no origin remote configured — rule 15's Release half not checkable here; the note half still binds"
