@@ -982,8 +982,10 @@ echo "Check 30: no expected keyword appears in ordinary finding-free prose"
 # criterion requires the defect — a term absent from this corpus can still be
 # domain-natural in a finding-free report ("heading" for a docs review), and
 # `iris-001`'s second criterion was found by hand, not by this.
-hollow_corpus=$(mktemp)
-cat > "$hollow_corpus" <<'HOLLOW'
+if ! hollow_corpus=$(mktemp); then
+    fail "Check 30 setup: mktemp could not create a file under TMPDIR=${TMPDIR:-/tmp} — no hollow corpus exists to grep, so this check asserted nothing"
+else
+    cat > "$hollow_corpus" <<'HOLLOW'
 # Review
 
 ## Summary
@@ -1002,20 +1004,21 @@ Each file was opened and read in full.
 No issues found. No change is recommended and there is nothing further to
 report. This looks correct to me and I would not alter it.
 HOLLOW
-for case_file in evals/cases/*/case.yaml; do
-    id=$(basename "$(dirname "$case_file")")
-    terms=$(awk '/^expected:/{f=1} /^(must_not_find|declared_defects|notes):/{f=0} f&&/^ *- "/{gsub(/^ *- "|"$/,""); print}' "$case_file")
-    [ -z "$terms" ] && { ok; continue; }
-    while IFS= read -r term; do
-        [ -z "$term" ] && continue
-        if grep -qiF -- "$term" "$hollow_corpus" 2>/dev/null; then
-            fail "$id: expected keyword \"$term\" appears in ordinary finding-free review prose — this criterion can be satisfied by a report that found nothing (rule 25, expected side)"
-        else
-            ok
-        fi
-    done <<< "$terms"
-done
-rm -f "$hollow_corpus"
+    for case_file in evals/cases/*/case.yaml; do
+        id=$(basename "$(dirname "$case_file")")
+        terms=$(awk '/^expected:/{f=1} /^(must_not_find|declared_defects|notes):/{f=0} f&&/^ *- "/{gsub(/^ *- "|"$/,""); print}' "$case_file")
+        [ -z "$terms" ] && { ok; continue; }
+        while IFS= read -r term; do
+            [ -z "$term" ] && continue
+            if grep -qiF -- "$term" "$hollow_corpus" 2>/dev/null; then
+                fail "$id: expected keyword \"$term\" appears in ordinary finding-free review prose — this criterion can be satisfied by a report that found nothing (rule 25, expected side)"
+            else
+                ok
+            fi
+        done <<< "$terms"
+    done
+    rm -f "$hollow_corpus"
+fi
 
 echo
 echo "Check 31: the repo root holds exactly the documents rule 1 whitelists"
