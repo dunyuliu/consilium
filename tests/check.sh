@@ -925,7 +925,14 @@ else
             base=$(basename "$path")
             if [ -f "$base" ] || [ -f "docs/$base" ]; then
                 ok
-            elif git log --diff-filter=D --format=%B -- "$path" 2>/dev/null | grep -qi 'rule 8a'; then
+                continue
+            fi
+            # Captured before grepping, not piped: under `set -o pipefail` a
+            # `grep -q` closes the pipe on its first match, git log takes
+            # SIGPIPE, and the pipeline reports failure exactly when the match
+            # succeeds. The bug is invisible until the branch should fire.
+            del_msgs=$(git log --diff-filter=D --format=%B -- "$base" "docs/$base" </dev/null 2>/dev/null || true)
+            if printf '%s' "$del_msgs" | grep -qi 'rule 8a'; then
                 # Rule 8a permits deleting a note for a tag that never existed by
                 # an act of release authority, and makes the commit message the
                 # artifact: it must name the tag and how the conditions were
