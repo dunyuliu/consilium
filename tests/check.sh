@@ -925,8 +925,16 @@ else
             base=$(basename "$path")
             if [ -f "$base" ] || [ -f "docs/$base" ]; then
                 ok
+            elif git log --diff-filter=D --format=%B -- "$path" 2>/dev/null | grep -qi 'rule 8a'; then
+                # Rule 8a permits deleting a note for a tag that never existed by
+                # an act of release authority, and makes the commit message the
+                # artifact: it must name the tag and how the conditions were
+                # confirmed. Without this branch 8a was unexecutable -- the rule
+                # allowed a deletion the gate then refused forever (2026-09-19).
+                echo "  $base deleted under rule 8a — the deleting commit cites it"
+                ok
             else
-                fail "$base was deleted and exists in neither the root nor docs/ — release notes are archived, never removed (rule 8)"
+                fail "$base was deleted and exists in neither the root nor docs/ — release notes are archived, never removed (rule 8); a deletion under rule 8a must say so in its commit message"
             fi
         done <<< "$deleted"
     fi

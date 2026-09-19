@@ -232,8 +232,10 @@ nobody with release authority ever created," and defaults to keeping both,
 turning a fabricated note into permanent un-removable content.
 
 A note may be deleted, by the human maintainer only, when **all** hold: (1) its
-version's tag does not exist on the remote and never did, confirmed on the
-platform of record, not merely `git tag --list` in one clone; (2) the note's
+version's tag does not exist on the remote, and never existed by an act of
+release authority — a tag an agent pushed outside its scope and someone then
+deleted satisfies this, a tag a release deliberately cut does not; confirmed on
+the platform of record, not merely `git tag --list` in one clone; (2) the note's
 own release gate was never run by a human with release authority — it was
 written by an agent acting outside its dispatched scope (rule 27's shape); (3)
 the deletion is a `git rm` whose commit message names the tag, why it is
