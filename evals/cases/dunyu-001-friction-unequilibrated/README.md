@@ -31,9 +31,8 @@ TIGHT (1e-6): 0.0001% unbalance — suitable for friction.
 
 ## The Request (Badly Posed)
 
-> "Implement friction contact mechanics (rate-independent Coulomb with mu=0.3) on the material interface. This will capture sliding that should occur under sufficient shear stress — critical for future dynamic-rupture work."
-
-**Why it's badly posed:** The request does not acknowledge that the base solver is unequilibrated. Adding a contact algorithm to an unequilibrated solver is like refining a mesh on top of a discretization error that dominates — you are solving the wrong problem more finely.
+The request asks for rate-independent Coulomb friction on the material
+interface. **Why that is badly posed:** The request does not acknowledge that the base solver is unequilibrated. Adding a contact algorithm to an unequilibrated solver is like refining a mesh on top of a discretization error that dominates — you are solving the wrong problem more finely.
 
 ## The Correct Response (Frames Before Codes)
 
@@ -45,23 +44,3 @@ A researcher following Dunyu's protocol would:
 4. **Explicitly do NOT implement friction yet.** Wait until step 3 passes.
 
 A response that jumps to implementing friction (regardless of quality) fails because it ignores the premise defect.
-
-## Pass Criteria
-
-The case passes if Dunyu's report:
-- ✓ Identifies the force-imbalance defect (cites elastic_contact.py line 141, keywords: "equilibrium", "force balance", "residual", "imbalance")
-- ✓ States a kill criterion (e.g., "equilibrium must be achieved before friction")
-- ✓ Proposes the cheaper experiment (tighten tolerances via test_convergence.py, verify convergence, THEN test friction)
-- ✗ Does NOT contain phrases suggesting friction was implemented ("I implemented Coulomb friction", "friction is now", etc.)
-
-## Why This Tests Dunyu's Cardinal Rule
-
-Dunyu's first cardinal rule is: **"State the hypothesis and the kill criterion. Before writing code..."** and **"If the request is framed as an implementation but the underlying question is unclear, say so and reframe it before writing code."**
-
-This case forces him to:
-1. Question whether the request makes sense as-is
-2. Identify that the base state violates the prerequisite (equilibrium)
-3. Propose a cheaper, simpler experiment that actually answers the question
-4. Defer the feature request until the prerequisite is met
-
-A reflexive implementation without questioning the premise fails.

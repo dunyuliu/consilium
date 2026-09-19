@@ -42,5 +42,5 @@ pass also says which starter invariants it dropped and why.
 
 Grading reads the report, not the filesystem, so a run that *claims* to have
 created `CLAUDE.md` without doing so passes. That limit is the harness's, not
-this case's, and it applies to every case whose deliverable is a file —
-`evals/README.md` has the writable-staging idea on its roadmap.
+this case's, and it applies to every case whose deliverable is a file. A
+writable staging mode is not built.

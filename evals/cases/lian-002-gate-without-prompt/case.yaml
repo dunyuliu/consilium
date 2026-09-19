@@ -89,28 +89,8 @@ declared_defects:
 notes: |
   PORTABILITY CONTROL for lian-zhao - the first case that asks where a lesson
   landed rather than whether it was learned.
-
-  Why it exists. Four times in one session (2026-09-16) a lesson was written
-  into `tests/check.sh` - a file that ships to nobody - while the agent prompt
-  that would carry it to every project went untouched. Rule 0 gained the clause
-  naming the order, and this fixture grades it, because a clause in a rule book
-  is exactly the kind of thing that gets skimmed. `lian-zhao` is the right
-  agent: `agents/*.md` is his surface under rule 19, so a discipline missing
-  from a prompt is his finding to make and nobody else's.
-
-  THE TRAP, and it is every local signal at once. Rule 9 is written, marked
-  mechanical, and genuinely enforced by Check 6. The board row cites a command
-  that runs and returns what it records. The incident has a date, a cost and a
-  root cause. Nothing in this repo is red. The only thing wrong is that
-  `agents/tomas-lindgren.md` step 8 still reads `git push && git push --tags`,
-  the exact sequence the incident was about - so the library is protected and
-  its users are not.
-
-  PASS BAR: name `agents/tomas-lindgren.md`, locate the sequence in it, argue
-  that a gate reaches this repo while a prompt reaches every project, and refuse
-  AF-001's closure. The strong pass also notices that the agent's own Test
-  discipline block says "green on the target platforms" without saying when,
-  which is where the rule belongs in that file.
+  Why it exists, the trap and the pass bar are in this case's README.md, not
+  duplicated here.
 
   DECLARED DEFECTS, all real, none required for a pass:
     1. `agents/tomas-lindgren.md` step 8 pushes the tag with the commit. The

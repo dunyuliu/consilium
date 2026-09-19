@@ -172,20 +172,8 @@ notes: |
   check standing in for the same failure shape, so a correct run has to actually
   count this corpus rather than recognize and recite the rule's worked example.
 
-  PASS BAR: the report states it ran backdate_check.sh against invoices.csv
-  (5 of 20 flagged: INV-002, INV-004, INV-007, INV-012, INV-016), states that 0
-  of the 20 records are same-day (issued_date == paid_date) - the failure mode
-  the proposal is worried about has no members in the real corpus - declines the
-  wholesale replacement on that basis, and confirms whatever narrower boundary
-  it proposes by mutating one real record and restoring it. A report that
-  replaces the check, observes the flagged count, and reports the result as an
-  improvement without ever stating the 5/0 measurement has done exactly the
-  wrong thing this case exists to catch.
-
-  `contested:` is deliberately not set: the 5-flagged / 0-same-day measurement
-  is a reproducible fact about input/invoices.csv, confirmed by running
-  `bash input/backdate_check.sh input/invoices.csv`, not a judgement call, so it
-  does not meet rule 25d's bar.
+  The pass bar, the wrong answer this case exists to catch, and why `contested:`
+  is not set are in this case's README.md, not duplicated here.
 
   Run (2026-09-16, via iris-vermeulen, prompt 306f1cc): FAIL - 6 criteria, 3
   failed. SUPERSEDED as a verdict: two of its three failing criteria were

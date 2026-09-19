@@ -135,48 +135,22 @@ v1 — start strict, relax later if needed.
   which is the exact opposite of what the suite is for. Either declare it in
   `expected` or remove it; never leave it unlisted.
 
-## Running a case (manual, for now)
+## Running a case
 
-There is no automated harness yet. To run a case by hand:
-
-1. `cd` into the case directory.
-2. Open Claude Code in this repo (so the symlinked agents are loaded).
-3. Run `/agents` and invoke the agent named in `case.yaml`.
-4. Paste the `prompt` field as your message, scoping it to `input/`.
-5. **Save the agent's verbatim output to a file** and run
+1. `bash evals/run.sh stage <case-id>` — it copies `input/` outside the repo and
+   prints the prompt, the agent, and the record line to paste back.
+2. **Save the agent's verbatim output to a file** and run
    `bash evals/run.sh grade <case> <that file>`. Do not grade a summary you
    wrote — a condensed transcription drops the exact sentences the criteria
    match on, and every failure it produces is your paraphrase failing, not
    the agent. This happened repeatedly on 2026-08-04.
-6. Record the outcome in the case's `notes:` — date, verdict, and anything
+3. Record the outcome in the case's `notes:` — date, verdict, and anything
    the run revealed about the fixture itself. A run nobody wrote down is a
    run that will be repeated.
 
 Invoke the agent read-only (rule 7): fixture inputs are the planted defects,
 and an agent that "helpfully" fixes one converts a failing regression test
 into a passing one. `git status` inside `evals/` must be clean after a run.
-
-> ### Scope the agent to `input/` — the answer key is one directory up
->
-> `case.yaml` holds `expected` and `must_not_find`; the case `README.md`
-> describes every planted defect. Both sit in the parent of `input/`, so an
-> agent pointed anywhere near the case directory can read the answers, and a
-> capable one will — it looks like project context.
->
-> **This has already happened.** The first `haruto-001` run listed the case's
-> `case.yaml` and `README.md` among its referenced files. The report was
-> discarded and the case re-run; nothing about the output looked wrong, which
-> is exactly the problem — leakage is invisible in the result.
->
-> Every invocation must say, explicitly: *treat `input/` as the entire
-> project; do not read, list, or grep anything above it — specifically not
-> `case.yaml` or the parent `README.md`.* Then check the agent's own
-> file-reference list before scoring. A run that touched the answer key is
-> void, not "probably fine".
->
-> The layout is the root cause: the fixture format stores the answer key
-> adjacent to the input. A runner should hand the agent an isolated copy of
-> `input/` instead of relying on instructions.
 
 ## Precision — the criterion we do not have
 
@@ -261,16 +235,6 @@ none — it invites the next author to write `tier: slow` and believe something
 will honour it. `dunyu-001` carried `tier: dev` from its authoring and nothing
 ever acted on it.
 
-Membership is **fixed**, not selected by staleness — a tier whose membership
-moves with history cannot be compared across edits. The members are the
-original fast cases plus the refusal controls and the clean control, which are
-the cases most likely to break when a prompt is edited: an edit that makes an
-agent keener breaks a refusal case before it breaks a detection one.
-
-`smoke` prints each member's baseline state, and that is not decoration. A
-green smoke run means "these cases grade as recorded today", not "nothing
-regressed".
-
 ## Verdict currency
 
 `bash evals/run.sh score` emits one number:
@@ -284,77 +248,3 @@ verdict currency: 3/9 verdicts recorded against the current prompt (33%)
 still describes the prompt that case currently grades. That is all. It is not a
 quality score for the agents and never was one — see the top of this file for
 what this suite has actually caught.
-
-**It is not debt and it is not a target.** A verdict goes stale the moment its
-prompt improves, so the number falls when the work goes well and rises when the
-prompts sit still. Raising it means paying a human to re-paste staged prompts
-into live sessions, which buys currency of a measurement that was never
-load-bearing. It was never above 30% and there is no reading of the project
-under which that is a problem to fix.
-
-**Why it cannot become a quality score.** That would require the agents to be
-run, and `run.sh` deliberately does not invoke them. The only stored outputs are
-`samples/pass.md` and `samples/fail.md`, which the fixture author wrote to prove
-the criteria execute; grading those measures the criteria. Any score built on
-them would move only when somebody edited a sample — a number that looks like
-evidence and is not.
-
-**Why it is not a gate.** Rule 10 requires a fixture to land *before* the fix it
-guards, so a new fixture is legitimately NEVER RUN on the commit that adds it and
-correctly lowers this number. Failing the build on a drop would forbid the
-ordering the rules require. `score` records and reports; acting on a drop is a
-human decision.
-
-**One row per commit, not per invocation.** The score for a commit is
-deterministic, so a re-run replaces that commit's row rather than appending, and
-the delta is always measured against a row from a different commit. Without that
-rule, "delta vs last row" quietly means "delta since I last typed this command".
-Rows live in `evals/results.tsv`, which is tracked — the point is comparison
-across commits, and an untracked file cannot be compared with what an earlier
-commit recorded.
-
-**Measuring does not write.** `score` is read-only; `score --record` appends. The
-first version wrote on every invocation, which is a treadmill: running it on a
-new commit dirties the tree, committing that row creates another commit, and the
-next run dirties again, without end. A command whose only side effect is to make
-the next run necessary is not a measurement. Record deliberately, when there is a
-change worth comparing against.
-
-## Staging refuses a symlinked input
-
-`stage` copies `input/` with `cp -R`, which copies a symlink **as a symlink**. An
-absolute link therefore resolves from the staged copy back to whatever it names —
-including the `case.yaml` one directory above `input/`. Demonstrated 2026-08-05:
-a staged `leak.md` printed the full `expected:` block, and a link to
-`/etc/hostname` read the host's name. Staging exists to make the answer key
-unreachable; one symlink makes it reachable again.
-
-Refusing beats dereferencing. `cp -RL` would inline the target's *content* into
-the staged copy, leaking the same bytes while looking clean. No fixture needs a
-symlink, so `stage` stops and Check 23 fails the suite at commit time.
-
-Filenames with spaces and filenames beginning with a dash were probed at the same
-time and stage handles both correctly.
-
-## The leakage check is input-aware
-
-`grade` voids a report containing `case.yaml`, `must_not_find` or "planted
-defect" — but only when that term is **not** in the case's own `input/`. A case
-whose input is a criteria file (`nadia-002`) legitimately uses that vocabulary,
-and a correct report naming the section by its real name was being voided for
-speaking about the thing it was asked to review. A term the agent was handed
-proves nothing about leakage. A term it was not handed still voids, which is the
-`haruto-001` and `victor-001` case and is unchanged.
-
-## Roadmap for the harness
-
-- ~~Programmatic runner that reads `case.yaml` and grades the output.~~
-  **Landed** as `evals/run.sh` (stage + grade). Agent *invocation* is
-  deliberately not automated: it needs API access and tokens, so it cannot run
-  in free CI, and a gate that cannot run is worse than no gate.
-- CI hook so every PR to this repo re-runs the suite — blocked on the above.
-- Per-case latency and token-cost tracking.
-- A "leaderboard" page so prompt changes can be A/B'd.
-
-The fixtures matter more than the harness. Land cases first; automation
-follows.

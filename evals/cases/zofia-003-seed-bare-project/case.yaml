@@ -60,7 +60,7 @@ must_not_find:
   #
   # This is the class of defect PF-003 exists to find: the fixture was wrong
   # and only attempting to run it showed that. Restore those guards only
-  # alongside writable staging (evals/README.md roadmap).
+  # alongside a writable staging mode, which is not built.
   # Wrong classification at Step 0. Declarative, and subject-first so a denial
   # ("CONTRIBUTING.md is not the rule book") does not contain it.
   - keywords:
@@ -104,33 +104,10 @@ declared_defects:
 
 notes: |
   MODE A CONTROL for zofia-kaminska - the first fixture in the suite that
-  reaches her seeding mode at all. zofia-001 tests discovery and zofia-002 tests
-  refusal, both Mode B; b9e02d6 shipped her root-document whitelist while
-  recording its own gap ("Mode A is 33% of this file and has no fixture at
-  all"), and on 2026-09-16 a user reported the predicted failure from a real
-  run, where seeding produced no CLAUDE.md and no board.
-
-  The trap is in the input, not the prompt, and there are two of them.
-  CONTRIBUTING.md is a plausible rule-book candidate that is really a page of
-  recipes, which Step 0 says to name as documentation and keep looking past.
-  TODO.md is a real status board under a non-canonical name, which Mode A says
-  to propose renaming rather than to shadow with a second file. Neither trap is
-  hinted at in the prompt; both are the kind of thing a repo actually contains.
-
-  PASS BAR: the report names all four root documents her invariant 1 requires,
-  says CLAUDE.md and PROJECT_RULES.md were created, proposes the TODO.md rename
-  instead of seeding a second board, classifies CONTRIBUTING.md as recipes
-  rather than rules, and adapts at least one rule to `make test` rather than
-  leaving it as "run the test suite". The strong pass also says which starter
-  invariants it dropped and why.
-
-  WHAT THIS CASE DOES NOT TEST. The harness stages read-only and grades the
-  report, so it cannot see the filesystem - and cannot let the agent touch one.
-  A run that says it would create CLAUDE.md is indistinguishable here from one
-  that would actually do it. That limit is the harness's and applies to every
-  case whose deliverable is a file; writable staging is on evals/README.md's
-  roadmap and is not built. Two guards were removed for colliding with it, and
-  the collision is recorded above them.
+  reaches her seeding mode at all. Why it exists, the two traps in the input,
+  the pass bar and what the harness cannot see are in this case's README.md,
+  not duplicated here. Two must_not_find guards were removed for colliding with
+  the read-only limit, and the collision is recorded above them.
 
   Verified by the author before shipping, per evals/README.md: "CLAUDE.md",
   "PROJECT_RULES.md" and "PATHWAY_FORWARD.md" appear nowhere in input/, so no
