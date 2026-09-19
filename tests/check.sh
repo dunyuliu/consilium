@@ -791,22 +791,25 @@ echo "Check 24: an empty report fails every case"
 # a non-PASS. It is complete for that. It does NOT establish that a weak report
 # fails — "how much work does this report show" is not mechanizable, and
 # `lars-002` was found by hand, not by this.
-empty_report=$(mktemp) || die_msg=""
-: > "$empty_report"
 check24_n=0
-for case_dir in evals/cases/*/; do
-    id=$(basename "$case_dir")
-    [ -f "$case_dir/case.yaml" ] || continue
-    check24_n=$((check24_n + 1))
-    verdict=$(bash evals/run.sh grade "$id" "$empty_report" 2>&1 | grep -cE '^PASS —' || true)
-    if [ "$verdict" -gt 0 ]; then
-        fail "$id: an EMPTY report passes this case — its guards are satisfied by silence and its expected criteria are too weak to require work (rule 25)"
-    else
-        ok
-    fi
-done
-rm -f "$empty_report"
-[ "$check24_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 24 asserted nothing"
+if ! empty_report=$(mktemp); then
+    fail "Check 24 setup: mktemp could not create a file under TMPDIR=${TMPDIR:-/tmp} — no empty report exists to grade, so this check asserted nothing"
+else
+    : > "$empty_report"
+    for case_dir in evals/cases/*/; do
+        id=$(basename "$case_dir")
+        [ -f "$case_dir/case.yaml" ] || continue
+        check24_n=$((check24_n + 1))
+        verdict=$(bash evals/run.sh grade "$id" "$empty_report" 2>&1 | grep -cE '^PASS —' || true)
+        if [ "$verdict" -gt 0 ]; then
+            fail "$id: an EMPTY report passes this case — its guards are satisfied by silence and its expected criteria are too weak to require work (rule 25)"
+        else
+            ok
+        fi
+    done
+    rm -f "$empty_report"
+    [ "$check24_n" -gt 0 ] || fail "no case.yaml found under evals/cases/*/ — Check 24 asserted nothing"
+fi
 
 
 echo "Check 26: no generated artefact in a fixture input (rule 7)"

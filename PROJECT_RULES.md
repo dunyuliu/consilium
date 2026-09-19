@@ -319,7 +319,7 @@ what the script now wires.
 
 These encode practices consilium already follows (README "Hiring",
 `agents/haruto-nakamura.md` release workflow, `tests/check.sh`) — codifications
-of existing agreements, not new policy, except where marked **Proposed**.
+of existing agreements, not new policy.
 
 ## 12. A new agent lands with its README roster, model table, and Layout entry
 
@@ -950,19 +950,15 @@ same thing to the next writer.
 **Known corrective paths**, so a refusal is recognisable as non-terminal:
 red-gate dispatch → 18b step 5; `tests/release_gate.sh`'s `row_skip` paths →
 `--accept-skips`; `tests/lock.sh acquire` refusing a second holder → a
-recorded force-release (18a). `pre-commit` and `pre-push` no longer exist
-(`install.sh`, `86f4b5d`), so their refusals are no longer cases this list
-needs to cover. `evals/run.sh` and CI gate nothing terminally. Check 35's
-newest-tag grace has no override today — board row PF-033.
+recorded force-release (18a). `evals/run.sh` and CI gate nothing terminally.
+Check 35's newest-tag grace has no override today — board row PF-033.
 
 ---
 
 ## Dropped starter rules
 
 - **Rule 6 — "every performance number carries its provenance."** Dropped:
-  consilium runs no benchmarks and ships no timing numbers. If the
-  `evals/run.py` harness on the roadmap adds per-case latency and token-cost
-  tracking, restore this rule as 6 rather than assigning a new number.
+  consilium runs no benchmarks and ships no timing numbers.
 
 The remaining starter rules are retained, all adapted to name this repo's
 actual artifacts.
