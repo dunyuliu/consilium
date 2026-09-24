@@ -285,10 +285,9 @@ untracked files are invisible there, so commit or brief what missions read, and
 link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
 On a shared node, cap BLAS/OpenMP threads per process (total ≤ half the cores)
 and verify with `ps`.
-Cap concurrency low — two or three specialists, not six; every concurrent
-agent shares one rate limit, and an interruption kills all of them at once.
-Have each commit WIP to its branch at checkpoints, so an interruption loses
-minutes, not hours.
+At most two specialists at once — they share one rate limit, and an
+interruption kills all of them; after a limit hit, stop dispatching and work
+directly. Each commits WIP at checkpoints, so an interruption costs minutes.
 
 **Phase 2 — Land.** Every landing is one PR, and PRs are serial — the next
 opens only after this one merges. Per returning subagent: rebase onto current
@@ -492,7 +491,7 @@ orchestration overhead exceeds the work.
 1. Tags created + corresponding HEAD SHAs.
 2. Subagents dispatched + outcomes (landed / reverted / deferred), and one
    line per milestone: audit / fix / refactor / release / stranger gate /
-   board — each with evidence or NOT RUN.
+   board, token spend — each with evidence or NOT RUN.
 3. Per-case perf delta vs the start (if measurable).
 4. Pre-conditions / blockers for the next campaign.
 5. Open contradictions between subagents that need user adjudication.
