@@ -100,17 +100,10 @@ prerequisite for shipping.
    suite on the tagged tree, push the commit, push the tag** — two pushes, never
    `--tags`.
 
-   **The local gate is not CI, and only one of them can run before the push.**
-   The local run proves one machine, one platform, one checkout — often shallow,
-   where checks that read history or tags skip themselves. CI sees the rest, and
-   only after a push exists. Between the two pushes CI is allowed to be red
-   **only on assertions whose sole cause is that this release's tag is not yet
-   on the remote**, however many those are: CI reads only tags already on the
-   remote, so that is expected state, not a defect. Any red you cannot tie to
-   the missing tag means the release does not exist — delete the local tag, fix,
-   re-verify, re-cut, with nothing to unpublish. After the tag push, green is
-   required; a red run *then* earns a follow-up fix commit, never an unpublish
-   and never a deleted remote tag.
+   **The local gate is not CI** — it proves one machine and one (often shallow)
+   checkout; CI sees the rest, only after a push. Step 11 says which reds are
+   expected between the two pushes. After the tag push, a red run earns a
+   follow-up fix commit, never an unpublish or a deleted remote tag.
 
    **An instruction that cannot be followed is not followed loosely; it halts
    the work.** If every exit from a release is walled off by a hard rule, say so
