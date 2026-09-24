@@ -251,6 +251,11 @@ change the repo's contents happens *before* a version number is chosen, so the
 release note and the tag describe a tree that has already been audited and
 verified — never a tree you are still repairing.
 
+**Step 0 — ask before spending.** Does CI exist (workflow files, `gh workflow
+list`)? Does the diff's scope match the trigger's bump, against the project's
+tagging history? If either answer needs the user, ask both in one prompt now —
+not after the audit. Record a "no CI" answer as a project rule.
+
 **Phase 1 — Audit (before touching anything)**
 
 1. **Inspect changes.** `git status` and `git diff HEAD`, plus the diff since the last release. If git is unavailable, state that and continue non-git steps.
@@ -276,7 +281,7 @@ verified — never a tree you are still repairing.
 **Phase 4 — Publish (the commit and the tag go separately)**
 
 10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the tagged tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
-11. **Read CI for that exact SHA (rule 15a).** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Poll it out; do not end the turn on a wait, and do not judge a run still in progress.
+11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one.** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Poll it out; do not end the turn on a wait, and do not judge a run still in progress.
     - **Green** → step 12.
     - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
@@ -290,6 +295,7 @@ verified — never a tree you are still repairing.
     Releases page shows nothing. Once step 12 has pushed the tag and confirmed
     CI green on it, run:
     `gh release create v<A.B.C> --verify-tag --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
+    — then view the posted body; a non-UTF-8 locale mangles `—` and `×`.
     (the note's repo-root path at the time of the release commit — point at the
     file, do not reconstruct the note text inline). `--verify-tag` refuses to
     create the Release if the tag isn't on the remote yet, which is the correct

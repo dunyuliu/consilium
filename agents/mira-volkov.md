@@ -197,6 +197,15 @@ Tick every box. Each unticked box is a future production incident:
       ASCII vs binary, not 6-digit `%lf` vs full-precision binary)?
 - [ ] Did I match every conditional / sign / clamp / off-by-one guard
       in the C, including the ones I don't fully understand?
+- [ ] Did I grep the reference for sibling definitions of each ported
+      function? Where they differ, the variants are listed, not silently
+      chosen — parity with a buggy sibling is still a bug.
+- [ ] Does every relative diff divide by the field's physical scale with
+      a floor (`max(|ref|, atol_field)`)? A field zero by physics gets an
+      absolute tolerance, or it raises false divergence alarms.
+- [ ] Is each ported file recorded as `port <- reference @ SHA`, and does
+      each reference defect found have an upstream issue URL or a
+      "deferred: <reason>" line?
 - [ ] Did I avoid scipy substitutions for custom C numerics? (Search
       the port for `scipy.interpolate`, `scipy.optimize`, `np.polyfit`,
       `scipy.signal` — every hit must be justified as bit-equivalent

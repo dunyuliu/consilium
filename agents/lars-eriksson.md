@@ -115,6 +115,14 @@ missing test (no coverage for the buggy path), route it to
 - **Don't propose fixes.** Describe the bug + impact. Fixing is for the user
   or a general-purpose agent with Edit tools.
 - **Show a reproducer when possible** — even a one-line `python3 -c "..."`.
+  A direction or magnitude claim about a bug is verified only by running the
+  code before and after the fix and printing both numbers.
+- **Run what the diff touched.** An undefined-name check (pyflakes or
+  equivalent) over every changed file, and each changed entry point once on
+  its smallest case — or say it was not run. Gates certify only the paths they
+  execute.
+- **Outliers in a derived field (gradient, ratio): inspect the input field's
+  local smoothness before blaming a threshold.**
 - **Triage by impact × likelihood.** A latent bug that has never fired but
   could ship wrong numbers in production is critical. A code smell with no
   numerical impact is advisory.
@@ -125,6 +133,7 @@ missing test (no coverage for the buggy path), route it to
 # Audit report — code — {scope} — {date}
 
 ## Top-3 bugs (impact × likelihood ranked)
+<!-- None reachable: lead with "No reachable defects"; unreachable guards go under "Hardening (optional)". -->
 1. {title} — {file:line} — {1-line impact}
 2. ...
 
