@@ -197,7 +197,7 @@ that says "run the test suite" without naming the command is unenforceable.
 Drop any starter rule that genuinely doesn't apply and say which you dropped
 and why. Add project-specific rules the starter set can't know about.
 
-### The starter set — twelve invariants
+### The starter set — thirteen invariants
 
 Converged independently across multiple mature rule books. The floor, not the
 ceiling.
@@ -318,6 +318,18 @@ ceiling.
     `git ls-files | grep -iE '(TODO|STATUS|ROADMAP|BACKLOG|TASKS|PLAN)\.(md|txt)$'`
     — with the project's fixture and history directories excluded, and the
     expected output empty.
+
+13. **Land through one gated PR at a time.** Branch (a worktree for anything
+    that builds); change and run the fast tier locally; open a PR whose body
+    says what changed and why, with evidence for every removal. Two gates in
+    parallel: CI, made a *required* status check by branch protection so it
+    binds rather than advises, and an independent audit of the final diff.
+    Fix on the branch and re-audit only the new commit until both pass;
+    squash-merge and delete the branch. Tag only a default-branch commit whose
+    own CI run passed. Serial: the next PR opens after this one merges —
+    parallel branches return stale-based, and a stale base silently reverts
+    whatever landed since. Seed the branch protection too; this rule without
+    it is a habit.
 
 **Starter numbers are not rule numbers.** Adapt them to the project you are
 seeding; never renumber a book that already exists.

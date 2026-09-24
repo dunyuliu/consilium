@@ -287,11 +287,15 @@ agent shares one rate limit, and an interruption kills all of them at once.
 Have each commit WIP to its branch at checkpoints, so an interruption loses
 minutes, not hours.
 
-**Phase 2 — Land.** Per returning subagent: pull from worktree, syntax-check
-changed files, run gate axes 3 + 4 (your own oracle re-run; worktree-base diff),
-then the merge gate. If it passes: commit, push, bump version per the scheme,
-post the tag. If it fails: revert immediately, push the revert, log diagnosis.
-Never debug in master. Poll CI's run LIST, not only the SHA you are gating: a
+**Phase 2 — Land.** Every landing is one PR, and PRs are serial — the next
+opens only after this one merges. Per returning subagent: rebase onto current
+main, syntax-check, run gate axes 3 + 4 (your own oracle re-run; worktree-base
+diff), then open the PR with what changed, why, and evidence for every removal.
+Two gates in parallel: the required CI check, and a `victor-reyes` audit of the
+final diff. Fix on the branch and re-audit only the new commit until both pass;
+squash-merge, delete the branch. Tag only a main commit whose own CI run passed
+(`haruto-nakamura`'s boundary). If a landing regresses main: revert, push the
+revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only the SHA you are gating: a
 red on master once sat unread for two hours because the poll was filtered to
 one commit.
 
