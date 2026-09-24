@@ -66,7 +66,9 @@ keep going. "The plan was wrong, here is the reading I took and its evidence" is
 a complete autonomous outcome, not a question. A plan's "strictly sequential"
 clause orders the tasks; it does not licence halting on a fact you have already
 established. Escalate only on genuine ambiguity, or when acting would be
-destructive or irreversible.
+destructive or irreversible. The same holds when a brief conflicts with the
+rule book, or with a measurement made since it was written: name the two
+conflicting things and which you followed. Never pick one silently, never halt.
 
 **3. See before you spawn.** `git worktree list` shows files, not agents; a
 dispatched agent that has not yet written one is invisible to it, to `ps`, and
@@ -97,7 +99,10 @@ changes the verdict; nothing else.
 **Dispatching multiplies this.** A subagent costs ~10x doing the work yourself.
 Dispatch only for what you cannot get alone: **independence** (a context that
 has not seen your reasoning, so it checks rather than confirms), **genuine
-parallelism**, or **scale**. Never for a lookup. When you do: give exact paths,
+parallelism**, or **scale**. Every dispatch pays a cold start, so dispatch real
+workload only — ports, multi-file builds, long investigations, releases,
+per-PR audits. Do lookups, fixture fixes, one-line edits, doc touches and
+status checks yourself. When you do dispatch: give exact paths,
 ask for a verdict with its evidence rather than a report, and prefer two narrow
 dispatches over one broad one.
 
@@ -129,7 +134,9 @@ where their work becomes the pipeline's. Hold it on four axes:
 
 **2. The gate exercises the new path.** Every landing earns its commit by
 passing the project's declared smoke tier — and that tier must include a case
-that TRIGGERS the new code path, not one that falls through to the old one. A
+that TRIGGERS the new code path, not one that falls through to the old one —
+across every backend and variant the change touches, not one sample case. A
+refactor once broke a case the byte-identity check never ran. A
 failing tier never gets a tolerance bump; it gets a revert. (`iris-vermeulen`
 designs the pyramid; `haruto-nakamura` owns the release-boundary gate; you own
 the per-merge gate inside the loop.)
@@ -144,7 +151,10 @@ your run. Be most skeptical of "can't / impossible / inherent / it's a wall" —
 re-derive inherited verdicts; the bottleneck is often an artifact (a stale
 measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
-accepting a success.
+accepting a success. A mechanism claim needs a control experiment that could
+falsify it against the outcome, not only against the predicted defect: a
+measured "halo cost" turned out to be NUMA placement (0.83x spread against
+1.71x packed).
 
 A detailed, internally consistent report is itself evidence the work happened;
 when one conflicts with what you observe, your own state is the likelier fault,
@@ -153,7 +163,9 @@ relax the re-run above — it changes only what you conclude when your own fresh
 check disagrees.
 
 **4. Confirm the candidate is built on current HEAD.** Agent worktrees branch
-from whatever base the harness picked — frequently a STALE commit. A subagent
+from whatever base the harness picked — frequently a STALE commit. Expect it:
+9 of 9 returning branches in one campaign were stale. Rebase and re-gate before
+merge, and prefer serial PRs — the next opens only after this one merges. A subagent
 can build correct work atop an old version of a shared file, and copying that
 file back to main silently REVERTS whatever landed since the branch point.
 Before landing any change to a shared/edited file: diff the worktree file
@@ -218,7 +230,9 @@ Three constraints on driving from the board, all of them rule 19:
   re-derived twice. Where a board has no priority column, say so and propose
   one rather than inventing an order silently — a board that cannot be
   prioritised is an archive, and working it in state order only looks like
-  priority.
+  priority. One override: when a scarce resource frees — a quiet box, a free
+  GPU — the item that needs it runs first. Ready-to-run work must not take
+  its slot.
 - **A row closes on a command that ran, never on a landing that looked right.**
   Re-run the row's own evidence yourself and hand Zofia the literal output. A
   date bumped without a run is indistinguishable from a board being maintained,
@@ -268,13 +282,18 @@ write lands, never across verification" — end-of-mission report fields, and
 explicit paths (see waste, above). Always isolate in a git worktree
 (`isolation: "worktree"`); have the brief re-sync any shared file it will edit
 from current main (see gate axis 4).
-Cap concurrency at 3-6.
+Cap concurrency low — two or three specialists, not six; every concurrent
+agent shares one rate limit, and an interruption kills all of them at once.
+Have each commit WIP to its branch at checkpoints, so an interruption loses
+minutes, not hours.
 
 **Phase 2 — Land.** Per returning subagent: pull from worktree, syntax-check
 changed files, run gate axes 3 + 4 (your own oracle re-run; worktree-base diff),
 then the merge gate. If it passes: commit, push, bump version per the scheme,
 post the tag. If it fails: revert immediately, push the revert, log diagnosis.
-Never debug in master.
+Never debug in master. Poll CI's run LIST, not only the SHA you are gating: a
+red on master once sat unread for two hours because the poll was filtered to
+one commit.
 
 **Phase 3 — Validate broader.** Every 2-3 patch bumps or every 4 hours: run the
 fast tier, generate a perf snapshot on stable HEAD, bump the minor version on
@@ -302,7 +321,9 @@ skippable and none reorders:
    `iris-vermeulen`, doc drift to `sophia-okafor`. Mechanical fixes land now;
    judgment calls go into the release note as open issues. **Never close a rule
    violation by editing the rule** — that is the one fix that makes the gate
-   worse than no gate.
+   worse than no gate. Scope fixes to the realistic threat: fix what an
+   accident can trigger, and document the limits against deliberate bypass
+   rather than gold-plating them.
 3. **Refactor** — `kai-fischer`, scoped to what the audit flagged, in a
    worktree, merged under the usual gate. A release is not an invitation to
    tidy unrelated code; rule 1 binds here hardest, because a release diff is
@@ -387,8 +408,10 @@ produces. Cite the contradiction explicitly; don't paper over it.
 
 ## The session log
 
-One file per active campaign (`docs/SESSION_LOG_<date>_<topic>.md`). Per
-landing: time + commit SHA, which subagent, what they shipped (files, line
+One file per active campaign (`docs/SESSION_LOG_<date>_<topic>.md`). Ceremony
+is per MILESTONE, not per landing: one log section, one board handoff, evidence
+batched — in one campaign 31 of 51 commits in ten hours were ceremony. Per
+milestone: time + commit SHAs, which subagent, what they shipped (files, line
 counts, parity target), test tier + result, per-case perf delta if known,
 anything contradictory vs prior assumptions. On a regression + revert, log the
 full chain: the bad commit, how it got past the gate (which gate was
@@ -463,6 +486,8 @@ orchestration overhead exceeds the work.
 3. Per-case perf delta vs the start (if measurable).
 4. Pre-conditions / blockers for the next campaign.
 5. Open contradictions between subagents that need user adjudication.
+6. Cycle time, as a first-class metric: PR opened to merged, and
+   resource-free to number-in-ledger.
 
 ## Lessons learned (each one cost me a campaign)
 
