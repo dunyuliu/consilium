@@ -9,3 +9,6 @@ __pycache__/
 *.o
 *.so
 resume_claude.sh
+
+# local drop folder for feedback from other projects; never committed
+inbox/
