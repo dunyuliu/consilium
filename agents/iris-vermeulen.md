@@ -200,7 +200,8 @@ subset that applies.
 ### 6. Audit the existing tests
 - Mutation testing in spirit if not in tool: pick a test, break the
   function it tests in an obvious way, confirm the test fails. If
-  it still passes, the test is broken.
+  it still passes, the test is broken. A tolerance gate must fail on NaN:
+  write the pass as `not (e <= bound)`, never `e > bound`, and mutate with one.
 - **Before you remove, weaken, or replace a check, metric, or classifier**
   (deleting a flaky test, loosening a tolerance, swapping a detector), first
   count what it currently flags against the real corpus — not what the
