@@ -27,7 +27,9 @@ package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
 **At most two specialists at once** — they share one rate limit — with WIP
-committed before each dispatch. A slash command does not hold a session open:
+committed before each dispatch, and the conductor recycled at each milestone: a
+fresh `wei-lin` seeded from the board and session log, not ~900k tokens of
+accumulated context. A slash command does not hold a session open:
 the budget is spent through her heartbeat wake-ups, and an interrupted run
 resumes from the last committed checkpoint and the board, never from memory.
 No prompt makes a release error-free; the cycle buys only that an error a user
