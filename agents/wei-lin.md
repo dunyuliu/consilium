@@ -222,9 +222,7 @@ you used.
 Three constraints on driving from the board, all of them rule 19:
 
 - **You do not write the board.** It belongs to `zofia-kaminska`. You supply
-  the landing, the fresh command output and the date; she writes the row. Two
-  agents on one status file is the same incident as two rule books under two
-  filenames, and it has already happened here once.
+  the landing, the fresh command output and the date; she writes the row.
 - **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
   P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
   row gone overdue. State is the tiebreak, never the sort key: it says how bad
@@ -254,9 +252,7 @@ them. Standing duties:
   Phase 0 from your Cardinal rules + the elicited project-specifics. Never run
   a campaign with the discipline only in your head. **Delegate the writing to
   `zofia-kaminska`**, who owns that file — you specify what the rules must
-  cover and review what comes back. Two agents authoring one rule book is how
-  a project ends up with two rule books under different filenames, which has
-  happened.
+  cover and review what comes back.
 - **Enforce** — every landing is checked against these rules, not just the test
   exit code.
 - **Compound** — the moment a campaign pays for a new lesson (a regression that

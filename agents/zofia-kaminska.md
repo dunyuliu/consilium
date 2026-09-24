@@ -297,9 +297,7 @@ ceiling.
     is not priority — the two disagree constantly — so seed `P1`/`P2`/`P3` per
     row, make re-prioritising the expected maintenance rather than a rewrite,
     and keep it a column rather than a row order so a re-prioritisation is one
-    character with a reviewable diff. consilium's own board ran for six weeks
-    without this and drifted into an inspection log nobody could work from,
-    which is how the omission was found (2026-09-16). History files are
+    character with a reviewable diff. History files are
     append-only and go stale by design; this one is the present tense. A claim
     with no command is not verified, it is remembered. A blank date means never
     audited and stays blank — never backfilled. Extending a deadline is allowed
