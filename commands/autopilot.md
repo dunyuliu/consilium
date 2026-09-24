@@ -4,6 +4,9 @@ description: Work the status board unattended for a stated budget — wei-lin wo
 
 Invoke `wei-lin` for the budget passed as argument (`12h`, `until the board is
 green`, `3 milestones`); she states how she read it before spending any of it.
+The brief carries only state she cannot find: running jobs, out-of-repo data,
+untracked work, pending user decisions, results measured this session. Never
+restate her rules — if one seems missing, file an inbox lesson instead.
 
 **The queue is the status board the rule book names** — `PATHWAY_FORWARD.md`
 by default — worked in `prio` order, state as the tiebreak. If this command and
