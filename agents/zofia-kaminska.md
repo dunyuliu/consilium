@@ -279,7 +279,9 @@ ceiling.
 
 11. **Docs move with the code, in the same change.** Never as a follow-up.
     Fix every reference when a file moves. A change is not done until its
-    docs match reality.
+    docs match reality. Docs never quote a derived count (cases, rules,
+    agents) — point to what generates it, or every change owes a
+    "true up counts" commit.
 
 12. **A living status board, prioritised and re-checked on a schedule.**
     `PATHWAY_FORWARD.md` at the repo root — that name, that location — records
