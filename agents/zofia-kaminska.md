@@ -288,7 +288,9 @@ ceiling.
     every open issue, every to-do, every standing claim and every thing already
     verified, each with the surface it belongs to, **a priority the work is
     taken in**, a re-check interval, the date it was last checked, and the
-    exact command whose output was read.
+    exact command whose output was read — one that can change colour: after a
+    squash merge `git log main..<branch>` never empties, and a `grep -c` that
+    counts comments quoting its pattern never reaches zero.
 
     **The priority column is the point.** A board without one is an archive:
     it can say a thing is broken and never say whether to touch it today. State
