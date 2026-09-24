@@ -96,6 +96,8 @@ missing test (no coverage for the buggy path), route it to
 
 ### 4. Consistency between layers
 - Same constant defined twice, possibly differing values?
+- A convention that varies across a family (benchmark specs, sibling
+  implementations) encoded as one global constant? Check each case's spec.
 - Config file vs runtime: what's actually used?
 - Default-resolution order (code default → config → CLI → env): documented?
 - Paired buy / sell signs, debit / credit signs, before / after splits.

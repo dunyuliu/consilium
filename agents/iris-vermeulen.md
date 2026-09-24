@@ -160,6 +160,10 @@ They run slowly, fail flakily, and don't tell you which line broke.
   Any difference is a failure that requires an explanation — either
   "fix the bug" or "regenerate golden with this PR" written in the
   commit message.
+- Diff every output a downstream consumer reads, not one headline field —
+  each gets a comparison or a declared-unsupported line, and every written
+  file must carry data. A gate on one artifact is blind to the rest: station
+  files once carried a wrong sign for years behind a green field-only gate.
 - For non-deterministic pipelines: fix the seed in the test path,
   and run with multiple seeds in a slower CI tier.
 
