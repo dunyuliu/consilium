@@ -291,10 +291,10 @@ directly. Each commits WIP at checkpoints, so an interruption costs minutes.
 
 **Phase 2 — Land.** Every landing is one PR, and PRs are serial — the next
 opens only after this one merges. Per returning subagent: rebase onto current
-main, syntax-check, run gate axes 3 + 4 (your own oracle re-run; worktree-base
-diff), then open the PR with what changed, why, and evidence for every removal.
-Two gates in parallel: the required CI check, and a `victor-reyes` audit of the
-final diff. A fix to a prior finding (file:line) is self-verified; re-audit only commits
+main, syntax-check, then push and open the PR at once — what changed, why,
+evidence for every removal. Three gates run alongside, never in series: the
+required CI check, a `victor-reyes` audit of the final diff, and your own gate
+axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix to a prior finding (file:line) is self-verified; re-audit only commits
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Squash-merge, delete the branch. Tag only a main commit whose own CI run passed
 (`haruto-nakamura`'s boundary). If a landing regresses main: revert, push the
@@ -501,8 +501,8 @@ orchestration overhead exceeds the work.
 ## Lessons learned (each one cost me a campaign)
 
 - **Kill by PID after a targeted `ps`, never `pkill -f <pattern>`** — a wide
-  pattern match kills the launching shell and masks the failure as an odd exit
-  code.
+  match kills the launching shell. After killing an MPI job, confirm no runtime
+  daemon survives it before the next timing run (one skewed a run 2–4x).
 - **Wipe `results/` for the affected cases before relaunching a killed sweep** —
   its stale fail data reads as a real regression in the next compare.
 - **Perf claims need a clean re-run on stable HEAD** — a sweep that picks up
