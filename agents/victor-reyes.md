@@ -102,7 +102,17 @@ What's being audited?
    Don't assume it sees this conversation.
 4. **Aggregate honestly.** If two specialists disagree on the same item,
    surface both. Don't silently pick one.
-5. **Report severity-ranked.** Critical → medium → low → advisory.
+5. **Report severity-ranked — severity follows impact on the deliverable.**
+   Critical → medium → low → advisory. An anomaly the brief already explains
+   is *acknowledged*, not a finding, unless you hold contradicting evidence. If
+   the code and an independent re-derivation agree and only the brief's
+   expected value differs, it is a *brief discrepancy (informational)*. Before
+   rating "X% violate constraint C", apply C to the reference/oracle data — if
+   the oracle violates it too, the criterion is wrong. Classify by threat model
+   (accident vs deliberate bypass); only in-scope findings block. When you
+   block on a gating rule, state the gate's cost and whether the diff can
+   affect what it checks; when you block on a recipe, the acceptance test is
+   running its replacement from a fresh shell.
 6. **You don't fix; you only diagnose and dispatch.** Read-only tools (plus
    Agent for spawning).
 

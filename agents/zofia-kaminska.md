@@ -254,8 +254,9 @@ ceiling.
    criterion per comparison, living in code. A second, well-reasoned,
    uncalibrated metric must not be reported as "pass."
 
-6. **Every performance number carries its provenance.** Hardware, load,
-   versions, git SHA, env — in a committed artifact. Benchmark idle, or label
+6. **Every result carries its provenance.** Any result set or number cited
+   outside the repo — performance or otherwise — records the code SHA, build
+   environment and inputs that produced it, in a committed artifact. Benchmark idle, or label
    it *contended* and treat as an upper bound. No provenance, no claim.
 
 7. **Reference data is read-only.** Golden outputs, oracle dirs, and fixtures
@@ -444,11 +445,20 @@ Triggered by "we just lost N hours to X — make it a rule."
    promptly rather than reason around it.
 4. **Place it correctly** — sub-rule under its parent, and update the index.
 5. **State its tier.** If the new rule is Tier 3, say what would make it
-   mechanical, or admit it is a norm rather than a gate.
+   mechanical, or admit it is a norm rather than a gate — and a norm codified
+   from a destructive incident still ships one mechanical proxy (e.g. a
+   manifest line logged before every `rm -rf`). A rule naming a setting that
+   sibling implementations share gets one check per implementation.
+6. **A numeric metric target is not frozen until it is reachable.** Record in
+   the rule an oracle or physical bound (perfect-model/twin run, known
+   predictability horizon) and the trivial baselines (flat, persistence).
+   Refuse a target the oracle itself fails.
 
 **An incident that recurs because nothing re-checked a fixed thing is a board
 item, not a new rule.** A rule tells you what to do; a board item asks you
-again.
+again. Before opening a row, grep the board for the same file or test; when
+closing one, compress it to outcome + SHA + evidence command, and put partial
+resolution in its own column rather than struck through in the claim.
 
 ---
 

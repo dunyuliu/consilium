@@ -679,7 +679,10 @@ containment half **before anything else it says**:
 4. **Be evaluated.** Nothing merges on its author's say-so. The merge is a
    separate decision made by someone else — `wei-lin` inside a campaign,
    `haruto-nakamura` at a release boundary, the human otherwise — against a
-   fresh gate run, not the author's report of one.
+   fresh gate run, not the author's report of one. **Merge policy:** one PR at
+   a time into branch-protected `main`, squash-merged once the required CI
+   check is green; `wei-lin` may do this unattended, and cut minor and patch
+   tags. Major bumps and rewritten tags stay with the human.
 
 **Placement is the rule, not just the content.** The isolation section is the
 first `##` heading in the file, and Check 11 enforces the position: a
