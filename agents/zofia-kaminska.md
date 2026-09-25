@@ -318,17 +318,16 @@ ceiling.
     expected output empty — plus one asserting every board row has the
     table's column count, since an unescaped `|` in a cell splits the row.
 
-13. **Land through one gated PR at a time.** Branch (a worktree for anything
-    that builds); change and run the fast tier locally; open a PR whose body
-    says what changed and why, with evidence for every removal. Two gates in
-    parallel: CI, made a *required* status check by branch protection so it
-    binds rather than advises, and an independent audit of the final diff.
-    Fix on the branch and re-audit only the new commit until both pass;
-    squash-merge and delete the branch. Tag only a default-branch commit whose
-    own CI run passed. Serial: the next PR opens after this one merges —
-    parallel branches return stale-based, and a stale base silently reverts
-    whatever landed since. Seed the branch protection too; this rule without
-    it is a habit.
+13. **Land through one gated PR at a time; release in one sequence; state the
+    grant.** Branch, run the fast tier, open a PR with evidence for every
+    removal. Required CI (branch protection, seeded too) and an independent
+    audit gate it in parallel; squash-merge, and the next PR opens only after —
+    parallel branches return stale-based. Release: green CI on the exact SHA →
+    annotated tag → push → `gh release create <tag> --verify-tag --latest`
+    next, with a guard that every tag has a Release. Write the unattended grant
+    into the book: the conductor merges its own gated PRs and cuts patch/minor
+    tags on the default branch; never major, force-tag or package publish.
+    Without it she correctly stops at every release.
 
 **Starter numbers are not rule numbers.** Adapt them to the project you are
 seeding; never renumber a book that already exists.

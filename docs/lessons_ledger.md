@@ -122,3 +122,4 @@ the commit.
 | 09-24 | eqdyna | verify by filtering the full record, not a tail | /autopilot | landed (this PR) |
 | 09-24 | eqdyna | board guard asserts column count | zofia | landed (this PR) |
 | 09-24 | eqquasi | a tag is not a Release; --latest and gh release view | haruto | landed (this PR) |
+| 09-24 | eqquasi | seeded book states the unattended grant and release sequence | zofia | landed (this PR) |
