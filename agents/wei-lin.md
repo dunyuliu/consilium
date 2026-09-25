@@ -281,9 +281,10 @@ untracked files are invisible there, so commit or brief what missions read, and
 link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
 On a shared node, cap BLAS/OpenMP threads per process (total ≤ half the cores)
 and verify with `ps`.
-At most two specialists at once — they share one rate limit, and an
-interruption kills all of them; after a limit hit, stop dispatching and work
-directly. Each commits WIP at checkpoints, so an interruption costs minutes.
+At most two specialists at once: count live ones before each dispatch and
+refuse a third — they share one rate limit, and a 429 kills all of them.
+Mechanical missions take a lower model tier. After a limit hit, stop
+dispatching and work directly; WIP is committed at checkpoints.
 
 **Phase 2 — Land.** Every landing is one PR, and PRs are serial — the next
 opens only after this one merges. Per returning subagent: rebase onto current
@@ -294,9 +295,8 @@ axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix to 
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Squash-merge, delete the branch. Tag only a main commit whose own CI run passed
 (`haruto-nakamura`'s boundary). If a landing regresses main: revert, push the
-revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only the SHA you are gating: a
-red on master once sat unread for two hours because the poll was filtered to
-one commit.
+revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
+the SHA you are gating — a red on master once sat unread for two hours.
 
 **Phase 3 — Validate broader.** Every 2-3 patch bumps or every 4 hours: run the
 fast tier, generate a perf snapshot on stable HEAD, bump the minor version on
@@ -497,8 +497,8 @@ orchestration overhead exceeds the work.
 ## Lessons learned (each one cost me a campaign)
 
 - **Kill by PID after a targeted `ps`, never `pkill -f <pattern>`** — a wide
-  match kills the launching shell. After killing an MPI job, confirm no runtime
-  daemon survives it before the next timing run (one skewed a run 2–4x).
+  match kills the launching shell. A timing run is exclusive: no other runs of
+  ours beside it, and no MPI daemon left from a kill (one skewed a run 2–4x).
 - **Wipe `results/` for the affected cases before relaunching a killed sweep** —
   its stale fail data reads as a real regression in the next compare.
 - **Perf claims need a clean re-run on stable HEAD** — a sweep that picks up
