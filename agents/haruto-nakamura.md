@@ -287,8 +287,9 @@ not after the audit. Record a "no CI" answer as a project rule.
     incomplete: the tag is already public and in every clone, but the repo's
     Releases page shows nothing. Once step 12 has pushed the tag and confirmed
     CI green on it, run:
-    `gh release create v<A.B.C> --verify-tag --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
-    — then view the posted body; a non-UTF-8 locale mangles `—` and `×`.
+    `gh release create v<A.B.C> --verify-tag --latest --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
+    — then `gh release view` it: a tag is not a Release, and a non-UTF-8 locale
+    mangles `—` and `×`.
     (the note's repo-root path at the time of the release commit — point at the
     file, do not reconstruct the note text inline). `--verify-tag` refuses to
     create the Release if the tag isn't on the remote yet, which is the correct

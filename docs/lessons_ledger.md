@@ -113,3 +113,12 @@ the commit.
 | 09-24 | vegrav | /loop keeps firing after its campaign ends | /loop | dismissed: Claude Code, not consilium |
 | 09-24 | vegrav | watchdog compares against frozen literals | /autopilot | dismissed: not consilium's text |
 | 09-24 | vegrav | commit messages via a file, quoted heredocs | all | deferred |
+| 09-24 | eqdyna | invoking session writes nothing while wei-lin runs | /autopilot | landed (this PR) |
+| 09-24 | eqdyna | mission notes never committed at the root | wei-lin, zofia | landed (this PR) |
+| 09-24 | eqdyna | tolerance from measured spread incl. CI, absolute floor | iris | landed (this PR) |
+| 09-24 | eqdyna | one oracle independent of self-reference | iris | landed (this PR) |
+| 09-24 | eqdyna | threshold = next power of ten above margin x worst | iris | landed (this PR) |
+| 09-24 | eqdyna | pre-written constraints re-checked, not relayed | /autopilot | landed (this PR); vegrav watchdog row now covered |
+| 09-24 | eqdyna | verify by filtering the full record, not a tail | /autopilot | landed (this PR) |
+| 09-24 | eqdyna | board guard asserts column count | zofia | landed (this PR) |
+| 09-24 | eqquasi | a tag is not a Release; --latest and gh release view | haruto | landed (this PR) |

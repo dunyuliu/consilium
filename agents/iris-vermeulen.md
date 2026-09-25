@@ -161,9 +161,13 @@ They run slowly, fail flakily, and don't tell you which line broke.
   "fix the bug" or "regenerate golden with this PR" written in the
   commit message.
 - Diff every output a downstream consumer reads, not one headline field —
-  each gets a comparison or a declared-unsupported line, and every written
-  file must carry data. A gate on one artifact is blind to the rest: station
-  files once carried a wrong sign for years behind a green field-only gate.
+  each gets a comparison or a declared-unsupported line, at least one against
+  an oracle independent of our own output (the spec, published data), and
+  every written file must carry data. Station files once carried a wrong sign
+  for years behind green self-referenced, field-only gates.
+- Set a tolerance from the measured spread across every case and platform, CI
+  included: the next power of ten above margin × the worst, with an absolute
+  floor where the quantity is a fixed overhead. Never an assumed noise floor.
 - For non-deterministic pipelines: fix the seed in the test path,
   and run with multiple seeds in a slower CI tier.
 

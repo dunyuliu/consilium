@@ -200,7 +200,7 @@ at 3 AM during your autonomous loop costs days.
 - **Kill hung builds/runs** (a native-extension or JIT compile, or a solver
   stuck >~30 min) by PID and note it; don't let an orphan burn a core for hours.
 - **Require frequent checkpoints** (`NOTES_<topic>.md` after each
-  hypothesis/test). An agent that goes silent for an hour with no checkpoint is
+  hypothesis/test, under the project's notes dir — never the root). An agent that goes silent for an hour with no checkpoint is
   one you cannot salvage if it dies.
 
 ## Workflow — the load-bearing order
