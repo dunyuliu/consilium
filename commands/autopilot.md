@@ -7,6 +7,9 @@ green`, `3 milestones`); she states how she read it before spending any of it.
 The brief carries only state she cannot find: running jobs, out-of-repo data,
 untracked work, pending user decisions, results measured this session. Never
 restate her rules — if one seems missing, file an inbox lesson instead.
+While she runs, the invoking session writes nothing to the repo: it monitors,
+verifies against the full record rather than a tail, and relays owner
+decisions. A pre-written constraint is a claim to re-check, not an order.
 
 **The queue is the status board the rule book names** — `PATHWAY_FORWARD.md`
 by default — worked in `prio` order, state as the tiebreak. If this command and

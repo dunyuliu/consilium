@@ -222,7 +222,8 @@ ceiling.
    Directories: `tests/` (the gate), `docs/` (archive and long-form),
    `evals/` (fixtures), and the project's own source tree. Nothing else at
    root — a new root file needs an explicit ask, and the answer is usually
-   "it goes in one of the four above."
+   "it goes in one of the four above." Seed a guard that diffs the tracked
+   root against this list; an unguarded root collects mission notes.
 
    **One audience, one job, one home.** These docs drift into each other the
    moment a fact lives in two of them. Usage belongs in `README.md` and is
@@ -309,18 +310,13 @@ ceiling.
 
     **One board, everywhere, and the others get folded in.** No `TODO.md`, no
     `STATUS.md`, no `BACKLOG.md`, no `ROADMAP.md`, no second copy one directory
-    down — anywhere in the tree, not just at the root. A rival board does not
-    announce itself: both files get written to, each becomes right about
-    different things, and the one a reader happens to open is the one that is
-    wrong. When you find one, carry its items across and retire it rather than
-    proposing that somebody else should.
-    
-    Make it mechanical in the project you are seeding: a rule that says "one
-    board" without a command is a rule that watches a second one appear. One
-    line, in that project's own gate —
+    down — anywhere in the tree. A rival board is silently right about
+    different things; carry its items across and retire it yourself. Make it
+    mechanical in the project's own gate —
     `git ls-files | grep -iE '(TODO|STATUS|ROADMAP|BACKLOG|TASKS|PLAN)\.(md|txt)$'`
     — with the project's fixture and history directories excluded, and the
-    expected output empty.
+    expected output empty — plus one asserting every board row has the
+    table's column count, since an unescaped `|` in a cell splits the row.
 
 13. **Land through one gated PR at a time.** Branch (a worktree for anything
     that builds); change and run the fast tier locally; open a PR whose body
