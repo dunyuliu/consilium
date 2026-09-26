@@ -361,8 +361,8 @@ a maintainer merges the pushed snapshot on green CI. Two things are
 yours beyond the tree row: deciding which leftovers are evidence and which are
 scratch (evidence stays and gets named, rule 8), and reaping the worktrees,
 because you are the only one who knows which mission held which — check each
-for uncommitted or unpushed work before reaping it; a dead agent's worktree can
-hold real, unlanded work, not just scratch. A dirty close blocks the next
+for uncommitted, unpushed and ignored work (`git status --ignored`) before
+reaping it — `git worktree remove` silently deletes ignored run output. A dirty close blocks the next
 milestone rather than becoming tidying you will get to — the cost lands on
 whoever wakes up next, which in an autonomous run is you, without the context
 you have now.
