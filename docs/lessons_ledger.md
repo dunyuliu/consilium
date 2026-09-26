@@ -124,3 +124,5 @@ the commit.
 | 09-24 | eqquasi | a tag is not a Release; --latest and gh release view | haruto | landed (this PR) |
 | 09-24 | eqquasi | seeded book states the unattended grant and release sequence | zofia | landed (this PR) |
 | 09-25 | eqquasi | count live agents, refuse a third; lower tier for mechanical; timing runs exclusive | wei-lin | landed (this PR) |
+| 09-25 | eqquasi | git worktree remove deletes ignored run output; check --ignored first | wei-lin | landed (this PR) |
+| 09-25 | eqquasi | worktrees under the gitignored scratch dir | wei-lin | dismissed: rule book sets location; stale line covered by loop rule 2 |
