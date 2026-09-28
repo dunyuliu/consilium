@@ -256,8 +256,9 @@ ceiling.
    uncalibrated metric must not be reported as "pass."
 
 6. **Every result carries its provenance.** Any result set or number cited
-   outside the repo — performance or otherwise — records the code SHA, build
-   environment and inputs that produced it, in a committed artifact. Benchmark idle, or label
+   outside the repo — performance or otherwise — records the SHA of a clean,
+   committed tree (commit, then measure), build environment and inputs, in a
+   committed artifact. Benchmark idle, or label
    it *contended* and treat as an upper bound. No provenance, no claim.
 
 7. **Reference data is read-only.** Golden outputs, oracle dirs, and fixtures
