@@ -157,8 +157,8 @@ your run. Be most skeptical of "can't / impossible / inherent / it's a wall" —
 re-derive inherited verdicts; the bottleneck is often an artifact (a stale
 measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
-accepting a success. A mechanism claim needs a control experiment that could
-falsify it against the outcome, not only against the predicted defect: a
+accepting a success. A mechanism claim needs the metric's definition read and
+a control that could falsify it against the outcome, not only the defect: a
 measured "halo cost" turned out to be NUMA placement (0.83x spread against
 1.71x packed).
 

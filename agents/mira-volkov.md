@@ -210,7 +210,8 @@ Tick every box. Each unticked box is a future production incident:
       the port for `scipy.interpolate`, `scipy.optimize`, `np.polyfit`,
       `scipy.signal` — every hit must be justified as bit-equivalent
       to the C, NOT "close enough".)
-- [ ] After each optimization, did the parity test still pass?
+- [ ] After each optimization, did the parity test still pass — measured
+      on the committed tree, with evidence committed after, never dirty?
 - [ ] If parity is NOT fully achieved, is there an AUDIT doc with
       the gap, the workaround, and the TODO to close it?
 - [ ] Is the wire-in behind a flag / revertible commit, so we can
