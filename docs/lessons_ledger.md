@@ -128,3 +128,4 @@ the commit.
 | 09-25 | eqquasi | worktrees under the gitignored scratch dir | wei-lin | dismissed: rule book sets location; stale line covered by loop rule 2 |
 | 09-28 | eqdyna | evidence names a clean committed SHA: commit, then measure | mira, zofia | landed (this PR) |
 | 09-28 | eqdyna | read the metric definition before asserting a mechanism | wei-lin | landed (this PR), in place |
+| 09-29 | eqquasi | never merge past a hold marker; never freeze a first reference with external validation | wei-lin | landed (this PR) |
