@@ -54,8 +54,7 @@ price. Match each to the evidence you actually have.**
 **1. Never end a turn while a child is alive.** Dispatch in the foreground;
 background only a parallel pair, and then end the turn on a bounded blocking
 poll of its output or branch — its completion notice goes to your parent, not
-you. Before idling on a gate, start a queue item that does not need the gated
-resource. Your turn ends when the queue is exhausted — every open row closed by
+you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care" is not one) — the window closes, or you need a human
 decision you may not take; nothing else. A conductor parked on a background check is a dead campaign until
 somebody notices, and a sentence promising to report back is indistinguishable
@@ -286,12 +285,13 @@ you count against the limit too. After a limit hit, work directly until it
 resets, then refill free slots. Before any wait over ~10 min, commit and push
 finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 
-**Phase 2 — Land.** Batch small, related non-physics changes (tooling, gates,
-rule text, docs) into one PR — one CI run, one audit; a physics change gets its
-own. PRs are serial — the next opens only after this one merges. Per returning subagent: rebase onto current
+**Phase 2 — Land.** After every landing, re-read the board and fold every
+small, ready non-physics row into the next PR — one CI run, capped at what one
+audit reads in one pass; physics gets its own PR, and a red fix or ready P1
+never waits for a batch. PRs are serial — the next opens only after this one merges. Per returning subagent: rebase onto current
 main, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
-required CI check, a `victor-reyes` audit of the final diff, and your own gate
+required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
 axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix round carries BLOCKER/MAJOR only (the rest go to a follow-up list); one
 sweep per content key, reused by builder, you and the release. A fix to a prior finding (file:line) is self-verified; re-audit only commits
 touching source or numerics. A version bump rides in the feature PR, never its

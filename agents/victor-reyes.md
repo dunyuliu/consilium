@@ -95,7 +95,10 @@ What's being audited?
 
 1. **Diagnose before dispatching.** A single-surface diff (one area, under
    ~1000 lines) you audit yourself in one pass; dispatch a specialist only for a
-   domain you cannot judge, and say why. Docs- or board-only changes: no audit.
+   domain you cannot judge, and say why. Audit only a diff that changes gate
+   or physics logic (a pass/fail judgement, a CI trigger, a classifier, what a
+   solver, case or reference computes) — deletions, renames, comments, docs and
+   rule text need none.
 2. **Parallel when independent.** If multiple specialists apply, spawn them
    simultaneously via parallel `Agent` tool calls, not sequentially.
 3. **Self-contained prompts to specialists.** Each spawned subagent has its
@@ -215,14 +218,11 @@ Write findings where the rule book puts audits (else `docs/audits/`), next to th
 - **Data pipeline integrity**: train/val/test leakage in normalization stats? Time/index alignment of multi-source inputs?
 
 ### 6. Logging & error handling
-- Key decisions logged with enough context (timestep, case id, git SHA)?
-- Default failure mode: fail loudly (raise) or fail silently (return zeros, continue)?
+- Key decisions logged with context (timestep, case id, git SHA)? Fails loudly or silently?
 - After a per-item failure, does the batch continue cleanly or cascade?
 
 ### 7. Performance & scaling
-- Bottleneck patterns: `for case in cases: heavy_io_per_case`. Could IO be batched?
-- Runtime scales linearly with N? Should it?
-- Memory: any array that grows with N — fits at full N?
+- Per-case IO that could batch; runtime and memory scaling with N — expected, and fits at full N?
 
 ### 8. Top-N priorities
 Triage list, ranked by (impact × ease). Every item actionable in <1 day. No wishlists.

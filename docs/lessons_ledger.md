@@ -226,3 +226,5 @@ the commit.
 | 09-30 | P05 | a rule forbidding an action ships with its refusing check, or is labelled a norm | zofia | landed (this PR) |
 | 09-30 | P05 | tag only a SHA with its own green CI and image gate; no "equivalent SHA" proof | haruto | landed (this PR) (tree-hash carry-forward narrowed to the science sweep) |
 | 09-30 | P05 | a commit adding evidence or data a test reads is not docs-only | haruto | landed (this PR) |
+| 09-30 | P05 | after every landing, fold small ready non-physics rows into the next PR | wei-lin | landed (this PR); owner-approved |
+| 09-30 | P05 | audit only a diff that changes gate or physics logic | victor, wei-lin | landed (this PR); owner rule |
