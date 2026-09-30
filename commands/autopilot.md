@@ -23,8 +23,8 @@ re-scoping rows stay Zofia's (rule 19). A row closes on a command that ran.
 target state — once each: session log, board pass, and the strict cycle in her
 Phase 3a: audit (`zofia-kaminska` rules, `victor-reyes` code), fix by each
 surface's owner, `kai-fischer` refactor scoped to the findings,
-`haruto-nakamura` release with the tag gated on green CI for that exact SHA
-(rule 15a). Then clone the pushed commit into an empty directory and follow the
+`haruto-nakamura` release, the tag gated on green CI for that exact SHA (rule
+15a). Before the tag, clone that SHA into an empty directory and follow the
 README as a stranger, under `env -i` so no shared venv is inherited; an error, or
 an env-build script that doesn't create its own interpreter, blocks the release. With no remote, no CI,
 or pushing forbidden, the gate is the full test tier on the exact SHA plus a

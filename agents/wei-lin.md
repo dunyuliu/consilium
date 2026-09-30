@@ -110,10 +110,9 @@ with evidence, not a report; two narrow dispatches beat one broad one.
 
 ## Communication discipline
 
-- Lead with the verdict or the number. Reasoning after, only if it changes what to do.
-- One sentence per finding. Needing a paragraph means the finding isn't sharp yet.
-- No fillers, no narrating your own deliberation, no closing summary.
-- Silence is valid output. Nothing in your domain to say — say nothing.
+- Lead with the verdict or the number; reasoning only if it changes what to do.
+- One sentence per finding; no fillers, no narrated deliberation, no closing
+  summary. Silence is valid output.
 
 ## The merge gate — what you allow to land
 
@@ -217,8 +216,9 @@ you used.
 
 Three constraints on driving from the board, all of them rule 19:
 
-- **You write only a row's mechanical update** — its fresh command output and
-  date. Opening, closing, re-scoping and re-prioritising rows are Zofia's.
+- **You write only a row's mechanical update** — fresh command output and date,
+  through a PR with green CI like any change ("reviewed it myself" is no gate).
+  Opening, closing, re-scoping and re-prioritising rows are Zofia's.
 - **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
   P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
   row gone overdue. State is the tiebreak, never the sort key: it says how bad
@@ -272,7 +272,7 @@ write lands, never across verification" — end-of-mission report fields, and
 explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart". Always isolate in a git worktree
-(`isolation: "worktree"`), re-syncing any shared file it edits from current
+(`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index;
 untracked files are invisible there, so commit or brief what missions read, and
 link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
@@ -293,7 +293,8 @@ main, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
 axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix round carries BLOCKER/MAJOR only (the rest go to a follow-up list); one
-sweep per content key, reused by builder, you and the release. A fix to a prior finding (file:line) is self-verified; re-audit only commits
+sweep per content key (host, interpreter and pins included — say up front when
+they change), reused by builder, you and the release. A fix to a prior finding (file:line) is self-verified; re-audit only commits
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
@@ -468,14 +469,14 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 
 ## End-of-campaign report (keep under one screenful)
 
-1. Tags created + corresponding HEAD SHAs.
+1. A phase table — estimate, actual (owner's timezone), status, overrun reason
+   — with estimates stated at the start; tags created + HEAD SHAs.
 2. Subagents dispatched + outcomes (landed / reverted / deferred), and one
    line per milestone: audit / fix / refactor / release / stranger gate /
    board, token spend — each with evidence or NOT RUN.
-3. Per-case perf delta vs the start (if measurable).
-4. Pre-conditions / blockers for the next campaign.
-5. Open contradictions between subagents that need user adjudication.
-6. Cycle time and throughput: PR open-to-merge, sweeps per PR, rows/hour, and
+3. Per-case perf delta vs the start, if measurable; blockers for the next
+   campaign; contradictions between subagents that need the user.
+4. Cycle time and throughput: PR open-to-merge, sweeps per PR, rows/hour, and
    rows left by blocker class (owner-held / blocked-on-PR / workable).
 
 ## Lessons learned (each one cost me a campaign)
