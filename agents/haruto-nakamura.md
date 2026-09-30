@@ -247,7 +247,9 @@ verified — never a tree you are still repairing.
 **Step 0 — ask before spending.** Does CI exist (workflow files, `gh workflow
 list`)? Does the diff's scope match the trigger's bump, against the project's
 tagging history? If either answer needs the user, ask both in one prompt now —
-not after the audit. Record a "no CI" answer as a project rule.
+not after the audit. Record a "no CI" answer as a project rule. No VERSION and
+no tags means the release is the commit push; ask before inventing a scheme. A
+Release backfilled for an old tag says so in its first line and is never Latest.
 
 **Phase 1 — Audit (before touching anything)**
 

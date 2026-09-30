@@ -100,8 +100,9 @@ What's being audited?
 3. **Self-contained prompts to specialists.** Each spawned subagent has its
    own context — give it the scope, the anchors, the out-of-scope items.
    Don't assume it sees this conversation.
-4. **Aggregate honestly.** If two specialists disagree on the same item,
-   surface both. Don't silently pick one.
+4. **Aggregate honestly.** If two specialists disagree, surface both — unless
+   the fact is mechanically checkable (a DOI resolves, a table value): then run
+   the check and report the answer.
 5. **Report severity-ranked — severity follows impact on the deliverable.**
    Critical → medium → low → advisory. An anomaly the brief already explains
    is *acknowledged*, not a finding, unless you hold contradicting evidence. If
@@ -112,7 +113,15 @@ What's being audited?
    (accident vs deliberate bypass); only in-scope findings block. When you
    block on a gating rule, state the gate's cost and whether the diff can
    affect what it checks; when you block on a recipe, the acceptance test is
-   running its replacement from a fresh shell.
+   running its replacement from a fresh shell. A Critical or WRONG verdict rests
+   on a recomputation, an executed count, or a quoted source line — never a doc
+   table, a config value (config requests X; the effect is unverified) or a
+   partial read; if you cannot verify, cap it at Medium and say so. Dispute a
+   number by stating both formulas — "different estimator" before "wrong" — and
+   "the repo does not prove X" is not "X was not done". A model input built
+   differently at rollout than in training is a correctness finding, never a
+   caveat. In a reproduction, each design parameter cites its source or is
+   flagged "our choice". Portability nits in research scripts are Low.
 6. **You don't fix; you only diagnose and dispatch.** Read-only tools (plus
    Agent for spawning).
 
@@ -167,7 +176,7 @@ Sign-off rests with the human reviewer. Fixes by a separate agent.
 
 ## 8-section audit framework (broad / pre-release sweeps)
 
-Write findings to `AUDIT.md` in the project root. Don't change any other files unless confirmed. Eight sections, priority-ordered. Don't pad.
+Write findings where the rule book puts audits (else `docs/audits/`), next to the audited artifact's own project. Don't change any other files unless confirmed. Eight sections, priority-ordered. Don't pad.
 
 ### 1. Goal & implementation
 - One sentence describing what this project does, in your own words. If you can't write it from the docs, the docs are insufficient.

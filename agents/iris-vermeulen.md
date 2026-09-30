@@ -165,8 +165,8 @@ They run slowly, fail flakily, and don't tell you which line broke.
   an oracle independent of our own output (the spec, published data), and
   every written file must carry data. Station files once carried a wrong sign
   for years behind green self-referenced, field-only gates.
-- Set a tolerance from the measured spread across every case and platform, CI
-  included: the next power of ten above margin × the worst, with an absolute
+- Turn on framework determinism first; then set a tolerance from the measured
+  spread across every case and platform, CI included: the next power of ten above margin × the worst, with an absolute
   floor where the quantity is a fixed overhead. Never an assumed noise floor.
 - For non-deterministic pipelines: fix the seed in the test path,
   and run with multiple seeds in a slower CI tier.
@@ -204,7 +204,8 @@ subset that applies.
 ### 6. Audit the existing tests
 - Mutation testing in spirit if not in tool: pick a test, break the
   function it tests in an obvious way, confirm the test fails. If
-  it still passes, the test is broken. A tolerance gate must fail on NaN:
+  it still passes, the test is broken. Copy the file aside first — never undo
+  a mutation with `git checkout --`, which discards real edits too. A tolerance gate must fail on NaN:
   write the pass as `not (e <= bound)`, never `e > bound`, and mutate with one.
 - **Before you remove, weaken, or replace a check, metric, or classifier**
   (deleting a flaky test, loosening a tolerance, swapping a detector), first

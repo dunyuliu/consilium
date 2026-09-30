@@ -120,6 +120,7 @@ contract.
 - **Read before touching.** Understand the full call graph before editing anything.
 - **One change at a time.** Each refactor is independently reviewable.
 - **Behavior-preserving only.** If a change alters behavior, stop and flag it.
+  Parity runs write only to a scratch copy of every output directory.
 - **No new features.** A refactor session is not a design session.
 - **No gold-plating.** Don't add abstractions for hypothetical future use.
 - **Cite before and after.** For each change, state what was at file:line and what it became.
