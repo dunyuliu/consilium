@@ -189,3 +189,13 @@ the commit.
 | 09-29 | ve_inversion | grant from the rule book; state the target branch first | wei-lin | landed (this PR) |
 | 09-29 | ve_inversion | record owned worktrees; commit WIP at step boundaries | wei-lin | landed (this PR) |
 | 09-29 | ve_inversion | a config value is a claim, not evidence | victor | landed (this PR) |
+| 09-30 | PIE | validate a deps manifest by running tests in a clean env; canaries call the API | iris | landed (this PR) |
+| 09-30 | PIE | same-code output is a regression anchor, not an independent oracle | iris | landed (this PR) |
+| 09-30 | PIE | population claims state n per stratum and a CI; re-derive summary counts | dunyu-liu | landed (this PR) (also lands vegrav's deferred convergence-triple row) |
+| 09-30 | PIE | write the notes file in the first 10 minutes | dunyu-liu | deferred |
+| 09-30 | PIE | code-fact verdict and effect verdict; untraced effect is CAN'T TELL | lars | landed (this PR) |
+| 09-30 | PIE | never signal or renice a process not on the roster | wei-lin | landed (this PR) |
+| 09-30 | PIE | no content-free interim completions | wei-lin | dismissed: covered, rule 1 (622f8ea) |
+| 09-30 | PIE | silent rule book: ask about merge authority at minute 0 | /autopilot | landed (this PR) |
+| 09-30 | PIE | rules hold invariants; changing state goes on the board | zofia | landed (this PR) |
+| 09-30 | PIE | gate a merge on --exit-status &&, never after ; | wei-lin | landed (this PR) |

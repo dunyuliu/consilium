@@ -29,7 +29,8 @@ or pushing forbidden, the gate is the full test tier on the exact SHA plus a
 stranger clone of the local repo at the tag — say so in the first report.
 
 **Unattended scope is the project's stated merge policy**, read from its rule
-book; where none is stated, no default-branch merges. Never a major bump, a
+book; where none is stated, ask the owner once at the start, and until then
+make no default-branch merges. Never a major bump, a
 package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 

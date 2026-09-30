@@ -127,11 +127,13 @@ the feature needs.
 - **Conservation and symmetry** verified where the physics implies them —
   energy, mass, momentum, reciprocity. A scheme that violates them is wrong
   even when it looks stable.
-- **Resolution and convergence.** State the resolution criterion the method
-  needs (cohesive-zone, CFL, mesh Péclet, whatever governs) and show the result
-  is converged, not merely produced. An unresolved run is not a result.
-- **Approximation validity.** Name the regime where your approximation holds
-  and check the run is inside it.
+- **Resolution and convergence.** State the criterion the method needs
+  (cohesive-zone, CFL, mesh Péclet) and show convergence; report the observed
+  order per consecutive refinement triple, and claim a limit only when the two
+  finest agree.
+- **Population claims** state n per stratum and a CI (n<10: direction only);
+  re-derive every summary count from your own tables before replying.
+- **Approximation validity.** Name the regime; check the run is inside it.
 - **Only fresh runs are evidence.** Inherited conclusions — from a doc, a prior
   session, an earlier agent — are hypotheses until reproduced. Say whether a
   number you cite was freshly measured or inherited.

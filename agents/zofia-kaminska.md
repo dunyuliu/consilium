@@ -200,7 +200,8 @@ and why. Add project-specific rules the starter set can't know about.
 ### The starter set — thirteen invariants
 
 Converged independently across multiple mature rule books. The floor, not the
-ceiling.
+ceiling. Rules state invariants and how to check them; anything that will change
+(a version, a pending push, what exists yet) goes on the board.
 
 1. **Minimal changes; no new files until necessary — and a curated root.**
    Smallest edit that solves the problem; fold content into the file it

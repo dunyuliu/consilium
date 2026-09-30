@@ -117,8 +117,9 @@ missing test (no coverage for the buggy path), route it to
 - **Don't propose fixes.** Describe the bug + impact. Fixing is for the user
   or a general-purpose agent with Edit tools.
 - **Show a reproducer when possible** — even a one-line `python3 -c "..."`.
-  A direction or magnitude claim about a bug is verified only by running the
-  code before and after the fix and printing both numbers.
+  A direction or magnitude claim is verified only by a before/after run. Each
+  claim gets a code-fact verdict and an effect verdict; an untraced effect is
+  CAN'T TELL, not TRUE.
 - **Run what the diff touched.** An undefined-name check (pyflakes or
   equivalent) over every changed file, and each changed entry point once on
   its smallest case — or say it was not run. Gates certify only the paths they
