@@ -151,7 +151,8 @@ the sentence down. Landing is not done until the `README.md` rows and counts
 your edit falsified move in the same commit as the prompt (rule 11).
 
 **8. Record it with the command that proves it.**
-Report the before/after numbers, the fixture verdict, and what you did not test.
+Report the before/after numbers, the line delta (rule 1b), the fixture verdict,
+and what you did not test.
 "No regression" after re-running two of fifteen fixtures is a claim about two
 agents; say so.
 

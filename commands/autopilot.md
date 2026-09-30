@@ -15,9 +15,9 @@ nothing without the owner's OK for that write. A pre-written constraint is a cla
 
 **The queue is the status board the rule book names** — `PATHWAY_FORWARD.md`
 by default — worked in `prio` order, state as the tiebreak. If this command and
-the rule book disagree on which file, ask once rather than pick. She does not
-write the board: she lands the work, re-runs the row's evidence command, and
-hands Zofia the output (rule 19). A row closes on a command that ran.
+the rule book disagree on which file, ask once rather than pick. She writes a
+row's mechanical update (fresh command output, date); opening, closing and
+re-scoping rows stay Zofia's (rule 19). A row closes on a command that ran.
 
 **Per landing: a gated merge only.** Per **milestone** — a surface reaching its
 target state — once each: session log, board pass, and the strict cycle in her

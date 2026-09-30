@@ -52,6 +52,7 @@
 #      closes the gap that let 23 tagged releases exist with no Release
 #      object behind them.
 #  36. No tracked file contains a merge-conflict marker.
+#  37. The shipped prompts stay within 2% of rule 1b's ceiling.
 #
 # Every check here was negative-tested when added — a check that has never
 # failed is not known to be a gate.
@@ -1370,6 +1371,24 @@ while IFS= read -r f; do
 done < <(git ls-files -- '*.md' '*.sh' '*.yaml' '*.yml' '*.awk' '*.tsv')
 [ "$conflicted" -eq 0 ] && ok
 
+echo
+echo "Check 37: the shipped prompts stay within 2% of rule 1b's ceiling"
+# Structural and deterministic: a line count against a number the rule book
+# states. The 2% is the maintainer's ("roughly is fine") -- it catches creep,
+# not a paid-for line or two. Whoever shrinks the product lowers the ceiling.
+ceiling=$(sed -n '/^### 1b\. /,/^## 2\. /p' PROJECT_RULES.md | grep -oE '^Ceiling: [0-9]+' | grep -oE '[0-9]+' || true)
+if [ -z "$ceiling" ]; then
+    fail "rule 1b's 'Ceiling: N' line is missing from PROJECT_RULES.md -- the check cannot run, which is a finding"
+else
+    total=$(cat agents/*.md commands/*.md | wc -l | tr -d ' ')
+    limit=$(( ceiling + ceiling / 50 ))
+    if [ "$total" -le "$limit" ]; then
+        echo "  agents/ + commands/: $total lines (ceiling $ceiling, limit $limit)"
+        ok
+    else
+        fail "agents/ + commands/ is $total lines, more than 2% over rule 1b's ceiling of $ceiling (limit $limit) -- cut before adding"
+    fi
+fi
 
 echo
 echo "Summary: $pass_count passed, $fail_count failed"

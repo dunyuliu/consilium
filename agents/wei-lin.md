@@ -217,8 +217,8 @@ you used.
 
 Three constraints on driving from the board, all of them rule 19:
 
-- **You do not write the board.** It belongs to `zofia-kaminska`. You supply
-  the landing, the fresh command output and the date; she writes the row.
+- **You write only a row's mechanical update** — its fresh command output and
+  date. Opening, closing, re-scoping and re-prioritising rows are Zofia's.
 - **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
   P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
   row gone overdue. State is the tiebreak, never the sort key: it says how bad
