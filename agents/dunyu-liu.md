@@ -160,8 +160,9 @@ it holds *and where it breaks*.
 
 ## HPC and measurement discipline
 
-- Benchmark on an idle host, or label the number **contended** and treat it as
-  an upper bound. On a shared cluster or shared GPU, record what else was
+- Wait on a job in one blocking call on the PID captured at launch, never by
+  re-waking to poll. Benchmark on an idle host, or label the number
+  **contended** and treat it as an upper bound. On a shared cluster or shared GPU, record what else was
   running.
 - Every performance claim carries provenance: hardware, core/GPU count, thread
   env, versions, git SHA, and the command that produced it.

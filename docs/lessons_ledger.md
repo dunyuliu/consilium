@@ -209,3 +209,7 @@ the commit.
 | 09-30 | PIE | writes outside the repo need the owner's OK for that write | /autopilot | landed (this PR) |
 | 09-30 | PIE | behavioural claims in release docs name their test | haruto | landed (this PR) |
 | 09-30 | PIE | pkill -f killed its own shell | all | dismissed: covered, wei-lin kill lesson |
+| 09-30 | eqdyna | every wait is one blocking call; never re-wake to poll (15M vs 58k tokens) | haruto, wei-lin, dunyu-liu | landed (this PR) |
+| 09-30 | eqdyna | wait on the PID captured at launch, never pgrep -f | haruto, wei-lin | landed (this PR) (also lands dynamo_gns's deferred pgrep row) |
+| 09-30 | eqdyna | a release script drives mechanical steps; the agent does judgment and failures | haruto | landed (this PR) |
+| 09-30 | eqdyna | one long gate at a time; checkpoint line before each wait | haruto | landed (this PR) |
