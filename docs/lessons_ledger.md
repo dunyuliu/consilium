@@ -214,3 +214,12 @@ the commit.
 | 09-30 | eqdyna | a release script drives mechanical steps; the agent does judgment and failures | haruto | landed (this PR) |
 | 09-30 | eqdyna | one long gate at a time; checkpoint line before each wait | haruto | landed (this PR) |
 | 09-30 | eqdyna | one agent per job; never resume a finished agent (it keeps its old prompt) | wei-lin, /autopilot, /release | landed (this PR) |
+| 09-30 | eqdyna | conductor cycle-time duty: one sweep per content key, fix rounds BLOCKER/MAJOR only | wei-lin | landed (this PR) (design review before build, CI cancel after force-push: deferred) |
+| 09-30 | eqdyna | throughput is measured: rows/hour and rows left by blocker class | wei-lin | landed (this PR) |
+| 09-30 | eqdyna | one cost-record schema emitted by every agent | all | dismissed: superseded by the SubagentStop hook in lesson 7 |
+| 09-30 | eqdyna | consilium reads only the sanitized cost export; no-leak rule for published material | consilium | open: maintainer's call on project names already in the ledger |
+| 09-30 | eqdyna | builders run touched tests locally; CI runs the full tier | haruto | landed (this PR) |
+| 09-30 | eqdyna | victor audits single-surface diffs himself; docs-only changes are not audited | victor | landed (this PR) |
+| 09-30 | eqdyna | victor fixes easy findings directly | victor | dismissed: covered by builder self-verify (f1e7fa8); an auditor fixing its own findings breaks rule 20 |
+| 09-30 | eqdyna | science sweep re-runs only when a declared science-bearing path changed | zofia, haruto | landed (this PR) |
+| 09-30 | eqdyna | touched tests include the cheap registration checks; no commits in the main checkout | haruto | landed (this PR) (main-checkout half already covered) |

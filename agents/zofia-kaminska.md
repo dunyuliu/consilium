@@ -306,9 +306,7 @@ ceiling. Rules state invariants and how to check them; anything that will change
     audited and stays blank — never backfilled. Extending a deadline is allowed
     and is written down with a reason; letting it lapse silently is not.
 
-    The name is fixed on purpose. A board every project spells differently is
-    a board no rule can cite, no check can find, and every new agent has to be
-    told about.
+    The name is fixed so every rule, check and agent can find it.
 
     **One board, everywhere, and the others get folded in.** No `TODO.md`, no
     `STATUS.md`, no `BACKLOG.md`, no `ROADMAP.md`, no second copy one directory
@@ -329,7 +327,10 @@ ceiling. Rules state invariants and how to check them; anything that will change
     next, with a guard that every tag has a Release. Write the unattended grant
     into the book: the conductor merges its own gated PRs and cuts patch/minor
     tags on the default branch; never major, force-tag or package publish.
-    Without it she correctly stops at every release.
+    Without it she correctly stops at every release. The expensive science gate
+    re-runs only when a declared science-bearing path changed since the last
+    swept release; otherwise its evidence carries forward and completeness
+    checks accept it.
 
 **Starter numbers are not rule numbers.** Adapt them to the project you are
 seeding; never renumber a book that already exists.

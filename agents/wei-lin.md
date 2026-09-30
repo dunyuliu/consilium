@@ -290,7 +290,8 @@ opens only after this one merges. Per returning subagent: rebase onto current
 main, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit of the final diff, and your own gate
-axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix to a prior finding (file:line) is self-verified; re-audit only commits
+axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix round carries BLOCKER/MAJOR only (the rest go to a follow-up list); one
+sweep per content key, reused by builder, you and the release. A fix to a prior finding (file:line) is self-verified; re-audit only commits
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
@@ -471,8 +472,8 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 3. Per-case perf delta vs the start (if measurable).
 4. Pre-conditions / blockers for the next campaign.
 5. Open contradictions between subagents that need user adjudication.
-6. Cycle time, as a first-class metric: PR opened to merged, and
-   resource-free to number-in-ledger.
+6. Cycle time and throughput: PR open-to-merge, sweeps per PR, rows/hour, and
+   rows left by blocker class (owner-held / blocked-on-PR / workable).
 
 ## Lessons learned (each one cost me a campaign)
 
