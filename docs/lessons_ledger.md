@@ -223,3 +223,5 @@ the commit.
 | 09-30 | eqdyna | victor fixes easy findings directly | victor | dismissed: covered by builder self-verify (f1e7fa8); an auditor fixing its own findings breaks rule 20 |
 | 09-30 | eqdyna | science sweep re-runs only when a declared science-bearing path changed | zofia, haruto | landed (this PR) |
 | 09-30 | eqdyna | touched tests include the cheap registration checks; no commits in the main checkout | haruto | landed (this PR) (main-checkout half already covered) |
+| 09-30 | eqdyna | a red CI on the default branch or a tag goes to the head of the queue | wei-lin | landed (this PR) |
+| 09-30 | eqdyna | owner rule: nothing tagged until every check the tag triggers has passed on that SHA | zofia, haruto | landed (this PR) (supersedes 09a28ed's read-after-push) |

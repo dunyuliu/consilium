@@ -300,6 +300,7 @@ has an external validation step — ask. Squash-merge, delete the branch. Tag on
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch --exit-status && gh pr
 merge`, never after `;` — and "no pending" is not completion (`needs:` jobs lag).
+A red on the default branch or a tag goes to the head of the queue unasked.
 
 **Phase 3 — Validate broader.** Every 2-3 patch bumps or every 4 hours: run the
 fast tier, generate a perf snapshot on stable HEAD, bump the minor version on

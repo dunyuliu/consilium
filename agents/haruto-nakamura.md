@@ -271,7 +271,7 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 **Phase 4 — Publish (the commit and the tag go separately)**
 
 10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the tagged tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
-11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one; after the tag push, the tag-triggered ones (publish) too.** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Wait in ONE blocking call (`gh run watch <id> --exit-status`, `gh pr checks <n> --watch`) — never re-wake to poll, which re-reads your whole context each time — and do not judge a run still in progress.
+11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one. Nothing is tagged until every check the tag will trigger has passed on this SHA: the release PR builds the image and runs its gate, and no check runs where it cannot pass by design (a tool or network the image lacks).** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Wait in ONE blocking call (`gh run watch <id> --exit-status`, `gh pr checks <n> --watch`) — never re-wake to poll, which re-reads your whole context each time — and do not judge a run still in progress.
     - **Green** → step 12.
     - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
@@ -282,16 +282,12 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 12a. **Create the GitHub Release — a required step, not optional polish.** A
     pushed, CI-green tag with no GitHub Release object leaves the publication
     incomplete: the tag is already public and in every clone, but the repo's
-    Releases page shows nothing. Once step 12 has pushed the tag and confirmed
-    CI green on it, run:
+    Releases page shows nothing. As the very next command after the tag push:
     `gh release create v<A.B.C> --verify-tag --latest --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
     — then `gh release view` it: a tag is not a Release, and a non-UTF-8 locale
     mangles `—` and `×`.
-    (the note's repo-root path at the time of the release commit — point at the
-    file, do not reconstruct the note text inline). `--verify-tag` refuses to
-    create the Release if the tag isn't on the remote yet, which is the correct
-    failure mode if step 12 was skipped or the push silently didn't land. Run
-    this step on every release, autonomous runs included. **A pushed tag with no
+    Point `--notes-file` at the note, never inline text; `--verify-tag` refuses
+    if the push didn't land. Run this on every release, autonomous runs included. **A pushed tag with no
     Release is a red gate.**
 13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the push result for both the commit and the tag, and the GitHub Release you created (URL).
 
