@@ -451,8 +451,9 @@ Triggered by "we just lost N hours to X — make it a rule."
 5. **State its tier.** If the new rule is Tier 3, say what would make it
    mechanical, or admit it is a norm rather than a gate — and a norm codified
    from a destructive incident still ships one mechanical proxy (e.g. a
-   manifest line logged before every `rm -rf`). A rule naming a setting that
-   sibling implementations share gets one check per implementation.
+   manifest line logged before every `rm -rf`). A rule forbidding an action
+   ships with the check that refuses it, in the same change — or is labelled a
+   norm. A shared setting across siblings gets one check per implementation.
 6. **A numeric metric target is not frozen until it is reachable.** Record in
    the rule an oracle or physical bound (perfect-model/twin run, known
    predictability horizon) and the trivial baselines (flat, persistence).
