@@ -60,7 +60,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 13 | *(retired 2026-09-17 — see rule body)* | — |
 | 14 | One installer, one canonical path | mechanical (in part) — Check 29 |
 | 15 | A release is a note plus a matching tag, both pushed | mechanical — Check 27 |
-| 15a | Nothing red is ever pushed, and the tag is pushed last | judgment — no local mechanism enforces it; see the rule |
+| 15a | Nothing red is ever pushed; the tag is created with its Release, last | judgment — no local mechanism enforces it; see the rule |
 | 15b | Five rows the gate decides; seven obligations the release engineer owes | mechanical for the five — `tests/release_gate.sh`, held to the schema by Check 33; the seven are norm |
 | 16 | Agent frontmatter is a contract, not a preamble | mechanical — Check 1 (structure only; description *quality* stays judgment) |
 | 17 | Cross-references between agents must resolve | mechanical — Checks 2, 8 |
@@ -372,23 +372,17 @@ either.
 `release_notes_v*.md` across the root and `docs/`. Cut a release when the
 unreleased commit count makes the last note misleading.
 
-## 15a. Nothing red is ever pushed, and the tag is pushed last
+## 15a. Nothing red is ever pushed; the tag is created with its Release, last
 
-Create the tag **locally, before any push**, so the local gate sees it: Check
-27 reads `refs/tags/<version>` in the working clone. Running `bash
-tests/check.sh` green before pushing is on the release engineer — no
-`pre-push` hook enforces it locally (rule 9). Then push in two commands —
-the commit, then the tag. Never `--tags`, never `--follow-tags`: a tag must not
-ride along on a push that could be rejected.
+Push the release commit, with `bash tests/check.sh` green first — no hook
+enforces it (rule 9); Check 27's newest-note grace covers the note whose tag
+does not exist yet. Once every check the tag will trigger has passed on that
+SHA, create the tag and the Release in one step: `gh release create v<X>
+--target <sha> --latest --notes-file <note>`. Never push a tag separately, so
+no tag ever exists without its Release. Any red before that means the release
+does not exist yet: fix and re-commit; there is nothing to unpublish.
 
-**The one failure CI may show between those two pushes** is Check 27 naming the
-note being released, and nothing else. CI reads only tags already on the
-remote, so that assertion *cannot* be green until the tag push lands —
-expected intermediate state, not a defect. Any other red assertion means the
-release does not exist yet: delete the local tag, fix, re-verify, re-cut;
-nothing needs unpublishing, because the tag was never pushed.
-
-**After the tag push, CI must be green on the released commit.** A red run
+**After the Release, CI must be green on the released commit.** A red run
 *then* is a real failure, answered with a follow-up fix commit — never an
 unpublish, never a force-push, never deleting a tag from the remote (rule 8).
 "Flake" is not a conclusion: re-run a job only for a named infrastructure
@@ -411,7 +405,7 @@ item 9), including the pre-tag run and its single permitted failure.
 
 `tests/release_gate.sh` decides five rows — tree, ci, publish, release, clone —
 each against reality: the working tree, CI, the tag and Release on the remote,
-a stranger's clone of the tagged commit. No tag is pushed until it exits 0.
+a stranger's clone of the tagged commit. No tag is created until it exits 0.
 
 The other seven — audit, correctness, conciseness, fixes, docs, refactor, rules
 — are obligations stated once in `agents/haruto-nakamura.md` and discharged in

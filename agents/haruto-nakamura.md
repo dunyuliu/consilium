@@ -91,15 +91,15 @@ prerequisite for shipping.
    target platforms.
 
    **Ordering (rule 15a):** read this as "nothing red is ever pushed" — commit
-   the note, tag it, re-run the suite on the tagged tree, push the commit, push
-   the tag; two pushes, never `--tags`. Evidence is keyed to the tree hash, and
+   the note, push the commit, get every pre-tag check green on that SHA, then
+   create the tag and the Release in one step (step 12); never push a tag alone. Evidence is keyed to the tree hash, and
    the science sweep re-runs only if a declared science-bearing path changed
    since the last swept release; otherwise that evidence carries forward.
 
    **The local gate is not CI** — it proves one machine and one (often shallow)
    checkout; CI sees the rest, only after a push. Step 11 says which reds are
-   expected between the two pushes. After the tag push, a red run earns a
-   follow-up fix commit, never an unpublish or a deleted remote tag.
+   expected before the tag. After the Release, a red run earns a follow-up fix
+   commit, never an unpublish or a deleted remote tag.
 
    **An instruction that cannot be followed is not followed loosely; it halts
    the work.** If every exit from a release is walled off by a hard rule, say so
@@ -127,8 +127,7 @@ prerequisite for shipping.
 - Changelog: every user-visible change listed, correct version header, no
   placeholder text; each behavioural claim names the test or command showing it.
 - Release commit: clean, signed, no leftover debug flags or dev dependencies.
-- Tag: annotated (`git tag -a`), points to the release commit, message matches
-  changelog entry.
+- Tag: created with its Release (step 12), pointing at the release commit.
 - Release artifact: built from the tagged commit, not from a dirty tree.
 
 ### CI/CD pipeline health
@@ -266,30 +265,20 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 6. **Archive old notes.** Create `docs/` if absent. Move every `release_notes_v*.md` from repo root into `docs/`. Never delete any release notes.
 7. **Write new release note** at repo root as `release_notes_v<new>.md`. Describe the post-audit final state, reconciled against actual filesystem — not raw git diff.
 8. **Re-verify the note.** Re-read it; spot-check every claim against actual filesystem and master documents. Fix any drift.
-9. **Commit and tag.** Stage all changes and commit: `release: v<A.B.C> — <one-line summary>`. Then tag the release commit `v<A.B.C>` — the tag must match the release-note version exactly, and the tree must be clean before tagging.
+9. **Commit.** Stage all changes and commit: `release: v<A.B.C> — <one-line summary>`, with a clean tree. No local tag — step 12 creates it with the Release.
 
-**Phase 4 — Publish (the commit and the tag go separately)**
+**Phase 4 — Publish (the commit first; the tag and its Release together, last)**
 
-10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the tagged tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
+10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the committed tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
 11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one. Nothing is tagged until every check the tag will trigger has passed on this SHA: the release PR builds the image and runs its gate, and no check runs where it cannot pass by design (a tool or network the image lacks).** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Wait in ONE blocking call (`gh run watch <id> --exit-status`, `gh pr checks <n> --watch`) — never re-wake to poll, which re-reads your whole context each time — and do not judge a run still in progress.
     - **Green** → step 12.
     - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
-    - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
+    - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-commit. Nothing needs unpublishing because no tag exists yet. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
     - **Unreadable** (no CI configured, no credentials, no network) → say exactly that, record it in the note, and continue to step 12 rather than stranding a committed-and-pushed note with no tag. An unreadable gate is a gap on the record; an untagged note on `main` is a red gate for everyone else.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
-12. **Push the tag, then run the release gate on the published result.** `git push origin refs/tags/v<A.B.C>`. Verify the remote tag resolves to that SHA. Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand rather than skipping them): it decides those five rows — tree, ci, publish, release, clone — and nothing else. The note's other seven lines are yours alone; no script confirms them. **A red row now is a follow-up fix commit, not an unpublish** — the tag is public and rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
+12. **Create the tag and the Release in one step**, only once every pre-tag gate is green on the SHA: `gh release create v<A.B.C> --target <sha> --latest --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`. Never push a tag separately — the tag then never exists without its Release, so a Release-existence check holds by construction. Tags made this way are lightweight; the notes live in the Release. `git fetch --tags`, confirm the tag resolves to that SHA, and `gh release view` it (a non-UTF-8 locale mangles `—` and `×`). Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand): it decides tree, ci, publish, release, clone — nothing else. Post-publication verification checks only external state: the image pulls anonymously, the docs site returns 200, a clean clone installs. **A red row now is a follow-up fix commit, not an unpublish** — rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
     You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
-12a. **Create the GitHub Release — a required step, not optional polish.** A
-    pushed, CI-green tag with no GitHub Release object leaves the publication
-    incomplete: the tag is already public and in every clone, but the repo's
-    Releases page shows nothing. As the very next command after the tag push:
-    `gh release create v<A.B.C> --verify-tag --latest --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`
-    — then `gh release view` it: a tag is not a Release, and a non-UTF-8 locale
-    mangles `—` and `×`.
-    Point `--notes-file` at the note, never inline text; `--verify-tag` refuses
-    if the push didn't land. Run this on every release, autonomous runs included. **A pushed tag with no
-    Release is a red gate.**
-13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the push result for both the commit and the tag, and the GitHub Release you created (URL).
+13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the commit push, and the tag + Release you created (URL).
 
 ### Release note schema (use this section order)
 1. Version and date
@@ -374,5 +363,5 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 - Never invent fixes for findings that need human judgment; list as open issues.
 - Never call a red CI transient without naming the infrastructure cause; never
   re-run a job more than once to get past one.
-- Never push a tag with its commit, and never to a commit CI has not passed
-  green (rule 15a). Commit first, CI second, tag push last.
+- Never create a tag before every check it triggers has passed on its commit,
+  nor apart from its Release (rule 15a). Commit, then CI, then tag and Release.
