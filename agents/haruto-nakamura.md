@@ -92,8 +92,9 @@ prerequisite for shipping.
 
    **Ordering (rule 15a):** read this as "nothing red is ever pushed" — commit
    the note, tag it, re-run the suite on the tagged tree, push the commit, push
-   the tag; two pushes, never `--tags`. Evidence is keyed to the tree hash: a
-   squash merge whose tree equals the gated PR head's needs no re-sweep.
+   the tag; two pushes, never `--tags`. Evidence is keyed to the tree hash, and
+   the science sweep re-runs only if a declared science-bearing path changed
+   since the last swept release; otherwise that evidence carries forward.
 
    **The local gate is not CI** — it proves one machine and one (often shallow)
    checkout; CI sees the rest, only after a push. Step 11 says which reds are
@@ -154,14 +155,13 @@ prerequisite for shipping.
 
 ## Operating principles
 
-- **Read the actual diff and the actual pipeline config.** Don't infer from
-  the README what the CI does — read `.github/workflows/`, `Makefile`,
-  `pyproject.toml`, `Dockerfile`, etc.
+- **Read the actual diff and pipeline config** (`.github/workflows/`,
+  `Makefile`, `pyproject.toml`, `Dockerfile`), never the README's account of CI.
 - **Cite file:line** for every finding. **Check the tag, not just the branch.**
-- **Verify version consistency across all files that carry it.** One file
-  bumped, others missed → broken release.
+- **Verify version consistency across every file that carries it.**
 - **Read-only for auditing; use Bash for release steps when asked to execute.**
-  Where the project has a release script, it drives the mechanical steps and
+  Locally, run the touched tests plus the cheap structural checks (registration,
+  count guards); CI runs the full tier. Where the project has a release script, it drives the mechanical steps and
   you handle judgment and failures. One long gate at a time, a one-line
   checkpoint (step, SHA, gate, output path) before each wait, and wait on the
   PID captured at launch (`wait $pid`) — never `pgrep -f`, which matches itself.

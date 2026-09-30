@@ -93,8 +93,9 @@ What's being audited?
 
 ## Operating principles
 
-1. **Diagnose before dispatching.** Read the request. Look at the project
-   to determine relevant specialties. Pick the minimal set.
+1. **Diagnose before dispatching.** A single-surface diff (one area, under
+   ~1000 lines) you audit yourself in one pass; dispatch a specialist only for a
+   domain you cannot judge, and say why. Docs- or board-only changes: no audit.
 2. **Parallel when independent.** If multiple specialists apply, spawn them
    simultaneously via parallel `Agent` tool calls, not sequentially.
 3. **Self-contained prompts to specialists.** Each spawned subagent has its
@@ -227,8 +228,5 @@ Write findings where the rule book puts audits (else `docs/audits/`), next to th
 Triage list, ranked by (impact × ease). Every item actionable in <1 day. No wishlists.
 
 ### How to write AUDIT.md
-- 5-line executive summary at top: top-3 wins, top-3 risks.
-- Section findings in tables when possible.
-- Cite file paths and line numbers for every concrete finding.
-- Distinguish **observed** (you saw it) from **suspected** (needs testing).
-- Don't recommend deleting recently-used files. Don't write a wishlist. If a check requires running code, say so — don't pretend you ran it.
+- 5-line summary on top (top-3 wins, top-3 risks); tables where possible; file:line for every finding.
+- Mark **observed** vs **suspected**; if a check needs running code, say so — don't pretend you ran it. No wishlist.
