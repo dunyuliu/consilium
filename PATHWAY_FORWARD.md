@@ -22,8 +22,8 @@ nobody has ever checked the row and stays blank until someone does — never
 backfilled.
 
 **Compressed 2026-09-17.** This file ran 2,764 lines for 34 rows — thirteen
-times heavier per row than EQdyna's `pathway_forward.md` (210 lines, 108 rows),
-the working instance this design was measured against. The cause was rule
+times heavier per row than a working instance of the same design elsewhere
+(210 lines, 108 rows). The cause was rule
 21a's now-dropped recorded-output requirement: every recheck added a "Re-run"
 paragraph defending a pasted transcript instead of just re-reading the command.
 **Nothing is destroyed.** The full narrative for every row below — every

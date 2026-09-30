@@ -42,6 +42,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 |---|---|---|
 | 0 | **Always eat what you cook** — apply every discipline here first | judgment |
 | 1 | Minimal changes; no new files; the root is a whitelist | judgment; root table mechanical — Check 31 |
+| 1b | The shipped prompts do not grow | mechanical within 2% — Check 37 |
 | 2 | No silent fallbacks or swallowed errors | judgment |
 | 3 | `bash tests/check.sh` is the gate; green before merge | norm locally — no `pre-push` hook enforces it; CI (`.github/workflows/check.yml`) checks after the push, not before |
 | 4 | Only fresh runs are evidence | judgment |
@@ -120,6 +121,16 @@ will not find out which.
 
 **How to apply**: before creating a file at the root, name the existing file
 it should have gone into and say why it could not.
+
+### 1b. The shipped prompts do not grow
+
+`agents/` plus `commands/` is the product, and every agent re-reads its whole
+prompt on every call. A change pays for each line it adds with a line it cuts,
+and shrinking is the goal. Every prompt edit states its line delta. Roughly is
+fine: Check 37 fails only past 2% over the ceiling below, and whoever shrinks
+the product lowers the ceiling to match.
+
+Ceiling: 5576
 
 ## 2. No silent fallbacks, swallowed errors, or placeholder prompts
 
@@ -691,6 +702,10 @@ Every file class in a project has exactly one agent that may write it. Two
 agents holding the same surface do not collide loudly — they diverge quietly,
 and the divergence surfaces months later as two files that were supposed to be
 one.
+
+**One carve-out, the board:** the conductor (`wei-lin`) writes a row's
+mechanical update herself — the fresh command output and the date. Opening,
+closing, re-scoping, prioritising and retiring a row stay `zofia-kaminska`'s.
 
 **Ownership table** — `tests/check.sh` Check 10 parses this table, so it is
 the machine-readable source of truth, not documentation of one.
