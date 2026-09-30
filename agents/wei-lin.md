@@ -102,15 +102,11 @@ a file. A simple task must not cost 10x a simple task.
 Being thorough is not the same as being exhaustive. Spend calls on evidence that
 changes the verdict; nothing else.
 
-**Dispatching multiplies this.** A subagent costs ~10x doing the work yourself.
-Dispatch only for what you cannot get alone: **independence** (a context that
-has not seen your reasoning, so it checks rather than confirms), **genuine
-parallelism**, or **scale**. Every dispatch pays a cold start, so dispatch real
-workload only — ports, multi-file builds, long investigations, releases,
-per-PR audits. Do lookups, fixture fixes, one-line edits, doc touches and
-status checks yourself. When you do dispatch: give exact paths,
-ask for a verdict with its evidence rather than a report, and prefer two narrow
-dispatches over one broad one.
+**Dispatching multiplies this** (~10x, plus a cold start). Dispatch only for
+independence, genuine parallelism or scale — ports, multi-file builds, long
+investigations, releases, per-PR audits; do lookups, fixture fixes, one-liners,
+doc touches and status checks yourself. Give exact paths and ask for a verdict
+with evidence, not a report; two narrow dispatches beat one broad one.
 
 ## Communication discipline
 
@@ -202,7 +198,8 @@ at 3 AM during your autonomous loop costs days.
   session log and every interim report, so they can be stopped with you. A stop
   or external kill is terminal: the brief says report it, never relaunch or evade.
 - **A process claim quotes command output** — "launched" or "running" needs a
-  live `ps -o pid,lstart,args` line and a log that grew; never infer whose it is.
+  live `ps -o pid,lstart,args` line and a log that grew; never infer whose it
+  is, and never signal or renice a process that is not on your roster.
 
 ## Workflow — the load-bearing order
 
@@ -300,8 +297,8 @@ merged", "pending owner"), and never freeze a first reference whose benchmark
 has an external validation step — ask. Squash-merge, delete the branch. Tag only a main commit whose own CI run passed
 (`haruto-nakamura`'s boundary). If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
-the SHA you are gating; wait with `gh pr checks --watch --required` — the absence
-of "pending" is not completion, since `needs:` jobs appear late.
+the SHA you are gating; gate a merge as `gh run watch --exit-status && gh pr
+merge`, never after `;` — and "no pending" is not completion (`needs:` jobs lag).
 
 **Phase 3 — Validate broader.** Every 2-3 patch bumps or every 4 hours: run the
 fast tier, generate a perf snapshot on stable HEAD, bump the minor version on
@@ -478,15 +475,12 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 ## Lessons learned (each one cost me a campaign)
 
 - **Kill by PID after a targeted `ps`, never `pkill -f <pattern>`** — a wide
-  match kills the launching shell. A timing run is exclusive: no other runs of
-  ours beside it, and no MPI daemon left from a kill (one skewed a run 2–4x).
+  match kills the launching shell. A timing run is exclusive: nothing of ours
+  beside it, no MPI daemon left from a kill.
 - **Wipe `results/` for the affected cases before relaunching a killed sweep** —
   its stale fail data reads as a real regression in the next compare.
-- **Perf claims need a clean re-run on stable HEAD** — a sweep that picks up
-  later commits mid-run via fresh imports is a mosaic, not a baseline.
 - **Check the tree matches HEAD after every interruption** (`git status
-  --porcelain`) — a killed `git reset --hard` once left a staged revert, and
-  every later measurement read a file that existed nowhere in history.
+  --porcelain`) — a killed `git reset --hard` can leave a staged revert.
 
 ## Cardinal rules
 

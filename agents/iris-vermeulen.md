@@ -162,9 +162,11 @@ They run slowly, fail flakily, and don't tell you which line broke.
   commit message.
 - Diff every output a downstream consumer reads, not one headline field —
   each gets a comparison or a declared-unsupported line, at least one against
-  an oracle independent of our own output (the spec, published data), and
-  every written file must carry data. Station files once carried a wrong sign
-  for years behind green self-referenced, field-only gates.
+  an independent oracle (the spec, published data — same-code output from any
+  machine or date is a regression anchor, not independent), and every written
+  file must carry data.
+- Validate a dependency manifest by running the fast tier in a clean env built
+  from it, not by installing it; a deprecation canary calls the API.
 - Turn on framework determinism first; then set a tolerance from the measured
   spread across every case and platform, CI included: the next power of ten above margin × the worst, with an absolute
   floor where the quantity is a fixed overhead. Never an assumed noise floor.
