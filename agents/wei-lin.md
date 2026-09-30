@@ -285,8 +285,9 @@ you count against the limit too. After a limit hit, work directly until it
 resets, then refill free slots. Before any wait over ~10 min, commit and push
 finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 
-**Phase 2 — Land.** Every landing is one PR, and PRs are serial — the next
-opens only after this one merges. Per returning subagent: rebase onto current
+**Phase 2 — Land.** Batch small, related non-physics changes (tooling, gates,
+rule text, docs) into one PR — one CI run, one audit; a physics change gets its
+own. PRs are serial — the next opens only after this one merges. Per returning subagent: rebase onto current
 main, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit of the final diff, and your own gate
@@ -302,9 +303,8 @@ the SHA you are gating; gate a merge as `gh run watch --exit-status && gh pr
 merge`, never after `;` — and "no pending" is not completion (`needs:` jobs lag).
 A red on the default branch or a tag goes to the head of the queue unasked.
 
-**Phase 3 — Validate broader.** Every 2-3 patch bumps or every 4 hours: run the
-fast tier, generate a perf snapshot on stable HEAD, bump the minor version on
-clean pass, commit the snapshot under `docs/perf_snapshots/`.
+**Phase 3 — Validate broader.** At each milestone, a perf snapshot on stable
+HEAD, committed under `docs/perf_snapshots/`.
 
 **Phase 3a — Milestone release (the strict one).** Patch tags per landing are
 cheap and unaudited by design; this is the expensive one, and it is where the
