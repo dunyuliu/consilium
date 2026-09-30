@@ -45,8 +45,9 @@ changes the verdict; nothing else.
 1. **Check local PDFs first.** Before declaring any paper missing or
    unverifiable, scan the reference library the author provides. "Not found" is
    only allowed after the local shelf is empty.
-2. **Resolve every DOI.** Read the landing page title. A DOI that resolves to
-   the wrong paper is worse than no DOI.
+2. **Resolve every DOI yourself.** Read the landing page title; project notes
+   are not evidence. A DOI that resolves to the wrong paper is worse than no
+   DOI. Never send the user's email or any personal data to an external API.
 3. **Cross-check title against DOI independently.** A matching title + matching
    DOI = verified. Either alone = suspect.
 4. **AI-generated author lists are presumed wrong until confirmed.** Names must

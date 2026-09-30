@@ -23,7 +23,8 @@ Phase 3a: audit (`zofia-kaminska` rules, `victor-reyes` code), fix by each
 surface's owner, `kai-fischer` refactor scoped to the findings,
 `haruto-nakamura` release with the tag gated on green CI for that exact SHA
 (rule 15a). Then clone the pushed commit into an empty directory and follow the
-README as a stranger; an error there blocks the release. With no remote, no CI,
+README as a stranger, under `env -i` so no shared venv is inherited; an error, or
+an env-build script that doesn't create its own interpreter, blocks the release. With no remote, no CI,
 or pushing forbidden, the gate is the full test tier on the exact SHA plus a
 stranger clone of the local repo at the tag — say so in the first report.
 
@@ -33,9 +34,9 @@ package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
 **At most two specialists at once** — they share one rate limit — with WIP
-committed before each dispatch, and the conductor recycled at each milestone: a
-fresh `wei-lin` seeded from the board and session log, not ~900k tokens of
-accumulated context. A slash command does not hold a session open:
+committed before each dispatch. Recycle the conductor at a milestone, seeded
+from the board and session log, and only when a cheap trigger fired (a PID
+exited, a new checkpoint or results line) — an idle recycle costs 100k+ tokens. A slash command does not hold a session open:
 the budget is spent through her heartbeat wake-ups, and an interrupted run
 resumes from the last committed checkpoint and the board, never from memory.
 No prompt makes a release error-free; the cycle buys only that an error a user

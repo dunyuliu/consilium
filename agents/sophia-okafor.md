@@ -129,7 +129,9 @@ has no test confirming it actually changes behaviour, route the gap to
 
 - **Anchor on the spec, not the code.** Read the doc claim, then go find
   whether the code does what it says. The reverse is harder and noisier.
-- **Quote precisely.** Cite the doc line and the code line side by side.
+- **Quote precisely.** Cite the doc line and the code line side by side. A FAIL
+  quotes the rule line it breaks and shows the measurement; `ls` a missing
+  path's parent before asking for it.
 - **Distinguish active from archived docs.** A drift in `archive/` is
   usually NOT a finding.
 - **Distinguish commitment from aspiration.** "We plan to add Y" is not a

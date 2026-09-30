@@ -129,3 +129,63 @@ the commit.
 | 09-28 | eqdyna | evidence names a clean committed SHA: commit, then measure | mira, zofia | landed (this PR) |
 | 09-28 | eqdyna | read the metric definition before asserting a mechanism | wei-lin | landed (this PR), in place |
 | 09-29 | eqquasi | never merge past a hold marker; never freeze a first reference with external validation | wei-lin | landed (this PR) |
+| 09-29 | ai-dataset | reviewer counts code objects by executing a count | elena-hartmann | deferred |
+| 09-29 | ai-dataset | "the repo does not prove X" is not "X was not done" | victor | landed (this PR) |
+| 09-29 | ai-dataset | summary dropped a source file's own caveat | main agent | dismissed: no consilium agent |
+| 09-29 | cyclegns | rollout input built unlike training is a correctness finding | victor | landed (this PR) |
+| 09-29 | cyclegns | compare running normalizer stats against ground truth | lars | deferred |
+| 09-29 | cyclegns | leaf agent briefed to dispatch audits it cannot | /autopilot | deferred |
+| 09-29 | cyclegns | never park on a background process (third time) | wei-lin | landed (this PR) |
+| 09-29 | cyclegns | shared launcher has every flag live configs use | haruto | deferred |
+| 09-29 | dynamo_gns | "dispatched" needs a live PID and a growing log | wei-lin | landed (this PR) |
+| 09-29 | dynamo_gns | a stop or kill is terminal; roster of child PIDs | wei-lin | landed (this PR) |
+| 09-29 | dynamo_gns | flock the model dir at launch | all | deferred |
+| 09-29 | dynamo_gns | recycle the conductor only on a cheap trigger | /autopilot | landed (this PR) |
+| 09-29 | dynamo_gns | OMP/MKL threads exported in launch templates | wei-lin | dismissed: covered, thread caps |
+| 09-29 | dynamo_gns | no signal swallowed as rc=0; check the final step | lars | deferred |
+| 09-29 | dynamo_gns | discover artifacts by glob, not a schedule | all | deferred |
+| 09-29 | dynamo_gns | never overwrite untracked reference artifacts | all | deferred |
+| 09-29 | dynamo_gns | measure the incumbent before co-locating on a GPU | wei-lin | deferred |
+| 09-29 | dynamo_gns | ratio-to-truth metrics scored two-sided | all | deferred |
+| 09-29 | enso_paleo | Critical rests on recomputation, not a doc table | victor | landed (this PR) |
+| 09-29 | enso_paleo | state both formulas; "different estimator" before "wrong" | victor | landed (this PR) |
+| 09-29 | enso_paleo | each design parameter cites its source or "our choice" | victor | landed (this PR) |
+| 09-29 | enso_paleo | no final report while own background children run | victor | deferred |
+| 09-29 | enso_paleo | portability nits in research scripts are Low | victor | landed (this PR) |
+| 09-29 | enso_paleo | release bumped minor unilaterally | haruto | dismissed: covered, step 0 |
+| 09-29 | eqdyna | never undo a mutation with git checkout -- | iris | landed (this PR) |
+| 09-29 | eqdyna | a test pins only a measured value | haruto | deferred |
+| 09-29 | eqdyna | reordering a data-moving step before refusal gates | haruto | deferred |
+| 09-29 | eqdyna | "board clear" means every row closed or blocked | wei-lin | landed (this PR) |
+| 09-29 | eqdyna | CI wait: absence of pending is not completion | wei-lin | landed (this PR) |
+| 09-29 | eqdyna | derive the bump from the changelog | haruto | dismissed: covered, step 0 |
+| 09-29 | eqgns | stranger clone under env -i; env scripts own their interpreter | /autopilot | landed (this PR) |
+| 09-29 | eqgns | PR carries code and tests; NOTES never committed | wei-lin | landed (this PR) |
+| 09-29 | eqgns | framework determinism before fitting a tolerance | iris | landed (this PR) |
+| 09-29 | eqgns | identify a process's owner before claiming contention | wei-lin | landed (this PR) |
+| 09-29 | eqgns | content-hash every anchor before building a gate | iris | deferred |
+| 09-29 | eqgns | no duplicate dispatch; never write under read-only dirs | wei-lin | deferred |
+| 09-29 | eqgns | commit WIP before a wait; heartbeat installed at launch | wei-lin, /autopilot | landed (this PR) |
+| 09-29 | eqrupt-surrogate | no CI: stop before pushing | haruto | dismissed: covered, step 0 |
+| 09-29 | eqrupt-surrogate | check the root-file rule before writing release notes | haruto | deferred |
+| 09-29 | gmtsar | reap worktrees on landing; git cherry for squash merges | wei-lin | landed (this PR) |
+| 09-29 | manuscripts | a perf number carries its repeat count and range | zofia | landed (this PR) |
+| 09-29 | manuscripts | fixed release-note schema | haruto | deferred |
+| 09-29 | manuscripts | backfilled Release says so and is never Latest | haruto | landed (this PR) |
+| 09-29 | manuscripts | check a scaling direction against numeric pairs | victor | landed (this PR) |
+| 09-29 | manuscripts | router settles mechanically checkable disagreements | victor | landed (this PR) |
+| 09-29 | manuscripts | WRONG against a source cites the line read | victor | landed (this PR) |
+| 09-29 | manuscripts | no VERSION or tags: the release is the commit | haruto | landed (this PR) |
+| 09-29 | mercury | never end a turn while a child is alive | wei-lin | landed (this PR) |
+| 09-29 | mercury | live roster of children; untracked outputs outside worktrees | wei-lin | landed (this PR) |
+| 09-29 | mercury | /audit report for a non-code artifact goes to its project | /audit, victor | landed (this PR) |
+| 09-29 | mercury | a FAIL quotes the rule and shows the measurement | sophia | landed (this PR) |
+| 09-29 | mercury | resolve DOIs yourself; never send the user's email out | ziyan | landed (this PR) |
+| 09-29 | mercury | parity runs write to a scratch copy | kai | landed (this PR) |
+| 09-29 | mfe-gf | push finished work before any long wait | wei-lin | landed (this PR) |
+| 09-29 | mfe-gf | copy out board-cited evidence before reaping | wei-lin | landed (this PR) |
+| 09-29 | mfe-gf | rule book names one board, the one /autopilot reads | zofia, /autopilot | dismissed: covered, one-board rule |
+| 09-29 | mfe-gf | quote a process's ps line, never infer it | wei-lin | landed (this PR) |
+| 09-29 | ve_inversion | grant from the rule book; state the target branch first | wei-lin | landed (this PR) |
+| 09-29 | ve_inversion | record owned worktrees; commit WIP at step boundaries | wei-lin | landed (this PR) |
+| 09-29 | ve_inversion | a config value is a claim, not evidence | victor | landed (this PR) |
