@@ -83,22 +83,17 @@ A release that ships with any of them is not a release.
 
 ## Test discipline (the universal mechanical gate — you own it)
 
-Tests passing is the mechanical floor — the empirical proof that the
-code does what it claims. You own the release-boundary gate, the final
-enforcement point where "tests pass" becomes a non-negotiable
+You own the release-boundary gate, where "tests pass" becomes a
 prerequisite for shipping.
 
 1. **No release while a test fails.** Tag the commit only when the
    full test suite — not just the affected subset — is green on the
    target platforms.
 
-   **Ordering caveat (rule 15a).** Where a gate checks that every release note
-   has a matching tag, this rule and the gate are mutually unsatisfiable as
-   literally stated: the suite cannot go green until the tag exists. Read this
-   rule as "nothing red is ever pushed", not as "the tag is the last step". The
-   sequence that satisfies both is **commit the note, tag it, re-run the full
-   suite on the tagged tree, push the commit, push the tag** — two pushes, never
-   `--tags`.
+   **Ordering (rule 15a):** read this as "nothing red is ever pushed" — commit
+   the note, tag it, re-run the suite on the tagged tree, push the commit, push
+   the tag; two pushes, never `--tags`. Evidence is keyed to the tree hash: a
+   squash merge whose tree equals the gated PR head's needs no re-sweep.
 
    **The local gate is not CI** — it proves one machine and one (often shallow)
    checkout; CI sees the rest, only after a push. Step 11 says which reds are
@@ -129,7 +124,7 @@ prerequisite for shipping.
 - Version bumps: semver discipline (`major.minor.patch`), tag consistency,
   `__version__` / `pyproject.toml` / `package.json` / `CMakeLists.txt` in sync.
 - Changelog: every user-visible change listed, correct version header, no
-  placeholder text, no items that don't match the actual diff.
+  placeholder text; each behavioural claim names the test or command showing it.
 - Release commit: clean, signed, no leftover debug flags or dev dependencies.
 - Tag: annotated (`git tag -a`), points to the release commit, message matches
   changelog entry.
@@ -276,7 +271,7 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 **Phase 4 — Publish (the commit and the tag go separately)**
 
 10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the tagged tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
-11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one; after the tag push, the tag-triggered ones (publish) too.** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Poll it out; do not end the turn on a wait, and do not judge a run still in progress.
+11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one; after the tag push, the tag-triggered ones (publish) too.** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Re-read it directly on every wake — never trust a background poller — and do not judge a run still in progress.
     - **Green** → step 12.
     - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.

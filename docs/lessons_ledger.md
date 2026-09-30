@@ -199,3 +199,13 @@ the commit.
 | 09-30 | PIE | silent rule book: ask about merge authority at minute 0 | /autopilot | landed (this PR) |
 | 09-30 | PIE | rules hold invariants; changing state goes on the board | zofia | landed (this PR) |
 | 09-30 | PIE | gate a merge on --exit-status &&, never after ; | wei-lin | landed (this PR) |
+| 09-30 | eqdyna | evidence keyed to the tree hash; no re-sweep of an identical tree | haruto | landed (this PR) |
+| 09-30 | eqdyna | re-read CI state on every wake; never trust a background poller | haruto | landed (this PR) |
+| 09-30 | eqdyna | checkpoint before long gates; one long-gate agent at a time | wei-lin | landed (this PR) |
+| 09-30 | PIE | long runs write per-case results and skip finished cases on restart | wei-lin | landed (this PR) |
+| 09-30 | PIE | after a 429 resets, refill free slots; deferrals name an unblock event | wei-lin | landed (this PR) (corrects 0730dcf's "stop dispatching") |
+| 09-30 | PIE | never leave artefacts untracked in the default checkout | wei-lin | dismissed: covered, never touch the main checkout |
+| 09-30 | PIE | invoker relays specialist numbers as unaudited until audited | /autopilot | landed (this PR) |
+| 09-30 | PIE | writes outside the repo need the owner's OK for that write | /autopilot | landed (this PR) |
+| 09-30 | PIE | behavioural claims in release docs name their test | haruto | landed (this PR) |
+| 09-30 | PIE | pkill -f killed its own shell | all | dismissed: covered, wei-lin kill lesson |
