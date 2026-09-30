@@ -224,7 +224,8 @@ ceiling. Rules state invariants and how to check them; anything that will change
    `evals/` (fixtures), and the project's own source tree. Nothing else at
    root — a new root file needs an explicit ask, and the answer is usually
    "it goes in one of the four above." Seed a guard that diffs the tracked
-   root against this list; an unguarded root collects mission notes.
+   root against this list; an unguarded root collects mission notes. All work —
+   worktrees, runs, data, scratch — lives inside the project root, never beside it.
 
    **One audience, one job, one home.** These docs drift into each other the
    moment a fact lives in two of them. Usage belongs in `README.md` and is
@@ -233,11 +234,9 @@ ceiling. Rules state invariants and how to check them; anything that will change
    in two files is a fact that will be wrong in one of them, and you will not
    find out which.
 
-   **Slots fill as earned.** Day one owes `README.md`, `CLAUDE.md`,
-   `PATHWAY_FORWARD.md` and this rule book. `tests/`, `evals/` and release
-   notes become required the moment the project has a test, a fixture, or a
-   tag — not before. The whitelist binds immediately; the requirements arrive
-   with the work.
+   **Slots fill as earned.** Day one owes the four documents; `tests/`, `evals/`
+   and release notes arrive with the first test, fixture or tag. The whitelist
+   binds immediately.
 
 2. **No silent fallbacks, swallowed errors, or placeholder data.** Missing
    input, binary, or config fails loudly and immediately. No substituted

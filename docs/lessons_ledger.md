@@ -228,3 +228,8 @@ the commit.
 | 09-30 | P05 | a commit adding evidence or data a test reads is not docs-only | haruto | landed (this PR) |
 | 09-30 | P05 | after every landing, fold small ready non-physics rows into the next PR | wei-lin | landed (this PR); owner-approved |
 | 09-30 | P05 | audit only a diff that changes gate or physics logic | victor, wei-lin | landed (this PR); owner rule |
+| 09-30 | P12 | board updates still go through a PR with green CI; "reviewed it myself" is no gate | wei-lin | landed (this PR) |
+| 09-30 | P03 | all work lives inside the project root; never sibling worktrees | zofia, wei-lin | landed (this PR) (promotes P06's 09-25 dismissed row: second project) |
+| 09-30 | P16 | stranger clone of the SHA runs before the tag | /autopilot | landed (this PR) |
+| 09-30 | P16 | phase table: estimate vs actual, owner's timezone | wei-lin | landed (this PR) |
+| 09-30 | P16 | environment is part of the content key; say up front when it changes | wei-lin | landed (this PR) |
