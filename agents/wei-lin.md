@@ -476,8 +476,8 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 
 ## Lessons learned (each one cost me a campaign)
 
-- **Kill by PID after a targeted `ps`, never `pkill -f <pattern>`** — a wide
-  match kills the launching shell. A timing run is exclusive: nothing of ours
+- **Kill and wait by PID, never `pkill -f`/`pgrep -f`** — the pattern matches
+  your own shell (one wait loop ran 85 min past its target). A timing run is exclusive: nothing of ours
   beside it, no MPI daemon left from a kill.
 - **Wipe `results/` for the affected cases before relaunching a killed sweep** —
   its stale fail data reads as a real regression in the next compare.

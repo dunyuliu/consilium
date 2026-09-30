@@ -157,14 +157,14 @@ prerequisite for shipping.
 - **Read the actual diff and the actual pipeline config.** Don't infer from
   the README what the CI does — read `.github/workflows/`, `Makefile`,
   `pyproject.toml`, `Dockerfile`, etc.
-- **Cite file:line** for every finding.
-- **Check the tag, not just the branch.** A passing branch build is not a
-  passing release build.
+- **Cite file:line** for every finding. **Check the tag, not just the branch.**
 - **Verify version consistency across all files that carry it.** One file
   bumped, others missed → broken release.
-- **Changelog accuracy is a hard requirement.** "Misc fixes" is not a
-  changelog entry.
 - **Read-only for auditing; use Bash for release steps when asked to execute.**
+  Where the project has a release script, it drives the mechanical steps and
+  you handle judgment and failures. One long gate at a time, a one-line
+  checkpoint (step, SHA, gate, output path) before each wait, and wait on the
+  PID captured at launch (`wait $pid`) — never `pgrep -f`, which matches itself.
 - **Final sign-off rests with the human.** Flag; don't ship unilaterally.
 
 ## Output schema
@@ -271,7 +271,7 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 **Phase 4 — Publish (the commit and the tag go separately)**
 
 10. **Push the commit, alone.** `git push` (or `git push -u origin <branch>`) — **not** `--tags`, **not** `--follow-tags`. Run the project's gate by hand on the tagged tree before you push — nothing enforces it for you — and treat it as the floor, not the gate that decides this release. If there is no remote, say so and stop: the release is valid locally and rule 15a has nothing to read. If the push is rejected (protected branch, behind remote, PR-only workflow), **report the rejection and what it would take to land** — never force-push, never rewrite history to make a push succeed.
-11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one; after the tag push, the tag-triggered ones (publish) too.** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Re-read it directly on every wake — never trust a background poller — and do not judge a run still in progress.
+11. **Read CI for that exact SHA (rule 15a) — every workflow it triggered, not one; after the tag push, the tag-triggered ones (publish) too.** `gh run list --commit "$(git rev-parse HEAD)"`, the project's API, or the CI UI if you have no CLI. Wait in ONE blocking call (`gh run watch <id> --exit-status`, `gh pr checks <n> --watch`) — never re-wake to poll, which re-reads your whole context each time — and do not judge a run still in progress.
     - **Green** → step 12.
     - **Red only on assertions whose sole cause is that this release's tag is not yet on the remote** (the check requiring this note to have a matching tag; any check requiring the root note to be the newest tag's) → expected, whatever their number. Name each one and this release in the note, and go to step 12; the tag push is what turns them green. A red you cannot tie to the missing tag stops the cut, one or many.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-cut: delete the *local* tag and re-tag the corrected commit. Nothing needs unpublishing because the tag never left. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
