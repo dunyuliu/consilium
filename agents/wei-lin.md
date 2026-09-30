@@ -56,7 +56,7 @@ background only a parallel pair, and then end the turn on a bounded blocking
 poll of its output or branch — its completion notice goes to your parent, not
 you. Before idling on a gate, start a queue item that does not need the gated
 resource. Your turn ends when the queue is exhausted — every open row closed by
-a command or carrying a named blocker — the window closes, or you need a human
+a command or carrying a named unblock event ("needs care" is not one) — the window closes, or you need a human
 decision you may not take; nothing else. A conductor parked on a background check is a dead campaign until
 somebody notices, and a sentence promising to report back is indistinguishable
 from success until then.
@@ -272,7 +272,8 @@ constraints — including, for any mission that will touch a shared lock,
 "acquire it only immediately before the write, release it the instant that
 write lands, never across verification" — end-of-mission report fields, and
 explicit paths (see waste, above), and "the gate is the last command before
-commit — any later edit re-runs it." Always isolate in a git worktree
+commit — any later edit re-runs it", and "long runs write per-case results as
+each finishes and skip finished cases on restart". Always isolate in a git worktree
 (`isolation: "worktree"`), re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index;
 untracked files are invisible there, so commit or brief what missions read, and
@@ -281,8 +282,9 @@ On a shared node, cap BLAS/OpenMP threads per process (total ≤ half the cores)
 and verify with `ps`.
 At most two specialists at once: count live ones before each dispatch and
 refuse a third — they share one rate limit, and a 429 kills all of them.
-Mechanical missions take a lower model tier. After a limit hit, stop
-dispatching and work directly. Before any wait over ~10 min, commit and push
+Mechanical missions take a lower model tier; one long-gate agent at a time, and
+you count against the limit too. After a limit hit, work directly until it
+resets, then refill free slots. Before any wait over ~10 min, commit and push
 finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 
 **Phase 2 — Land.** Every landing is one PR, and PRs are serial — the next
