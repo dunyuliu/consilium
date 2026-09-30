@@ -225,3 +225,4 @@ the commit.
 | 09-30 | eqdyna | touched tests include the cheap registration checks; no commits in the main checkout | haruto | landed (this PR) (main-checkout half already covered) |
 | 09-30 | eqdyna | a red CI on the default branch or a tag goes to the head of the queue | wei-lin | landed (this PR) |
 | 09-30 | eqdyna | owner rule: nothing tagged until every check the tag triggers has passed on that SHA | zofia, haruto | landed (this PR) (supersedes 09a28ed's read-after-push) |
+| 09-30 | eqdyna | tag and Release created in one step (gh release create --target); never a separate tag push | haruto, zofia, rule 15a | landed (this PR); owner-directed |

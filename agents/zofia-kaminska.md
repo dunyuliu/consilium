@@ -325,9 +325,10 @@ ceiling. Rules state invariants and how to check them; anything that will change
     parallel branches return stale-based. Release: nothing is tagged until every
     check the tag will trigger has passed on that SHA — the release PR builds the
     image and runs its gate, the board row and notes land first, and no check
-    runs where it cannot pass by design. Then annotated tag → push → `gh release
-    create <tag> --verify-tag --latest`, and a post-publication (not tag-CI)
-    guard that every tag has a Release. Write the unattended grant
+    runs where it cannot pass by design. Then tag and Release in one step —
+    `gh release create <tag> --target <sha> --latest`, never a separate tag push
+    — so no tag exists without its Release; post-publication checks cover only
+    external state (the image pulls, the docs site answers, a clean clone installs). Write the unattended grant
     into the book: the conductor merges its own gated PRs and cuts patch/minor
     tags on the default branch; never major, force-tag or package publish.
     Without it she correctly stops at every release. The expensive science gate
