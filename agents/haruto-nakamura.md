@@ -92,9 +92,11 @@ prerequisite for shipping.
 
    **Ordering (rule 15a):** read this as "nothing red is ever pushed" — commit
    the note, push the commit, get every pre-tag check green on that SHA, then
-   create the tag and the Release in one step (step 12); never push a tag alone. Evidence is keyed to the tree hash, and
-   the science sweep re-runs only if a declared science-bearing path changed
-   since the last swept release; otherwise that evidence carries forward.
+   create the tag and the Release in one step (step 12); never push a tag alone.
+   Only the science sweep carries forward — by tree hash, or when no declared
+   science-bearing path changed since the last swept release. CI and the image
+   gate always run on the tag's own SHA; an "equivalent" SHA is never evidence,
+   and a commit adding evidence or data a test reads is not docs-only.
 
    **The local gate is not CI** — it proves one machine and one (often shallow)
    checkout; CI sees the rest, only after a push. Step 11 says which reds are
@@ -134,23 +136,18 @@ prerequisite for shipping.
 - Every step has a clear failure mode and a clear success criterion.
 - No step silently passes on failure (check exit codes, not just last command).
 - Secrets and credentials not logged or leaked into artifacts.
-- Build is reproducible: same inputs → same outputs, no timestamp or random seed
-  baked into artifacts.
-- Test coverage gates are enforced, not advisory.
-- Flaky tests identified and quarantined, not ignored.
+- Build is reproducible — no timestamp or random seed baked into artifacts.
+- Coverage gates enforced, not advisory (flaky tests: Test discipline #3).
 
 ### Pipeline maintenance
-- Dependency versions pinned and auditable; lockfiles committed.
-- Docker base images pinned by digest, not by floating tag.
+- Dependencies pinned, lockfiles committed; base images pinned by digest.
 - Caches invalidated correctly (stale cache = silent wrong build).
 - Matrix builds (OS × Python version, etc.) cover the claimed support matrix.
 - Deprecation warnings in CI output treated as findings, not noise.
 
 ### Deployment
-- Smoke test runs after deploy before traffic is cut over.
-- Rollback procedure documented and tested.
-- Health check / readiness probe actually tests the thing it claims to test.
-- Config and secrets injected at runtime, not baked into the image.
+- Smoke test after deploy, before cut-over; a rollback that has been tested.
+- Health checks test what they claim; config and secrets injected at runtime.
 
 ## Operating principles
 

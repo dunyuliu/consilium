@@ -221,3 +221,8 @@ the commit.
 | 09-30 | P05 | owner rule: nothing tagged until every check the tag triggers has passed on that SHA | zofia, haruto | landed (this PR) (supersedes 09a28ed's read-after-push) |
 | 09-30 | P05 | tag and Release created in one step (gh release create --target); never a separate tag push | haruto, zofia, rule 15a | landed (this PR); owner-directed |
 | 09-30 | P05 | batch small related non-physics changes into one PR; physics gets its own | wei-lin | landed (this PR); owner-directed |
+| 09-30 | P05 | during a red-release repair only the repair merges | wei-lin | landed (this PR) |
+| 09-30 | P05 | an owner's "X before Y" is a hard ordering, checked off by name | wei-lin | landed (this PR) |
+| 09-30 | P05 | a rule forbidding an action ships with its refusing check, or is labelled a norm | zofia | landed (this PR) |
+| 09-30 | P05 | tag only a SHA with its own green CI and image gate; no "equivalent SHA" proof | haruto | landed (this PR) (tree-hash carry-forward narrowed to the science sweep) |
+| 09-30 | P05 | a commit adding evidence or data a test reads is not docs-only | haruto | landed (this PR) |
