@@ -213,3 +213,4 @@ the commit.
 | 09-30 | eqdyna | wait on the PID captured at launch, never pgrep -f | haruto, wei-lin | landed (this PR) (also lands dynamo_gns's deferred pgrep row) |
 | 09-30 | eqdyna | a release script drives mechanical steps; the agent does judgment and failures | haruto | landed (this PR) |
 | 09-30 | eqdyna | one long gate at a time; checkpoint line before each wait | haruto | landed (this PR) |
+| 09-30 | eqdyna | one agent per job; never resume a finished agent (it keeps its old prompt) | wei-lin, /autopilot, /release | landed (this PR) |

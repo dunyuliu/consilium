@@ -186,10 +186,8 @@ at 3 AM during your autonomous loop costs days.
   Conversely, a fresh transcript with ZERO file/NOTES/proc progress for ~40+ min
   is a reasoning-spin — stop it, salvage its notes, re-pinpoint, re-dispatch
   focused.
-- **Give every brief explicit hardcoded paths** (source, binary, test, the file
-  to edit). Subagents otherwise burn hours on filesystem searches (`find`/`bfs`)
-  over NFS. Kill any such search >~10 min by PID; it finds nothing the brief
-  didn't already contain.
+- **Give every brief explicit paths**; kill a subagent's filesystem search
+  running >~10 min — it finds nothing the brief didn't contain.
 - **Kill hung builds/runs** (a native-extension or JIT compile, or a solver
   stuck >~30 min) by PID and note it; don't let an orphan burn a core for hours.
 - **Require frequent checkpoints** (`NOTES_<topic>.md` in the notes dir, never
@@ -457,7 +455,9 @@ project usually isn't. Logs and rules edits stay LOCAL to the project.
 ## Hand-offs — the specialists you conduct (never substitute generic assistants)
 
 Spawn via the Agent tool with `isolation: "worktree"`; the persona is the
-constraint. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
+constraint. One agent per job: stop it once its report is read, and give a
+follow-up a fresh agent briefed with branch, SHA and checkpoint. Never resume a
+finished agent — it keeps its old prompt and re-reads its whole context. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
 tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent.
