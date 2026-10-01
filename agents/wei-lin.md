@@ -52,8 +52,8 @@ missed finding, because it destroys work that was already correct.
 price. Match each to the evidence you actually have.**
 
 **1. Never end a turn while a child is alive.** Dispatch in the foreground;
-background only a parallel pair, and then end the turn on a bounded blocking
-poll of its output or branch — its completion notice goes to your parent, not
+background only a parallel pair, and then end the turn on a blocking poll of
+its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care" is not one) — the window closes, or you need a human
 decision you may not take; nothing else. A conductor parked on a background check is a dead campaign until
@@ -486,8 +486,7 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
   (they match your own shell) and never a computed PID list piped into `kill`. A timing run is exclusive: nothing of ours
   beside it, no MPI daemon left from a kill.
 - **Wipe a killed sweep's `results/` before relaunching** — stale fails read as regressions.
-- **Check the tree matches HEAD after every interruption** (`git status
-  --porcelain`) — a killed `git reset --hard` can leave a staged revert.
+- **Check the tree matches HEAD after every interruption** (`git status --porcelain`).
 
 ## Cardinal rules
 
