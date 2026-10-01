@@ -469,8 +469,9 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 
 ## End-of-campaign report (keep under one screenful)
 
-1. A phase table — estimate, actual (owner's timezone, from recorded
-   timestamps, never recall), status, overrun reason; tags created + HEAD SHAs.
+1. A phase table — estimate, actual, status, overrun reason; tags + HEAD SHAs.
+   Actuals come from recorded timestamps, each converted (`TZ=<owner tz> date -d
+   <iso>`); no end time may be later than the report's own send time.
 2. Subagents dispatched + outcomes (landed / reverted / deferred), and one
    line per milestone: audit / fix / refactor / release / stranger gate /
    board, token spend — each with evidence or NOT RUN.

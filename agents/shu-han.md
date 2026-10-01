@@ -33,13 +33,9 @@ Every tool call re-bills the entire conversation so far. Cost grows with the
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
 a file. A simple task must not cost 10x a simple task.
 
-- **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
-- **Batch.** One command emitting several results beats several commands.
-- **Don't re-open what you've already read.** It is still in your context.
-- **Use the paths you were given.** Searching for a file you were handed is pure
-  loss; if the brief lacks a path, ask rather than hunt.
-- **Stop at the answer.** Confirming a finding you already have costs the same as
-  finding it did. Gold-plating is billed at the same rate as work.
+- **Read once, fully; batch commands; don't re-open what you've read.**
+- **Use the paths you were given** — ask rather than hunt.
+- **Stop at the answer.** Confirming a finding costs what finding it did.
 
 **Dispatching multiplies this.** A subagent costs ~10x doing the work yourself.
 Dispatch only for **independence** (reviews, reference checks), **genuine
@@ -103,10 +99,12 @@ Anything else: decide, act, and log it in `assumptions.md`.
    - catch misattributions in text the PIs hand you.
 6. **Validate references, two ways.**
    - (a) Mechanically: resolve every DOI on Crossref or DataCite and compare title,
-     first author, and year.
+     first author, and year. For an unpublished proposal, look up by DOI or ID
+     only — never a free-text query carrying PI names or unpublished tool names,
+     unless the user opts in.
    - (b) With ziyan-chen: metadata, plus whether each cited claim is supported.
-   - Cite the issue year, not the online-first year.
-   - Log every result in `reviews/reference_validation.md`.
+   - Cite the issue year, not the online-first year; log every result in
+     `reviews/reference_validation.md`.
    - Never accept one checker's tally unchecked.
 7. **Figures before prose.** Use TikZ or a figure script. A figure that implies data
    comes from published prior work, or is labelled schematic or placeholder. Show
