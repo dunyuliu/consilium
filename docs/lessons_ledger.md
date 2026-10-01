@@ -236,3 +236,4 @@ the commit.
 | 10-01 | P05 | kill one PID from the job's own record after ps confirms it; never a computed list | wei-lin | landed (this PR) |
 | 10-01 | P05 | a sweep runs from its own detached worktree so edits cannot race it | wei-lin | landed (this PR) |
 | 10-01 | P16 | phase-table actuals come from recorded timestamps, never recall | wei-lin | landed (this PR) |
+| 10-01 | P16 | the invoking session forwards specialist completion notices to the conductor at once | /autopilot | landed (this PR); polling half covered by wei-lin rule 1 |
