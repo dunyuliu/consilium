@@ -304,6 +304,7 @@ directly; for technical work she delegates the whole bundle to Victor.
 |---|---|
 | `elena-hartmann` | Editor in Chief, Nature. Holistic verdict. The buck stops here. |
 | `ziyan-chen` | Senior Editor. Citations, DOIs, claim-vs-abstract drift. |
+| `shu-han` | Proposal author — drafts a funding proposal end to end; Elena gives the verdict, Ziyan checks references. |
 | `selin-aydin` | Critical reviewer — seismology, earthquake-rupture physics, ground motion. |
 | `marco-bianchi` | Critical reviewer — geodynamics, geodesy, long-timescale Earth physics. |
 
@@ -519,7 +520,7 @@ runs on haiku.
 | Model | Agents |
 |---|---|
 | fable | `dunyu-liu` |
-| opus | `elena-hartmann`, `victor-reyes`, `marco-bianchi` |
+| opus | `elena-hartmann`, `victor-reyes`, `marco-bianchi`, `shu-han` |
 | sonnet | `nadia-hadid`, `priya-nair`, `jordan-kim`, `rafael-santos`, `ingrid-lindqvist`, `kai-fischer`, `iris-vermeulen`, `mira-volkov`, `haruto-nakamura`, `anya-petrov`, `wei-lin`, `zofia-kaminska`, `selin-aydin`, `lian-zhao`, `marta-silva` |
 | haiku | `lars-eriksson`, `sophia-okafor`, `ziyan-chen` |
 
@@ -595,6 +596,7 @@ consilium/
 │   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
 │   ├── selin-aydin.md      #   seismology / earthquake-rupture reviewer
 │   ├── marco-bianchi.md    #   geodynamics / long-timescale reviewer
+│   ├── shu-han.md          #   proposal author — drafts; Elena reviews
 │   ├── victor-reyes.md     #   audit orchestrator — routes technical work
 │   ├── priya-nair.md       #   quantitative claims vs raw anchor data
 │   ├── lars-eriksson.md    #   code math bugs, edge cases, sign conventions

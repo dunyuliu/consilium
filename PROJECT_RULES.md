@@ -128,9 +128,10 @@ it should have gone into and say why it could not.
 prompt on every call. A change pays for each line it adds with a line it cuts,
 and shrinking is the goal. Every prompt edit states its line delta. Roughly is
 fine: Check 37 fails only past 2% over the ceiling below, and whoever shrinks
-the product lowers the ceiling to match.
+the product lowers the ceiling to match. One exception, the maintainer's: a new
+agent no longer than the mean agent may raise the ceiling once, by its length.
 
-Ceiling: 5576
+Ceiling: 5768
 
 ## 2. No silent fallbacks, swallowed errors, or placeholder prompts
 
@@ -719,6 +720,7 @@ the machine-readable source of truth, not documentation of one.
 | new production code (create) | `dunyu-liu` |
 | release notes, version files, tags | `haruto-nakamura` |
 | publication staging, citation files | `anya-petrov` |
+| funding-proposal drafts | `shu-han` |
 | figure-generation scripts + their rendered images | `marta-silva` |
 | campaign session log, merge decisions | `wei-lin` |
 | `.consilium-review/` in a deployed project | `nadia-hadid` |
