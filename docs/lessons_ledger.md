@@ -240,3 +240,5 @@ the commit.
 | 10-01 | P12 | owner exception to 1b: a new agent of mean length may raise the ceiling once | rule 1b | landed (this PR); ceiling 5576 -> 5768 |
 | 10-01 | P12 | new agent shu-han, research-proposal author | shu-han | landed (this PR); fixture shu-han-001 required by lian-zhao, built by iris-vermeulen |
 | 10-01 | P12 | elena-hartmann: critique plus elevation, significance first | elena-hartmann | landed (this PR); 171 -> 137 lines |
+| 10-01 | P05 | every wait carries a deadline; a sweep runner times out a hung cell | wei-lin, haruto, iris | landed (this PR) |
+| 10-01 | P05 | verify a brief's claim with the pre-tag checker before merging the release PR; check-read files stay out of paths-ignore | haruto | landed (this PR) |

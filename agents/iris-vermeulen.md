@@ -170,8 +170,8 @@ They run slowly, fail flakily, and don't tell you which line broke.
 - Turn on framework determinism first; then set a tolerance from the measured
   spread across every case and platform, CI included: the next power of ten above margin × the worst, with an absolute
   floor where the quantity is a fixed overhead. Never an assumed noise floor.
-- For non-deterministic pipelines: fix the seed in the test path,
-  and run with multiple seeds in a slower CI tier.
+  A sweep runner kills a cell past 3x its last measured wall time: FAIL(timeout).
+- Non-deterministic: fix the seed in the test path; multiple seeds in a slower tier.
 
 ### 5. Add physical-behaviour tests (scientific code only)
 These are the empirical contract between code and physics. Pick the
