@@ -242,3 +242,5 @@ the commit.
 | 10-01 | P12 | elena-hartmann: critique plus elevation, significance first | elena-hartmann | landed (this PR); 171 -> 137 lines |
 | 10-01 | P05 | every wait carries a deadline; a sweep runner times out a hung cell | wei-lin, haruto, iris | landed (this PR) |
 | 10-01 | P05 | verify a brief's claim with the pre-tag checker before merging the release PR; check-read files stay out of paths-ignore | haruto | landed (this PR) |
+| 10-01 | P16 | convert every timestamp with TZ=<owner tz>; no end time later than the send time | wei-lin | landed (this PR); the prose rule from 584e270 had not held |
+| 10-01 | P17 | reference lookups for an unpublished proposal are DOI/ID-only; no free-text queries with PI or tool names | shu-han | landed (this PR) |
