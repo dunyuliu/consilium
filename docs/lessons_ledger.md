@@ -233,3 +233,6 @@ the commit.
 | 09-30 | P16 | stranger clone of the SHA runs before the tag | /autopilot | landed (this PR) |
 | 09-30 | P16 | phase table: estimate vs actual, owner's timezone | wei-lin | landed (this PR) |
 | 09-30 | P16 | environment is part of the content key; say up front when it changes | wei-lin | landed (this PR) |
+| 10-01 | P05 | kill one PID from the job's own record after ps confirms it; never a computed list | wei-lin | landed (this PR) |
+| 10-01 | P05 | a sweep runs from its own detached worktree so edits cannot race it | wei-lin | landed (this PR) |
+| 10-01 | P16 | phase-table actuals come from recorded timestamps, never recall | wei-lin | landed (this PR) |

@@ -294,7 +294,7 @@ evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
 axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix round carries BLOCKER/MAJOR only (the rest go to a follow-up list); one
 sweep per content key (host, interpreter and pins included — say up front when
-they change), reused by builder, you and the release. A fix to a prior finding (file:line) is self-verified; re-audit only commits
+they change), run from its own detached worktree so edits cannot race it. A fix to a prior finding (file:line) is self-verified; re-audit only commits
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
@@ -469,8 +469,8 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 
 ## End-of-campaign report (keep under one screenful)
 
-1. A phase table — estimate, actual (owner's timezone), status, overrun reason
-   — with estimates stated at the start; tags created + HEAD SHAs.
+1. A phase table — estimate, actual (owner's timezone, from recorded
+   timestamps, never recall), status, overrun reason; tags created + HEAD SHAs.
 2. Subagents dispatched + outcomes (landed / reverted / deferred), and one
    line per milestone: audit / fix / refactor / release / stranger gate /
    board, token spend — each with evidence or NOT RUN.
@@ -481,11 +481,11 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 
 ## Lessons learned (each one cost me a campaign)
 
-- **Kill and wait by PID, never `pkill -f`/`pgrep -f`** — the pattern matches
-  your own shell (one wait loop ran 85 min past its target). A timing run is exclusive: nothing of ours
+- **Kill and wait on one PID from the job's own record** (`$!`, a pidfile), after
+  `ps -o pid,args -p` shows the expected command — never `pkill -f`/`pgrep -f`
+  (they match your own shell) and never a computed PID list piped into `kill`. A timing run is exclusive: nothing of ours
   beside it, no MPI daemon left from a kill.
-- **Wipe `results/` for the affected cases before relaunching a killed sweep** —
-  its stale fail data reads as a real regression in the next compare.
+- **Wipe a killed sweep's `results/` before relaunching** — stale fails read as regressions.
 - **Check the tree matches HEAD after every interruption** (`git status
   --porcelain`) — a killed `git reset --hard` can leave a staged revert.
 
