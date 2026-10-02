@@ -65,8 +65,9 @@ and the board rather than from memory.
 
 ## `/propose` — what it does
 
-`propose <solicitation-url-or-path> [inputs…]` invokes `shu-han`, fresh, on
-the solicitation and whatever inputs you pass. Her workflow order is the
+`propose <idea> [solicitation-url-or-path] [inputs…]` invokes `shu-han`,
+fresh, on the idea and whatever inputs you pass. The idea comes first; with no
+solicitation she lists the programs that fit and you pick one. Her workflow order is the
 contract: nothing is drafted before `criteria_checklist.md` and
 `literature_review.md` exist, and a requested output list adds files to the
 run without ever dropping a step. The full sequence: criteria checklist,
