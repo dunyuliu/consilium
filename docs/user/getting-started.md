@@ -1,8 +1,9 @@
 # Getting started
 
-Consilium is a team of named AI specialists that build, port, audit, review
-and ship scientific software, backed by a test suite that keeps the team
-itself honest. It runs on Claude Code; `README.md` has the install steps and
+Consilium is a team of named AI specialists that accelerates scientific
+innovation, from idea and proposal through methods, audits and peer review
+to release and publication, backed by checks that keep the team itself
+honest. It runs on Claude Code; `README.md` has the install steps and
 the Quick start block.
 
 You rarely need to name a specialist directly — a front-door agent routes to

@@ -1,8 +1,8 @@
 # Consilium
 
-> An AI specialist team to accelerate scientific innovation — and the test
-> suite that keeps it honest. Named specialists that build, port, audit,
-> review and ship scientific software; regression fixtures and structural
+> An AI specialist team to accelerate scientific innovation. Named
+> specialists take research from idea to result: proposals, new methods,
+> ports, audits, peer review, releases and publication, with gates and
 > checks that measure whether they actually did.
 
 Specialists organised into three teams and a quality bench, each with a
