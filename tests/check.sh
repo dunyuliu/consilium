@@ -1106,10 +1106,17 @@ else
                         echo "  no v* tags in this clone — cannot tell which release note is current; not checkable here"
                         ok
                     else
-                        case "$the_one" in
-                            *"$newest_tag"*) ok ;;
-                            *) fail "the root release note is '$the_one' but the newest tag is $newest_tag — the current release's note belongs at the root and the older one in docs/ (rule 8)" ;;
-                        esac
+                        root_ver=$(basename "$the_one" .md | sed 's/^release_notes_//')
+                        if [ "$root_ver" = "$newest_tag" ]; then
+                            ok
+                        elif ! git rev-parse -q --verify "refs/tags/$root_ver" >/dev/null 2>&1 \
+                             && [ "$(printf '%s\n%s\n' "$newest_tag" "$root_ver" | sort -V | tail -1)" = "$root_ver" ]; then
+                            # Same pre-tag window as Check 27: the release commit lands before its tag.
+                            echo "  root note $the_one is newer than $newest_tag and not yet tagged — rule 15a's pre-tag window"
+                            ok
+                        else
+                            fail "the root release note is '$the_one' but the newest tag is $newest_tag — the current release's note belongs at the root and the older one in docs/ (rule 8)"
+                        fi
                     fi
                 fi
                 ;;
