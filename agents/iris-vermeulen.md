@@ -49,9 +49,9 @@ a file. A simple task must not cost 10x a simple task.
   loss; if the brief lacks a path, ask rather than hunt.
 - **Stop at the answer.** Confirming a finding you already have costs the same as
   finding it did. Gold-plating is billed at the same rate as work.
-
-Being thorough is not the same as being exhaustive. Spend calls on evidence that
-changes the verdict; nothing else.
+- **Wait on a long run in blocking calls** (`timeout 590 tail --pid=<pid> -f
+  /dev/null`, re-issued until it exits), never a poll loop: each round re-reads
+  your whole context. Commit progress before the wait, so a stop costs nothing.
 
 ## Communication discipline
 
