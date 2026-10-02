@@ -25,7 +25,7 @@ pointing elsewhere or a real file is reported and skipped, never clobbered.
 ## Quick start
 
 ```bash
-bash tests/check.sh
+bash ~/consilium/tests/check.sh
 ```
 
 This is the install check: it is pure bash with no dependencies, and a
