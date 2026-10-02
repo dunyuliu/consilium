@@ -226,7 +226,23 @@ slightly from the one v1.27.0 reported for itself.)
 
 ## 9. CI run this release was gated on
 
-transcribed by the follow-up commit
+Run **`37052904856`**, conclusion **success**, on SHA
+`e84f40e72cbd6cb7d6d4cec8b60114f3bba8db99` (the merge of PR #72 into `main`) —
+https://github.com/dunyuliu/consilium/actions/runs/37052904856. This is the
+tag-push run; the merge-commit push run on the same SHA, **`37052747541`**
+(https://github.com/dunyuliu/consilium/actions/runs/37052747541), also
+concluded **success** — no red at any point, because PR #73 (merged
+`8367835`, the pre-tag-grace fix for Check 31) was already on `main` before
+this release's branch was rebased onto it. Both runs read the same SHA twice.
+
+Upstream of the merge, the PR branch itself (`release/v1.28.0` rebased onto
+`main` tip `8367835`, SHA `576213a6687f6886cca6af3cdf9c07e9eac754f7`) was also
+green on both its triggers before merge: pull_request run `37052655408`
+(success) and push run `37052649903` (success) —
+https://github.com/dunyuliu/consilium/actions/runs/37052655408.
+
+The tag was created only after `e84f40e`'s own run was read and confirmed
+green, per rule 15a.
 
 ## 10. Trend since v1.27.0
 
@@ -291,4 +307,18 @@ codebase** — reported as deterioration where it is one, not smoothed into
 
 ## 12. Release gate
 
-transcribed by the follow-up commit
+`bash tests/release_gate.sh release_notes_v1.28.0.md` at the tag, after the
+GitHub Release was created: **5 passed, 0 failed, 0 skipped**, exit 0.
+Transcribed verbatim.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream
+- ci: PASS — green on `e84f40e7` (run `37052904856`, the tag-push run)
+- publish: PASS — v1.28.0 pushed and pointing at `e84f40e7`
+- release: PASS — GitHub Release exists for v1.28.0,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.28.0
+- clone: PASS — fresh clone of v1.28.0; README's install block and its first
+  following command both exited 0
+
+`bash tests/check.sh` at the tag: `Summary: 917 passed, 0 failed` (915 at the
+merged pre-tag tree; the +2 are Check 35's per-tag Release assertions for
+v1.28.0 itself).
