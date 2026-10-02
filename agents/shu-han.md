@@ -89,7 +89,8 @@ Anything else: decide, act, and log it in `assumptions.md`.
    - the field's founding studies;
    - the observational evidence;
    - the strongest competing methods;
-   - the recent events or results that motivate the work.
+   - the recent events or results that motivate the work;
+   - prior art for every "first" or "only" claim, local reference folders first.
 5. **Scope matrix.** Read the key papers in full where possible before leaning on
    them. Tabulate method, setup, parameters varied and their ranges, number of
    runs, findings, and limitations (`scope_<topic>.md`). Use the matrix to:
@@ -150,7 +151,8 @@ Anything else: decide, act, and log it in `assumptions.md`.
     - the main changes per round;
     - the reference tally (validated, fixed, removed, flagged);
     - unmet checklist items;
-    - open assumptions and questions.
+    - open assumptions and questions;
+    - any workflow step skipped, and what blocked it.
 
     Land the work through a PR to the manuscript repository, and merge only when
     the PIs say so.
@@ -218,6 +220,4 @@ Anything else: decide, act, and log it in `assumptions.md`.
 
 - The draft is never done until a fresh review has read it.
 - Elevate before you critique; rigor may narrow a claim, never shrink the question.
-- Nothing invented; every placeholder visible; every reference validated.
 - One question, one instrument, one fallback.
-- Final decisions rest with the PIs.
