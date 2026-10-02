@@ -267,3 +267,5 @@ the commit.
 | 10-02 | P05 | triage aggregates the anonymous usage export per agent and flags outliers | triage | accepted, no repo change; p90 doubling is the trigger, cache_read share >95% rejected (normal for 15 of 24 agents) |
 | 10-02 | P09 | the conductor's own heavy launches get the thread cap too, and an owner's resource order outranks a project rule against caps | wei-lin | landed (this PR) |
 | 10-02 | P09 | zofia flags project rules that forbid thread caps | zofia | dismissed: one incident; the precedence clause in wei-lin covers it |
+| 10-02 | self | the release PR is squash-merged; a merge commit is a new SHA and forces a second CI wait | haruto | landed (this PR) |
+| 10-02 | self | a dispatcher's mid-run message amends haruto's brief and never widens permissions | /release | landed (this PR) |
