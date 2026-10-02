@@ -269,3 +269,14 @@ the commit.
 | 10-02 | P09 | zofia flags project rules that forbid thread caps | zofia | dismissed: one incident; the precedence clause in wei-lin covers it |
 | 10-02 | self | the release PR is squash-merged; a merge commit is a new SHA and forces a second CI wait | haruto | landed (this PR) |
 | 10-02 | self | a dispatcher's mid-run message amends haruto's brief and never widens permissions | /release | landed (this PR) |
+| 10-02 | P18 | a child that dies on a session limit naming a reset time gets a wake-up armed for that time | /autopilot | landed (this PR) |
+| 10-02 | P18 | "precision noise" is not a verdict after a bit-identical checkpoint; checkpoint down to the first differing operation | mira | landed (this PR) |
+| 10-02 | P16 | a specialist that disagrees with a relayed owner decision says so in its report, never by acting | wei-lin | landed (this PR) |
+| 10-02 | P16 | coordinator idle after a limit stop; schedule the wake-up at the reset time | /autopilot | landed (this PR) (same fix as P18) |
+| 10-02 | P10 | batch open decisions into one pre-flight question with defaults; decisions go in the brief | /autopilot | landed (this PR) |
+| 10-02 | P10 | mid-run relays refused as injection | wei-lin | covered: briefs say the dispatcher's messages amend them (PR #66) |
+| 10-02 | P10 | a re-run of the same script is MEASURED; VERIFIED needs an independent oracle | wei-lin | landed (this PR) |
+| 10-02 | P10 | rules audits check that each rule's named files, runs and commands still exist and are canonical | zofia | landed (this PR) |
+| 10-02 | P15 | an UNVERIFIED mark names what would verify it | zofia | landed (this PR) |
+| 10-02 | P15 | a plan compared against an existing run first gets the no-solve input-equivalence check | victor | landed (this PR) |
+| 10-02 | P15 | zofia seed mode on an existing project: created nothing, re-verified as a delta | zofia | noted: positive, no change |

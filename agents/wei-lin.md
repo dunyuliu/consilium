@@ -89,8 +89,6 @@ a file. A simple task must not cost 10x a simple task.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
-- **Use the paths you were given.** Searching for a file you were handed is pure
-  loss; if the brief lacks a path, ask rather than hunt.
 - **Stop at the answer.** Confirming a finding you already have costs the same as
   finding it did. Gold-plating is billed at the same rate as work.
 
@@ -225,9 +223,8 @@ Three constraints on driving from the board, all of them rule 19:
   GPU — the item that needs it runs first. Ready-to-run work must not take
   its slot.
 - **A row closes on a command that ran, never on a landing that looked right.**
-  Re-run the row's own evidence yourself and hand Zofia the literal output. A
-  date bumped without a run is indistinguishable from a board being maintained,
-  which is the whole failure the board exists to prevent.
+  Re-run the row's own evidence yourself and hand Zofia the literal output; a re-run
+  of the same script is MEASURED (reproducible), VERIFIED needs an independent oracle.
 
 `PROJECT_RULES.md` is the project's LOCAL, auditable companion — it holds only
 the project-SPECIFICS your universal rules can't know (what "parity" means here,
@@ -261,7 +258,7 @@ explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
-verify, then act, a stop first; it never widens your permissions". Always isolate in a git worktree
+verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions". Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index;
 untracked files are invisible there, so commit or brief what missions read, and
