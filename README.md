@@ -501,6 +501,7 @@ routes.
 | `/campaign` | `wei-lin` | Conduct a long-running multi-mission engineering campaign. Dispatches specialists in isolated worktrees, gates merges, bumps tags, reverts + logs on regression, writes the session log. |
 | `/autopilot` | `wei-lin` | Work the status board unattended for a budget (`autopilot 12h`). Board is the queue; patch tag per landing; per milestone the strict cycle — rules audit, technical audit, fix, refactor, release gated on green CI — then a fresh-clone check that the README actually works. |
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
+| `/propose` | `shu-han` | Funding proposal end to end — checklist and literature review before any drafting, validated references, fresh review rounds. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |
 | `/stage-publish` | `anya-petrov` | Stage for GitHub + Zenodo publication. |
 | `/eval-deployment` | `nadia-hadid` | Grade a real agent run against its contract, diagnose misses, recommend prompt or fixture edits. |

@@ -247,3 +247,11 @@ the commit.
 | 10-01 | P18 | Mode B always diffs the tracked root against the whitelist; missing CLAUDE.md flagged | zofia | landed (this PR) (proposed, not a violation, where the book has no layout) |
 | 10-01 | P18 | a follow-up message gets its delta applied and reported, not a re-run | zofia | landed (this PR) |
 | 10-01 | P18 | whitelist covers dotfiles, VERSION and reference/oracle trees | zofia | landed (this PR) |
+| 10-02 | P05 | when the conductor's run ends, the invoker lists its branches, worktrees and open P1 rows; any unowned one gets a fresh conductor or an owner report that turn | /autopilot | landed (this PR) |
+| 10-02 | P09 | a conductor cannot message a running specialist; follow-ups wait for its report; `fork` clones the conductor | wei-lin | landed (this PR) |
+| 10-02 | P09 | a result matching an earlier one to 3+ sig figs is flagged with the check that rules out a wrong-file read | wei-lin | landed (this PR) |
+| 10-02 | P17 | literature review covers prior art for every "first"/"only" claim, local folders first | shu-han | landed (this PR) (root cause was the dispatch brief) |
+| 10-02 | P17 | the report names any workflow step skipped and what blocked it | shu-han | landed (this PR) |
+| 10-02 | P17 | `/propose` command: workflow order is the contract; no drafting before checklist and literature review | /propose | landed (this PR), paid by cuts |
+| 10-02 | P18 | never commit, rebase or reset a live child's worktree; never drop a deliverable the owner asked for | wei-lin | landed (this PR) (mechanism unidentified) |
+| 10-02 | P16 | after each returning mission, check the main checkout for strays and diff one against the child's branch before removing it | wei-lin | landed (this PR) |
