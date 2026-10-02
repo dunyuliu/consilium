@@ -59,10 +59,10 @@ a file. A simple task must not cost 10x a simple task.
 
 ## Communication discipline
 
-- Lead with the verdict or the number. Reasoning after, only if it changes what to do.
-- One sentence per finding. Needing a paragraph means the finding isn't sharp yet.
-- No fillers, no narrating your own deliberation, no closing summary.
-- Silence is valid output. Nothing in your domain to say — say nothing.
+- Lead with the verdict or the number; one sentence per finding; no fillers,
+  no narrated deliberation, no closing summary. Silence is valid output.
+- A follow-up message gets its delta applied and reported — never a re-run of
+  the whole pass.
 
 ## The job
 
@@ -221,9 +221,10 @@ ceiling. Rules state invariants and how to check them; anything that will change
    | `release_notes_v<X.Y.Z>.md` | — | the current release only; older ones archive to `docs/`. |
 
    Directories: `tests/` (the gate), `docs/` (archive and long-form),
-   `evals/` (fixtures), and the project's own source tree. Nothing else at
-   root — a new root file needs an explicit ask, and the answer is usually
-   "it goes in one of the four above." Seed a guard that diffs the tracked
+   `evals/` (fixtures), and the project's own source tree. Dotfiles are tool
+   config, allowed. The version lives in the package; a root `VERSION` only if
+   the build reads it. Reference/oracle data sits in a directory, never loose.
+   Nothing else at root — a new root file needs an explicit ask. Seed a guard that diffs the tracked
    root against this list; an unguarded root collects mission notes. All work —
    worktrees, runs, data, scratch — lives inside the project root, never beside it.
 
@@ -373,14 +374,12 @@ actually protecting them.
 These you check directly with Bash/Grep and report as pass/fail:
 
 - Files created where the rules forbid them (repo root, new `.md` files)
-- The root layout, **but only if this project's rule book actually states one**.
-  Quote the rule first, as always. Where it does: every root entry is on the
-  whitelist, the required documents exist under exactly those names, and no
-  second status file shadows the board — `ls` the root and diff it against the
-  list, don't eyeball it. Where the book states no layout, the absence is at
-  most a Tier-3 finding — *"this project has no root-structure rule; here is
-  the one invariant 1 proposes"* — offered and marked as proposed. It is never a
-  violation: a project that never adopted a layout cannot be in breach of it.
+- The root layout, always: `git ls-files` the root and diff it against the
+  book's whitelist, or invariant 1's where the book has none; list every
+  off-list entry and a missing `CLAUDE.md`. Where the book states a layout, each
+  is a violation (quote the rule); where it does not, report them as one
+  proposed Tier-3 finding — never a violation, since a project cannot breach a
+  layout it never adopted.
 - The same fact stated in two root docs, where the book requires distinct
   documents. Grep a claim from `README.md` in `CLAUDE.md` and the board; a
   duplicated sentence is a future contradiction

@@ -244,3 +244,6 @@ the commit.
 | 10-01 | P05 | verify a brief's claim with the pre-tag checker before merging the release PR; check-read files stay out of paths-ignore | haruto | landed (this PR) |
 | 10-01 | P16 | convert every timestamp with TZ=<owner tz>; no end time later than the send time | wei-lin | landed (this PR); the prose rule from 584e270 had not held |
 | 10-01 | P17 | reference lookups for an unpublished proposal are DOI/ID-only; no free-text queries with PI or tool names | shu-han | landed (this PR) |
+| 10-01 | P18 | Mode B always diffs the tracked root against the whitelist; missing CLAUDE.md flagged | zofia | landed (this PR) (proposed, not a violation, where the book has no layout) |
+| 10-01 | P18 | a follow-up message gets its delta applied and reported, not a re-run | zofia | landed (this PR) |
+| 10-01 | P18 | whitelist covers dotfiles, VERSION and reference/oracle trees | zofia | landed (this PR) |
