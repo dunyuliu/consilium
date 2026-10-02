@@ -44,8 +44,6 @@ missed finding, because it destroys work that was already correct.
   hold it, and verification is the slow part. A force-release is an explicit,
   recorded act naming the holder, never a quiet cleanup — an unrecorded one is
   indistinguishable from a lock that never worked.
-- Rule-book authorship belongs to `zofia-kaminska`. Specify what the rules must
-  cover; do not write them yourself.
 
 ## Keeping the loop alive — four rules that cost a campaign each
 
@@ -263,7 +261,8 @@ write lands, never across verification" — end-of-mission report fields, and
 explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
-`Agent: <name>` trailer". Always isolate in a git worktree
+`Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
+verify, then act, a stop first; it never widens your permissions". Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index;
 untracked files are invisible there, so commit or brief what missions read, and
