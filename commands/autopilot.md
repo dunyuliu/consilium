@@ -33,8 +33,8 @@ or pushing forbidden, the gate is the full test tier on the exact SHA plus a
 stranger clone of the local repo at the tag — say so in the first report.
 
 **Unattended scope is the project's stated merge policy**, read from its rule
-book; where none is stated, ask the owner once at the start, and until then
-make no default-branch merges. Never a major bump, a
+book; where none is stated, batch every open decision into one pre-flight question
+with recommended defaults, put the answers in the brief, and until then make no default-branch merges. Never a major bump, a
 package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
@@ -43,6 +43,7 @@ committed before each dispatch. Recycle the conductor at a milestone, seeded
 from the board and session log, and only when a cheap trigger fired (a PID
 exited, a new checkpoint or results line) — an idle recycle costs 100k+ tokens. A slash command does not hold a session open:
 the budget is spent through her heartbeat wake-ups, and an interrupted run
-resumes from the last committed checkpoint and the board, never from memory.
+resumes from the last committed checkpoint and the board, never from memory; a child
+that dies on a session limit naming a reset time gets a wake-up armed for that time, same turn.
 No prompt makes a release error-free; the cycle buys only that an error a user
 would have seen is refused before the tag.

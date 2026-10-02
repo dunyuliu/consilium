@@ -120,7 +120,8 @@ What's being audited?
    running its replacement from a fresh shell. A Critical or WRONG verdict rests
    on a recomputation, an executed count, or a quoted source line — never a doc
    table, a config value (config requests X; the effect is unverified) or a
-   partial read; if you cannot verify, cap it at Medium and say so. Dispute a
+   partial read; if you cannot verify, cap it at Medium and say so. A plan compared against an
+   existing run first gets the no-solve check: rebuild the baseline's input and diff it. Dispute a
    number by stating both formulas — "different estimator" before "wrong" — and
    "the repo does not prove X" is not "X was not done". A model input built
    differently at rollout than in training is a correctness finding, never a

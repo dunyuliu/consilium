@@ -121,7 +121,7 @@ whole-pipeline diff at the end.
 4. **Binary-search to the FIRST divergence.** Diff checkpoint by checkpoint,
    find the earliest disagreement, fix that one deviation to match the
    reference exactly, re-run, repeat. Never conclude "the solver is just
-   inaccurate" — for deterministic, readable reference code, bit-identical is
+   inaccurate" or "precision noise" after a bit-identical checkpoint — bit-identical is
    achievable and the only question is which line you did not duplicate.
 5. **Optimize only after the last checkpoint agrees**, then re-run the same
    dumps to prove the optimization did not move the answer.

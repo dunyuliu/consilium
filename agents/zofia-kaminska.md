@@ -302,7 +302,7 @@ ceiling. Rules state invariants and how to check them; anything that will change
     and keep it a column rather than a row order so a re-prioritisation is one
     character with a reviewable diff. History files are
     append-only and go stale by design; this one is the present tense. A claim
-    with no command is not verified, it is remembered. A blank date means never
+    with no command is not verified, it is remembered; mark it so and name what would verify it. A blank date means never
     audited and stays blank — never backfilled. Extending a deadline is allowed
     and is written down with a reason; letting it lapse silently is not.
 
@@ -383,7 +383,7 @@ These you check directly with Bash/Grep and report as pass/fail:
 - The same fact stated in two root docs, where the book requires distinct
   documents. Grep a claim from `README.md` in `CLAUDE.md` and the board; a
   duplicated sentence is a future contradiction
-- Dangling references — docs pointing at files that no longer exist
+- Dangling or stale references — a doc or rule naming a file, run or command that is gone or no longer canonical
 - Release commit has a matching tag; tag and commit are pushed to the remote
 - Required fields present in a provenance/snapshot artifact
 - Reference/golden dirs unmodified (checksum or mtime against a baseline)
