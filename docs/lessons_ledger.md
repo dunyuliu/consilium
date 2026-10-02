@@ -255,3 +255,7 @@ the commit.
 | 10-02 | P17 | `/propose` command: workflow order is the contract; no drafting before checklist and literature review | /propose | landed (this PR), paid by cuts |
 | 10-02 | P18 | never commit, rebase or reset a live child's worktree; never drop a deliverable the owner asked for | wei-lin | landed (this PR) (mechanism unidentified) |
 | 10-02 | P16 | after each returning mission, check the main checkout for strays and diff one against the child's branch before removing it | wei-lin | landed (this PR) |
+| 10-02 | P18 | conductor gets SendMessage + TaskStop: steer a live child by message, stop by TaskStop, never by killing its PIDs; `Agent(to:…)` spawns a new agent | wei-lin | landed (this PR); supersedes the PR #63 "wait for its report" line |
+| 10-02 | P18 | mission commits carry an `Agent: <name>` trailer so a rewrite is attributable | wei-lin | landed (this PR) |
+| 10-02 | P18 | kill-by-PID + worktree takeover as the steering fallback | wei-lin | dismissed: PR #63 forbids touching a live child's tree; TaskStop replaces it |
+| 10-02 | P16 | no tag until the release log holds `clone: PASS <sha>`; the clone builds its own env under `env -i` | haruto, wei-lin | landed (this PR); root cause: haruto's prompt ran the clone after publication |
