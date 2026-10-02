@@ -259,3 +259,6 @@ the commit.
 | 10-02 | P18 | mission commits carry an `Agent: <name>` trailer so a rewrite is attributable | wei-lin | landed (this PR) |
 | 10-02 | P18 | kill-by-PID + worktree takeover as the steering fallback | wei-lin | dismissed: PR #63 forbids touching a live child's tree; TaskStop replaces it |
 | 10-02 | P16 | no tag until the release log holds `clone: PASS <sha>`; the clone builds its own env under `env -i` | haruto, wei-lin | landed (this PR); root cause: haruto's prompt ran the clone after publication |
+| 10-02 | P05 | long jobs re-read their context every tool round (one job: 231 calls, 62.5M tokens, nothing committed for 50 min); wait in blocking calls, commit before the wait | mira, iris, kai | landed (this PR) |
+| 10-02 | P05 | a waiting subagent ends its turn and is woken by the run's exit | — | dismissed: a subagent that ends its turn is finished; a blocking call gets the same saving |
+| 10-02 | P05 | auditors cost about 1/100 of implementers per job | — | noted: the review step is not the cost centre |

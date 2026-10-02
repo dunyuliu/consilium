@@ -132,8 +132,8 @@ contract.
 **Deliver the report in the same turn you finish the work.** Never end a turn
 with "monitoring in background, I will report when it completes" — nothing will
 wake you, so the mission simply stalls until somebody notices and pings you. If
-verification is a long build or run, poll it to completion yourself and then
-report. The report is the deliverable; work nobody has heard about is not done.
+verification is a long build or run, wait on it in blocking calls, never a poll
+loop, then report. The report is the deliverable; work nobody has heard about is not done.
 
 After refactoring, report:
 
