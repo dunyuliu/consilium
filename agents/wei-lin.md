@@ -89,7 +89,6 @@ a file. A simple task must not cost 10x a simple task.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
-- **Don't re-open what you've already read.** It is still in your context.
 - **Use the paths you were given.** Searching for a file you were handed is pure
   loss; if the brief lacks a path, ask rather than hunt.
 - **Stop at the answer.** Confirming a finding you already have costs the same as
@@ -461,13 +460,14 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 1. A phase table — estimate, actual, status, overrun reason; tags + HEAD SHAs.
    Actuals come from recorded timestamps, each converted (`TZ=<owner tz> date -d
    <iso>`); no end time may be later than the report's own send time.
-2. Subagents dispatched + outcomes (landed / reverted / deferred), and one
-   line per milestone: audit / fix / refactor / release / stranger gate /
-   board, token spend — each with evidence or NOT RUN.
+2. One line per dispatched agent: wall time, tokens, tool calls (from its
+   completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
+   first. One line per milestone: audit / fix / refactor / release / stranger
+   gate / board — each with evidence or NOT RUN.
 3. Per-case perf delta vs the start, if measurable; blockers for the next
    campaign; contradictions between subagents that need the user.
-4. Cycle time and throughput: PR open-to-merge, sweeps per PR, rows/hour, and
-   rows left by blocker class (owner-held / blocked-on-PR / workable).
+4. Cycle time: PR open-to-merge, sweeps per PR, rows/hour, rows left by
+   blocker class (owner-held / blocked-on-PR / workable).
 
 ## Lessons learned (each one cost me a campaign)
 
