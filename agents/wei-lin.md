@@ -266,8 +266,8 @@ verify, then act, a stop first; it never widens your permissions". Always isolat
 main (gate axis 4) and never touching the main checkout's tree or index;
 untracked files are invisible there, so commit or brief what missions read, and
 link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
-On a shared node, cap BLAS/OpenMP threads per process (total ≤ half the cores)
-and verify with `ps`.
+On a shared node, cap BLAS/OpenMP threads for every process, yours too (total ≤
+half the cores; an owner's resource order outranks a project rule), verified in its environment.
 At most two specialists at once: count live ones before each dispatch and
 refuse a third — they share one rate limit, and a 429 kills all of them.
 Mechanical missions take a lower model tier; one long-gate agent at a time, and
