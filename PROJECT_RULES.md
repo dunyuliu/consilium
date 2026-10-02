@@ -131,7 +131,7 @@ fine: Check 37 fails only past 2% over the ceiling below, and whoever shrinks
 the product lowers the ceiling to match. One exception, the maintainer's: a new
 agent no longer than the mean agent may raise the ceiling once, by its length.
 
-Ceiling: 5763
+Ceiling: 5762
 
 ## 2. No silent fallbacks, swallowed errors, or placeholder prompts
 

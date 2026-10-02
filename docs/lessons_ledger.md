@@ -262,3 +262,6 @@ the commit.
 | 10-02 | P05 | long jobs re-read their context every tool round (one job: 231 calls, 62.5M tokens, nothing committed for 50 min); wait in blocking calls, commit before the wait | mira, iris, kai | landed (this PR) |
 | 10-02 | P05 | a waiting subagent ends its turn and is woken by the run's exit | — | dismissed: a subagent that ends its turn is finished; a blocking call gets the same saving |
 | 10-02 | P05 | auditors cost about 1/100 of implementers per job | — | noted: the review step is not the cost centre |
+| 10-02 | P16 | a specialist treated its conductor's mid-task messages as untrusted and finished a superseded brief (~57 min, 122k tokens) | wei-lin | landed (this PR): the brief says her messages amend it, never widen permissions |
+| 10-02 | P05 | consilium ships a usage kit (SubagentStop hook, exporter, leak gate) and requires it | — | deferred to the owner: a user-level settings hook is the owner's call; consilium retired its hooks 09-17 |
+| 10-02 | P05 | triage aggregates the anonymous usage export per agent and flags outliers | triage | accepted, no repo change; p90 doubling is the trigger, cache_read share >95% rejected (normal for 15 of 24 agents) |
