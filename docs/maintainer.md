@@ -1,0 +1,638 @@
+# Maintainer guide
+
+This is the maintainer-facing half of consilium's documentation: the beliefs
+the team is built on, the standards every agent carries, the routing table,
+how the delivery mechanism works, how to hire a new specialist, the
+regression-eval and test machinery, the inspection log, and the roadmap.
+
+If you are here to *use* consilium, you want `README.md` and `docs/user/`
+instead — this file assumes you are adding, auditing, or releasing the repo
+itself. `CLAUDE.md` is the companion working doc for the order a change goes
+in; `PROJECT_RULES.md` is the binding rule book this file narrates.
+
+---
+
+## The machinery that keeps them honest
+
+This is most of the repo, by file count and by intent:
+
+- **`PROJECT_RULES.md`** — the binding rules and sub-rules; retired ones
+  keep their numbers so every citation still resolves. Each carries the
+  incident that paid for it, and a tier column recording what enforces it and
+  how far. Until 2026-08-05 four rules the index called mechanical had nothing
+  enforcing them; reading the tier column against the checks that exist found
+  that, and closed it.
+- **`tests/check.sh`** — the structural gate, numbered with retired checks
+  keeping their numbers; every check negative-tested by breaking the thing it guards and confirming the intended
+  message. A check that has never failed is not known to be a gate. The
+  lowest-numbered checks are the exception worth naming: they predated that
+  convention by several releases and were negative-tested retroactively, six
+  mutations on 2026-08-04.
+- **`evals/cases/`** — regression fixtures covering a subset of the
+  agents. Prompt edits are measurable instead of vibe-checked — but see the
+  coverage figures below: most verdicts are older than the prompt they
+  graded.
+- **`PATHWAY_FORWARD.md`** — the inspection log: what is true *now*, by
+  surface, with the date it was last checked and the command that checked
+  it. A blank date means never audited, and stays blank.
+- **`tests/lock.sh`** — one declared writer per repo at a time. It is a
+  label, not an enforcement: no hook refuses a commit outside a lock's
+  scope, and the only hook the installer wires is `post-merge`.
+
+Two of those exist because this repo audited itself and found it was
+shipping claims it could not support: a release note describing a hook
+that had never been committed, and a tagged release containing six files
+its notes did not mention.
+
+---
+
+## What we believe
+
+These are the design choices the team is built on. They are operating
+principles, not aspirations.
+
+**Personas, not assistants.** Every specialist is a named person with a
+backstory, standards, and a domain they own. `lars-eriksson` reports
+bugs at file:line and won't write fluffy advice. `selin-aydin` attacks
+rupture physics the way Reviewer 2 will. `ingrid-lindqvist` has spent
+thirty years watching physicists apply theorems outside their domain
+of validity. The character is the constraint — a persona refuses
+things a generic assistant will cheerfully do.
+
+**Independence.** Each subagent runs in its own context and does not
+see your prior conversation. This forces re-derivation from raw
+sources. An auditor who saw the conversation that produced the bug
+cannot be trusted to find it.
+
+**Single source of truth for routing.** Victor owns technical dispatch;
+Elena owns the scientific verdict. There is exactly one routing table
+per concern. Drift between two parallel tables is a bug — and the
+reason Elena now delegates technical work to Victor rather than
+maintaining her own list.
+
+**Read-only by default, and one owner per surface.** Auditors and
+reviewers verify; they do not fix. Nine agents write, each to exactly
+one surface — `kai-fischer` (existing code), `dunyu-liu` (new code),
+`iris-vermeulen` (tests/CI), `mira-volkov` (ports + parity tests),
+`zofia-kaminska` (the rule book), `haruto-nakamura` (release notes,
+versions, tags), `anya-petrov` (publication staging), `wei-lin`
+(campaign log), `nadia-hadid` (project-local reviews). Everyone else
+is read-only.
+
+The mapping lives in `PROJECT_RULES.md` rule 19 and is enforced by
+`tests/check.sh` Check 10: an agent holding `Edit`/`Write` with no
+surface fails the gate, as does a surface with two owners. When that
+check was first run it found three agents whose declared job their
+tools could not perform — including a release engineer who could not
+write a release note.
+
+**Final sign-off rests with the human.** The team finds what is wrong
+and recommends what to do. You decide. What no agent does on your
+behalf — and the single narrow exception you have to ask for by name —
+is spelled out under *Human sign-off* below, in one place rather than
+two.
+
+**Evidence over vibes.** Regression fixtures in `evals/cases/` test
+agents on planted defects so prompt changes can be measured rather
+than vibe-checked. New behaviours land with new eval cases.
+
+### Human sign-off
+
+No agent merges, pushes, publishes, deletes a branch, force-updates
+a tag, or issues a final verdict on your behalf. The team finds what
+is wrong; you decide what to do.
+
+**One narrow exception, and only when you ask for it by name.** An
+autopilot run (`/autopilot <budget>`) is pre-authorized to commit,
+push, and tag **patch and minor releases on a non-default branch**,
+each behind its own gates: the merge gate, the milestone audit cycle,
+a green CI run on the exact SHA (rule 15a), and a fresh-clone check
+that the README's own steps still work. Nothing else is granted. A
+major bump, a tag on the default branch, a publish to a package
+index, a force-update of an existing tag, and every other verdict
+stay yours — and the run stops and asks rather than assuming. Starting
+a campaign is not the same as signing off on it: `wei-lin` signs
+individual merges, you sign the run.
+
+Written down here on purpose. An autopilot whose permissions live in
+a prompt is an autopilot whose permissions nobody can audit.
+
+(The same fact, aimed at a user deciding whether to run `/autopilot`,
+lives in `docs/user/commands.md`.)
+
+---
+
+## Our standards
+
+Universal across the team. Not preferences. Policy.
+
+### Code discipline
+
+Every code-touching agent applies these four rules, as findings on
+code they review and as constraints on code they write:
+
+1. **No fallback.** Required input, dependency, or config missing →
+   raise. No silent substitution of a default, an empty value, a
+   previous result, or a "reasonable guess." If the value matters,
+   its absence matters.
+2. **No placeholder.** No `TODO`, `FIXME`, `pass  # implement later`,
+   stub returns, or commented-out alternatives in shipped code. A
+   placeholder is an unkept promise that ships.
+3. **Hard failure.** Errors raise. Failure modes are loud,
+   attributable to a line, and stop the operation. No
+   `try / except: pass`, no `except: return default`, no
+   logged-and-continued error in a path that needed to succeed.
+4. **No silent failure.** When an operation cannot do its job, it
+   says so where the caller can see. `fillna(0)`, `clip(0, 1)`,
+   `if not x: return`, default arguments that hide intent, batch
+   loops that swallow per-item errors — silent unless the silence
+   is the documented contract.
+
+The editorial team (`elena-hartmann`, `selin-aydin`,
+`marco-bianchi`) deliberately does not carry these rules — they
+review scientific work, not code. Every other agent does.
+
+### The test gate
+
+Tests passing is the mechanical floor for the whole software
+pipeline — the empirical proof that the code does what it claims.
+
+- `iris-vermeulen` designs the pyramid: unit → integration →
+  end-to-end → physical-behaviour (conservation laws, dimensional
+  analysis, manufactured solutions, convergence order, symmetry).
+- `haruto-nakamura` enforces the gate at the release boundary: no
+  release while a test fails, no silent skips, no quarantine without
+  a deadline, CI/README parity, no `--no-verify` bypass.
+- Every code-touching agent respects it. Auditors' findings must be
+  actionable in a way that leaves the suite green. Refactors verify
+  before-and-after. Publications include the test suite in the
+  fresh-clone reproduction.
+
+A green suite with skipped tests, fake assertions, or swallowed
+errors is worse than a red suite. It lies.
+
+### Communication
+
+Every agent applies the same rules to everything it outputs:
+
+- Lead with the verdict, finding, or answer. Reasoning follows.
+- One sentence per finding when the finding allows. If you need a
+  paragraph, the finding is not yet sharp enough.
+- No fillers — no "interesting", "promising", "as we discussed",
+  "let me know if you have questions", "I hope this helps".
+- No narrating internal deliberation. Output decisions, not the
+  process that produced them.
+- Silence is a valid output. When there is nothing in scope to say,
+  say nothing; do not pad to look productive.
+
+### Confidentiality (when deployed at a client project)
+
+When an agent runs onsite at a third-party project, consilium's repo
+boundary is the boundary between confidential workspace and public
+publication. Agents never write to the consilium checkout from a
+deployment.
+
+- `nadia-hadid`'s rich onsite reviews go to a project-local
+  `.consilium-review/` directory (gitignored).
+- Upstream proposals (new eval fixtures derived from a wild miss) are
+  staged anonymised — invented file names, invented data values,
+  generic domain terms, authors stripped — inside the project, never
+  inside consilium. The human carries approved proposals across the
+  boundary.
+- Secrets, PII, and internal identifiers are flagged, never echoed in
+  any report.
+
+---
+
+## Responsibility map
+
+The team has overlapping coverage by design — many issues benefit
+from two independent lenses. The table below names the primary owner
+of each issue type, the secondary lens that catches it from a
+different angle when one applies, and the hand-off when a finding is
+real but outside the finder's scope. This is the canonical routing
+table; the per-agent "Cardinal rules" footers must agree with it.
+
+### Code
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Math bug / sign / off-by-one in code | `lars-eriksson` | `ingrid-lindqvist` (math), `rafael-santos` (physics) | — |
+| Edge case / NaN / silent failure | `lars-eriksson` | — | — |
+| Placeholder (`TODO`, stub, `NotImplementedError`) | `lars-eriksson` | `sophia-okafor` (if docs claim it's shipped) | — |
+| Structural cleanup / dedup / naming | `kai-fischer` | — | `lars-eriksson` if a latent bug is suspected |
+| Untestable shape | `kai-fischer` | `iris-vermeulen` | — |
+| Port between languages — bit-faithful parity + numpy/scipy optimization | `mira-volkov` | `lars-eriksson` (code bugs in the port), `ingrid-lindqvist` (math-rigor on library substitutions), `rafael-santos` (physics in the underlying numerics) | `iris-vermeulen` for the project-wide pyramid beyond the parity test; `haruto-nakamura` for the release gate after wire-in |
+
+### Physics & math
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Units / conservation / boundary conditions | `rafael-santos` | — | — |
+| Wrong sign in a physics formula | `rafael-santos` | `lars-eriksson` (if it's a code typo, not a physics error) | — |
+| Approximation regime invalid | `rafael-santos` | — | — |
+| Theorem applicability / derivation step | `ingrid-lindqvist` | — | — |
+| Numerical stability / convergence order | `ingrid-lindqvist` | `rafael-santos` (if the scheme is physically wrong) | — |
+| Linear algebra (conditioning, rank, SPD) | `ingrid-lindqvist` | — | — |
+| Statistical assumption (normality, independence, multiple testing) | `ingrid-lindqvist` | — | — |
+| Earthquake source physics / rupture dynamics / ground motion | `selin-aydin` | `rafael-santos` (physics), `ingrid-lindqvist` (math) | `lars-eriksson` for solver code bugs |
+| Long-timescale geodynamics / GIA / postseismic / geodesy | `marco-bianchi` | `rafael-santos`, `ingrid-lindqvist` | `lars-eriksson` for solver code bugs |
+
+### Data
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Pipeline drops / silent joins / leakage | `jordan-kim` | — | — |
+| Raw extraction quality (PDF, OCR, instrument, API dump) | `jordan-kim` | — | — |
+| Train/val/test leakage | `jordan-kim` | — | — |
+
+### Numbers and claims
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Numeric claim wrong vs raw anchor data | `priya-nair` | — | `lars-eriksson` if the code produced it wrong |
+| Numeric claim wrong vs cited paper | `ziyan-chen` | — | — |
+
+### Docs and spec
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| README / methods / config vs code | `sophia-okafor` | — | `lars-eriksson` if the code has a placeholder |
+| Citations / DOIs / author lists / claim-vs-abstract | `ziyan-chen` | — | — |
+
+### Tests, releases, publication
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Missing test | `iris-vermeulen` | — | flagged by the auditor who surfaced the gap |
+| Overfit / tautological / wrong-oracle test | `iris-vermeulen` | — | — |
+| Failing test in CI | `haruto-nakamura` (gate) | — | `lars-eriksson` for the underlying bug; the human applies the fix |
+| Quarantined / skipped tests | `iris-vermeulen` (cleanup) | `haruto-nakamura` (gate) | — |
+| Version bump / tag / changelog | `haruto-nakamura` | — | — |
+| CI step exits 0 on failure | `haruto-nakamura` | — | — |
+| Dependency / Docker image floats by tag | `haruto-nakamura` | — | — |
+| Pre-publication scrub / CITATION.cff / Zenodo / DOI | `anya-petrov` | — | `iris-vermeulen` if test coverage is thin |
+| Figure font scale / colorbar endpoints / shared scales / axis units at print | `marta-silva` | — | — |
+
+### Scientific verdict
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| "Is this paper publishable?" | `elena-hartmann` | — | dispatches specialists |
+| Reviewer-2 attack vector — general | `elena-hartmann` | — | — |
+| Reviewer-2 attack vector — rupture / source / ground motion | `selin-aydin` | — | — |
+| Reviewer-2 attack vector — long-timescale geodynamics | `marco-bianchi` | — | — |
+
+### Meta — agent performance
+
+| Issue | Primary | Secondary lens | Hand-off |
+|---|---|---|---|
+| Did an agent deliver against the task? | `nadia-hadid` | — | routes prompt edits to the affected agent's file (human applies); routes test gaps to `iris-vermeulen` |
+| Should this wild miss become a regression fixture? | `nadia-hadid` (stages anonymised proposal in project-local dir) | — | human moves the approved proposal into `evals/cases/` |
+
+---
+
+## How it works (mechanics)
+
+- Each subagent loads its own prompt from `~/.claude/agents/<name>.md`,
+  symlinked from this repo via `install.sh`. `git pull` updates every
+  machine.
+- Slash commands in `~/.claude/commands/` are thin wrappers that invoke
+  a specific agent with a scoped prompt.
+- The orchestrators (Elena, Victor) spawn specialists via the Claude
+  Code Agent tool, in parallel when independent.
+- Regression evals live in `evals/cases/`, on the agents where a fixture
+  has distinguished something. `evals/run.sh`
+  stages an isolated copy and grades a report mechanically; invoking the
+  agent stays manual, because it needs API access and a gate that cannot
+  run in CI is worse than no gate.
+
+### Install internals
+
+```bash
+git clone https://github.com/dunyuliu/consilium.git ~/consilium
+bash ~/consilium/install.sh
+```
+
+Idempotent symlinks; safe to re-run after `git pull`. Use `--force` to
+re-link when targets have moved — without it, a symlink pointing
+elsewhere or a real file is reported and skipped, never clobbered.
+
+The installer also wires one git hook in this checkout:
+
+- **post-merge** — re-runs `install.sh` after every `git pull`, so new
+  agents appear without a manual step.
+
+Nothing local runs the gate. `.github/workflows/check.yml` runs it after a
+push, so a red tree is discovered rather than prevented.
+
+Hook bodies are versioned; re-running the installer replaces an outdated
+hook rather than leaving the old one in place.
+
+---
+
+## Layout
+
+```
+consilium/
+├── commands/          # custom slash commands  (--> ~/.claude/commands/)
+│   ├── audit.md            #   /audit            — eight-section project audit
+│   ├── audit-citations.md  #   /audit-citations  — manuscript citations
+│   ├── audit-claim.md      #   /audit-claim      — numeric claim vs raw data
+│   ├── audit-code.md       #   /audit-code       — source-file bug hunt
+│   ├── audit-data.md       #   /audit-data       — data extraction + pipeline
+│   ├── audit-math.md       #   /audit-math       — derivations, stability
+│   ├── audit-physics.md    #   /audit-physics    — units, conservation, BCs
+│   ├── audit-spec.md       #   /audit-spec       — docs vs code drift
+│   ├── refactor.md         #   /refactor         — simplify code (applies edits)
+│   ├── release.md          #   /release          — versioned-release workflow
+│   ├── review.md           #   /review           — full editorial decision
+│   ├── stage-publish.md    #   /stage-publish    — GitHub + Zenodo staging
+│   ├── eval-deployment.md  #   /eval-deployment  — grade a real agent run
+│   ├── test-design.md      #   /test-design      — design + write the test pyramid
+│   ├── port.md             #   /port             — C/Fortran→Python port with parity gate
+│   ├── campaign.md         #   /campaign         — Wei conducts a multi-mission campaign
+│   ├── autopilot.md        #   /autopilot        — Wei works the board for a budget
+│   ├── enforce-rules.md    #   /enforce-rules    — seed / audit / codify the rule book
+│   ├── propose.md          #   /propose          — funding proposal end to end
+│   └── implement.md        #   /implement        — research-heavy new feature
+├── agents/            # specialist subagents   (--> ~/.claude/agents/)
+│   ├── elena-hartmann.md   #   Editor in Chief — final scientific authority
+│   ├── ziyan-chen.md       #   senior editor — citations, DOIs, manuscripts
+│   ├── selin-aydin.md      #   seismology / earthquake-rupture reviewer
+│   ├── marco-bianchi.md    #   geodynamics / long-timescale reviewer
+│   ├── shu-han.md          #   proposal author — drafts; Elena reviews
+│   ├── victor-reyes.md     #   audit orchestrator — routes technical work
+│   ├── priya-nair.md       #   quantitative claims vs raw anchor data
+│   ├── lars-eriksson.md    #   code math bugs, edge cases, sign conventions
+│   ├── jordan-kim.md       #   data integrity — extraction + pipeline
+│   ├── sophia-okafor.md    #   spec drift — docs vs code
+│   ├── rafael-santos.md    #   physical validity — units, conservation, BCs
+│   ├── ingrid-lindqvist.md #   mathematical rigor — derivations, stability, proofs
+│   ├── kai-fischer.md      #   refactoring — simplify, dedupe (applies edits)
+│   ├── iris-vermeulen.md   #   test architect — designs + writes the pyramid
+│   ├── mira-volkov.md      #   bit-identical porting, any language pair
+│   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
+│   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
+│   ├── marta-silva.md      #   publication-figure engineer — print-width scaling
+│   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
+│   ├── zofia-kaminska.md   #   project-rules enforcer — align a project to the book
+│   ├── lian-zhao.md        #   agent refinement — cheaper without worse
+│   ├── dunyu-liu.md        #   computational researcher — new implementations
+│   └── wei-lin.md          #   campaign conductor — multi-mission orchestration
+├── docs/              # archived release notes, session logs, and this guide
+│   └── user/          # user-facing docs (--> docs/user/*.md)
+├── evals/             # regression fixtures for the agents
+│   ├── README.md           # fixture format and harness expectations
+│   ├── run.sh              # stage an isolated copy; grade a report
+│   │                       #   each case ships samples/{pass,fail}.md as proof
+│   ├── parse_case.awk      #   criteria parser used by run.sh grade
+│   └── cases/              # one directory per planted-bug case
+├── tests/             # structural-invariant checks for consilium itself
+│   ├── check.sh            # pure-bash; runs in CI on every push/PR
+│   ├── release_gate.sh     # the five rows a release must satisfy (rule 15b)
+│   ├── parse_board.awk     #   board-row parser used by Check 12
+│   └── lock.sh             # one-writer-per-repo lock (rule 18)
+├── .github/workflows/
+│   └── check.yml      # CI runner for tests/check.sh
+├── CITATION.cff       # machine-readable citation metadata
+├── CLAUDE.md          # working doc for editing this repo — order of operations,
+│                      #   what the gate misses, the traps
+├── PATHWAY_FORWARD.md # inspection log — what is audited, when, with what evidence
+├── install.sh         # the canonical installer — symlinks into ~/.claude
+│                      #   and wires the post-merge hook
+├── PROJECT_RULES.md   # the rule book /enforce-rules audits against
+└── README.md
+```
+
+---
+
+## Hiring
+
+Adding a new specialist to the team:
+
+1. **A new specialist must do something the team can't already do.**
+   If an existing agent is the closer fit with a one-line scope tweak,
+   tweak rather than hire.
+2. **Persona, not role.** Give them a real name, a backstory, a domain
+   they own, and a thing they refuse to let slide. "Persona has
+   standards" is the design pattern — a generic "code-quality assistant"
+   is not.
+3. **Write a specific `description:` field.** Victor and Elena route
+   based on it; vague descriptions break routing.
+4. **Apply the code-discipline and test-gate blocks** if they touch
+   code. Skip them if they're editorial.
+5. **Plant a fixture only if it would distinguish something** — a
+   defect this agent should catch and plausibly might not. Rule 13,
+   which required one per agent, was retired 2026-09-17 for
+   manufacturing fixtures that only ever passed. No fixture is better
+   than one nothing ever learns from.
+6. Drop `agents/<name>.md` and run `bash install.sh`.
+
+Adding a new slash command:
+
+1. Drop `commands/<name>.md` (use existing files as templates).
+2. Run `bash install.sh`.
+
+---
+
+## Regression evals
+
+`evals/cases/` holds small fixtures (planted bugs, stale docs,
+miscited papers) with expected findings, so prompt changes can be
+measured rather than vibe-checked. See `evals/README.md` for the
+fixture format and how to run a case by hand.
+
+**Coverage covers a subset of the agents, and most verdicts are older than
+the prompt they grade.** One-fixture-per-agent was retired with rule 13: a
+fixture is kept only where it has distinguished something. How many verdicts
+are current is a number that changes with every prompt edit, so it is not
+written here — `bash evals/run.sh score` prints it, `list` prints the state of
+each case, and `smoke` prints it for the fast tier. That staleness is the
+accumulated cost of editing prompts faster than fixtures can be re-run: each
+prompt edit stales its agent's cases, and re-running them needs real
+dispatches.
+
+Most test *detection* — can the agent find a planted defect. A smaller set
+tests *refusal*, which is the harder half to write and the easier half to get
+wrong: `lars-002` is correct code where any invented finding fails;
+`lian-002` grades a prompt edit that ships without a fixture; `dunyu-001` poses
+a request that is implementable and meaningless. Two more exist for the agents
+whose wrong move is irreversible — `anya-002` refuses to block a clean
+repository, and `nadia-002` refuses to recommend a change when the agent under
+review was right.
+
+Each case ships `samples/pass.md` and `samples/fail.md`, and Check 15
+grades both — a criterion that rejects a report written to satisfy it is a
+typo with authority, not a criterion. That check found a grader bug on its
+first run: `printf '%s'` had been silently dropping the last keyword of
+every `any_of` list since the grader landed.
+
+The suite is a living record of what has gone wrong, not a planned matrix
+of what might (rule 25). Every case here came from a real miss. On
+2026-08-04, twelve times a run was right and the fixture was wrong — when
+they disagree, the fixture is the more likely defendant.
+
+## Tests
+
+Structural invariants of consilium itself — agent frontmatter,
+command-to-agent references, README/filesystem sync, stale-reference
+detection, README completeness per agent, write-surface ownership,
+isolation-first prompts, tool-economy and communication declarations, the
+inspection log's currency, the root-document whitelist, and the eval suite's
+own criteria (executable, non-contradictory, token-anchored) — are checked by:
+
+```bash
+bash tests/check.sh
+```
+
+Pure bash, no dependencies. The same checks run on every push and
+pull request via `.github/workflows/check.yml`. Running it locally before
+a push is on the writer — no hook enforces it. Failures exit non-zero and
+the CI run goes red.
+
+### The inspection log
+
+`PATHWAY_FORWARD.md` is the present tense and a queue: one row per surface of
+the repo, with a priority the work is taken in (`P1` first), the date it was
+last audited, and the command whose output was read. Re-prioritising is the
+expected maintenance — state says how bad a row is, `prio` says whether to
+touch it today, and Check 12 fails a row carrying no priority.
+Release notes are history and are never revised — the board is what you read
+to know where things actually stand.
+
+A row is `VERIFIED`, `OPEN`, `BROKEN`, or `DEFERRED`. `VERIFIED` requires a
+command that ran; a claim with no command is not verified, it is remembered.
+A **blank date means never audited** and stays blank — it is the honest
+statement that nobody has checked that surface, and backfilling it to look
+tidy is the failure the whole file exists to prevent.
+
+Check 12 fails the gate on an item that is overdue against its own stated
+interval. Deferring is legitimate and costs one line in the deferral log with
+a reason; letting an inspection lapse silently is not. The gate reddens on an
+undecided item, never on a date alone.
+
+Check 12 verifies that a `VERIFIED` claim *cites* a command. Nothing runs it.
+Check 17 did — every fenced command executed on every suite run and byte-diffed
+against a recorded `# →` output — and it was retired on 2026-09-17 with rule
+21a, because a recorded output pins whatever happened to be true the day it was
+pasted and reddens on a legitimate change. What remains is that a row names the
+command that would settle it, and that whoever re-checks the row on its
+interval runs that command. Whether they did is not mechanized (rule 21a).
+
+Add new structural checks to `tests/check.sh` when they cost less
+than the rule they enforce. `iris-vermeulen`'s default applies here
+too: write in-session, defer only when a new dependency is genuinely
+required.
+
+---
+
+## Roadmap
+
+- ~~Automated eval harness.~~ **Partly** — `evals/run.sh` stages and grades;
+  invoking the agent needs API access and stays manual.
+- **Measure precision, not just phrasing.** Half built. `declared_defects:`
+  lists every real defect in a case's input, including ones nobody planted, and
+  `grade` reports how many a run mentioned — so a correct-but-uncredited finding
+  is visible. The other half is not buildable: listing findings that map to *no*
+  declared defect needs findings enumerated from prose, where they are not
+  delimited, so `grade` prints `NOT MEASURED` rather than a number that would be
+  wrong. Precision is read, not computed.
+- `install.sh` has since been exercised by hand under a sandboxed `HOME` —
+  clean clone, dirty target, foreign symlink, real file, `--force`, second
+  install — and PF-010 is closed. It still has no automated test; the structural
+  invariants are covered by `tests/check.sh`, the script itself is not.
+- Statistics specialist for p-hacking, multiple comparisons, study
+  design.
+- Security/privacy agent for credential leaks, PII, supply-chain risk.
+- GitHub-Action wiring so `/audit` runs automatically on PRs to
+  user projects (the structural-invariant CI is already wired).
+
+---
+
+## The questions — full detail
+
+`README.md` carries the condensed form of the project's own three standing
+questions, plus a pointer here. This is the full account: what each question
+asks, what answers it today, and what does not yet.
+
+### 1. Seeding: does a new project come out with four documents doing four jobs?
+
+`/enforce-rules seed` should leave `CLAUDE.md` for agents, `README.md`
+for users, `PATHWAY_FORWARD.md` as a living prioritized board, and
+`PROJECT_RULES.md` to anchor the work.
+
+- **Enforced**: all four are on invariant 1's whitelist in
+  `agents/zofia-kaminska.md`, Mode A creates the two that do not
+  exist, and `evals/cases/zofia-003-seed-bare-project/` grades whether
+  a real run says it did.
+- **Not yet**: nothing holds a seeded README to being *credible* —
+  concise is asked for, evidence-backed is not. The board's missing
+  priority column was the other half of this and is now closed
+  (PF-018): `prio` is required on every row, seeded by invariant 12,
+  and read by `/autopilot`.
+
+### 2. Release: does it cover what a release owes?
+
+Audit the changes, correctness, conciseness, fix, document, refactor
+for leanness, a clean tree with no wandering work dirs, CI green, the
+published release and version control, and the rule book followed.
+
+- **Enforced**: five of the twelve. `tests/release_gate.sh` refuses a
+  tag when the tree is dirty or holds a stray worktree or lock, when CI
+  is not green on that exact SHA, when the tag or its GitHub Release is
+  missing from the remote, or when a stranger clone of the tagged commit
+  cannot run what the README documents (rule 15b). Check 35 separately
+  asserts every pushed tag carries both a note and a published Release.
+- **Not yet**: the other seven — audit, correctness, conciseness, fixes,
+  docs, refactor, rules — are obligations on the release engineer, not
+  rows. They were rows until 2026-09-17 and passed whenever the note
+  carried a `key:` line of twelve characters or more: the gate never
+  verified the audit happened, only that a string was present. We stopped
+  asserting that a recorded verdict proves a pass.
+
+### 3. Autopilot: how is any of that enforced strictly, rather than hoped for?
+
+- **Enforced**: by the only three tiers that bind. A **gate that
+  refuses** (`tests/release_gate.sh`, `tests/check.sh`), a **recorded
+  verdict a check asserts exists** (rule 15a's CI
+  field), and for what neither can reach, **an owner who is not the
+  author** — the gate is `iris-vermeulen`'s file, the rule-book verdict
+  is `zofia-kaminska`'s, the refactor is `kai-fischer`'s. Prompt prose
+  is not a tier: a step described only in prose is satisfied by an
+  agent believing it did the step.
+- **Not yet**: we now deliberately measure less. On 2026-09-17 the
+  suite was cut from 36 fixtures to 10, and rule 13 — every agent owes
+  a fixture naming it — was retired along with the check enforcing it.
+  That rule is what produced the 36: it mandated fixtures by agent
+  headcount, so 22 agents forced at least 22 fixtures whether or not
+  any had ever distinguished a good report from a bad one. **20 of the
+  36 had never once recorded a FAIL.** The survivors are the ones that
+  earned it — each caught a real regression, changed a prompt, or
+  taught a lesson that shipped.
+  This is a trade, not an improvement. Measuring prose means
+  dispatching a live agent and grading its report by substring, and
+  that cost more than it told us: a verdict expires the moment the
+  prompt improves, which is why the number was never above 30%. We
+  bought back the maintenance burden of 26 fixtures and gave up the
+  claim that every agent is covered by one. **Most agent behaviour is
+  now unmeasured, and rests on the judgement of whoever reviews the
+  prompt.** The machinery to measure — `evals/run.sh`, the grader,
+  Check 30's keyword corpus — is kept intact and works at nine cases
+  exactly as it did at thirty-six, so the method is available when a
+  question is worth the dispatch. It is now used on purpose rather
+  than by mandate.
+
+Refining these three is the point of them, and that is the human's
+call. An agent proposes a change to them; it does not make one.
+
+### The standing set
+
+Under each question above, *Enforced* already names what holds it.
+Two more the project keeps asking, and what asks them for you:
+
+- Is this number from a run, or from a memory? — rule 4, and the
+  board's requirement that a claim cite the command whose output was
+  read.
+- What would this tool find if aimed at us? — rule 0, which is why the
+  rest get checked at all.

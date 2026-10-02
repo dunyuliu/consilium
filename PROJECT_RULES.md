@@ -108,10 +108,13 @@ source of truth, not documentation of one.
 | `PROJECT_RULES.md` | Claude and the user | this rule book. |
 | `install.sh` | users | the one installer (rule 14) — the delivery mechanism, not a document. |
 | `LICENSE` | — | — |
+| `CITATION.cff` | users, citation tools | machine-readable citation metadata (CFF 1.2.0); `anya-petrov`'s surface (rule 19). |
 | `release_notes_v*.md` | — | the current release only; older ones archive to `docs/` (rule 8). |
 
 Directories: `agents/` and `commands/` (the product), `tests/` (the gate),
-`evals/` (fixtures), `docs/` (archive). Nothing else at root.
+`evals/` (fixtures), `docs/` (archive, plus the maintainer guide and
+`docs/user/` — everything that does not fit the root whitelist above).
+Nothing else at root.
 
 **One audience, one job, one home.** Usage belongs in `README.md` and is cited
 elsewhere, never copied; a convention for working on this repo belongs in
@@ -309,9 +312,11 @@ one is a debt that lands before the next version tag.
 
 `README.md` is the living doc. Any change to a surface the README describes
 updates the README in the same commit: an agent's name, scope, model, routing
-or command wrapper (the roster table, the routing table, the model table, the
-Layout tree, the headline specialist count), and equally `install.sh`, the
-hooks it wires and the gate they run (the Install and CI sections). A README
+or command wrapper (the roster table, the routing table, the model table,
+the headline specialist count), and equally `install.sh`, the
+hooks it wires and the gate they run (the Install and CI sections). The
+Layout tree lives in `docs/maintainer.md`, not the README, and moves with
+the prompt on the same terms. A README
 still promising a `pre-push` hook that `86f4b5d` removed is the same defect as
 a stale model row, and it went unrouted because this rule named only prompts.
 Never as a follow-up. README prose that restates another surface is owned by
@@ -335,16 +340,17 @@ of existing agreements, not new policy.
 
 ## 12. A new agent lands with its README roster, model table, and Layout entry
 
-`agents/<name>.md` is not done until `README.md` contains a roster-table row, a
-model-table row under the correct model, and a Layout-tree line. A new command
-additionally needs a row in the commands table.
+`agents/<name>.md` is not done until `README.md` contains a roster-table row
+and a model-table row under the correct model, and `docs/maintainer.md`
+contains a Layout-tree line. A new command additionally needs a row in the
+commands table.
 
 **Mechanical**: Check 6 asserts every agent appears exactly once in the model
 table under the model its frontmatter declares and that no row names a
 non-existent agent; Check 7 covers the roster row (first cell the backticked
-name) and the Layout line; Checks 3 and 4 cover the commands table and *any*
-mention. Both were negative-tested — a check that has never failed is not
-known to be a gate.
+name, in `README.md`) and the Layout line (in `docs/maintainer.md`); Checks 3
+and 4 cover the commands table and *any* mention. Both were negative-tested —
+a check that has never failed is not known to be a gate.
 
 ## 13. *(retired 2026-09-17)*
 
@@ -364,10 +370,11 @@ that. **Check 25 retires with this rule** (`iris-vermeulen`'s surface), and
 
 ## 14. One installer, one canonical path
 
-The repo ships exactly one install script, and the README, the Layout tree and
-any post-merge hook all name the same path. Two installers with divergent
-behaviour is a fork of the delivery mechanism: a user following the README gets
-whichever set of hooks and safeties that one happens to carry.
+The repo ships exactly one install script, and the README, the Layout tree
+(`docs/maintainer.md`) and any post-merge hook all name the same path. Two
+installers with divergent behaviour is a fork of the delivery mechanism: a
+user following the README gets whichever set of hooks and safeties that one
+happens to carry.
 
 **How to apply**: pick one, delete the other, update every reference in the
 same commit (rule 11).
