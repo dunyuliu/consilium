@@ -158,7 +158,8 @@ fi
 extract_readme_blocks() {
     # $1 = README path, $2 = output file for the Install section's bash block,
     # $3 = output file for the next bash-tagged block after it (skipping any
-    # non-bash fenced blocks, e.g. the Layout tree, in between).
+    # non-bash fenced blocks in between, e.g. a plain-text slash-command
+    # example).
     awk -v oi="$2" -v of="$3" '
         BEGIN { state = 0 }
         state == 0 && /^## Install/          { state = 1; next }

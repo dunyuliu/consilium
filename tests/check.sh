@@ -15,9 +15,11 @@
 #      names the file in its failure message.)
 #   6. The README model table lists every agent exactly once, under the
 #      model its own frontmatter declares, with no stale rows.
-#   7. Every agent has a README roster-table row and a Layout-tree line.
+#   7. Every agent has a README roster-table row and a Layout-tree line in
+#      docs/maintainer.md.
 #   8. Every backtick-quoted agent-shaped reference in README.md, CLAUDE.md,
-#      agents/*.md and commands/*.md resolves to an agent that exists.
+#      docs/user/*.md, docs/maintainer.md, agents/*.md and commands/*.md
+#      resolves to an agent that exists.
 #   9. Every eval fixture's line_range still brackets its declared anchor.
 #  10. The rule-19 write-surface ownership table is complete and exclusive.
 #  11. Every write-surface owner declares isolation as its first section.
@@ -240,8 +242,11 @@ done
 #
 # Roster row: a table line whose FIRST cell is exactly the backticked agent
 # name — `| \`lars-eriksson\` | Code auditor ... |`. The model table is
-# excluded because its first cell is a model name, not an agent.
-# Layout line: a tree line naming <agent>.md.
+# excluded because its first cell is a model name, not an agent. This half
+# stays on README.md: the roster is what a user reads to pick a specialist.
+#
+# Layout line: a tree line naming <agent>.md, in docs/maintainer.md — the
+# Layout tree moved there with the maintainer-facing documentation (rule 12).
 echo "Check 7: every agent has a README roster row and Layout entry"
 for stem in "${AGENTS[@]}"; do
     if grep -qE "^\| *\`$stem\` *\|" README.md; then
@@ -249,10 +254,10 @@ for stem in "${AGENTS[@]}"; do
     else
         fail "agents/$stem.md has no README roster-table row"
     fi
-    if grep -qE "^│.*$stem\.md" README.md; then
+    if grep -qE "^│.*$stem\.md" docs/maintainer.md; then
         ok
     else
-        fail "agents/$stem.md missing from the README Layout tree"
+        fail "agents/$stem.md missing from the docs/maintainer.md Layout tree"
     fi
 done
 
@@ -277,10 +282,12 @@ done
 # CLAUDE.md joined the list when it landed (2026-09-16) and README.md when
 # Check 5 merged in here (2026-09-18): a root document that names agents — who
 # owns which surface, who to route a finding to — is the same hole as a prompt
-# that does. A missing root document is Check 31's finding, not this one's, so
+# that does. docs/user/*.md and docs/maintainer.md joined when the README
+# split into user-first and maintainer-facing halves: the same hole, moved.
+# A missing root document is Check 31's finding, not this one's, so
 # it is skipped rather than erroring here.
-echo "Check 8: agent-shaped references resolve in README, CLAUDE.md, agents/ and commands/"
-for f in README.md CLAUDE.md agents/*.md commands/*.md; do
+echo "Check 8: agent-shaped references resolve in README, CLAUDE.md, docs/, agents/ and commands/"
+for f in README.md CLAUDE.md docs/maintainer.md docs/user/*.md agents/*.md commands/*.md; do
     [ -e "$f" ] || continue
     mapfile -t body_refs < <(grep -oE '`[a-z]+-[a-z]+`' "$f" \
         | sed 's/^`//; s/`$//' \

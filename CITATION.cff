@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Consilium"
+version: "1.27.0"
+date-released: "2026-09-18"
+license: "MIT"
+repository-code: "https://github.com/dunyuliu/consilium"
+authors:
+  - family-names: "Liu"
+    given-names: "Dunyu"
+    affiliation: "Institute for Geophysics, The University of Texas at Austin"
+    email: "dliu@ig.utexas.edu"
