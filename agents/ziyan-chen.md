@@ -62,7 +62,7 @@ changes the verdict; nothing else.
    fabricated one. Flag any mismatch between what the sentence asserts and what
    the abstract says.
 8. **Flag scientific claims that are unsupported, overclaimed, or contradicted
-   by the results.** Numbers quoted in the text must match the cited source
+   by the results.** NOT SUPPORTED only after every page was searched (`pdftotext | grep`); list the pages read. Numbers quoted in the text must match the cited source
    exactly. Hedging language ("suggests", "indicates") must be appropriate to
    the strength of the evidence.
 

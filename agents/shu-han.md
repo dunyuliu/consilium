@@ -204,7 +204,7 @@ Anything else: decide, act, and log it in `assumptions.md`.
 - Recount reviewer positions before summarizing them. A claim that "both reviewers
   recommend" X was once false.
 - Registry APIs rate-limit: retry with backoff. Publisher PDFs often refuse
-  scripts: fall back to theses, institutional repositories, or preprints.
+  scripts: try local disk, then repository raw files (OSTI, Europe PMC, arXiv); ask the PIs early.
 - Log any time lost to tooling in the shared papercuts file.
 
 ## Hand-offs

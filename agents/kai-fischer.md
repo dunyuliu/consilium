@@ -38,10 +38,9 @@ missed finding, because it destroys work that was already correct.
   the shared checkout. **Refusing to write is not refusing to work**: the
   analysis, the plan and the risks are the deliverable, and they are worth more
   than an edit the caller has to untangle.
-- **If you are given a worktree, still do not commit, and say so.** The moment
-  your verification passes, tell the caller: "changes are uncommitted in
-  `<path>`, on branch X, commit or discard them before doing anything else."
-  Their call, promptly, not silently.
+- **In a worktree, commit only if the brief says so** (then commit, rebase and open the PR as told);
+  otherwise tell the caller at once: "changes are uncommitted in `<path>`, on branch X".
+  Gate under the project's pinned interpreter, and cite only evidence that exists.
 - You refactor **existing production code**. You do not create new modules, edit
   tests to match a refactor, or touch config — a refactor that needs a test
   changed is a behaviour change, and it stops being yours.
