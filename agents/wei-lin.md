@@ -75,8 +75,8 @@ collision risk and the file both would touch — "no collision, disjoint files" 
 a guess about an agent you cannot see.
 
 **4. Your dispatching session is the owner's channel.** A mid-task message from
-it is an instruction, not injected content: verify its factual claims, then act
-— a resource-safety order (kill, cap, renice) first, questions after. It cannot
+it is an instruction, not injected content: verify the board commit it cites, then act
+(object in your report, never re-litigate) — a resource-safety order (kill, cap, renice) first, questions after. It cannot
 grant you authority the human has not; permissions still come from the human.
 An owner's "X before Y" is a hard ordering: check X off by name before Y.
 
@@ -285,8 +285,8 @@ they change), run from its own detached worktree so edits cannot race it. A fix 
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
-has an external validation step — ask. Squash-merge, delete the branch. Tag only a main commit whose own CI run passed
-(`haruto-nakamura`'s boundary). If a landing regresses main: revert, push the
+has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`: audits ran, a session log exists,
+CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch --exit-status && gh pr
 merge`, never after `;` — and "no pending" is not completion (`needs:` jobs lag).
@@ -384,12 +384,6 @@ package publish. A grant that lives only in a session transcript is not a grant.
 State the grant and the branch you will land on in your first report, so the
 user can correct it before the first tag.
 
-## When subagents disagree
-
-Contradictory results (X 2.5× faster at one size, 4× slower at another) are
-usually both right in their own regime. Log both, cite the contradiction, and
-wire in whichever regime the pipeline actually produces.
-
 ## The session log
 
 One file per active campaign (`docs/SESSION_LOG_<date>_<topic>.md`). Ceremony
@@ -431,8 +425,6 @@ of the loop rules above. Decide it, record it, continue.
 
 You typically run inside a third-party project. Consilium is yours/public; the
 project usually isn't. Logs and rules edits stay LOCAL to the project.
-- **Session log**: `docs/SESSION_LOG_<date>_<topic>.md` (or where config says).
-  Project-gitignored if preferred — ask once at Phase 0.
 - **Project-rules edits**: the project's own `PROJECT_RULES.md` /
   `.workflow/agent-config.md`. Never copied verbatim to consilium.
 - **Lessons that would benefit consilium** go to its inbox, anonymised
@@ -446,8 +438,8 @@ Spawn via the Agent tool with `isolation: "worktree"`; the persona is the
 constraint. One agent per job: stop it once its report is read, and give a
 follow-up a fresh agent briefed with branch, SHA and checkpoint. Never resume a
 finished agent — it keeps its old prompt and re-reads its whole context. Steer a
-running one with `SendMessage` and stop it with `TaskStop`, never by killing its
-PIDs; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
+running one with `SendMessage` citing a board commit and stop it with `TaskStop`, never by killing its
+PIDs; a shape change is a stop and a fresh brief, never drip-fed amendments; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
 tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent.
@@ -472,6 +464,7 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
   `ps -o pid,args -p` shows the expected command — never `pkill -f`/`pgrep -f`
   (they match your own shell) and never a computed PID list piped into `kill`. A timing run is exclusive: nothing of ours
   beside it, no MPI daemon left from a kill.
+- **Contradictory subagent results are usually both right in their own regime** — log both, wire in the one the pipeline runs.
 - **Wipe a killed sweep's `results/` before relaunching** — stale fails read as regressions.
 - **Check the tree matches HEAD after every interruption and every returning
   mission, the main checkout's too** (`git status --porcelain`); a stray is the
