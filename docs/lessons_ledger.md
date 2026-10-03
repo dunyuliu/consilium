@@ -280,3 +280,9 @@ the commit.
 | 10-02 | P15 | an UNVERIFIED mark names what would verify it | zofia | landed (this PR) |
 | 10-02 | P15 | a plan compared against an existing run first gets the no-solve input-equivalence check | victor | landed (this PR) |
 | 10-02 | P15 | zofia seed mode on an existing project: created nothing, re-verified as a delta | zofia | noted: positive, no change |
+| 10-03 | P05 | owner decisions relayed mid-run get a verifiable channel: committed verbatim to the board, the relay cites the commit; the conductor objects in her report, never re-litigates | /autopilot, wei-lin | landed (this PR) |
+| 10-03 | P12 | mid-mission amendments ignored by a specialist; a shape change is a stop and a fresh brief, small steers cite a board commit | wei-lin | landed (this PR) |
+| 10-03 | P12 | a way for agents to authenticate the sender of a message | tooling | deferred: a harness feature; the board-commit citation is the workaround |
+| 10-03 | P13 | every verb in the owner's budget (clean up, refactor, release) is committed scope; only narrowing needs the owner | /autopilot | landed (this PR) |
+| 10-03 | P13 | zofia declined her dispatcher's mid-task scope additions | /enforce-rules | landed (this PR): a message citing a board commit amends the brief |
+| 10-03 | P10 | a conductor tagged without the milestone cycle, a session log or the gate on the tag's SHA; tag only through haruto's checklist | wei-lin | landed (this PR) |

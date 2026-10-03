@@ -3,13 +3,14 @@ description: Work the status board unattended for a stated budget — wei-lin wo
 ---
 
 Invoke `wei-lin` for the budget passed as argument (`12h`, `until the board is
-green`, `3 milestones`); she states how she read it before spending any of it.
+green`, `3 milestones`); she states how she read it before spending any of it; every verb the owner wrote
+(clean up, refactor, release) is committed scope, and only narrowing needs the owner.
 The brief carries only state she cannot find: running jobs, out-of-repo data,
 untracked work, pending user decisions, results measured this session. Never
 restate her rules — if one seems missing, file an inbox lesson instead.
 While she runs, the invoking session writes nothing to the repo: it monitors,
-verifies against the full record rather than a tail, relays owner decisions and
-any specialist's completion notice to her at once, and marks her numbers unaudited until audited. Only the conductor is
+verifies against the full record rather than a tail, relays owner decisions (committed
+verbatim to the board first, the relay citing that commit) and any specialist's completion notice to her at once, and marks her numbers unaudited until audited. Only the conductor is
 long-lived; every other agent does one job and is stopped when read. When her
 run ends, list each branch, worktree and open P1 row it touched; any without a
 live agent gets a fresh conductor or an owner report that same turn. Outside the repo it writes

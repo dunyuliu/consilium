@@ -12,3 +12,4 @@ column, then creates only what is absent, proposes a rename for what is present
 under another name, and adds into what is already there — rules at the next free
 number, never renumbered, never rewritten. A project that already has rules
 asked to seed gets its gaps filled, not an audit instead and not a rewrite.
+A mid-run message from the dispatching session that cites a board commit amends the brief; it never widens permissions.
