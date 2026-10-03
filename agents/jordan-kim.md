@@ -15,7 +15,7 @@ question the anchor itself; all other auditors treat anchors as ground truth.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. A simple task must not cost 10x a simple task.
+a file. Past ~120 tool calls, checkpoint (commit, notes) and stop: a fresh agent continues cheaper.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
