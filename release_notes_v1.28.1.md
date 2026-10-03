@@ -200,13 +200,26 @@ one consistent command per row, not copied from either note.)
 
 ## 9. CI run this release was gated on
 
-PENDING — this release follows the same two-commit pattern §6.5 flags as a
-process gap: the tag can only be created after CI is read green on the
-post-squash-merge SHA, which does not exist until after this note is first
-committed and merged. This section is completed in a follow-up commit once
-that SHA's CI run is confirmed, before the tag is created, matching
-`v1.27.0`/`v1.28.0` precedent — recorded here rather than silently, per rule
-2, as an explicit forward reference rather than an invented fact.
+Run **`37121157214`**, conclusion **success**, on SHA
+`522532c1e2603fb2aeb8f86f33664f8bd750cf3d` (the squash-merge of PR #79 into
+`main`) —
+https://github.com/dunyuliu/consilium/actions/runs/37121157214. A second run
+on the same SHA, **`37121214357`** (triggered by the tag push once the
+Release was created), also concluded **success**.
+
+Upstream of the merge, PR #79's own branch was green on both its triggers
+before merge: push run `37121126564` and pull_request run `37121134537`,
+both success —
+https://github.com/dunyuliu/consilium/actions/runs/37121126564.
+
+The tag was created only after `522532c1`'s own merge-push run
+(`37121157214`) was read and confirmed green, per rule 15a. `gh run list
+--commit 522532c1e2603fb2aeb8f86f33664f8bd750cf3d --limit 1 --json
+conclusion` returned an empty result for roughly the first minute after the
+tag/Release were created (`tests/release_gate.sh`'s `ci` row read SKIP once
+on that transient GitHub API lag) and `success` on an immediate re-query —
+treated as a read-only re-query, not a job rerun, so rule 15a's "re-run at
+most once" cap does not apply.
 
 ## 10. Trend since v1.28.0
 
@@ -234,9 +247,10 @@ open on the same terms.
 - **audit**: `victor-reyes`, self-handled without sub-dispatch (diff judged
   too small to need a specialist). 12 findings — 0 Critical, 4 Major, 3
   Medium, 4 Minor, 1 Advisory, all §6.
-- **correctness**: `bash tests/check.sh` → `917 passed, 0 failed`, run on the
-  pristine pre-release tree; to be re-run on the merged commit before tagging
-  (§12).
+- **correctness**: `bash tests/check.sh` → `917 passed, 0 failed` on the
+  pristine pre-release tree, `918 passed, 0 failed` with this note staged,
+  `920 passed, 0 failed` re-run at the tag (the +2 are Check 35's per-tag
+  Release assertions for v1.28.1 itself, same pattern as v1.28.0 §12).
 - **conciseness**: assessed inline, not independently verified by
   `kai-fischer` (see `refactor:` below). Net +44 tracked lines, almost
   entirely new ledger rows; no duplication found.
@@ -259,6 +273,19 @@ open on the same terms.
 
 ## 12. Release gate
 
-PENDING — completed in the same follow-up commit as §9, after
-`bash tests/release_gate.sh release_notes_v1.28.1.md` is run at the tag. Not
-fabricated here; see §9 for why.
+`bash tests/release_gate.sh release_notes_v1.28.1.md` at the tag: first run
+**4 passed, 1 skipped** (`ci` SKIP on the transient GitHub API lag noted in
+§9); immediate re-run **5 passed, 0 failed, 0 skipped**, exit 0. Transcribed
+verbatim from the second run.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream
+- ci: PASS — green on `522532c1`
+- publish: PASS — v1.28.1 pushed and pointing at `522532c1`
+- release: PASS — GitHub Release exists for v1.28.1,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.28.1
+- clone: PASS — fresh clone of v1.28.1; README's install block and its first
+  following command both exited 0
+
+`bash tests/check.sh` at the tag: `Summary: 920 passed, 0 failed` (918 at the
+merged pre-tag tree; the +2 are Check 35's per-tag Release assertions for
+v1.28.1 itself).
