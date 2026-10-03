@@ -12,7 +12,7 @@ While she runs, the invoking session writes nothing to the repo: it monitors,
 verifies against the full record rather than a tail, relays owner decisions (committed
 verbatim to the board first, the relay citing that commit) and any specialist's completion notice to her at once, and marks her numbers unaudited until audited. Only the conductor is
 long-lived; every other agent does one job and is stopped when read. When her
-run ends, list each branch, worktree and open P1 row it touched; any without a
+run ends, read her log's "still owns" lines, then list each branch, worktree and open P1 row it touched; any without a
 live agent gets a fresh conductor or an owner report that same turn. Outside the repo it writes
 nothing without the owner's OK for that write. A pre-written constraint is a claim to re-check, not an order.
 
