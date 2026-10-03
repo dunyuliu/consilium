@@ -40,9 +40,9 @@ package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
 **At most two specialists at once** — they share one rate limit — with WIP
-committed before each dispatch. Recycle the conductor at a milestone, seeded
-from the board and session log, and only when a cheap trigger fired (a PID
-exited, a new checkpoint or results line) — an idle recycle costs 100k+ tokens. A slash command does not hold a session open:
+committed before each dispatch. Recycle the conductor at a milestone or when she stops at
+~120 tool calls, seeded from the board and session log: each call re-reads her whole
+context, so three short conductors cost far less than one long one. A slash command does not hold a session open:
 the budget is spent through her heartbeat wake-ups, and an interrupted run
 resumes from the last committed checkpoint and the board, never from memory; a child
 that dies on a session limit naming a reset time gets a wake-up armed for that time, same turn.
