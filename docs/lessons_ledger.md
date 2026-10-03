@@ -288,3 +288,10 @@ the commit.
 | 10-03 | P10 | a conductor tagged without the milestone cycle, a session log or the gate on the tag's SHA; tag only through haruto's checklist | wei-lin | landed (this PR) |
 | 10-03 | P12 | a conductor ends no turn with its own wait pending: cancel it or log "still owns <step>"; the invoker reads that before re-briefing | wei-lin, /autopilot | landed (this PR) |
 | 10-03 | P12 | a long-job monitor needs a wall-time ceiling, not only an exit wait (92-min hang missed) | wei-lin | dismissed: covered, every wait carries a 2-3x deadline (rule 1) |
+| 10-03 | P16 | under "clear the board", a checkpoint is not a stop; an ownership claim that blocks work is re-read from current files | wei-lin | landed (this PR) |
+| 10-03 | P16 | a commit/PR instruction in the brief overrides kai's no-commit default; gate under the pinned interpreter | kai | landed (this PR) |
+| 10-03 | P16 | a docstring cited evidence that does not exist; cite only what exists | kai | landed (this PR) |
+| 10-03 | P16 | a turn that ends on a wait names the PID or agent that wakes it, or the work is hers now | wei-lin | landed (this PR) |
+| 10-03 | P16 | one owner per PR; a correction goes to that owner (or stops it) first | wei-lin | landed (this PR) |
+| 10-03 | P17 | NOT SUPPORTED only after every page was searched; list the pages read | ziyan | landed (this PR) |
+| 10-03 | P17 | try local disk, then repository raw files, before publisher URLs; ask the PIs early | shu-han | landed (this PR) |

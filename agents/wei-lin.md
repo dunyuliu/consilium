@@ -51,9 +51,9 @@ missed finding, because it destroys work that was already correct.
 background only a parallel pair, and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
-a command or carrying a named unblock event ("needs care" is not one) — the window closes, or you need a human
+a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or an ownership claim not re-read from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
-cancel it, or log "still owns <step>" so nobody re-briefs that step.
+cancel it, or log "still owns <step>" so nobody re-briefs that step; a wait names the PID or agent that wakes you, or the work is yours now.
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
@@ -274,7 +274,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 **Phase 2 — Land.** After every landing, re-read the board and fold every
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
-never waits for a batch. PRs are serial — the next opens only after this one merges. Per returning subagent: rebase onto current
+never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first. Per returning subagent: rebase onto current
 main, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
