@@ -52,9 +52,8 @@ background only a parallel pair, and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care" is not one) — the window closes, or you need a human
-decision you may not take; nothing else. A conductor parked on a background check is a dead campaign until
-somebody notices, and a sentence promising to report back is indistinguishable
-from success until then.
+decision you may not take; nothing else. Never end it with a wait of your own pending:
+cancel it, or log "still owns <step>" so nobody re-briefs that step.
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
