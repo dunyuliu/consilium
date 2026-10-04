@@ -297,3 +297,9 @@ the commit.
 | 10-03 | P17 | try local disk, then repository raw files, before publisher URLs; ask the PIs early | shu-han | landed (this PR) |
 | 10-03 | self | usage log: 94% of subagent tokens are context re-reads; runs over 150 tool calls are 6% of runs but 58% of tokens; every agent checkpoints and stops at ~120 calls, and the conductor is recycled there | all agents, /autopilot | landed (this PR) |
 | 10-03 | self | usage by project: a conductor briefed as a generic agent ran 243 calls without her cap; one conductor ran 8 h with no commit; conductors overshot the cap by up to 60% | /autopilot, wei-lin | landed (this PR) |
+| 10-03 | P16 | a stale injected copy of the instruction file put rows "out of scope"; "exhausted" names each open row's blocker | wei-lin | dismissed: covered, loop rule 1 (10-03 row: re-read from current files; every open row named with its unblock event) |
+| 10-03 | P16 | board and log commits went straight to the default branch; they take the PR path code takes | wei-lin | landed (this PR) |
+| 10-03 | P16 | a write-capable specialist dispatched without worktree isolation, a day after logging the same lesson | wei-lin | dismissed: covered three times (Isolation, Phase 1, Hand-offs); a compliance miss no prompt line fixes |
+| 10-03 | P18 | a multi-day gate of independent cases ran as a serial loop on a mostly idle many-core host; pool it from nproc, load and memory, ETA on the board | wei-lin | landed (this PR) |
+| 10-04 | P16 | the greenfield-research specialist was dispatched for re-runs, re-analysis and a bug fix; match task class to the description | dunyu-liu, wei-lin | landed (this PR): description names what it is not for |
+| 10-04 | P16 | the costliest specialist was dispatched without the owner's OK; route to the cheapest match, owner OK per dispatch | dunyu-liu, wei-lin | landed (this PR); per-dispatch cost line dismissed: tool calls already capped |
