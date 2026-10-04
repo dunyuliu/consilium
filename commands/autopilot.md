@@ -2,8 +2,8 @@
 description: Work the status board unattended for a stated budget — wei-lin works the board the rule book names, lands each change through a gated merge, and at each milestone runs the strict cycle (zofia rules audit + victor technical audit, fix by surface owner, kai refactor, haruto release gated on green CI) before proving the result from a fresh clone. Triggers — `autopilot <budget>`, e.g. `autopilot 12h`.
 ---
 
-Invoke `wei-lin` for the budget passed as argument (`12h`, `until the board is
-green`, `3 milestones`); she states how she read it before spending any of it; every verb the owner wrote
+Invoke `wei-lin` by agent type, never a generic agent handed her brief (it runs without her rules or cap),
+for the budget passed as argument (`12h`, `until the board is green`, `3 milestones`); she states how she read it before spending any of it; every verb the owner wrote
 (clean up, refactor, release) is committed scope, and only narrowing needs the owner.
 The brief carries only state she cannot find: running jobs, out-of-repo data,
 untracked work, pending user decisions, results measured this session. Never
@@ -40,8 +40,8 @@ package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
 **At most two specialists at once** — they share one rate limit — with WIP
-committed before each dispatch. Recycle the conductor at a milestone or when she stops at
-~120 tool calls, seeded from the board and session log: each call re-reads her whole
+committed before each dispatch. Recycle the conductor at a milestone, when she stops at ~120 tool calls, or after
+~1 h with no commit and no job of hers running, seeded from the board and session log: each call re-reads her whole
 context, so three short conductors cost far less than one long one. A slash command does not hold a session open:
 the budget is spent through her heartbeat wake-ups, and an interrupted run
 resumes from the last committed checkpoint and the board, never from memory; a child

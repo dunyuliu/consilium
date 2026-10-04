@@ -37,10 +37,10 @@ moved is the history behind an already-settled claim, not the claim or the row.
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | ~~the pre-commit hook and its version marker are committed, not only installed locally~~ — retired 2026-09-18, ground (c): there is no pre-commit hook; the same decision that retired PF-028 and PF-030 removed it | RETIRED | 2026-09-18 | — | — |
 | PF-002 | `agents/` | ~~every agent has at least one eval fixture (rule 13)~~ — rule 13 retired 2026-09-17, headcount is no longer a claim this board makes | RETIRED | 2026-09-17 | — | — |
-| PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | VERIFIED | 2026-09-19 | 14 | P2 |
+| PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | BROKEN | 2026-10-04 | 14 | P2 |
 | PF-004 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
 | PF-005 | `docs/release_notes_*` | ~~no divergence between a release note and its tag goes unrecorded~~ — retired 2026-09-18, ground (b): the command read a tag's immutable content and printed the same 6 forever; v1.10.0's divergence stays recorded in the block below | RETIRED | 2026-09-18 | — | — |
-| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-09-19 | 14 | P2 |
+| PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-10-04 | 14 | P2 |
 | PF-007 | `tests/check.sh` | the header's live `Verifies:` entries are exactly the checks the body runs, by number | VERIFIED | 2026-09-19 | 30 | P3 |
 | PF-008 | `tests/check.sh` | ~~checks 1–5 have been negative-tested~~ — retired 2026-09-18, ground (b): a historical fact about one day's work, watched by a green-suite command that cannot go red for it | RETIRED | 2026-09-18 | — | — |
 | PF-009 | `agents/` | ~~no agent prompt's body contradicts its own frontmatter or another agent's prompt~~ — retired 2026-09-18, ground (b): one string in one of 22 files standing in for a fleet-wide semantic claim | RETIRED | 2026-09-18 | — | — |
@@ -55,10 +55,10 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | PF-018 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-19 | 30 | P3 |
 | PF-019 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-09-19 | 30 | P3 |
 | PF-020 | `tests/check.sh` Check 27 | the untagged-release-note check exists independent of any one tag's current state | VERIFIED | 2026-09-19 | 30 | P3 |
-| PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-09-19 | 14 | P3 |
+| PF-021 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-10-04 | 14 | P3 |
 | PF-022 | `agents/` | `lian-zhao`'s frontmatter no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-19 | 30 | P3 |
-| PF-023 | `tests/lock.sh` | the lock resolves to the same shared file from a main checkout and any linked worktree | VERIFIED | 2026-09-19 | 14 | P3 |
-| PF-024 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-09-19 | 14 | P3 |
+| PF-023 | `tests/lock.sh` | the lock resolves to the same shared file from a main checkout and any linked worktree | VERIFIED | 2026-10-04 | 14 | P3 |
+| PF-024 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-10-04 | 14 | P3 |
 | PF-025 | `evals/cases/zofia-004-seed-patch-established` | causes 1–2 fixed (`iris-vermeulen`); rests on criterion 3 alone — a named substring-grading limit, not a gap, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | PF-026 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-19 | 30 | P3 |
 | PF-027 | `evals/cases/*/case.yaml`, `evals/run.sh` | ~~a verdict names the prompt SHA it was graded against; a contested case cites its sample count (rule 25d)~~ — retired 2026-09-18, ground (a): the SHA half is PF-024's mechanism and no contested case survives the 36→10 cut | RETIRED | 2026-09-18 | — | — |
@@ -141,13 +141,14 @@ enforced this row's claim, retires with it — `iris-vermeulen`'s surface. This
 row is kept, not deleted (rule 21); it no longer asserts anything, so it
 carries no command and no interval.
 
-### PF-003 — `evals/cases/` — VERIFIED
+### PF-003 — `evals/cases/` — BROKEN
 Coverage only — a superseded or FAILing verdict still counts. See PF-004 for
 precision and PF-025 for the one known-defective criterion set.
 
 Run 2026-09-18, after `f1289f6` rewrote every case's `notes:` block and
 `b1b1ad8` cut the suite from ten cases to nine: no output, exit 0 — all nine
-surviving cases still carry a dated `Run (...)` line.
+surviving cases still carry a dated `Run (...)` line. 2026-10-04: BROKEN —
+`shu-han-001-no-invention` prints NEVER RUN (added without a dispatch).
 ```bash
 for d in evals/cases/*/; do [ -f "$d/case.yaml" ] || { echo "$(basename "$d"): NO case.yaml"; continue; }; grep -qiE 'run \((19|20)[0-9]{2}-' "$d/case.yaml" || echo "$(basename "$d"): NEVER RUN"; done
 ```
