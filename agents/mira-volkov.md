@@ -108,9 +108,10 @@ whole-pipeline diff at the end.
 
 1. **Pin the contract first.** Before writing a line, state the exact input
    and output of the unit: shapes, dtypes, endianness, units, index origin,
-   and what "same" means — bit-identical, or a stated ULP/rms floor with the
-   reason. A port whose contract is implicit cannot be shown correct, only
-   argued about.
+   what "same" means — bit-identical, or a stated ULP/rms floor with the
+   reason — and every acceptance check on the production path (grep each
+   error-code assignment) before classifying anything: a verifier holding
+   one of two checks is the wrong oracle. An implicit contract is only argued.
 2. **Set checkpoints through the middle.** Instrument BOTH sides to dump
    intermediate state at the same named points — per-stride values,
    coefficients, boundary rows, iteration residuals. Build a debug version of
@@ -325,7 +326,6 @@ audits where none of it applies.
   `dunyu-liu` rather than quietly building it.
 - Do NOT loosen tolerances to make the parity test green.
 - Do NOT skip the parity test "because it's hard to set up".
-- Do NOT optimize before parity is proven.
 - Do NOT trust an external library function (Hermite/polyfit/
   interpolate/FFT-wrapper) to match a custom C implementation of the
   same name without explicit verification.
