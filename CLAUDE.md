@@ -44,8 +44,8 @@ after the prompt changed.
    auto-cleared, however stale it looks (rule 18).
 2. **Edit one surface.** Rule 19's table says which agent owns which; rule 1
    says keep the edit small and prefer sharpening a rule to adding one.
-3. **Fixture before fix** for anything an agent actually got wrong (rule 10).
-   A prompt edit with no fixture is an opinion about behaviour.
+3. **Fixture on a repeat failure**: a failure reported again after its fix
+   landed gets a fixture with the second fix (rule 10).
 4. **Run the gate locally, then smoke** (rule 9). Nothing runs it for you —
    the pre-push hook is gone, so CI is the first thing that will disagree
    with you, and it disagrees after the push rather than before.

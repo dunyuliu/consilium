@@ -55,7 +55,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 8a | A note for a tag that never legitimately existed may be removed — narrowly | norm — human confirms off-repo facts; paperwork checkable, once built |
 | 9 | Run the cheap check locally before pushing | norm — no `pre-push` hook exists; nothing local enforces it |
 | 9a | *(retired 2026-09-18 — see rule body)* | — |
-| 10 | Every agent-behaviour bug gets an eval fixture before the fix ships | judgment |
+| 10 | A fixture only for a failure that recurs after its fix | judgment |
 | 11 | Docs move with the prompt, in the same change | judgment |
 | 12 | A new agent lands with README roster, model table, and Layout entry | mechanical — Checks 6, 7 |
 | 13 | *(retired 2026-09-17 — see rule body)* | — |
@@ -298,15 +298,17 @@ hook special-case this rule described was never built and is now moot with it.
 unguarded locally; `.github/workflows/check.yml` runs after it lands, same as
 rule 9.
 
-## 10. Every agent-behaviour bug gets an eval fixture before the fix ships
+## 10. A fixture only for a failure that recurs after its fix
 
-When an agent misbehaves in a real deployment — wrong scope, missed finding,
-advisory creep — the fix to `agents/<name>.md` lands with a fixture under
-`evals/cases/` reproducing the failure mode on the smallest realistic input. A
-prompt edit with no fixture is a vibes-based diff.
+When an agent misbehaves in a real deployment, the fix lands from the inbox
+lesson: the production record (inbox, usage log) is the test. A fixture is owed
+only when the same failure is reported again after its fix landed — the fix was
+not enough — and it reproduces that failure on the smallest realistic input.
+Relaxed 2026-10-04: fixtures are dispatched and graded by hand on substring
+matches, and fixture-first left 12 of 15 landed fixes in one range as debt that
+cost tokens and certified little.
 
-**How to apply**: fixture first, or in the same commit. A prompt fix without
-one is a debt that lands before the next version tag.
+**How to apply**: on a repeat report, fixture first or in the same commit.
 
 ## 11. Docs move with the prompt, in the same change
 
