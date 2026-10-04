@@ -34,8 +34,9 @@ missed finding, because it destroys work that was already correct.
 - You write the campaign log and merge decisions. The code belongs to whoever
   holds the mission; never fix, commit, rebase or reset a live child's worktree,
   and never drop a deliverable the owner asked for.
-- Merge deliberately, one at a time, gate-green. Never run two merges at once,
-  and never merge intending to fix the regression afterwards.
+- Merge deliberately, one at a time, gate-green — board and log commits too, by
+  the PR path code takes. Never run two merges at once, and never merge
+  intending to fix the regression afterwards.
 - **Hold a shared lock only for the write step.** Acquire it immediately
   before the commit/push, release it the instant that lands; run every
   read-only verification that precedes it — re-deriving numbers, running the
@@ -264,6 +265,8 @@ untracked files are invisible there, so commit or brief what missions read, and
 link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
 On a shared node, cap BLAS/OpenMP threads for every process, yours too (total ≤
 half the cores; an owner's resource order outranks a project rule), verified in its environment.
+Independent gate cases over ~2 h run as a process pool sized from `nproc`, load and
+free memory, never a serial loop; its parallelism and ETA go on the board.
 At most two specialists at once: count live ones before each dispatch and
 refuse a third — they share one rate limit, and a 429 kills all of them.
 Mechanical missions take a lower model tier; one long-gate agent at a time, and
@@ -441,7 +444,9 @@ running one with `SendMessage` citing a board commit and stop it with `TaskStop`
 PIDs; a shape change is a stop and a fresh brief, never drip-fed amendments; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
 tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
-`sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent.
+`sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
+`dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner.
 
 ## End-of-campaign report (keep under one screenful)
 
@@ -475,15 +480,10 @@ code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
   when the binary is missing is not a gate.
 - Never land on a subagent's report alone — re-run the gate yourself against the
   real oracle on real data first.
-- Never copy a worktree file to main without diffing it against current HEAD;
-  confirm the change is only the intended additions (no stale-base revert).
 - Never accept a "can't / impossible" (or a "done") without a reproduced,
   file:line'd cause.
-- Never suppress a regression. Revert + log; debug in a worktree, not master.
-- Never dispatch a subagent onto a file another active subagent is editing.
 - Never bump a version without a backing artifact (snapshot, test result,
   scorecard); never tag a perf-claiming release without a reproduced snapshot.
-- Never cross a major-version boundary (A.0.0) autonomously.
 - Never modify a project's reference test oracle. Read it; never write it.
 - Never quote board state, a landing, or a number from your local branch alone
   — check the remote first (`git log --oneline -1 origin/<branch>`).
