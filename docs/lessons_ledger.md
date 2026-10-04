@@ -296,3 +296,4 @@ the commit.
 | 10-03 | P17 | NOT SUPPORTED only after every page was searched; list the pages read | ziyan | landed (this PR) |
 | 10-03 | P17 | try local disk, then repository raw files, before publisher URLs; ask the PIs early | shu-han | landed (this PR) |
 | 10-03 | self | usage log: 94% of subagent tokens are context re-reads; runs over 150 tool calls are 6% of runs but 58% of tokens; every agent checkpoints and stops at ~120 calls, and the conductor is recycled there | all agents, /autopilot | landed (this PR) |
+| 10-03 | self | usage by project: a conductor briefed as a generic agent ran 243 calls without her cap; one conductor ran 8 h with no commit; conductors overshot the cap by up to 60% | /autopilot, wei-lin | landed (this PR) |
