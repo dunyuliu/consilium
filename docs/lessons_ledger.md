@@ -303,3 +303,6 @@ the commit.
 | 10-03 | P18 | a multi-day gate of independent cases ran as a serial loop on a mostly idle many-core host; pool it from nproc, load and memory, ETA on the board | wei-lin | landed (this PR) |
 | 10-04 | P16 | the greenfield-research specialist was dispatched for re-runs, re-analysis and a bug fix; match task class to the description | dunyu-liu, wei-lin | landed (this PR): description names what it is not for |
 | 10-04 | P16 | the costliest specialist was dispatched without the owner's OK; route to the cheapest match, owner OK per dispatch | dunyu-liu, wei-lin | landed (this PR); per-dispatch cost line dismissed: tool calls already capped |
+| 10-04 | P16 | a parity verifier held one of two production acceptance checks and three audits re-derived arithmetic under it; enumerate every check on the production path, audit the rule set against the source | mira-volkov, priya-nair, lars-eriksson | landed (this PR) |
+| 10-04 | P16 | merged when the only completed CI run had failed (the other was cancelled) and reported green; quote run id and conclusion, strip machine-local paths | wei-lin | landed (this PR) |
+| 10-04 | P16 | merge discipline lived only as written rules; propose host-side protection to the owner as a day-one decision, no bypass actors | zofia-kaminska | landed (this PR): sharpens starter invariant 13 |

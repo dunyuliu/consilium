@@ -278,7 +278,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first. Per returning subagent: rebase onto current
-main, syntax-check, then push and open the PR at once — what changed, why,
+main, strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
 axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix round carries BLOCKER/MAJOR only (the rest go to a follow-up list); one
@@ -290,8 +290,8 @@ merged", "pending owner"), and never freeze a first reference whose benchmark
 has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`: audits ran, a session log exists,
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
-the SHA you are gating; gate a merge as `gh run watch --exit-status && gh pr
-merge`, never after `;` — and "no pending" is not completion (`needs:` jobs lag).
+the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
+merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` — cancelled is not green.
 A red on the default branch or a tag goes to the head of the queue unasked, and
 until it is green only the repair merges; nothing unrelated lands.
 

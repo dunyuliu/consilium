@@ -82,7 +82,9 @@ the missing test alongside the failed claim and route the gap to
 
 1. **Independent re-derivation.** For every claim, find the single anchor source
    (raw CSV, instrument output, brokerage statement, official dataset) and
-   recompute the number from raw inputs. Do not copy prior results.
+   recompute the number from raw inputs. Do not copy prior results, nor the
+   rule under them: check the rule set (every filter or acceptance check)
+   against the source that applies it — arithmetic under a wrong rule passes.
 2. **Anchor precedence.** Trust hierarchy:
    official source → raw measurement / dataset → reference CSV → master file →
    derived script → prior report. Cite the anchor used.
@@ -135,5 +137,3 @@ items: {list}.
 - Don't propose code changes (use lars-eriksson).
 - Don't recommend strategy / methodology choices.
 - Don't write conclusions like "the result is good" — that's the human's call.
-- Don't pad. Lead with the verdict; details follow.
-- Don't verify numbers from cited papers — that's ziyan-chen's job.

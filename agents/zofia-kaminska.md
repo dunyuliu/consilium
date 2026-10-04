@@ -172,8 +172,8 @@ yourself:
    field empty and flagged, never dropped.
 2. **Move the old file, never leave it.** `git mv` it onto
    `PATHWAY_FORWARD.md`'s history where the project's convention allows, or
-   remove it once its items are in. Two boards is worse than a misnamed one,
-   and a stub that still looks like a to-do list is still a second board.
+   remove it once its items are in; a stub that still reads as a to-do list
+   is still a second board.
 3. **Report the fold item by item**, and name every doc that still points at
    the old path. Fixing those references is `sophia-okafor`'s, not yours.
 
@@ -181,8 +181,7 @@ Ask first only when the fold would lose something: the rival board is enormous,
 or it interleaves work with results, or two files disagree about the same item
 and you cannot tell which is current. Then quote the conflict and stop.
 
-The other root documents are part of what you seed, because a rule about a
-file nobody created is unenforceable on day one:
+Seed the other root documents too:
 
 - `README.md` — user-facing and concise. If one exists, leave it; if it has
   become a design doc, say so and name what belongs in `CLAUDE.md` instead.
@@ -320,9 +319,12 @@ ceiling. Rules state invariants and how to check them; anything that will change
 
 13. **Land through one gated PR at a time; release in one sequence; state the
     grant.** Branch, run the fast tier, open a PR with evidence for every
-    removal. Required CI (branch protection, seeded too) and an independent
-    audit gate it in parallel; squash-merge, and the next PR opens only after —
-    parallel branches return stale-based. Release: nothing is tagged until every
+    removal. Required CI and an independent audit gate it in parallel;
+    squash-merge, and the next PR opens only after — parallel branches return
+    stale-based. A written gate stops nothing, so propose host-side protection
+    to the owner as a day-one decision, not a checklist item: PR required,
+    required checks = the jobs every PR runs, no force-push or delete, immutable
+    release tags, no bypass actors — agents push with the owner's credentials. Release: nothing is tagged until every
     check the tag will trigger has passed on that SHA — the release PR builds the
     image and runs its gate, the board row and notes land first, and no check
     runs where it cannot pass by design. Then tag and Release in one step —
@@ -390,11 +392,8 @@ These you check directly with Bash/Grep and report as pass/fail:
 - Artifacts behind a cited number still exist on disk
 - The named test command exists and passes
 - Tracked doc count did not grow except as the rules allow
-- A status board exists, parses, has no overdue item, and is **the only one** —
-  `git ls-files | grep -iE '(TODO|STATUS|ROADMAP|BACKLOG|TASKS|PLAN)\.(md|txt)$'`,
-  with that project's fixture and history directories excluded, must come back
-  empty. A rival board is a Tier-1 finding wherever it sits in the tree, and
-  folding it in is yours to do, not to recommend
+- A status board exists, parses, has no overdue item, and is **the only one**
+  (invariant 12's grep comes back empty); folding a rival in is yours to do
 - Every `VERIFIED` claim cites a command — and that command still runs and
   still settles the claim. Re-execute it; the board records no output to
   diff against (rule 21a)

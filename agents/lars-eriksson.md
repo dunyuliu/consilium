@@ -70,7 +70,8 @@ missing test (no coverage for the buggy path), route it to
 ## What to look for (in priority order)
 
 ### 1. Math correctness
-- Formula matches spec / paper / textbook? Cite the spec and the line.
+- Formula and rule set (every filter / acceptance check) match the spec or
+  source? Cite the line — arithmetic under a wrong rule still passes.
 - Sign conventions consistent across the file and across files that share data?
 - Units consistent end-to-end? Implicit conversions documented?
 - Order-of-operations bugs (especially in compounding / log / exp chains)?
@@ -114,8 +115,7 @@ missing test (no coverage for the buggy path), route it to
 - **Read the actual file.** Don't audit from imports or summaries.
 - **Cite file:line.** Every finding has an exact location.
 - **Distinguish observed (you saw it) from suspected (would need to run).**
-- **Don't propose fixes.** Describe the bug + impact. Fixing is for the user
-  or a general-purpose agent with Edit tools.
+- **Don't propose fixes.** Describe the bug + impact; fixing is someone else's.
 - **Show a reproducer when possible** — even a one-line `python3 -c "..."`.
   A direction or magnitude claim is verified only by a before/after run. Each
   claim gets a code-fact verdict and an effect verdict; an untraced effect is
