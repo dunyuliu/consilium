@@ -60,8 +60,9 @@ lines, all prompt/doc text, one surface) small enough to assess directly
 rather than sub-dispatching, and ran the gate and eval tooling fresh himself
 rather than trusting this agent's own run.
 
-**8 consolidated findings — 0 Critical, 1 Major, 4 Medium, 2 Low, 1 Low
-(suspected).** None is a `tests/check.sh` check-logic defect (the gate itself
+**9 consolidated findings (8 from `victor-reyes`, 1 from this agent's own CI
+read) — 0 Critical, 1 Major, 4 Medium, 3 Low, 1 Low (suspected).** None is a
+`tests/check.sh` check-logic defect (the gate itself
 stays green — `921 passed, 0 failed`, confirmed independently by this agent).
 **Fixes applied this release: none.** Every finding sits on a surface owned
 by someone other than `haruto-nakamura` under rule 19 (`agents/*.md` and
@@ -145,6 +146,12 @@ All from `victor-reyes`'s pass unless noted; none fixed this release (§5).
    but this fourth was not confirmed present under a paraphrase. Owner:
    `lian-zhao`, to confirm by direct read whether the guarantee survives
    elsewhere in the file.
+9. **(Low — found by this agent, not victor-reyes.)** The PR's CI run
+   (`gh run watch`) printed two Node.js-20-deprecation annotations
+   (`actions/checkout@v4` forced onto Node 24; `ubuntu-latest` migrating to
+   Ubuntu 26 on 2026-10-19) on both the pull_request and push triggers.
+   Rule treats deprecation warnings as findings, not noise. Owner:
+   `iris-vermeulen` (`.github/workflows/check.yml`).
 
 **Carried from v1.28.1, still open, not re-audited this pass:** §6.6 (no
 rule-19 ownership row for `docs/maintainer.md`, `docs/user/*.md`,
@@ -192,8 +199,25 @@ using one consistent command per row, not copied from either note.
 
 ## 9. CI run this release was gated on
 
-_Filled in after the release PR's CI run and the post-merge run on `main`;
-see the Release gate section (§12) for the final, transcribed values._
+PR #85 (`release/v1.28.2`) was green on both its triggers before merge: push
+run `37209904116` and pull_request run `37209906163`, both **success** on
+`56921ae7f77c058a992c4acc12a200f5dc762a7c` —
+https://github.com/dunyuliu/consilium/actions/runs/37209904116.
+
+Squash-merged to `main` as `18988abd767312162d3e74b9b0b04fe0f8e2098a`. Run
+**`37209938790`**, conclusion **success**, on that SHA —
+https://github.com/dunyuliu/consilium/actions/runs/37209938790 — read and
+confirmed green before the tag was created, per rule 15a. A second run on the
+same SHA, **`37210018205`** (triggered by the tag push once the Release was
+created), also concluded **success**.
+
+`bash tests/release_gate.sh release_notes_v1.28.2.md`'s `ci` row read SKIP
+once immediately after the tag/Release were created
+("no run found for 18988abd" — the same transient GitHub API lag v1.28.1's
+note documented) and `success` on an immediate re-query
+(`gh run list --commit 18988abd... --json conclusion`) — treated as a
+read-only re-query, not a job rerun, so rule 15a's "re-run at most once" cap
+does not apply.
 
 ## 10. Trend since v1.28.1
 
@@ -220,8 +244,9 @@ releases, which is the clearest piece of deterioration in this note.
 ## 11. Work record
 
 - **audit**: `victor-reyes`, self-handled without sub-dispatch (diff judged
-  too small to need a specialist). 8 consolidated findings — 0 Critical, 1
-  Major, 4 Medium, 2 Low, 1 Low-suspected, all §6.
+  too small to need a specialist), plus one finding from this agent's own CI
+  read. 9 consolidated findings — 0 Critical, 1 Major, 4 Medium, 3 Low, 1
+  Low-suspected, all §6.
 - **correctness**: `bash tests/check.sh` → `921 passed, 0 failed` on the
   pristine pre-release tree; see §12 for the merged-SHA and tagged-SHA
   re-runs.
@@ -247,6 +272,19 @@ releases, which is the clearest piece of deterioration in this note.
 
 ## 12. Release gate
 
-_Filled in once `tests/release_gate.sh release_notes_v1.28.2.md` runs clean
-after the tag and Release are created — see the final report for the
-transcribed rows._
+`bash tests/release_gate.sh release_notes_v1.28.2.md` at the tag: first run
+(immediately post-tag) **4 passed, 1 skipped** (`ci` SKIP on the transient
+GitHub API lag noted in §9); immediate re-run **5 passed, 0 failed, 0
+skipped**, exit 0. Transcribed verbatim from the second run.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream
+- ci: PASS — green on `18988abd`
+- publish: PASS — v1.28.2 pushed and pointing at `18988abd`
+- release: PASS — GitHub Release exists for v1.28.2,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.28.2
+- clone: PASS — fresh clone of v1.28.2; README's install block and its first
+  following command both exited 0
+
+`bash tests/check.sh` at the tag: `Summary: 924 passed, 0 failed` (922 at the
+merged pre-tag tree; the +2 are Check 35's per-tag Release assertions for
+v1.28.2 itself, same pattern as v1.28.1).
