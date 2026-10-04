@@ -37,7 +37,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 |---|---|---|---|---|---|---|
 | PF-001 | `install.sh` | ~~the pre-commit hook and its version marker are committed, not only installed locally~~ — retired 2026-09-18, ground (c): there is no pre-commit hook; the same decision that retired PF-028 and PF-030 removed it | RETIRED | 2026-09-18 | — | — |
 | PF-002 | `agents/` | ~~every agent has at least one eval fixture (rule 13)~~ — rule 13 retired 2026-09-17, headcount is no longer a claim this board makes | RETIRED | 2026-09-17 | — | — |
-| PF-003 | `evals/cases/` | every fixture has been dispatched and graded at least once (coverage, not health — see PF-004, PF-025) | BROKEN | 2026-10-04 | 14 | P2 |
+| PF-003 | `evals/cases/` | ~~every fixture has been dispatched and graded at least once~~ — retired 2026-10-04, ground (c): rule 10 relaxed to fixtures for repeat failures only; hand-dispatched coverage is no longer a goal | RETIRED | 2026-10-04 | — | — |
 | PF-004 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
 | PF-005 | `docs/release_notes_*` | ~~no divergence between a release note and its tag goes unrecorded~~ — retired 2026-09-18, ground (b): the command read a tag's immutable content and printed the same 6 forever; v1.10.0's divergence stays recorded in the block below | RETIRED | 2026-09-18 | — | — |
 | PF-006 | `tests/check.sh` | the suite is green | VERIFIED | 2026-10-04 | 14 | P2 |
@@ -80,7 +80,7 @@ and PF-027 passed on a marker and a file that a deletion elsewhere had already
 removed, PF-013's criterion can never be met by the agents it has left, and
 PF-010's grep was a proxy that could not fail — it alone is kept, re-pointed at
 the walk it always claimed. **No P1 stands.** **P2** is active work and the
-claims worth rechecking often: PF-003, PF-006. **P3** is settled, stable claims
+claims worth rechecking often: PF-006. **P3** is settled, stable claims
 on long intervals — checked for drift, not because they matter less in kind.
 **A green row is not a checked row**: three of these four were green on every
 pass since the thing they watched was deleted, which is what re-running a
@@ -141,7 +141,11 @@ enforced this row's claim, retires with it — `iris-vermeulen`'s surface. This
 row is kept, not deleted (rule 21); it no longer asserts anything, so it
 carries no command and no interval.
 
-### PF-003 — `evals/cases/` — BROKEN
+### PF-003 — `evals/cases/` — RETIRED
+
+Ground (c), 2026-10-04: the owner relaxed rule 10 (fixtures cost tokens for
+little); the block below is history.
+
 Coverage only — a superseded or FAILing verdict still counts. See PF-004 for
 precision and PF-025 for the one known-defective criterion set.
 
