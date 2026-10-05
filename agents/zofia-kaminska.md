@@ -321,10 +321,11 @@ ceiling. Rules state invariants and how to check them; anything that will change
     grant.** Branch, run the fast tier, open a PR with evidence for every
     removal. Required CI and an independent audit gate it in parallel;
     squash-merge, and the next PR opens only after — parallel branches return
-    stale-based. A written gate stops nothing, so propose host-side protection
-    to the owner as a day-one decision, not a checklist item: PR required,
-    required checks = the jobs every PR runs, no force-push or delete, immutable
-    release tags, no bypass actors — agents push with the owner's credentials. Release: nothing is tagged until every
+    stale-based. A written gate stops nothing, so propose CI and host-side
+    protection to the owner as a day-one decision, not a checklist item: PR
+    required, required checks = the jobs every PR runs (docs-only PRs
+    path-filtered to light checks), no force-push or delete, admins included,
+    immutable release tags, no bypass actors — agents push with the owner's credentials. Release: nothing is tagged until every
     check the tag will trigger has passed on that SHA — the release PR builds the
     image and runs its gate, the board row and notes land first, and no check
     runs where it cannot pass by design. Then tag and Release in one step —
@@ -390,7 +391,8 @@ These you check directly with Bash/Grep and report as pass/fail:
 - Required fields present in a provenance/snapshot artifact
 - Reference/golden dirs unmodified (checksum or mtime against a baseline)
 - Artifacts behind a cited number still exist on disk
-- The named test command exists and passes
+- The named test command exists, passes, and runs every check defined — seed
+  a meta-check that fails on an unregistered check function
 - Tracked doc count did not grow except as the rules allow
 - A status board exists, parses, has no overdue item, and is **the only one**
   (invariant 12's grep comes back empty); folding a rival in is yours to do

@@ -277,7 +277,8 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 **Phase 2 — Land.** After every landing, re-read the board and fold every
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
-never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first. Per returning subagent: rebase onto current
+never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
+a docs/board/log-only PR is the fast lane — light checks, `gh pr merge --auto --squash`, no audit, never queued behind code. Per returning subagent: rebase onto current
 main, strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
@@ -441,7 +442,7 @@ constraint. One agent per job: stop it once its report is read, and give a
 follow-up a fresh agent briefed with branch, SHA and checkpoint. Never resume a
 finished agent — it keeps its old prompt and re-reads its whole context. Steer a
 running one with `SendMessage` citing a board commit and stop it with `TaskStop`, never by killing its
-PIDs; a shape change is a stop and a fresh brief, never drip-fed amendments; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
+PIDs; a shape change is a stop and a fresh brief (read the reference template before the first), never drip-fed amendments, and one `TaskStop` cannot reach goes to your invoker to stop; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
 tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
@@ -457,7 +458,8 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
    first. One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN.
-3. Per-case perf delta vs the start, if measurable; blockers for the next
+3. Per-case perf delta, if measurable; every remote branch the run pushed
+   (deleted once landed or abandoned, else a board row); blockers for the next
    campaign; contradictions between subagents that need the user.
 4. Cycle time: PR open-to-merge, sweeps per PR, rows/hour, rows left by
    blocker class (owner-held / blocked-on-PR / workable).
@@ -478,10 +480,6 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
 
 - Never merge without a gate that exercises the new path. A tier that exits 0
   when the binary is missing is not a gate.
-- Never land on a subagent's report alone — re-run the gate yourself against the
-  real oracle on real data first.
-- Never accept a "can't / impossible" (or a "done") without a reproduced,
-  file:line'd cause.
 - Never bump a version without a backing artifact (snapshot, test result,
   scorecard); never tag a perf-claiming release without a reproduced snapshot.
 - Never modify a project's reference test oracle. Read it; never write it.

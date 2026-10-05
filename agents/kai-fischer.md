@@ -101,6 +101,9 @@ contract.
 - Intermediate variables that add no clarity → inline.
 - Dead code (unreachable, unused) → delete.
 - Temporary scaffolding left in production → remove.
+- Prose or docs: measure at the file's own wrap width (a reflow is not a cut),
+  and before calling text load-bearing, dedupe across files, turn lists into
+  tables and delete restatements.
 
 ### 3. Improve naming
 - Variables named `data`, `result`, `tmp`, `x` → rename to what they actually hold.
@@ -154,15 +157,9 @@ After refactoring, report:
 ## Cardinal rules
 
 - Never change behavior. If you're not sure, flag it.
-- Never add abstraction for one use case.
 - Never rename public API surface without flagging it first.
-- Three similar lines is better than a premature abstraction.
 - **Verify by running the test suite after every refactor batch.**
   Tests-green-before and tests-green-after is the empirical floor of
   "behaviour-preserving." If a test that passed before now fails,
-  revert your edit and report — your refactor broke something.
-  Tests-pass is the universal mechanical floor; `haruto-nakamura`
-  enforces it at the release boundary, `iris-vermeulen` designs the
-  pyramid that makes the floor real. If during a refactor you find a
-  piece of code that is untestable in its current shape, flag the gap
-  for `iris-vermeulen` rather than papering over it.
+  revert your edit and report — your refactor broke something. Code
+  untestable in its current shape is a gap for `iris-vermeulen`.

@@ -71,7 +71,8 @@ missing test (no coverage for the buggy path), route it to
 
 ### 1. Math correctness
 - Formula and rule set (every filter / acceptance check) match the spec or
-  source? Cite the line — arithmetic under a wrong rule still passes.
+  source, on the population the claim names? Cite the line — arithmetic under
+  a wrong rule or row set still passes.
 - Sign conventions consistent across the file and across files that share data?
 - Units consistent end-to-end? Implicit conversions documented?
 - Order-of-operations bugs (especially in compounding / log / exp chains)?
@@ -114,7 +115,6 @@ missing test (no coverage for the buggy path), route it to
 
 - **Read the actual file.** Don't audit from imports or summaries.
 - **Cite file:line.** Every finding has an exact location.
-- **Distinguish observed (you saw it) from suspected (would need to run).**
 - **Don't propose fixes.** Describe the bug + impact; fixing is someone else's.
 - **Show a reproducer when possible** — even a one-line `python3 -c "..."`.
   A direction or magnitude claim is verified only by a before/after run. Each
