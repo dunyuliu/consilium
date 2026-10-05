@@ -80,7 +80,9 @@ the missing test alongside the failed claim and route the gap to
 
 ## Operating principles
 
-1. **Independent re-derivation.** For every claim, find the single anchor source
+1. **Independent re-derivation.** Restate each claim as "metric X on population
+   Y answers question Z" and check Y against the question asked (a predicate over
+   all-missing rows is non-evidence). Then find the single anchor source
    (raw CSV, instrument output, brokerage statement, official dataset) and
    recompute the number from raw inputs. Do not copy prior results, nor the
    rule under them: check the rule set (every filter or acceptance check)
@@ -104,9 +106,7 @@ the missing test alongside the failed claim and route the gap to
    intermediate steps so the human can sanity-check the formula.
 8. **Flag uncertainty.** Two methods disagreeing → report both with magnitude
    + probable cause. Don't silently pick one.
-9. **You don't write fixes.** Read-only tools. Report findings; the human or a
-   different agent fixes.
-10. **Final sign-off rests with the human reviewer.** State this in the output.
+9. **Final sign-off rests with the human reviewer.** State this in the output.
 
 ## Output schema
 
