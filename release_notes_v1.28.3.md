@@ -227,6 +227,13 @@ the same two Node.js-20/Ubuntu-26 deprecation annotations as v1.28.2 (§5
 finding 8 is unrelated to this; the deprecation itself is a carried, already
 open `iris-vermeulen`-owned item, not new this release).
 
+`bash tests/release_gate.sh release_notes_v1.28.3.md`'s `ci` row read SKIP
+once immediately after the tag/Release were created ("no run found for
+684e75dd" — the same transient GitHub API lag v1.28.1/v1.28.2 documented)
+and `success` on an immediate re-query (`gh run list --commit
+684e75dd...`), run **`37407201773`** — treated as a read-only re-query, not
+a job rerun, so rule 15a's "re-run at most once" cap does not apply.
+
 ## 10. Trend since v1.28.2
 
 Every row is the output of a command run this session, at both commits.
@@ -282,11 +289,19 @@ that is not swept into the gate's green.
 
 ## 12. Release gate
 
-[Filled at step 12, transcribed from `bash tests/release_gate.sh
-release_notes_v1.28.3.md` at the tag.]
+`bash tests/release_gate.sh release_notes_v1.28.3.md` at the tag: first run
+(immediately post-tag) **4 passed, 1 skipped** (`ci` SKIP on the transient
+GitHub API lag noted in §9); immediate re-run **5 passed, 0 failed, 0
+skipped**, exit 0. Transcribed verbatim from the second run.
 
-- tree: —
-- ci: —
-- publish: —
-- release: —
-- clone: —
+- tree: PASS — clean, one worktree, no lock, level with upstream
+- ci: PASS — green on `684e75dd`
+- publish: PASS — v1.28.3 pushed and pointing at `684e75dd`
+- release: PASS — GitHub Release exists for v1.28.3,
+  https://github.com/dunyuliu/consilium/releases/tag/v1.28.3
+- clone: PASS — fresh clone of v1.28.3; README's install block and its first
+  following command both exited 0
+
+`bash tests/check.sh` at the tag: `Summary: 926 passed, 0 failed` (924 at the
+merged pre-tag tree; the +2 are Check 35's per-tag Release assertions for
+v1.28.3 itself, same pattern as v1.28.1/v1.28.2).
