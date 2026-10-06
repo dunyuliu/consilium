@@ -173,6 +173,10 @@ rule 10 and is her surface under rule 19.
 6. **(Carried from v1.28.1/v1.28.2, not re-audited this pass.)** No
    rule-19 ownership row for `docs/maintainer.md`, `docs/user/*.md`,
    `docs/lessons_ledger.md` itself — no new evidence either way this range.
+7. **(Carried from v1.28.2 §6.9, unresolved.)** CI (`.github/workflows/check.yml`)
+   still prints the same two Node.js-20/Ubuntu-26 deprecation annotations on
+   every run (confirmed again this release, §9) — rule treats deprecation
+   warnings as findings, not noise. Owner: `iris-vermeulen`.
 
 ## 7. Totals or cost changes
 
@@ -210,7 +214,18 @@ worktree at that tag, v1.28.3 on the release branch before the tag was cut.
 
 ## 9. CI run this release was gated on
 
-[Filled at step 11, after the release PR's CI is read green on its SHA.]
+PR #91 (`release/v1.28.3`) was green on both its triggers before merge: push
+run `37406843301` and pull_request run `37406855658`, both **success** on
+`f097dc6e7c3e0bc49a22022baa143e3a518fea5e` —
+https://github.com/dunyuliu/consilium/actions/runs/37406855658.
+
+Squash-merged to `main` as `369be909c0b8df22915c0b9179b277bd3502b809`. Run
+**`37406905318`**, conclusion **success**, on that SHA —
+https://github.com/dunyuliu/consilium/actions/runs/37406905318 — read and
+confirmed green before the tag was created, per rule 15a. Both runs carried
+the same two Node.js-20/Ubuntu-26 deprecation annotations as v1.28.2 (§5
+finding 8 is unrelated to this; the deprecation itself is a carried, already
+open `iris-vermeulen`-owned item, not new this release).
 
 ## 10. Trend since v1.28.2
 
