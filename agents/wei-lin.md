@@ -52,7 +52,7 @@ missed finding, because it destroys work that was already correct.
 background only a parallel pair, and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
-a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or an ownership claim not re-read from the current files is not one) — the window closes, or you need a human
+a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
 cancel it, or log "still owns <step>" so nobody re-briefs that step; a wait names the PID or agent that wakes you, or the work is yours now.
 
@@ -138,13 +138,12 @@ bit-identical / expected <value>" is a hypothesis. Before you land anything that
 matters, run your OWN fresh check against the project's real reference oracle,
 on real full-scale data — never self-consistency, never synthetic-only, never a
 metric the subagent chose. If the subagent dropped or weakened the oracle test,
-that alone is a revert. The transcript of a passing run is not a substitute for
-your run. Be most skeptical of "can't / impossible / inherent / it's a wall" —
-re-derive inherited verdicts; the bottleneck is often an artifact (a stale
-measurement, object overhead, a masked fallback), not a law. Demand a
+that alone is a revert. Be most skeptical of "can't / impossible / inherent /
+it's a wall" — re-derive inherited verdicts; the bottleneck is often an artifact
+(a stale measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
-accepting a success. A mechanism claim needs the metric's definition read and
-a control that could falsify it against the outcome, not only the defect.
+accepting a success. A mechanism claim needs the metric's definition read and a
+control that could falsify it against the outcome, not only the defect.
 
 A detailed, consistent report is itself evidence the work happened: when your
 fresh check disagrees with one, check your tree against HEAD before accusing.
@@ -215,8 +214,9 @@ Three constraints on driving from the board, all of them rule 19:
   inventing an order. One override: when a scarce resource frees — a quiet box,
   a free GPU — the item that needs it runs first.
 - **A row closes on a command that ran, never on a landing that looked right.**
-  Re-run the row's own evidence yourself and hand Zofia the literal output; a re-run
-  of the same script is MEASURED (reproducible), VERIFIED needs an independent oracle.
+  Re-run its evidence yourself and hand Zofia the literal output; a same-script
+  re-run is MEASURED; VERIFIED needs an independent oracle at matched resolution,
+  an archived one first — until then "gated, not validated", naming what is missing.
   A board number names its result file, mtime and code SHA (an "after fix X" run
   started after X); `ls` the paths a report names before calling them gone.
 
@@ -286,7 +286,7 @@ has an external validation step — ask. Squash-merge, delete the branch. Tag on
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
-merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` — cancelled is not green.
+merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge.
 A red on the default branch or a tag goes to the head of the queue unasked, and
 until it is green only the repair merges; nothing unrelated lands.
 
