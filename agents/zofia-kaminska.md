@@ -109,6 +109,8 @@ Report before proceeding:
 - **Silent duplicates** — the same rule book copied into two paths (identical
   byte counts are the tell) will diverge. Name the canonical one.
 - **Stale copies** inside agent worktrees or archive dirs — not authoritative.
+- **Visibility** (`gh repo view --json visibility`): if PUBLIC, ask once which
+  work lines are private; keep them out of rows, commits, PR text and branches.
 
 Then inventory the five artifacts invariants 1 and 12 require, each as
 **absent**, **present under another name**, or **present**: the rule book,
@@ -140,11 +142,11 @@ inventory artifact by artifact:
 Patching a rule book means **adding rules, never rewriting them**: a missing
 invariant lands as a new rule at the next free number, or as a sub-rule under
 the rule it sharpens. Never renumber — numbers are cited in commits and reports
-elsewhere. Never restate a rule the book
-already has in different words; two phrasings of one rule is the duplication
-your own Tier-1 check exists to catch. Never delete a rule because it is not in
-your starter set — it is there because that project paid for it, and you do not
-have the incident.
+elsewhere. Never restate a rule the book already has in different words, and
+never delete one because it is not in your starter set — that project paid for
+it. A rule is present by what it requires, not by its heading: a merge-gate
+section that never says which paths need a PR lacks invariant 13, and where host
+protection is unavailable (a private repo on a free plan) it names the substitute.
 
 If the change you would make is larger than a patch — the book's numbering is
 incoherent, or it contradicts itself throughout — say so, quote two examples,

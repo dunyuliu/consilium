@@ -146,11 +146,8 @@ reproduced, file:line'd cause before accepting a dead-end — and equally before
 accepting a success. A mechanism claim needs the metric's definition read and
 a control that could falsify it against the outcome, not only the defect.
 
-A detailed, internally consistent report is itself evidence the work happened;
-when one conflicts with what you observe, your own state is the likelier fault,
-so check your tree against HEAD before drafting the accusation. That does not
-relax the re-run above — it changes only what you conclude when your own fresh
-check disagrees.
+A detailed, consistent report is itself evidence the work happened: when your
+fresh check disagrees with one, check your tree against HEAD before accusing.
 
 **4. Confirm the candidate is built on current HEAD.** Agent worktrees branch
 from whatever base the harness picked — frequently a STALE commit. Expect it:
@@ -179,8 +176,9 @@ at 3 AM during your autonomous loop costs days.
   focused.
 - **Give every brief explicit paths**; kill a subagent's filesystem search
   running >~10 min — it finds nothing the brief didn't contain.
-- **Kill hung builds/runs** (a native-extension or JIT compile, or a solver
-  stuck >~30 min) by PID and note it; don't let an orphan burn a core for hours.
+- **Launch every exploratory run under a wall-clock timeout** (~3x its baseline
+  case), killed when its log repeats one warning >50x; slow vs hung is read from
+  the log at ~30 min, never waited out. Kill a hung build by PID and note it.
 - **Require frequent checkpoints** (`NOTES_<topic>.md` in the notes dir, never
   committed — findings go in commit messages and PR bodies).
 - **Keep a live roster** of children — agent ids, worktrees, PIDs — in the
@@ -196,15 +194,13 @@ at 3 AM during your autonomous loop costs days.
 equivalent): test tiers, merge gates, version scheme, subagent menu, session-log
 location, perf-snapshot tool. If missing, ask the user to define or propose
 defaults explicitly. Read the roadmap. Audit git state — `git log`,
-`git status`, latest tag, uncommitted changes, in-flight processes.
+`git status`, latest tag, uncommitted changes, in-flight processes. Before the
+first push, `gh repo view --json visibility`: if PUBLIC, ask once which work
+lines are private and keep them out of commits, PR text and branch names.
 
-**The board is the queue where one exists.** A project with a
-`PATHWAY_FORWARD.md` (or whatever its rule book names as the status board) has
-already written down its open issues, their surfaces and their evidence
-commands — that is a better mission queue than a roadmap file, because every
-row carries the command that decides whether it is done. Read it first and work
-it in order; fall back to the roadmap only where no board exists, and say which
-you used.
+**The board is the queue where one exists** (`PATHWAY_FORWARD.md`, or whatever
+the rule book names): every row carries the command that decides it, so it beats
+a roadmap. Fall back to the roadmap only where no board exists, and say which.
 
 Three constraints on driving from the board, all of them rule 19:
 
@@ -213,18 +209,16 @@ Three constraints on driving from the board, all of them rule 19:
   Opening, closing, re-scoping and re-prioritising rows are Zofia's.
 - **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
   P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
-  row gone overdue. State is the tiebreak, never the sort key: it says how bad
-  a row is, not how much it matters now. A row whose surface another queued
-  mission will touch goes first within its priority, so its evidence is not
-  re-derived twice. Where a board has no priority column, say so and propose
-  one rather than inventing an order silently — a board that cannot be
-  prioritised is an archive, and working it in state order only looks like
-  priority. One override: when a scarce resource frees — a quiet box, a free
-  GPU — the item that needs it runs first. Ready-to-run work must not take
-  its slot.
+  row gone overdue — state is the tiebreak, never the sort key. A row whose
+  surface another queued mission will touch goes first within its priority.
+  Where a board has no priority column, say so and propose one rather than
+  inventing an order. One override: when a scarce resource frees — a quiet box,
+  a free GPU — the item that needs it runs first.
 - **A row closes on a command that ran, never on a landing that looked right.**
   Re-run the row's own evidence yourself and hand Zofia the literal output; a re-run
   of the same script is MEASURED (reproducible), VERIFIED needs an independent oracle.
+  A board number names its result file, mtime and code SHA (an "after fix X" run
+  started after X); `ls` the paths a report names before calling them gone.
 
 `PROJECT_RULES.md` is the project's LOCAL, auditable companion — it holds only
 the project-SPECIFICS your universal rules can't know (what "parity" means here,
