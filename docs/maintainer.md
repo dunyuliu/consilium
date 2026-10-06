@@ -94,7 +94,8 @@ two.
 
 **Evidence over vibes.** Regression fixtures in `evals/cases/` test
 agents on planted defects so prompt changes can be measured rather
-than vibe-checked. New behaviours land with new eval cases.
+than vibe-checked. A fixture is owed only when a failure recurs after
+its fix (rule 10, relaxed 2026-10-04) — not for every new behaviour.
 
 ### Human sign-off
 
