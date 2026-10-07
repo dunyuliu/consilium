@@ -355,10 +355,14 @@ files, §2) = 22,077.
 
 ## 9. CI run this release was gated on
 
-*(pending — filled in after the release PR merges to `main`; rule 15a
-requires CI green on the exact SHA being tagged, which does not exist until
-after merge. Interim: the release branch's own push-triggered run is quoted
-below, and transcribed with the merge-SHA run before the tag is cut.)*
+Two `structural-invariants` push-triggered runs exist for the merge SHA
+`6f4838f9055c1748d578963d112eb0587b2821d0` (the squash-merge commit of PR #99
+into `main`), both `success`, no reruns:
+- https://github.com/dunyuliu/consilium/actions/runs/37659160710 — `success`
+- https://github.com/dunyuliu/consilium/actions/runs/37659391890 — `success`
+
+The tag `v1.28.4` and its Release were cut against this exact SHA only after
+both runs were confirmed green, per rule 15a.
 
 ## 10. Trend since v1.28.3
 
@@ -420,8 +424,14 @@ plain language because no mechanical measure would otherwise surface them.
 
 ## 12. Release gate
 
-*(pending — `bash tests/release_gate.sh release_notes_v1.28.4.md` will be run
-against the merged, pre-tag tree and transcribed here before the tag is cut,
-per rule 15a; rows `publish`/`release`/`clone` are expected to read SKIP at
-that point since no tag exists yet, and will be re-transcribed once PASS
-after the tag is created.)*
+`bash tests/release_gate.sh release_notes_v1.28.4.md`, run post-tag from an
+independent scratch clone of the pushed tag (not this worktree, to avoid the
+structural "two worktrees / detached HEAD" false negative): **release gate: 5
+passed, 0 failed, 0 skipped**.
+
+- **tree**: clean, one worktree, no lock, level with upstream.
+- **ci**: green on `6f4838f9` (both runs above).
+- **publish**: `v1.28.4` pushed and pointing at `6f4838f9`.
+- **release**: GitHub Release exists for `v1.28.4`, confirmed `--latest`.
+- **clone**: PASS — a fresh clone of `v1.28.4` ran README's documented
+  `## Install` bash block and the next bash block end-to-end, both exit 0.
