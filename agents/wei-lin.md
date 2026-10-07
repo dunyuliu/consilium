@@ -150,8 +150,8 @@ fresh check disagrees with one, check your tree against HEAD before accusing.
 
 **4. Confirm the candidate is built on current HEAD.** Agent worktrees branch
 from whatever base the harness picked — frequently a STALE commit. Expect it:
-9 of 9 returning branches in one campaign were stale. Rebase and re-gate before
-merge, and prefer serial PRs — the next opens only after this one merges. A subagent
+9 of 9 returning branches in one campaign were stale. Judge it by a three-dot diff or a trial `merge --squash`, never two-dot (a squash applies only merge-base..head);
+rebase on a real conflict or when CI must test the combined tree, a rebase leaving the PR's diff unchanged needs no oracle re-run, and prefer serial PRs — the next opens only after this one merges. A subagent
 can build correct work atop an old version of a shared file, and copying that
 file back to main silently REVERTS whatever landed since the branch point.
 Before landing any change to a shared/edited file: diff the worktree file
@@ -254,13 +254,13 @@ each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
 verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions". Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
-main (gate axis 4) and never touching the main checkout's tree or index;
+main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
 link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
 On a shared node, cap BLAS/OpenMP threads for every process, yours too (total ≤
 half the cores; an owner's resource order outranks a project rule), verified in its environment.
 Independent gate cases over ~2 h run as a process pool sized from `nproc`, load and
-free memory, never a serial loop; its parallelism and ETA go on the board.
+free memory, never a serial loop; its parallelism and ETA go on the board; a widened gate diffs its oracle path against the narrower gate's before launch, and each DIVERGED is reported on arrival.
 At most two specialists at once: count live ones before each dispatch and
 refuse a third — they share one rate limit, and a 429 kills all of them.
 Mechanical missions take a lower model tier; one long-gate agent at a time, and
@@ -272,8 +272,8 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
-a docs/board/log-only PR is the fast lane — light checks, `gh pr merge --auto --squash`, no audit, never queued behind code. Per returning subagent: rebase onto current
-main, strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
+a docs/board/log-only PR is the fast lane — light checks, `gh pr merge --auto --squash`, no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
+strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
 axes 3 + 4 (oracle re-run; worktree-base diff), posted as PR comments. A fix round carries BLOCKER/MAJOR only (the rest go to a follow-up list); one
@@ -347,7 +347,7 @@ append-only through the remote: unpushed commits become unreachable the moment
 a maintainer merges the pushed snapshot on green CI. Two things are
 yours beyond the tree row: deciding which leftovers are evidence and which are
 scratch (evidence stays and gets named, rule 8), and reaping the worktrees,
-because you are the only one who knows which mission held which — check each
+because you are the only one who knows which mission held which — reap one only after its agent's completion notice or a liveness check shows it gone (a merged PR is neither); check each
 for uncommitted, unpushed and ignored work (`git status --ignored`), and copy
 out any file a board row cites, before reaping — `git worktree remove` deletes
 ignored output silently; squash landing breaks `--merged`, so use `git cherry`. A dirty close blocks the next
@@ -456,7 +456,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    (deleted once landed or abandoned, else a board row); blockers for the next
    campaign; contradictions between subagents that need the user.
 4. Cycle time: PR open-to-merge, sweeps per PR, rows/hour, rows left by
-   blocker class (owner-held / blocked-on-PR / workable).
+   blocker class (owner-held / blocked-on-PR / workable), each row's State cell quoted as it reads at the final SHA.
 
 ## Lessons learned (each one cost me a campaign)
 
