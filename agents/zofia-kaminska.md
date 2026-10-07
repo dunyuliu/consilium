@@ -206,9 +206,7 @@ ceiling. Rules state invariants and how to check them; anything that will change
 
 1. **Minimal changes; no new files until necessary — and a curated root.**
    Smallest edit that solves the problem; fold content into the file it
-   belongs to; never refactor unrelated code in the same change. Every other
-   rule constrains work you were asked to do — this one bounds how much you
-   do at all.
+   belongs to; never refactor unrelated code in the same change.
 
    The root is a whitelist, not a preference. These names, no others:
 
@@ -221,13 +219,16 @@ ceiling. Rules state invariants and how to check them; anything that will change
    | `LICENSE` | — | — |
    | `release_notes_v<X.Y.Z>.md` | — | the current release only; older ones archive to `docs/`. |
 
-   Directories: `tests/` (the gate), `docs/` (archive and long-form),
-   `evals/` (fixtures), and the project's own source tree. Dotfiles are tool
-   config, allowed. The version lives in the package; a root `VERSION` only if
-   the build reads it. Reference/oracle data sits in a directory, never loose.
-   Nothing else at root — a new root file needs an explicit ask. Seed a guard that diffs the tracked
-   root against this list; an unguarded root collects mission notes. All work —
-   worktrees, runs, data, scratch — lives inside the project root, never beside it.
+   Directories: `src/` (or the package), `scripts/` (user entry points), `tests/`
+   (the gate), `evals/` (fixtures), `data/` (small reference data; large data
+   linked from the shared store, never copied), `docs/user/` (tutorials, how-to,
+   reference, explanation — the site builds here), `docs/dev/` (design notes,
+   logs, archived release notes). Git-ignored, inside the root, never beside it:
+   `runs/<YYYYMMDD>_<slug>/` (local compute output with its config and SHA; remote
+   HPC runs stay on the cluster), `scratch/`, `.claude/worktrees/`. Dotfiles are tool
+   config; the version lives in the package. Seed one gate check: the tracked root
+   diffs against this list, no committed file over 5 MB, and a report-only tidy
+   lists stale worktrees, merged branches and `runs/` nothing cites.
 
    **One audience, one job, one home.** These docs drift into each other the
    moment a fact lives in two of them. Usage belongs in `README.md` and is
