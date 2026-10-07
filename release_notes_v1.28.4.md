@@ -4,15 +4,24 @@
 
 **v1.28.4**, cut 2026-10-07 from `main`, on top of `v1.28.3`
 (`684e75dd578a30acd51e0fd6db2d228e6689dbc7`, 2026-10-05). Patch bump: cadence
-trigger (≥5 PRs since last tag) — five merged PRs (#93–#97), all
-prompt/doc/ledger lessons folded in from the inbox-triage process plus one
-agent-scope expansion. No new agent, no new command, no rule added or
-renumbered (rule 10 unchanged this range, only re-cited).
+trigger (≥5 PRs since last tag) — six merged PRs (#93–#98): five
+prompt/doc/ledger lessons folded in from the inbox-triage process, one
+agent-scope expansion, and one root-isolation wording tightening. No new
+agent, no new command, no rule added or renumbered (rule 10 unchanged this
+range, only re-cited; rule 20's first item reworded in place by #98, not
+renumbered).
+
+This note was drafted once against #93–#97 (branch cut before #98 merged to
+`main`), then extended in place to cover #98 after the branch was rebased
+onto `main`'s new tip — every count, table and finding below reflects the
+full #93–#98 range, re-verified on the rebased tree, not the original
+five-PR draft.
 
 ## 2. Summary of scope
 
-5 commits, 8 files changed, **+112 / −86** (tracked `.md` text,
-`git diff --stat v1.28.3..HEAD`).
+6 commits, 10 files changed, **+128 / −100** (tracked `.md` text,
+`git diff --numstat v1.28.3..HEAD -- '*.md' '*.sh' '*.py'`, re-measured on the
+rebased tree).
 
 | Theme | PR | What |
 |---|---|---|
@@ -21,6 +30,7 @@ renumbered (rule 10 unchanged this range, only re-cited).
 | Inbox lessons, net 0 | #95 | A relayed success names its result file, never "no exception"; a reference check lists one row per assigned ID and tallies IDs marked, not rows |
 | Inbox lessons, net 0 | #96 | Judge branch staleness by a three-dot diff (never two-dot) or a trial squash, rebase only on a real conflict or when CI must test the combined tree; reap a dispatched agent's worktree only after its completion notice or a liveness check, never because its PR merged; a widened gate diffs its oracle path against the narrower gate's before launch; a closing report quotes each board row's State cell as read at the final SHA |
 | Agent scope expansion, net −3 | #97 | `anya-petrov` becomes standing owner of a project's user docs (Diátaxis split, README first, docs land in the code's PR, executable README commands checked by shape after scripted edits, link check, changelog per bump, confirm the docs site actually publishes) — not only a publication-time pass |
+| Isolation rewording, net +1 | #98 | Rule 20's item 1 reworded: work stays inside the session's root (worktree, branch or scratch directory all nested there), a write outside it needs the owner's OK, replacing the flatter "never write to the repo root" phrasing; `zofia-kaminska`'s portable root template widened to name `docs/user/`, `docs/dev/`, `runs/`, `scratch/`, `.claude/worktrees/` and a new report-only root/size/tidy gate-check invariant; `kai-fischer`'s refusal-to-write path now asks for "a worktree inside the project root" instead of `git worktree add ../<name>` (which the new wording forbids outright) |
 
 ## 3. Files added / removed / renamed / cleaned up
 
@@ -28,16 +38,20 @@ renumbered (rule 10 unchanged this range, only re-cited).
   (`git mv`, rule 8 — archived, never deleted).
 - **Added**: this note, at the repo root, as the only root release note.
 - No other file added to or removed from the repo root; root still holds
-  exactly rule 1's whitelist (Check 31 confirms mechanically).
+  exactly rule 1's whitelist (Check 31 confirms mechanically) — true both
+  before and after #98, which touched no root file.
 - No new agent, command, rule, check, or eval case landed in this range.
 
 ## 4. Content updates to master documents
 
-- **`PROJECT_RULES.md`** — 1,005 lines (unchanged from v1.28.3), 47 index rows
-  unchanged, no renumbering. One line edited in place (rule 19's ownership
-  table, PR #97): `anya-petrov`'s row widened from "publication staging,
-  citation files" to "publication staging, citation files, a project's user
-  docs." No rule text itself amended this range.
+- **`PROJECT_RULES.md`** — 1,005 → 1,006 lines, 47 index rows unchanged, no
+  renumbering. Two edits in place: rule 19's ownership table (PR #97):
+  `anya-petrov`'s row widened from "publication staging, citation files" to
+  "publication staging, citation files, a project's user docs"; rule 20's
+  item 1 (PR #98, `:686-689`): "Work in your own worktree, branch, or scratch
+  directory" gains "all inside the root the session started in; a write
+  outside it needs the owner's OK," replacing the flatter "never write to the
+  repo root" framing. Neither is a new rule or a renumbering.
 - **`PATHWAY_FORWARD.md`** — untouched this range (`git diff --stat
   v1.28.3..HEAD -- PATHWAY_FORWARD.md` is empty). Board total unchanged: 13
   VERIFIED, 22 RETIRED, 0 BROKEN (of 35 rows) — same as v1.28.3. No blank
@@ -48,9 +62,25 @@ renumbered (rule 10 unchanged this range, only re-cited).
   `## User docs (standing, every PR)` section; tightened Isolation,
   Communication-discipline and Tool-economy prose to pay for it (rule 1b);
   publication-staging section renamed "in priority order" → kept, trimmed of
-  now-duplicated README-structure bullets. Net line count for `agents/` +
-  `commands/`: 5,746 → 5,743 (ceiling unchanged at 5,754, matches PR #97's
-  stated net −3; Check 37 passes with 11 lines of headroom).
+  now-duplicated README-structure bullets.
+- **`agents/kai-fischer.md`** (1 line touched: 1/1, PR #98) — the
+  refusal-to-write path (`:37`) now asks for "a worktree inside the project
+  root" rather than `git worktree add ../<name>`, which rule 20's reworded
+  item 1 now forbids outright (a worktree must nest inside the session's
+  root, not sit beside it).
+- **`agents/zofia-kaminska.md`** (21 lines touched: 11/10, PR #98) — the
+  portable starter-set root template (`:206-231`, Mode A: what she hands a
+  project with no rules yet) widened from a single generic directory list to
+  name `src/`/`scripts/`/`tests/`/`evals/`/`data/`/`docs/user/`/`docs/dev/`,
+  plus git-ignored `runs/<YYYYMMDD>_<slug>/`, `scratch/`,
+  `.claude/worktrees/`; and gains one new invariant text — "seed one gate
+  check: the tracked root diffs against this list, no committed file over
+  5 MB, and a report-only tidy lists stale worktrees, merged branches and
+  `runs/` nothing cites" — for her to apply to *other* projects, not a claim
+  that consilium itself runs that check (it doesn't; §5 finding 12).
+  Net line count for `agents/` + `commands/` across all four PRs this range
+  (#94, #96, #97, #98): 5,746 → 5,743 (PR #97's net −3) → 5,744 (PR #98's net
+  +1); ceiling unchanged at 5,754, Check 37 passes with 10 lines of headroom.
 - **`agents/wei-lin.md`** (40 lines touched: 20/20, PRs #94/#96) — staleness
   judged by three-dot diff or trial squash (never two-dot); worktree reaping
   gated on a liveness check; hold/time-box must be quoted from current files;
@@ -73,11 +103,21 @@ renumbered (rule 10 unchanged this range, only re-cited).
 
 ## 5. Audit findings and fixes
 
-**Dispatched `victor-reyes`** for the deep pass (self-handled, no
+**Dispatched `victor-reyes`** for the deep pass over #93–#97 (self-handled, no
 sub-dispatch — 8 files, 198 diff lines, one surface, no gate or physics logic
 touched). Ran `bash tests/check.sh` himself: `926 passed, 0 failed`.
 
-**10 consolidated findings — 0 Major, 4 Medium, 5 Low, 1 advisory.**
+**Extended with a second, scoped audit for #98** after it landed on `main`
+post-dispatch: a fresh agent, briefed with the same cross-reference and
+internal-consistency checks `victor-reyes` applies, limited to #98's 3-file
+diff (`PROJECT_RULES.md`, `agents/kai-fischer.md`, `agents/zofia-kaminska.md`)
+plus full reads of all three files and every other `agents/*.md` prompt
+carrying the pre-#98 isolation sentence, to catch a propagation miss the
+3-file diff alone would not surface. Findings 11–13 below are its output;
+finding 11 (the dangling cross-reference) was independently confirmed by
+grep before being accepted into this note.
+
+**13 consolidated findings — 1 Major, 5 Medium, 6 Low, 1 advisory.**
 
 1. **(Medium, `victor-reyes`.)** Rule 19's row giving `anya-petrov` "a
    project's user docs" (`PROJECT_RULES.md:731`) is not reconciled against
@@ -156,24 +196,63 @@ touched). Ran `bash tests/check.sh` himself: `926 passed, 0 failed`.
    reads as a line-budget trim (rule 1b), not a capability loss.
 10. **(Advisory, `victor-reyes`.)** Archiving `release_notes_v1.28.3.md` to
     `docs/` via `git mv` at this cut is the normal rule-8 step, not a defect.
+11. **(Major, #98 addendum audit — independently confirmed by grep.)**
+    `agents/mira-volkov.md:45` and `agents/dunyu-liu.md:55` (plus
+    `mira-volkov.md:3`'s frontmatter `description`) still read the pre-#98
+    isolation sentence verbatim — "Never write to the repo root, the
+    `main`/`master` checkout, or the master project folder" — superseded by
+    PR #98's rule 20 item 1 ("…all inside the root the session started in; a
+    write outside it needs the owner's OK"). PR #98's own title claims only
+    "kai's worktree moves inside the root"; two more prompts carrying the
+    identical superseded sentence were left stale. Check 11
+    (isolation-section-first) checks the section's position only, never its
+    wording, so this gap is invisible to the gate — `tests/check.sh` stays
+    green over it. **Not fixed** — `agents/*.md` is `lian-zhao`'s surface;
+    deferred to her.
+12. **(Medium, #98 addendum audit — confirmed: `grep` of `tests/check.sh`
+    finds no 5 MB ceiling and no stale-worktree/merged-branch/`runs/` tidy
+    check anywhere in this repo.)** `agents/zofia-kaminska.md:229-231`'s new
+    starter-set invariant ("seed one gate check: the tracked root diffs
+    against this list, no committed file over 5 MB, and a report-only tidy
+    lists stale worktrees, merged branches and `runs/` nothing cites") is
+    prose she hands to *other* projects (Mode A), not a claim about
+    consilium's own gate — so it is not a false statement. But rule 0
+    ("apply every discipline here first") means a newly invented mechanism
+    ought to be piloted on consilium's own tree before being prescribed
+    elsewhere, and it has not been. **Not fixed** — `zofia-kaminska`'s own
+    rule-1/template surface; deferred to her/human (pilot it here via a
+    `PATHWAY_FORWARD.md` row, or label it explicitly untested in her prompt).
+13. **(Low, #98 addendum audit.)** `agents/kai-fischer.md:37`'s replacement
+    text ("ask for a worktree inside the project root") drops the concrete
+    path `agents/zofia-kaminska.md:228` just introduced as the canonical
+    convention, `.claude/worktrees/<name>`. **Not fixed** — `lian-zhao`'s
+    surface; deferred.
 
 **Fixes applied this release:** one (finding 7, mechanical doc-sync).
-**Deferred, by owner:** findings 1, 2, 3, 5, 6, 8 (all `lian-zhao` or
-`zofia-kaminska`/human — none invented). Finding 4 is carried and worsened,
-flagged at the same severity as v1.28.3 rather than re-litigated, since the
-rule and the facts are unchanged. Findings 9–10 are explained, not actionable.
+**Deferred, by owner:** findings 1, 6, 12 to `zofia-kaminska`/human; findings
+2, 3, 5, 8, 11, 13 to `lian-zhao` — nine findings total, none invented.
+Finding 4 is carried and worsened, flagged at the same severity as v1.28.3
+rather than re-litigated, since the rule and the facts are unchanged.
+Findings 9–10 are explained, not actionable. Finding 11 is the most severe
+open item this release: a real, grep-confirmed stale cross-reference in two
+shipped prompts, invisible to every mechanical check — carried to §6 as the
+top open issue.
 
-**This pass's own verification, re-run fresh:**
-- `bash tests/check.sh` on the pristine pre-release tree: `926 passed, 0
-  failed`.
-- `cat agents/*.md commands/*.md | wc -l` → `5743`, matching Check 37's
-  measured count, 11 lines under the 5,754 ceiling.
+**This pass's own verification, re-run fresh (on the rebased, #98-inclusive
+tree):**
+- `bash tests/check.sh`: `927 passed, 0 failed` (926 at the pre-#98 draft;
+  the +1 is attributable to #98's content, not a new Check number — Check 37
+  remains the highest).
+- `cat agents/*.md commands/*.md | wc -l` → `5744`, matching Check 37's
+  measured count, 10 lines under the 5,754 ceiling.
 - Read every new `docs/lessons_ledger.md` row by hand: no project name, path,
   host, or person — only `P05`/`P15`/`P16`/`P17`/`P18`/`owner` aliases and
   agent names.
 - `git diff v1.28.3..HEAD -- PATHWAY_FORWARD.md`: empty — board untouched.
 - `git diff --stat v1.28.3..HEAD -- evals/`: empty — confirms finding 4's "no
   fixture landed" claim directly, not by assertion.
+- `grep -n "repo root" agents/mira-volkov.md agents/dunyu-liu.md`: both hit,
+  confirming finding 11 directly rather than taking the sub-agent's word.
 
 ## 6. Remaining open issues or pending items
 
@@ -207,33 +286,63 @@ rule and the facts are unchanged. Findings 9–10 are explained, not actionable.
    Ubuntu-26 deprecation annotations on every run — not re-confirmed this pass
    (no new CI run read yet at the time of writing; to be confirmed against
    the gating run in §9). Owner: `iris-vermeulen`.
+10. **(Major, open, new this range — #98 addendum.)** `agents/mira-volkov.md`
+    and `agents/dunyu-liu.md` still carry the isolation sentence PR #98
+    superseded in rule 20 item 1 and in `agents/kai-fischer.md` — §5 finding
+    11, grep-confirmed. This is the sharpest open item in this release: a
+    live, shipped contradiction between two prompts' stated isolation rule and
+    the rule book's current text, invisible to every check in `tests/check.sh`.
+    Owner: `lian-zhao` (propagate the reworded sentence to both files and
+    audit the rest of `agents/*.md` for the same stale string in the same
+    pass).
+11. **(Medium, open, new this range — #98 addendum.)** `zofia-kaminska`'s new
+    portable root/size/tidy gate-check invariant has never been run against
+    consilium's own tree — §5 finding 12. Owner: `zofia-kaminska`/human.
+12. **(Low, open, new this range — #98 addendum.)** `agents/kai-fischer.md`'s
+    worktree instruction has no concrete path, unlike the convention
+    `agents/zofia-kaminska.md` just introduced — §5 finding 13. Owner:
+    `lian-zhao`.
 
 ## 7. Totals or cost changes
 
-Both columns measured fresh this session — v1.28.3 in a throwaway detached
-worktree at that tag, v1.28.4 on the release branch before the tag was cut.
+Both columns re-measured fresh in this session's final pass — v1.28.3 in a
+throwaway detached `git worktree add --detach` at that tag (removed after
+reading), v1.28.4 on the release branch, rebased onto `main`'s #98 tip,
+before the tag was cut. (An earlier draft of this table, taken before #98
+was folded in, read 21,762 tracked lines for v1.28.4; superseded below.)
 
 | Measure | v1.28.3 | v1.28.4 |
 |---|---|---|
-| Tracked lines (`git ls-files \| xargs wc -l`) | 21,736 | 21,762 |
+| Tracked lines (`git ls-files \| xargs wc -l`) | 21,736 | 22,077 |
+| Tracked files (`git ls-files \| wc -l`) | 176 | 177 |
 | `evals/` lines (`git ls-files evals \| xargs wc -l`) | 4,585 | 4,585 |
 | `tests/check.sh` lines | 1,409 | 1,409 |
-| `PROJECT_RULES.md` lines | 1,005 | 1,005 |
-| `agents/`+`commands/` lines (rule 1b) | 5,746 (ceiling 5,754) | 5,743 (ceiling 5,754) |
-| Live checks | 32 | 32 |
+| `PROJECT_RULES.md` lines | 1,005 | 1,006 |
+| `agents/`+`commands/` lines (rule 1b) | 5,746 (ceiling 5,754) | 5,744 (ceiling 5,754) |
+| Live checks (37 numbered, 5 retired) | 32 | 32 |
 | Eval cases | 10 | 10 |
 | Agents / commands | 23 / 20 | 23 / 20 |
 | Rule-book index rows (incl. sub-rules, retired) | 47 | 47 |
 | Board rows VERIFIED / RETIRED / BROKEN (of 35 total) | 13 / 22 / 0 | 13 / 22 / 0 |
 
+The 22,077 figure reconciles exactly against the diff: 21,736 + 313 (this
+note itself) + 28 (net tracked-text change across the ten other touched
+files, §2) = 22,077.
+
 ## 8. Assumptions used
 
-- **The brief's state was re-verified, not taken.** `main`'s tip (`c982eaa`),
-  the five-PR/five-commit range, the free lock, branch protection (required
-  check: `"check"`), and the local `926/0` gate were each re-read by command
-  before use, not copied from the dispatch brief.
+- **The brief's state was re-verified, not taken.** `main`'s tip (`8810c81`,
+  after #98 merged), the six-PR/six-commit range, the free lock, branch
+  protection (required check: `"check"`), and the local `927/0` gate were
+  each re-read by command before use, not copied from the dispatch brief or
+  from the earlier five-PR draft.
+- **The release branch was rebased, not recreated.** `release/v1.28.4`
+  (local-only, never pushed — confirmed via `git branch -a`, no
+  `origin/release/v1.28.4`) was rebased onto `origin/main` with
+  `git rebase origin/main`, which applied cleanly with no conflicts; this is
+  not a rewrite of a shared ref since the branch had never been pushed.
 - **No refactor pass ran** (`kai-fischer` not dispatched) — this range is
-  five already-PR-gated prompt/doc commits with no production code touched;
+  six already-PR-gated prompt/doc commits with no production code touched;
   nothing on his surface to simplify.
 - **`zofia-kaminska` was not re-dispatched** for finding 4 (rule 10's
   enforceability) — her v1.28.3 verdict was obtained on the identical rule
@@ -257,45 +366,50 @@ Every row is the output of a command run this session, at both commits.
 
 | Measure | v1.28.3 | v1.28.4 | Direction |
 |---|---|---|---|
-| Gate assertions — `bash tests/check.sh` | `926 passed, 0 failed` | `926 passed, 0 failed` | **Unchanged** — no new check added or dropped this range. |
-| Fixture verdicts — `bash evals/run.sh score` | 10 cases, 0 current (0%), 9 stale, 1 never-run | 10 cases, 0 current (0%), 9 stale, 1 never-run | **Unchanged** — already at the floor; this range's prompt edits (wei-lin, ziyan-chen, anya-petrov) add to the stale set but do not move the headline numbers. |
-| Tracked text lines — `git diff --stat v1.28.3..HEAD -- '*.md' '*.sh' '*.py'` | — | 8 files, **112 added / 86 removed, net +26** | **Modest growth**, concentrated in `docs/lessons_ledger.md` (+14 rows) and `agents/anya-petrov.md`'s new section (paid for by trims to the same file, net −3 lines across `agents/`+`commands/`). |
-| Board currency — `PATHWAY_FORWARD.md` | 13 VERIFIED, 22 RETIRED, 0 BROKEN, 0 blank | 13 VERIFIED, 22 RETIRED, 0 BROKEN, 0 blank | **Unchanged** — board untouched this range (empty diff). |
-| CI green-on-first-try — `gh run list` since v1.28.3's tag push | — | 5 push runs (one per merged PR, #93–#97), 5/5 green on attempt 1, 0 reruns | **Unchanged in substance** (100%, same as v1.28.3's own range). |
+| Gate assertions — `bash tests/check.sh` | `926 passed, 0 failed` | `927 passed, 0 failed` | **+1 assertion**, attributable to #98's content (no Check number added or dropped — 37 stays the ceiling, 32 live). |
+| Fixture verdicts — `bash evals/run.sh score` | 10 cases, 0 current (0%), 9 stale, 1 never-run | 10 cases, 0 current (0%), 9 stale, 1 never-run | **Unchanged** — already at the floor; this range's prompt edits (wei-lin, ziyan-chen, anya-petrov, kai-fischer, zofia-kaminska) add to the stale set but do not move the headline numbers. |
+| Tracked text lines — `git diff --numstat v1.28.3..HEAD -- '*.md' '*.sh' '*.py'` | — | 10 files, **128 added / 100 removed, net +28** | **Modest growth**, concentrated in `docs/lessons_ledger.md` (+14 rows) and `agents/anya-petrov.md`'s new section (paid for in the same file, net −3 across `agents/`+`commands/`); #98 adds back +1 net to that same ceiling. |
+| Board currency — `PATHWAY_FORWARD.md` | 13 VERIFIED, 22 RETIRED, 0 BROKEN, 0 blank | 13 VERIFIED, 22 RETIRED, 0 BROKEN, 0 blank | **Unchanged** — board untouched this range (empty diff, re-confirmed on the #98-inclusive tree). |
+| CI green-on-first-try — `gh run list` since v1.28.3's tag push | — | 6 push runs (one per merged PR, #93–#98), 6/6 green on attempt 1, 0 reruns | **Unchanged in substance** (100%, same as v1.28.3's own range). |
 
-**Reading, plainly.** The gate holds exactly flat and fixture currency sits at
-its already-established floor. Tracked-line growth is modest and
-attributable to ledger rows and one agent's new section, paid for elsewhere
-per rule 1b — not a leanness regression. The real deterioration this range is
-not visible in any of the five measures above: §5 finding 4's unfixtured,
+**Reading, plainly.** The gate holds nearly flat (+1 assertion, no new Check)
+and fixture currency sits at its already-established floor. Tracked-line
+growth is modest and attributable to ledger rows, one agent's new section,
+and #98's small net addition, paid for elsewhere per rule 1b — not a leanness
+regression by that measure alone. Two real deteriorations this range are not
+visible in the five mechanical measures above: §5 finding 4's unfixtured,
 self-certified rule-10 recurrences **quadrupled** (2 → 8) with zero fixtures
-landed against any of them, in either range. That is called out here in plain
-language because none of the mechanical measures would otherwise surface it.
+landed against any of them; and §5 finding 11 (new, #98) is a live,
+grep-confirmed stale cross-reference in two shipped prompts' isolation
+sections — a correctness gap that `tests/check.sh` cannot see because Check
+11 verifies section position, never content. Both are called out here in
+plain language because no mechanical measure would otherwise surface them.
 
 ## 11. Work record
 
-- **audit**: `victor-reyes`, self-handled without sub-dispatch (diff judged
-  small enough: 8 files, 198 lines, one surface, no gate/physics logic
-  touched). 10 consolidated findings — 0 Major, 4 Medium, 5 Low, 1 advisory,
-  all §5.
-- **correctness**: `bash tests/check.sh` → `926 passed, 0 failed` on the
-  pristine pre-release tree; see §12 for the merged-SHA and tagged-SHA
-  re-runs.
+- **audit**: `victor-reyes` for #93–#97 (self-handled, no sub-dispatch — 8
+  files, 198 lines, one surface, no gate/physics logic touched), extended
+  with a second scoped audit for #98 (3 files, 30 lines) after it landed
+  post-dispatch. 13 consolidated findings — 1 Major, 5 Medium, 6 Low, 1
+  advisory, all §5; finding 11 (the Major) independently confirmed by grep.
+- **correctness**: `bash tests/check.sh` → `927 passed, 0 failed` on the
+  rebased, #98-inclusive pre-release tree (926 at the pre-#98 draft); see §12
+  for the merged-SHA and tagged-SHA re-runs.
 - **conciseness**: assessed inline, not independently verified by
   `kai-fischer` (see `refactor:` below). Net −3 tracked lines across
-  `agents/`+`commands/`; `agents/anya-petrov.md`'s new section paid for by
-  trims in Isolation/Tool-economy/publication-staging prose in the same file,
+  `agents/`+`commands/` from #97, +1 from #98 (net −2 over the full range);
+  `agents/anya-petrov.md`'s new section paid for by trims in the same file,
   per rule 1b.
 - **fixes**: one applied (`docs/lessons_ledger.md` one-line clarity fix, §5
-  finding 7, mechanical). Six findings deferred by owner (§5/§6): findings 1,
-  6 to `zofia-kaminska`/human; findings 2, 3, 5, 8 to `lian-zhao`; finding 4
-  carried forward at the same severity as v1.28.3, worse by count, to
-  `iris-vermeulen`/`zofia-kaminska`/human — none invented.
+  finding 7, mechanical). Nine findings deferred by owner (§5/§6): findings
+  1, 6, 12 to `zofia-kaminska`/human; findings 2, 3, 5, 8, 11, 13 to
+  `lian-zhao`; finding 4 carried forward at the same severity as v1.28.3,
+  worse by count, to `iris-vermeulen`/`zofia-kaminska`/human — none invented.
 - **docs**: reconciled against the filesystem, not the diff. Root walked
   against rule 1's whitelist; every count in §7 re-read off disk this session
   at both commits; `PATHWAY_FORWARD.md` confirmed untouched by direct diff,
   not assumed from the PR list.
-- **refactor**: **`kai-fischer` did not run this release.** Five
+- **refactor**: **`kai-fischer` did not run this release.** Six
   already-PR-gated prompt/doc commits with no production code in the diff —
   nothing on his surface.
 - **rules**: **`zofia-kaminska` not dispatched this release** — see §8's
