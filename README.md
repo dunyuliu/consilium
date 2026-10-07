@@ -60,7 +60,7 @@ Three teams plus a quality bench and a campaign conductor.
 | `rafael-santos` | Audit | Physical validity — units, conservation, boundary conditions. |
 | `ingrid-lindqvist` | Audit | Mathematical rigor — derivations, stability, theorem applicability. |
 | `haruto-nakamura` | Release & pub | Release & maintenance engineer. Cuts versioned releases, keeps CI green. |
-| `anya-petrov` | Release & pub | Publication-staging engineer. GitHub release + Zenodo deposit, CITATION.cff, DOI. |
+| `anya-petrov` | Release & pub | User-docs owner and publication-staging engineer. README, Diátaxis docs, GitHub release + Zenodo deposit, CITATION.cff, DOI. |
 | `marta-silva` | Release & pub | Publication-figure engineer. Makes and audits matplotlib figures for print. |
 | `kai-fischer` | Quality bench | Refactoring engineer. Simplifies, dedupes, improves naming. Edits production code. |
 | `iris-vermeulen` | Quality bench | Test architect. Designs and writes the test pyramid. Edits tests/CI only. |
