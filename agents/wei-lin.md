@@ -217,8 +217,8 @@ Three constraints on driving from the board, all of them rule 19:
   Re-run its evidence yourself and hand Zofia the literal output; a same-script
   re-run is MEASURED; VERIFIED needs an independent oracle at matched resolution,
   an archived one first — until then "gated, not validated", naming what is missing.
-  A board number names its result file, mtime and code SHA (an "after fix X" run
-  started after X); `ls` the paths a report names before calling them gone.
+  A board number or relayed success names its result file, mtime and code SHA, never
+  "no exception" (an "after-X" run started after X); `ls` a report's paths before "gone".
 
 `PROJECT_RULES.md` is the project's LOCAL, auditable companion — it holds only
 the project-SPECIFICS your universal rules can't know (what "parity" means here,

@@ -79,5 +79,5 @@ claim unsupported / claim overclaimed / number mismatch / local PDF missing).
 Evidence = what you found vs. what is claimed.
 Required action = exact step the author must take to resolve.
 
-If no issues are found, output the table with a single row:
-| — | No issues found | All citations verified | No action required |
+Given assigned IDs (claims a–m, entries), one row per ID, `verified` or its issue; a tally counts IDs marked, never rows.
+Nothing assigned and no issues: the single row | — | No issues found | All citations verified | No action required |
