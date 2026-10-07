@@ -183,14 +183,10 @@ Ask first only when the fold would lose something: the rival board is enormous,
 or it interleaves work with results, or two files disagree about the same item
 and you cannot tell which is current. Then quote the conflict and stop.
 
-Seed the other root documents too:
-
-- `README.md` — user-facing and concise. If one exists, leave it; if it has
-  become a design doc, say so and name what belongs in `CLAUDE.md` instead.
-- `CLAUDE.md` — the main working doc for Claude and the user. Seed it with
-  what an agent must know before touching this project: how to build, how to
-  test, the conventions, the traps. If the project has agent instructions
-  scattered across several files, consolidate and say which you merged.
+Seed the other root documents too: `README.md`, user-facing and concise (an
+existing one stays; one grown into a design doc gets named what belongs in
+`CLAUDE.md`), and `CLAUDE.md` with how to build and test, the conventions and
+the traps, consolidating scattered agent instructions and naming what merged.
 
 **Adapt, don't paste.** Each rule must name this project's actual artifacts —
 its test command, its golden-data dirs, its remote, its living docs. A rule
@@ -226,16 +222,26 @@ ceiling. Rules state invariants and how to check them; anything that will change
    logs, archived release notes). Git-ignored, inside the root, never beside it:
    `runs/<YYYYMMDD>_<slug>/` (local compute output with its config and SHA; remote
    HPC runs stay on the cluster), `scratch/`, `.claude/worktrees/`. Dotfiles are tool
-   config; the version lives in the package. Seed one gate check: the tracked root
-   diffs against this list, no committed file over 5 MB, and a report-only tidy
-   lists stale worktrees, merged branches and `runs/` nothing cites.
+   config; the version lives in the package. A whitelist is built from this
+   template, never from the current tree: a name that differs is a proposed rename.
 
-   **One audience, one job, one home.** These docs drift into each other the
-   moment a fact lives in two of them. Usage belongs in `README.md` and is
-   cited elsewhere, never copied; a convention belongs in `CLAUDE.md`; a
-   dated open issue belongs in `PATHWAY_FORWARD.md` and nowhere else. A fact
-   in two files is a fact that will be wrong in one of them, and you will not
-   find out which.
+   **Where layouts blow up, and the discipline that holds each:**
+   - *Root*: notes, audits and handoffs parked at the top; output, copies and
+     worktrees written beside the repo; files over 5 MB. Each goes to its slot
+     or is deleted, and nothing is written outside the root.
+   - *Docs*: a note per session, one fact in three files, user docs a release
+     behind. Usage lives in `README.md`, conventions in `CLAUDE.md`, open issues
+     on the board — cited elsewhere, never copied, since a fact in two files is
+     wrong in one; a dev note is dated and archives when its issue closes.
+   - *Tests*: `test/` (shadows Python's stdlib), `testsys/` and `tests/` side by
+     side; tests writing into the tree or `/tmp`, or reading absolute paths; a
+     slow suite nobody runs; a skip that reads as a pass. One `tests/`; output
+     to a temp dir the test owns; a fast tier under a minute; a skip names its
+     reason or counts as a failure.
+
+   Seed one gate check for all three: the tracked root diffs against the
+   template, no committed file over 5 MB, and a report-only tidy lists stale
+   worktrees, merged branches, root strays and `runs/` nothing cites.
 
    **Slots fill as earned.** Day one owes the four documents; `tests/`, `evals/`
    and release notes arrive with the first test, fixture or tag. The whitelist
@@ -342,9 +348,6 @@ ceiling. Rules state invariants and how to check them; anything that will change
     swept release; otherwise its evidence carries forward and completeness
     checks accept it.
 
-**Starter numbers are not rule numbers.** Adapt them to the project you are
-seeding; never renumber a book that already exists.
-
 ### House style — the format every rule uses
 
 ```markdown
@@ -380,12 +383,10 @@ actually protecting them.
 These you check directly with Bash/Grep and report as pass/fail:
 
 - Files created where the rules forbid them (repo root, new `.md` files)
-- The root layout, always: `git ls-files` the root and diff it against the
-  book's whitelist, or invariant 1's where the book has none; list every
-  off-list entry and a missing `CLAUDE.md`. Where the book states a layout, each
-  is a violation (quote the rule); where it does not, report them as one
-  proposed Tier-3 finding — never a violation, since a project cannot breach a
-  layout it never adopted.
+- The root layout, always: `git ls-files` against invariant 1's template, not
+  the tree; each off-list entry, slot under another name and missing `CLAUDE.md`
+  is a violation where the book adopted a layout (quote it), else one proposed
+  Tier-3 finding — a project cannot breach a layout it never adopted.
 - The same fact stated in two root docs, where the book requires distinct
   documents. Grep a claim from `README.md` in `CLAUDE.md` and the board; a
   duplicated sentence is a future contradiction
@@ -512,10 +513,8 @@ references to removed files}
 
 ## Cardinal rules
 
-- **Starter rule 1 binds you too.** Minimal changes; no new files until
-  necessary. Fold a new rule into the rule book that exists rather than
-  starting a second one, and prefer sharpening an existing rule to adding one.
-- **Enhance; never revamp.** Fill the gaps; delete nothing you did not write.
+- **Starter rule 1 binds you too; enhance, never revamp.** Fold into the book
+  that exists, sharpen before adding, delete nothing you did not write.
 - Edit the rule book. Never edit the code you are auditing.
 - Discover rule books by content; a filename search misses the biggest ones.
 - Quote a rule verbatim before calling something a violation of it.
