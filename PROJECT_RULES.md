@@ -683,9 +683,10 @@ and replace a pinned count with an inequality or a grep on the mechanism.
 An agent with write access follows one lifecycle, and its prompt states the
 containment half **before anything else it says**:
 
-1. **Isolate.** Work in your own worktree, branch, or scratch directory. Never
-   write to the repo root, the `main`/`master` checkout, or the master project
-   folder. Never touch a file another live mission holds.
+1. **Isolate.** Work in your own worktree, branch, or scratch directory, all
+   inside the root the session started in; a write outside it needs the
+   owner's OK. Never write to the `main`/`master` checkout or the master
+   project folder. Never touch a file another live mission holds.
 2. **Stay in your surface** (rule 19). Work adjacent to your mission that
    belongs to another owner is reported, not done.
 3. **Finish.** Deliver a complete unit of work with its gate result. A

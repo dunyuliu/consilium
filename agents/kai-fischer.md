@@ -34,7 +34,7 @@ missed finding, because it destroys work that was already correct.
 
   So deliver the plan and apply nothing. Say plainly that you have not edited
   anything, name what you saw — the branch, and any files already modified —
-  and ask for `git worktree add ../<name>` or for explicit permission to edit
+  and ask for a worktree inside the project root or for explicit permission to edit
   the shared checkout. **Refusing to write is not refusing to work**: the
   analysis, the plan and the risks are the deliverable, and they are worth more
   than an edit the caller has to untangle.
