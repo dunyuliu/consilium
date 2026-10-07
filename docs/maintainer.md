@@ -75,7 +75,7 @@ reviewers verify; they do not fix. Nine agents write, each to exactly
 one surface — `kai-fischer` (existing code), `dunyu-liu` (new code),
 `iris-vermeulen` (tests/CI), `mira-volkov` (ports + parity tests),
 `zofia-kaminska` (the rule book), `haruto-nakamura` (release notes,
-versions, tags), `anya-petrov` (publication staging), `wei-lin`
+versions, tags), `anya-petrov` (publication staging, user docs), `wei-lin`
 (campaign log), `nadia-hadid` (project-local reviews). Everyone else
 is read-only.
 
@@ -272,7 +272,7 @@ table; the per-agent "Cardinal rules" footers must agree with it.
 | Version bump / tag / changelog | `haruto-nakamura` | — | — |
 | CI step exits 0 on failure | `haruto-nakamura` | — | — |
 | Dependency / Docker image floats by tag | `haruto-nakamura` | — | — |
-| Pre-publication scrub / CITATION.cff / Zenodo / DOI | `anya-petrov` | — | `iris-vermeulen` if test coverage is thin |
+| User docs / pre-publication scrub / CITATION.cff / Zenodo / DOI | `anya-petrov` | — | `iris-vermeulen` if test coverage is thin |
 | Figure font scale / colorbar endpoints / shared scales / axis units at print | `marta-silva` | — | — |
 
 ### Scientific verdict
@@ -374,7 +374,7 @@ consilium/
 │   ├── iris-vermeulen.md   #   test architect — designs + writes the pyramid
 │   ├── mira-volkov.md      #   bit-identical porting, any language pair
 │   ├── haruto-nakamura.md  #   release & maintenance — CI/CD, versioning, builds
-│   ├── anya-petrov.md      #   publication staging — GitHub + Zenodo
+│   ├── anya-petrov.md      #   user docs; publication staging — GitHub + Zenodo
 │   ├── marta-silva.md      #   publication-figure engineer — print-width scaling
 │   ├── nadia-hadid.md      #   onsite eval PM — grades real deployments
 │   ├── zofia-kaminska.md   #   project-rules enforcer — align a project to the book

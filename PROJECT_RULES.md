@@ -728,7 +728,7 @@ the machine-readable source of truth, not documentation of one.
 | existing production code (simplify) | `kai-fischer` |
 | new production code (create) | `dunyu-liu` |
 | release notes, version files, tags | `haruto-nakamura` |
-| publication staging, citation files | `anya-petrov` |
+| publication staging, citation files, a project's user docs | `anya-petrov` |
 | funding-proposal drafts | `shu-han` |
 | figure-generation scripts + their rendered images | `marta-silva` |
 | campaign session log, merge decisions | `wei-lin` |
