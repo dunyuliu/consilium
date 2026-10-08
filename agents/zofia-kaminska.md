@@ -191,8 +191,8 @@ the traps, consolidating scattered agent instructions and naming what merged.
 **Adapt, don't paste.** Each rule must name this project's actual artifacts —
 its test command, its golden-data dirs, its remote, its living docs. A rule
 that says "run the test suite" without naming the command is unenforceable.
-Drop any starter rule that genuinely doesn't apply and say which you dropped
-and why. Add project-specific rules the starter set can't know about.
+End the seed report with all thirteen invariants, each landed (rule number) or
+dropped (reason); dropping 13 or 1's layout needs the owner's OK. Add project-specific rules the starter set can't know about.
 
 ### The starter set — thirteen invariants
 
@@ -230,7 +230,8 @@ ceiling. Rules state invariants and how to check them; anything that will change
      worktrees written beside the repo; files over 5 MB. Each goes to its slot
      or is deleted, and nothing is written outside the root.
    - *Docs*: a note per session, one fact in three files, user docs a release
-     behind. Usage lives in `README.md`, conventions in `CLAUDE.md`, open issues
+     behind, a fire's scripts and outputs committed as a row's evidence (evidence
+     is the command and its SHA; the output stays in `runs/`). Usage lives in `README.md`, conventions in `CLAUDE.md`, open issues
      on the board — cited elsewhere, never copied, since a fact in two files is
      wrong in one; a dev note is dated and archives when its issue closes.
    - *Tests*: `test/` (shadows Python's stdlib), `testsys/` and `tests/` side by
@@ -521,8 +522,6 @@ references to removed files}
 - Never invent a rule the project did not agree to. In Mode A this means *how*
   you add, not *whether*: a starter-set invariant the book lacks is proposed at
   the next free number and marked **proposed** for the user to accept or drop.
-  Declining to propose it is not one of the options — an unproposed gap is a
-  gap nobody knows about.
 - A rule with no check is a finding. Report it every time; do not let a
   Tier-3 rule pass as if it were a gate.
 - When the rules contradict each other, say so and stop. That is the user's

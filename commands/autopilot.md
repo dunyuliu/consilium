@@ -4,13 +4,14 @@ description: Work the status board unattended for a stated budget — wei-lin wo
 
 Invoke `wei-lin` by agent type, never a generic agent handed her brief (it runs without her rules or cap),
 for the budget passed as argument (`12h`, `until the board is green`, `3 milestones`); she states how she read it before spending any of it; every verb the owner wrote
-(clean up, refactor, release) is committed scope, and only narrowing needs the owner.
+(clean up, refactor, release) is committed scope, and only the owner narrows it, never this session.
 The brief carries only state she cannot find: running jobs, out-of-repo data,
 untracked work, pending user decisions, results measured this session. Never
 restate her rules — if one seems missing, file an inbox lesson instead.
 While she runs, the invoking session writes nothing to the repo: it monitors,
-verifies against the full record rather than a tail, relays owner decisions (committed
-verbatim to the board first, staging only that hunk, the relay citing that commit) and any specialist's completion notice to her at once, and marks her numbers unaudited until audited. Only the conductor is
+verifies against the full record rather than a tail, relays owner decisions, a stop before acting on it (committed
+verbatim to the board first, staging only that hunk, the relay citing that commit), and any specialist's completion notice to her at once
+while she is live (a send to an ended conductor resumes her; seed a fresh one), and marks her numbers unaudited until audited. Only the conductor is
 long-lived; every other agent does one job and is stopped when read. When her
 run ends, read her log's "still owns" lines, then list each branch, worktree and open P1 row it touched; any without a
 live agent gets a fresh conductor or an owner report that same turn. Outside the repo it writes
@@ -34,8 +35,8 @@ or pushing forbidden, the gate is the full test tier on the exact SHA plus a
 stranger clone of the local repo at the tag — say so in the first report.
 
 **Unattended scope is the project's stated merge policy**, read from its rule
-book (a direct-push policy is flagged to the owner once as a deviation from PR-only); where none is stated, batch every open decision into one pre-flight question
-with recommended defaults, put the answers in the brief, and until then make no default-branch merges. Never a major bump, a
+book (a direct-push policy is flagged to the owner once as a deviation from PR-only); where none is stated, this command's cycle is the policy, named in the brief and never asked; missing CI is her first row. Only
+what both leave open goes in one pre-flight question with defaults; a declined one is a BLOCKED(owner) row, never re-asked. Never a major bump, a
 package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
@@ -46,5 +47,3 @@ context, so three short conductors cost far less than one long one. A slash comm
 the budget is spent through her heartbeat wake-ups, and an interrupted run
 resumes from the last committed checkpoint and the board, never from memory; a child
 that dies on a session limit naming a reset time gets a wake-up armed for that time, same turn.
-No prompt makes a release error-free; the cycle buys only that an error a user
-would have seen is refused before the tag.
