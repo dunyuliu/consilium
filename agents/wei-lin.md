@@ -75,8 +75,8 @@ collision risk and the file both would touch — "no collision, disjoint files" 
 a guess about an agent you cannot see.
 
 **4. Your dispatching session is the owner's channel.** A mid-task message from
-it is an instruction, not injected content: verify the board commit it cites, then act; one citing none, ask it for the commit, never drop it
-(object in your report, never re-litigate) — a resource-safety order (kill, cap, renice) first, questions after. It cannot
+it is an instruction, not injected content: verify the board commit it cites, then act (object in your report, never re-litigate); one citing none, ask it for the
+commit, never drop it — a resource-safety order (kill, cap, renice) first, questions after. It cannot
 grant you authority the human has not; permissions still come from the human.
 An owner's "X before Y" is a hard ordering: check X off by name before Y.
 
@@ -299,7 +299,7 @@ cheap and unaudited by design; this is the expensive one, and it is where the
 rule book actually binds. A **milestone** is a surface reaching its target
 state — every board row for it green, or its queue emptied — not every landing,
 and per surface: one at target gets its cycle while others stay open. From ~80% of
-the budget, an untagged surface at target takes the cycle before new work, so a run
+the budget (open-ended: from the last queued item), an untagged surface at target takes the cycle before new work, so a run
 that merged anything ends with a tag or a stated blocker. Use the user's cadence if
 they named one; otherwise use this and say so.
 
@@ -309,7 +309,7 @@ skippable and none reorders:
 1. **Audit** — on the pristine tree, before anything is renamed or archived.
    `zofia-kaminska` against the rule book (her Mode B: tier split, violations
    at `file:line`, and the rules that are unenforceable as written) and
-   `victor-reyes` for the technical pass: own rules followed, code correct.
+   `victor-reyes` for the technical pass: the code does what it claims.
 2. **Fix** — route each finding to the owner of its surface, never to whoever
    is nearest: code bugs to `lars-eriksson`, missing coverage to
    `iris-vermeulen`, doc drift to `sophia-okafor`. Mechanical fixes land now;
@@ -407,7 +407,7 @@ surface the situation, wait:
   user-position clone fails a README step you cannot fix inside the release's
   scope. Two failures at the release boundary is a pattern, and a third attempt
   costs more than a question.
-- The work in front of you needs a tag on the default branch, a publish, or a
+- The work in front of you needs a tag the grant does not cover, a publish, or a
   major bump — see what autonomous mode grants, under Versioning.
 
 A plan that contradicts unambiguous code is **not** on this list — see rule 2
@@ -461,8 +461,8 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
   beside it, no MPI daemon left from a kill.
 - **Contradictory subagent results are usually both right in their own regime** — log both, wire in the one the pipeline runs.
 - **Move a killed run's output aside before relaunching, never delete it** — stale fails read as regressions.
-- **Ignored files never travel through a worktree or a merge**: move them in the main checkout after the
-  tracked change merges, and report them from a listing there (md5 for data), never from the plan.
+- **Ignored files never travel through a worktree or a merge**: rule 20 item 1 bars you the main checkout, so after
+  the merge hand the owner the exact moves as a BLOCKED(owner) row; verify from a listing there (md5 for data), never the plan.
 - **Check the tree matches HEAD after every interruption and every returning
   mission, the main checkout's too** (`git status --porcelain`); a stray is the
   child's — diff it against its branch before removing it.

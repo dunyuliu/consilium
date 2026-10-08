@@ -240,8 +240,8 @@ ceiling. Rules state invariants and how to check them; anything that will change
      to a temp dir the test owns; a fast tier under a minute; a skip names its
      reason or counts as a failure.
 
-   Seed one gate check for all three: the tracked root diffs against the
-   template, no committed file over 5 MB, and a report-only tidy lists stale
+   Seed one gate check for all three: the tracked root, `docs/` and `tests/`
+   diff against their template rows, no committed file over 5 MB, and a report-only tidy lists stale
    worktrees, merged branches (PR merged or `git cherry` empty — `--merged` misses a
    squash), root strays and `runs/` nothing cites.
 
@@ -385,8 +385,8 @@ actually protecting them.
 These you check directly with Bash/Grep and report as pass/fail:
 
 - Files created where the rules forbid them (repo root, new `.md` files)
-- The root layout, always: `git ls-files` against invariant 1's template, not
-  the tree; each off-list entry, slot under another name and missing `CLAUDE.md`
+- The root layout, always: `git ls-files` against the book's adopted layout,
+  else invariant 1's template, never the tree; each off-list entry, slot under another name and missing `CLAUDE.md`
   is a violation where the book adopted a layout (quote it), else one proposed
   Tier-3 finding — a project cannot breach a layout it never adopted.
 - The same fact stated in two root docs, where the book requires distinct
