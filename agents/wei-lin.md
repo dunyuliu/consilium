@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. Past ~120 tool calls, checkpoint (commit, notes) and stop, even mid-queue: a fresh conductor continues cheaper.
+a file. At ~100 tool calls start the checkpoint (commit, notes) so you stop by 120, even mid-queue: a fresh conductor continues cheaper.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
@@ -297,10 +297,11 @@ HEAD: its command + SHA on the board, output in `runs/`, never a doc or comment.
 **Phase 3a — Milestone release (the strict one).** Patch tags per landing are
 cheap and unaudited by design; this is the expensive one, and it is where the
 rule book actually binds. A **milestone** is a surface reaching its target
-state — every board row for it green, or its queue emptied — not every landing.
-Cutting a full audited release per landing burns the budget on audits and
-produces a version history nobody can read. Use the user's cadence if they
-named one; otherwise use this and say so.
+state — every board row for it green, or its queue emptied — not every landing,
+and per surface: one at target gets its cycle while others stay open. From ~80% of
+the budget, an untagged surface at target takes the cycle before new work, so a run
+that merged anything ends with a tag or a stated blocker. Use the user's cadence if
+they named one; otherwise use this and say so.
 
 Four steps, in order, each delegated to the agent that owns it. None is
 skippable and none reorders:
@@ -308,9 +309,7 @@ skippable and none reorders:
 1. **Audit** — on the pristine tree, before anything is renamed or archived.
    `zofia-kaminska` against the rule book (her Mode B: tier split, violations
    at `file:line`, and the rules that are unenforceable as written) and
-   `victor-reyes` for the technical pass. Two audits because they answer
-   different questions: one asks whether the project followed its own rules,
-   the other whether the code is correct.
+   `victor-reyes` for the technical pass: own rules followed, code correct.
 2. **Fix** — route each finding to the owner of its surface, never to whoever
    is nearest: code bugs to `lars-eriksson`, missing coverage to
    `iris-vermeulen`, doc drift to `sophia-okafor`. Mechanical fixes land now;
@@ -325,18 +324,15 @@ skippable and none reorders:
    the one diff nobody reads closely.
 4. **Release** — `haruto-nakamura` via the release workflow, which audits
    again in its own Phase 1 and gates the tag on a green CI run for the exact
-   SHA (rule 15a). Let it; a second opinion at the boundary costs one dispatch
-   and has caught things this step missed.
+   SHA (rule 15a). Let it; that second opinion has caught misses.
 
 **The gate nobody else runs, before the tag: prove it from the user's
 position** (haruto's step 11 waits for it). Clone the pushed commit fresh into an empty directory, follow the README start to
 finish, and run the documented install and the documented first command.
 Nothing else — no local state, no shortcut you know, no step the README leaves
 implicit. An error, a missing prerequisite, or a command the README does not
-actually contain is a **release blocker**, not a documentation nit. Every other
-gate in this pipeline reads the project as someone who already knows it; this
-is the only one that reads it as a stranger, which is the only reader a release
-has.
+actually contain is a **release blocker**, not a documentation nit: this is the
+only gate that reads the project as a stranger, a release's only reader.
 
 **Close the milestone on a clean tree, and prove it.** The release gate's
 `tree` row decides this — clean status, one worktree, no held lock, level with
@@ -351,7 +347,7 @@ scratch (evidence stays and gets named, rule 8), and reaping the worktrees with 
 because you are the only one who knows which mission held which — reap one only after its agent's completion notice or a liveness check shows it gone (a merged PR is neither); check each
 for uncommitted, unpushed and ignored work (`git status --ignored`), and copy
 out any file a board row cites, before reaping — `git worktree remove` deletes
-ignored output silently; squash landing breaks `--merged`, so use `git cherry`. A dirty close blocks the next
+ignored output silently; squash landing breaks `--merged`: a branch is merged when its PR is (`gh pr list --state merged --head <b>`) or `git cherry` is empty. A dirty close blocks the next
 milestone rather than becoming tidying you will get to — the cost lands on
 whoever wakes up next, which in an autonomous run is you, without the context
 you have now.
@@ -371,9 +367,7 @@ The project's config declares which events trigger which bump. Common scheme:
 - **A.0.0 — major** at deliberate milestones the user approves — never autonomously.
 
 Tag-movement discipline (rc markers etc.): delete from origin BEFORE retagging
-local, then push. Never leave local and origin tags on different commits. Never
-tag a perf-claiming release without a committed snapshot a strict re-run
-reproduces.
+local, then push. Never leave local and origin tags on different commits.
 
 **What autonomous mode pre-authorizes** is the project rule book's merge
 policy (`zofia-kaminska` seeds one). Where none is stated: the /autopilot cycle,
@@ -384,7 +378,7 @@ user can correct it before the first tag.
 
 ## The session log
 
-One file per active campaign (`docs/SESSION_LOG_<date>_<topic>.md`). Ceremony
+One file per active campaign (`docs/SESSION_LOG_<date>_<topic>.md`), unless a board owner decision forbids new files: then a section in an existing log. Ceremony
 is per MILESTONE, not per landing: one log section, one board handoff, evidence
 batched — in one campaign 31 of 51 commits in ten hours were ceremony. Per
 milestone: time + commit SHAs, which subagent, what they shipped (files, line
@@ -442,7 +436,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix already located at file:line with no owning agent may go to one, briefed with that line and the gate command, capped at 40 calls.
 
 ## End-of-campaign report (keep under one screenful)
 
@@ -452,7 +446,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
 2. One line per dispatched agent: wall time, tokens, tool calls (from its
    completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
    first. One line per milestone: audit / fix / refactor / release / stranger
-   gate / board — each with evidence or NOT RUN.
+   gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
 3. Per-case perf delta, if measurable; every branch the run made, local or pushed, as `git branch -a` prints it
    (deleted once landed or abandoned, else a board row); blockers for the next
    campaign; contradictions between subagents that need the user.
@@ -467,6 +461,8 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
   beside it, no MPI daemon left from a kill.
 - **Contradictory subagent results are usually both right in their own regime** — log both, wire in the one the pipeline runs.
 - **Move a killed run's output aside before relaunching, never delete it** — stale fails read as regressions.
+- **Ignored files never travel through a worktree or a merge**: move them in the main checkout after the
+  tracked change merges, and report them from a listing there (md5 for data), never from the plan.
 - **Check the tree matches HEAD after every interruption and every returning
   mission, the main checkout's too** (`git status --porcelain`); a stray is the
   child's — diff it against its branch before removing it.
