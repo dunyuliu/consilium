@@ -95,8 +95,13 @@ round.
    wording is `lian-zhao`'s; deferred to both to reconcile (either the gate
    excludes the release engineer's own worktree, or the prompt says to remove
    it before the gate runs). **Worked around operationally this release**:
-   the release worktree was removed before `tests/release_gate.sh` ran (see
-   §12) — this is a release-engineer choice, not a fix to either surface.
+   `tests/release_gate.sh` was run post-tag from a standalone scratch clone of
+   the pushed tag, not from this worktree or the main checkout — a scratch
+   clone's own `git worktree list` is always 1, decoupled from whatever this
+   repo's worktree layout is at gate time (see §12). The release worktree was
+   also removed afterward as cleanup, once it had nothing left to do, but that
+   removal is not what makes the `tree` row pass. This is a release-engineer
+   choice, not a fix to either surface.
 2. **(Major.)** `agents/haruto-nakamura.md:278`'s new claim that the gate's
    `clone` row "re-reads step 11's pre-tag clone" is false against
    `tests/release_gate.sh:144-150,181-269`: `run_clone_row` makes its own
@@ -285,10 +290,12 @@ writing it (§10 re-derives the text-only half independently).
 - **Scope is #101–#105 only**, excluding PR #100 — #100 landed after the
   v1.28.4 tag but is v1.28.4's own CI/gate transcription, already recorded in
   `docs/release_notes_v1.28.4.md`'s own history and not re-litigated here.
-- **The release worktree is removed before the gate's final run**, to satisfy
-  `tests/release_gate.sh`'s one-worktree `tree` row (§5 finding 1) — an
-  operational choice for this release, not a fix to either surface, stated so
-  the next release engineer does not have to rediscover the contradiction.
+- **The gate's final run happens in a standalone scratch clone**, not this
+  worktree or the main checkout, to satisfy `tests/release_gate.sh`'s
+  one-worktree `tree` row (§5 finding 1) without needing to remove anything
+  from this repo's own worktree layout — an operational choice for this
+  release, not a fix to either surface, stated so the next release engineer
+  does not have to rediscover the contradiction.
 - **`kai-fischer` not dispatched** — zero files this range sit on his surface
   (existing production code); all five are `agents/*.md`, `commands/*.md` or
   `docs/lessons_ledger.md`.
@@ -302,9 +309,12 @@ writing it (§10 re-derives the text-only half independently).
 
 ## 9. CI run this release was gated on
 
-PENDING-FILL — recorded after the release PR merges to `main` and both the
-PR-branch and merge-commit `structural-invariants` runs are confirmed green,
-per rule 15a; filled in before the tag is cut (§12).
+Three `structural-invariants` push-triggered runs, all `success`, gate this
+release: two on the PR #106 head SHA `72483d351f57388003b6f5f5382166e9e877738e`
+(runs `37819104439` and `37819124906`), and one on the squash-merge commit
+`9fd3c5d9aef894c67191d35b7c8b9c890cfb8b49` on `main` (run `37819277582`,
+https://github.com/dunyuliu/consilium/actions/runs/37819277582). The tag is
+cut against `9fd3c5d9aef894c67191d35b7c8b9c890cfb8b49`, per rule 15a.
 
 ## 10. Trend since v1.28.4
 
@@ -316,7 +326,7 @@ Every row is the output of a command run this session, at both commits.
 | Fixture verdicts — `bash evals/run.sh score` | `never run: 1, unknown provenance: 0, contested: 0, delta vs previous commit: -46 points` | identical output | **Unchanged** — already at the floor; this range's prompt edits (`haruto-nakamura`, `wei-lin`, `zofia-kaminska`) add to the stale set (`bash evals/run.sh list` now shows `haruto-002-tag-before-gate` and `zofia-003-seed-bare-project` STALE against today's prompt SHA) without moving the headline numbers. |
 | Tracked text lines — `git diff --numstat v1.28.4..HEAD -- '*.md' '*.sh' '*.py'` | — | 6 files, **124 added / 89 removed, net +35** | **Modest growth**, concentrated in `docs/lessons_ledger.md` (+27 rows) and `agents/wei-lin.md`'s lesson folds, partly offset by `agents/zofia-kaminska.md`'s net −1 and `commands/autopilot.md`'s net −1 (§2). |
 | Board currency — `PATHWAY_FORWARD.md` | 13 VERIFIED, 22 RETIRED, 0 BROKEN, 0 blank | 13 VERIFIED, 22 RETIRED, 0 BROKEN, 0 blank | **Unchanged** — board untouched this range (empty diff, re-confirmed). |
-| CI green-on-first-try — `gh run list` since v1.28.4's tag push | — | every push run since `6f4838f9` (through PRs #100–#105) reports `success`, 0 reruns | **Unchanged in substance** (100%, same streak as v1.28.3→v1.28.4). |
+| CI green-on-first-try — `gh run list` since v1.28.4's tag push | — | every push run since `6f4838f9` (through PRs #100–#106, including both PR #106 head-SHA runs and the merge-SHA run, §9) reports `success`, 0 reruns | **Unchanged in substance** (100%, same streak as v1.28.3→v1.28.4). |
 
 **Reading, plainly.** The gate holds flat (+1 assertion, no new Check) and
 fixture currency sits at its already-established floor; tracked-line growth
@@ -363,13 +373,18 @@ release running.
 
 ## 12. Release gate
 
-PENDING-FILL — `bash tests/release_gate.sh release_notes_v1.28.5.md`, run
-post-tag from an independent scratch clone of the pushed tag, after the
-release worktree is removed (§5 finding 1, §8). Filled in before the tag is
-treated as final.
+`bash tests/release_gate.sh release_notes_v1.28.5.md`, run post-tag in a
+standalone `git clone` of `https://github.com/dunyuliu/consilium.git` on
+branch `main` (tip `9fd3c5d9aef894c67191d35b7c8b9c890cfb8b49`, same commit the
+tag `v1.28.5` points at), outside this repo and this worktree entirely (§5
+finding 1, §8) — `main` rather than a detached tag checkout, so the clone
+carries an upstream tracking ref for the `tree` row's comparison. Result:
+**5 passed, 0 failed, 0 skipped.**
 
-- **tree**: PENDING.
-- **ci**: PENDING.
-- **publish**: PENDING.
-- **release**: PENDING.
-- **clone**: PENDING.
+- **tree**: PASS — clean, one worktree, no lock, level with upstream.
+- **ci**: PASS — green on `9fd3c5d9` (run `37819277582`, §9).
+- **publish**: PASS — `v1.28.5` pushed and pointing at `9fd3c5d9`.
+- **release**: PASS — GitHub Release exists for `v1.28.5`
+  (https://github.com/dunyuliu/consilium/releases/tag/v1.28.5).
+- **clone**: PASS — fresh clone of `v1.28.5`; README's Install block and the
+  next `bash`-fenced block both exited 0.
