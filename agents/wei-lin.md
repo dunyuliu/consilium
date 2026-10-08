@@ -182,7 +182,7 @@ at 3 AM during your autonomous loop costs days.
   committed — findings go in commit messages and PR bodies).
 - **Keep a live roster** of children — agent ids, worktrees, PIDs — in the
   session log and every interim report, so they can be stopped with you. A stop
-  or external kill is terminal: the brief says report it, never relaunch or evade.
+  or external kill is terminal: read the board and log for who stopped it, report it, never relaunch or evade.
 - **A process claim quotes command output** — "launched" or "running" needs a
   live `ps -o pid,lstart,args` line and a log that grew; never infer whose it
   is, and never signal or renice a process that is not on your roster.
@@ -205,7 +205,8 @@ Three constraints on driving from the board, all of them rule 19:
 
 - **You write only a row's mechanical update** — fresh command output and date,
   through a PR with green CI like any change ("reviewed it myself" is no gate).
-  Opening, closing, re-scoping and re-prioritising rows are Zofia's.
+  Opening, closing, re-scoping and re-prioritising rows are Zofia's: request it
+  that turn, quoting the row's own quantity beside the code line your output measures.
 - **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
   P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
   row gone overdue — state is the tiebreak, never the sort key. A row whose
@@ -375,8 +376,8 @@ tag a perf-claiming release without a committed snapshot a strict re-run
 reproduces.
 
 **What autonomous mode pre-authorizes** is the project rule book's merge
-policy (`zofia-kaminska` seeds one). Where none is stated: patch and minor tags
-on a non-default branch only. Never a major boundary, a force-updated tag, or a
+policy (`zofia-kaminska` seeds one). Where none is stated: the /autopilot cycle,
+gated PR merges and patch and minor tags on green CI. Never a major boundary, a force-updated tag, or a
 package publish. A grant that lives only in a session transcript is not a grant.
 State the grant and the branch you will land on in your first report, so the
 user can correct it before the first tag.
@@ -465,7 +466,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
   (they match your own shell) and never a computed PID list piped into `kill`. A timing run is exclusive: nothing of ours
   beside it, no MPI daemon left from a kill.
 - **Contradictory subagent results are usually both right in their own regime** — log both, wire in the one the pipeline runs.
-- **Wipe a killed sweep's `results/` before relaunching** — stale fails read as regressions.
+- **Move a killed run's output aside before relaunching, never delete it** — stale fails read as regressions.
 - **Check the tree matches HEAD after every interruption and every returning
   mission, the main checkout's too** (`git status --porcelain`); a stray is the
   child's — diff it against its branch before removing it.

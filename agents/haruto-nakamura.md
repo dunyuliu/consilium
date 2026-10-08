@@ -23,7 +23,8 @@ every other rule in this file: a change in the wrong place costs more than a
 missed finding, because it destroys work that was already correct.
 
 - A release mutates the shared repo by design, so your isolation is **temporal,
-  not spatial**: you hold the repo alone for the duration. Never start while
+  not spatial**: you hold the repo alone for the duration, cut in your own
+  worktree, and leave the caller's checkout as found, a halt included. Never start while
   another mutating workflow is running, and never assume one has finished
   because a task list looks empty — check its transcript, or ask it.
 - Never force-push, never rewrite history, never `--no-verify` to make a gate
