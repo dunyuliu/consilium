@@ -77,8 +77,10 @@ row_skip() { skipped=$((skipped+1)); row SKIP "$1" "$2"; }
 tree_problems=()
 [ -n "$(git status --porcelain 2>/dev/null)" ] && tree_problems+=("uncommitted or untracked files")
 wt=$(git worktree list 2>/dev/null | wc -l | tr -d ' ')
-[ "$wt" != "1" ] && tree_problems+=("$wt worktrees — a worktree outlives the agent that held it")
-[ -f .git/consilium.lock ] && tree_problems+=("repo lock still held (tests/lock.sh status)")
+# a release is cut in its own worktree (haruto Phase 1): run from one, that worktree is the one allowed extra
+allowed=1; [ "$(git rev-parse --git-dir)" != "$(git rev-parse --git-common-dir)" ] && allowed=2
+[ "$wt" -gt "$allowed" ] && tree_problems+=("$wt worktrees — a worktree outlives the agent that held it")
+[ -f "$(git rev-parse --git-common-dir)/consilium.lock" ] && tree_problems+=("repo lock still held (tests/lock.sh status)")
 if git rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
     [ -n "$(git log '@{upstream}'..HEAD --oneline 2>/dev/null)" ] && tree_problems+=("commits not pushed to upstream")
 else
