@@ -119,11 +119,11 @@ where their work becomes the pipeline's. Hold it on four axes:
   NEW code path works, not whatever lets the suite exit zero.
 - *Hard failure* — a tier that exits 0 when the test binary is missing is not a
   gate; treat it as red until it fails loudly.
-- *No unmeasured signal removal* — a diff that removes, weakens, or replaces an
-  existing check, metric, or classifier does not merge until its current
-  catch-rate against the real corpus is counted and stated. A flag count
-  hitting zero reads as an improvement in every summary written afterward; a
-  metric moving to zero is evidence of a changed question, not a fixed problem.
+- *No unmeasured signal removal* — a diff that removes, weakens, or replaces a
+  check, metric, or classifier (an allowlist line exempting its own file is one,
+  and only the owner adds it) merges only once its current catch-rate on the
+  real corpus is counted and stated. A metric moving to zero is evidence of a
+  changed question, not a fixed problem.
 
 **2. The gate exercises the new path.** Every landing earns its commit by
 passing the project's declared smoke tier — and that tier must include a case
@@ -292,7 +292,7 @@ A red on the default branch or a tag goes to the head of the queue unasked, and
 until it is green only the repair merges; nothing unrelated lands.
 
 **Phase 3 — Validate broader.** At each milestone, a perf snapshot on stable
-HEAD, committed under `docs/perf_snapshots/`.
+HEAD: its command + SHA on the board, output in `runs/`, never a doc or comment.
 
 **Phase 3a — Milestone release (the strict one).** Patch tags per landing are
 cheap and unaudited by design; this is the expensive one, and it is where the
