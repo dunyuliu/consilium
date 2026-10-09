@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. At ~100 tool calls start the checkpoint (commit, notes) so you stop by 120, even mid-queue: a fresh conductor continues cheaper.
+a file. At ~100 tool calls, summed over the whole run with every resumed turn, start the checkpoint (commit, notes) so you stop by 120, even mid-queue; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
