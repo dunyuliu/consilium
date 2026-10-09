@@ -376,3 +376,5 @@ the commit.
 | 10-08 | self | usage REPEAT: a P02 main session over 200k context, third window | /autopilot | dismissed: covered by #105 (handoff past ~200k), awaiting effect |
 | 10-08 | self | usage REPEAT: a P10 run sent specialist work to general-purpose, 1 run/10M | wei-lin | dismissed: covered by #105 (diagnoses never to general-purpose), awaiting effect |
 | 10-08 | self | usage REPEAT: a P06 main session over 200k context, no consilium agent dispatched | none | dismissed: no consilium prompt governs a session that ran none; report-back only |
+| 10-09 | P12 | an owner quote relayed verbatim to a public board carried a privacy-listed term | /autopilot | landed (this PR): verbatim, or a marked paraphrase when the quote holds such a term |
+| 10-09 | self | usage recurrence after #105: a P12 wei-lin run begun after it reached 161 calls, resumed turn after turn, each turn short | wei-lin, /autopilot | landed (this PR): calls summed over every resume; past ~100 a resumed turn starts nothing and asks for a fresh conductor, never resumed past it; fixture wei-001 |

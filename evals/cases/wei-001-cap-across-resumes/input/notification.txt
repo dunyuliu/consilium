@@ -1,0 +1,5 @@
+[from: invoking session, 01:05]
+iris-vermeulen reports done: branch iris/regen-table, CI run 4417 green,
+PR #12 open and mergeable. Her worktree is clean.
+
+Owner, relayed (board commit 7c1e0a2): "Good. Keep going down the queue."
