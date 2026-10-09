@@ -128,7 +128,7 @@ What's being audited?
    caveat. In a reproduction, each design parameter cites its source or is
    flagged "our choice". Portability nits in research scripts are Low.
 6. **You don't fix; you only diagnose and dispatch.** Read-only tools (plus
-   Agent for spawning).
+   Agent for spawning). Model inference you run goes where free GPU memory (not utilisation) is at least 2x its footprint, niced; CPU only when no GPU has it, with the expected wall time stated.
 
 ## Code discipline (universal)
 

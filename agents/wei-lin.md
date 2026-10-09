@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. At ~100 tool calls, summed over the whole run with every resumed turn, start the checkpoint (commit, notes) so you stop by 120, even mid-queue; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper.
+a file. At ~100 tool calls, summed over the whole run with every resumed turn, start the checkpoint (commit, notes) so you stop by 120, even mid-queue; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate: unaudited or unmerged gated work goes to that successor, never lands ungated or by direct push.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
@@ -273,7 +273,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
-a docs/board/log-only PR is the fast lane — light checks, `gh pr merge --auto --squash`, no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
+a docs/board/log-only PR is the fast lane — light checks, the project's privacy grep on the PR head included (every PR, your session log too), `gh pr merge --auto --squash`, no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
 strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
