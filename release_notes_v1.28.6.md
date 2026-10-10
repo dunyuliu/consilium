@@ -141,12 +141,12 @@ SHA): run https://github.com/dunyuliu/consilium/actions/runs/38019979229 —
   live-graded; stale count held at 9, never-run rose 1 → 7 (the six new
   fixtures, not yet hand-graded). Neither better nor worse — new coverage
   added, none of it graded yet.
-- **Tracked text lines** (`git diff --stat 9fd3c5d..HEAD -- '*.md' '*.sh'
-  '*.py'`, extensions chosen to match this repo's tracked prose/code): to be
-  finalized against the release commit (see follow-up); at the pre-fix
-  cumulative diff it stood at 442 insertions, 67 deletions across 38 files —
-  almost entirely new fixture content, not prompt growth (rule 1b's ceiling
-  held: 5742 → 5745 lines in `agents/`+`commands/`).
+- **Tracked text lines** (`git diff --stat 9fd3c5d..2325e9f -- '*.md' '*.sh'
+  '*.py'`, extensions chosen to match this repo's tracked prose/code,
+  measured against the tagged release commit): 651 insertions, 69 deletions
+  across 39 files — almost entirely new fixture content plus this release's
+  own note, not prompt growth (rule 1b's ceiling held: 5742 → 5745 lines in
+  `agents/`+`commands/`).
 - **Board currency** (`PATHWAY_FORWARD.md`): 35 rows, 13 VERIFIED, 0 BROKEN,
   0 blank-`last-checked` — unchanged at both commits; the board was not
   touched by this diff.
@@ -155,7 +155,7 @@ SHA): run https://github.com/dunyuliu/consilium/actions/runs/38019979229 —
   `run_attempt: 1` — 100%, via `gh api repos/:owner/:repo/actions/runs/<id>`
   per SHA.
 
-This section reports; it does not gate. Tracked lines grew (442 insertions)
+This section reports; it does not gate. Tracked lines grew (651 insertions)
 while the gate and fixture-currency numbers did not improve proportionally —
 most of that growth is new, ungraded fixture content, which is a coverage
 bet, not yet a proven improvement. Said plainly: this is acceptable for a
@@ -193,12 +193,44 @@ fixtures are hand-graded.
 
 ## 12. Release gate
 
-- tree: PENDING — known once the release commit is pushed; filled in the
-  follow-up transcription commit.
-- ci: PENDING — known once CI concludes on the pushed SHA (rule 15a); filled
-  in the follow-up transcription commit.
-- publish: PENDING — `tests/release_gate.sh`'s `publish`/`release`/`clone`
-  rows structurally cannot resolve before the tag exists (rule 15b); filled
-  in the follow-up transcription commit, run after the tag.
-- release: PENDING
-- clone: PENDING
+**Process error, disclosed rather than hidden.** `bash
+tests/release_gate.sh` is designed to run once, immediately after `gh
+release create`, before anything else lands on `main` — its `clone` row
+clones whatever `main`'s tip currently is and compares that SHA against the
+tag's. This release's CI-transcribe follow-up (PR #114, commit `1226f38`)
+was merged *before* this gate ran, so by the time it ran, `main` had already
+moved past the tagged commit (`2325e9f7`). That is a sequencing mistake in
+how this release was cut, not a defect in the tagged artifact — rows `ci`,
+`publish` and `release` below were independently re-verified directly
+against the tag's own SHA, and `tree` was directly observed at tag time (not
+reconstructed). Per rule 8 / step 12, a red row found after tagging is a
+disclosed finding and a lesson for the process, never grounds to unpublish or
+retag.
+
+- **tree**: PASS (observed directly, not via the script, at the moment of
+  tagging) — `git status --short` showed only the about-to-be-committed note
+  edit, one worktree, lock already released, upstream in sync.
+- **ci**: PASS — green on `2325e9f7` (run
+  https://github.com/dunyuliu/consilium/actions/runs/38019979229,
+  `run_attempt: 1`), confirmed by `gh run list --commit 2325e9f7...` and
+  re-confirmed via `tests/release_gate.sh` run against the tag commit
+  directly in a scratch clone.
+- **publish**: PASS — `v1.28.6` pushed and pointing at `2325e9f7`, confirmed
+  by `git rev-parse v1.28.6` (both plain and `^{commit}`) and independently
+  by `tests/release_gate.sh` in a scratch clone checked out at the tag.
+- **release**: PASS — GitHub Release exists for `v1.28.6`
+  (https://github.com/dunyuliu/consilium/releases/tag/v1.28.6), confirmed by
+  `gh release view v1.28.6` and by the gate script against the tag commit.
+- **clone**: **FAIL** — "README's install clones `1226f384` but tag
+  `v1.28.6` points at `2325e9f7` — the remote's default branch and its tag
+  disagree." Caused entirely by the sequencing error above (`main` advanced
+  past the tag before this row ran); a clone of the tag commit itself
+  (`2325e9f7`) is byte-identical to what shipped in v1.28.5 at the same
+  `install.sh`/README content and is not expected to behave differently.
+  Not re-run after the fact to force a PASS — rule 15b: "a row passes
+  because the script read the state that makes it true," and the state this
+  row reads (default branch vs. tag) is now permanently what it is for this
+  tag. Logged as a process finding against `agents/haruto-nakamura.md`'s own
+  Phase 4 ordering (run the full gate immediately post-tag, before any
+  follow-up commit — not documented explicitly enough to have prevented
+  this), routed to the human rather than self-amended.
