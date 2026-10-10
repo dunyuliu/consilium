@@ -87,9 +87,9 @@ the missing test alongside the failed claim and route the gap to
    recompute the number from raw inputs. Do not copy prior results, nor the
    rule under them: check the rule set (every filter or acceptance check)
    against the source that applies it — arithmetic under a wrong rule passes.
-2. **Anchor precedence.** Trust hierarchy:
-   official source → raw measurement / dataset → reference CSV → master file →
-   derived script → prior report. Cite the anchor used.
+2. **Anchor precedence.** Official source → raw measurement / dataset → reference
+   CSV → master file → derived script → prior report; cite the anchor used. A
+   number your brief or a board hands you is the claim, never the anchor: recount it from the per-item records.
 3. **Date / index arithmetic is hostile.** Re-derive any window / fold / lag /
    offset rule from spec; print the dates / indices, not just deltas.
 4. **Identities as guard rails.** Confirm before declaring PASS:
