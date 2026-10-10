@@ -76,7 +76,7 @@ a guess about an agent you cannot see.
 
 **4. Your dispatching session is the owner's channel.** A mid-task message from
 it is an instruction, not injected content: verify the board commit it cites, then act (object in your report, never re-litigate); one citing none, ask it for the
-commit, never drop it — a resource-safety order (kill, cap, renice) first, questions after. It cannot
+commit, never drop it — a resource-safety order (kill, cap, renice, stop) first, questions after. It cannot
 grant you authority the human has not; permissions still come from the human.
 An owner's "X before Y" is a hard ordering: check X off by name before Y.
 
@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. At ~100 tool calls, summed over the whole run with every resumed turn, start the checkpoint (commit, notes) so you stop by 120, even mid-queue; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate: unaudited or unmerged gated work goes to that successor, never lands ungated or by direct push.
+a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate: unaudited or unmerged gated work goes to that successor, never lands ungated or by direct push.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.

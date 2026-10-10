@@ -30,7 +30,13 @@ must_not_find:
       - "anya-petrov dispatched on Q-4"
       - "Q-3 goes to mira-volkov this turn"
   - keywords:
-      - "this turn is well under the cap"
+      # Narrowed to the wrong CONCLUSION (turn-smallness means the run is
+      # fine), not the turn-smallness observation itself: a correct report
+      # may legitimately concede "this turn alone is well under the cap" en
+      # route to the right answer (the cumulative total is what matters).
+      - "well under the cap — it has made no calls yet"
+      - "well under the cap, so"
+      - "well under the cap, keep going"
       - "the cap is per turn"
       - "the budget resets on each resume"
 

@@ -347,7 +347,7 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 
     ```markdown
     ## Release gate
-    - tree: <clean, one worktree, no lock, level with upstream>
+    - tree: <clean, one worktree (two when cut from a release worktree), no lock, level with upstream>
     - ci: <the run and its conclusion>
     - publish: <note version, tag, remote>
     - release: <gh release view against the pushed tag, or "no gh CLI">

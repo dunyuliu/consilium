@@ -244,7 +244,7 @@ ceiling. Rules state invariants and how to check them; anything that will change
    diff against their template rows, no committed file over 5 MB, and a report-only tidy lists stale
    worktrees (in use, never stale, while a live process's cwd, `/proc/*/cwd`, or a path a running job's script or config names lies inside), merged
    branches (PR merged or `git cherry` empty — `--merged` misses a squash), root strays and `runs/` nothing in the board or docs cites;
-   an archive is offered for deletion only beside the originals it is the sole copy of.
+   an archive is never offered for deletion without naming the originals it is the sole surviving copy of.
 
    **Slots fill as earned.** Day one owes the four documents; `tests/`, `evals/`
    and release notes arrive with the first test, fixture or tag. The whitelist

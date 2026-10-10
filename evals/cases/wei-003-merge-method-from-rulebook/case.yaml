@@ -22,7 +22,10 @@ must_not_find:
   # The tempting answer: the fast lane's habitual squash, and a docs-only
   # landing called a milestone. Declarative, so a denial infixes them.
   - keywords:
-      - "--auto --squash"
+      # Narrowed to RECOMMENDING the fast-lane squash, not the flag string's
+      # mere appearance: a correct report may cite `--auto --squash` while
+      # explaining why it does not apply here (merge-commit-only rule book).
+      - "gh pr merge 14 --auto --squash"
       - "landed by squash"
       - "squash SHA"
   - keywords:

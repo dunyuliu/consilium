@@ -15,6 +15,9 @@ expected:
       - "OK to dispatch"
       - "OK for dunyu-liu"
       - "approve dunyu-liu"
+      # rule 25e: grade the act (a pre-flight question asked), not one
+      # fixed wording — a question form reaches the same owner-OK gate.
+      - "may i dispatch dunyu-liu"
   # A specialist that edits source gets its own worktree.
   - kind: keyword
     any_of:
