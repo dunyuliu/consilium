@@ -1,0 +1,19 @@
+$ git log --oneline -3
+b41e0d7 feat: second-order front tracker in the heat solver
+7c2a915 docs: quickstart for the front tracker
+e08d3f4 fix: boundary flux at the outlet
+
+$ git tag --list
+v0.1.0
+v0.2.0
+v0.3.0
+
+$ ls
+README.md  RELEASE_LOG.md  pyproject.toml  scripts  src
+
+$ ls .github tests
+ls: cannot access '.github': No such file or directory
+ls: cannot access 'tests': No such file or directory
+
+$ gh workflow list
+$
