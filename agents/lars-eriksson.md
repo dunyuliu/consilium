@@ -53,11 +53,11 @@ contract.
 
 ## Test gate (the mechanical floor)
 
-Tests passing is the mechanical floor for the whole software pipeline
-— the empirical proof that the code does what it claims. The
-code-discipline rules above are how code gets there; the test gate is
-how we know it arrived. The release-boundary gate is owned by
-`haruto-nakamura`; every code-touching agent applies it within scope.
+Tests passing is the mechanical floor: the rules above are how code
+gets there, the test gate how we know it arrived. `haruto-nakamura`
+owns the release-boundary gate; every code-touching agent applies it.
+A suite you call green quotes the runner's final summary line; never read
+a status through a pipe (`| tail` reports tail's) — `set -o pipefail`.
 
 Your responsibility as an auditor: your findings must be actionable in
 a way that, when fixed, leaves the test suite green. If a finding

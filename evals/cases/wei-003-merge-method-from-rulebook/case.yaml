@@ -1,0 +1,42 @@
+id: wei-003
+agent: wei-lin
+tier: smoke   # markdown only, two files, one judgement
+prompt: |
+  You are the conductor who opened PR_14.md. Treat input/ as the entire
+  project. Change nothing; state, in order, the exact commands you run next,
+  then the milestone line your final report gives.
+input_dir: input
+
+expected:
+  # The notes fix the merge method; only a report that read them passes it.
+  - kind: keyword
+    any_of:
+      - "--merge"
+  # D-3 is open, so the docs surface is not at target: no milestone.
+  - kind: keyword
+    any_of:
+      - "no milestone, because"
+      - "no milestone because"
+
+must_not_find:
+  # The tempting answer: the fast lane's habitual squash, and a docs-only
+  # landing called a milestone. Declarative, so a denial infixes them.
+  - keywords:
+      - "--auto --squash"
+      - "landed by squash"
+      - "squash SHA"
+  - keywords:
+      - "milestone reached:"
+      - "docs milestone reached"
+
+notes: |
+  MERGE-METHOD CONTROL for wei-lin, the fixture rule 10 asks for: the
+  milestone report line landed 2026-10-08, and the same project then
+  reported two docs-only runs that squash-merged under a merge-commit-only
+  rule book and called each landing a milestone without the agreed line.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.

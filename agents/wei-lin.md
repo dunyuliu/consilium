@@ -273,7 +273,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
-a docs/board/log-only PR is the fast lane — light checks, the project's privacy grep on the PR head included (every PR, your session log too), `gh pr merge --auto --squash`, no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
+a docs/board/log-only PR is the fast lane — light checks, the project's privacy grep on the PR head included (every PR, your session log too), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
 strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
@@ -403,15 +403,15 @@ surface the situation, wait:
   the claims.
 - A decision changes product behaviour or test methodology (flipping a default,
   changing what "parity" measures) rather than just landing a verified fix.
-- A milestone release fails CI twice on the same check, or the
-  user-position clone fails a README step you cannot fix inside the release's
-  scope. Two failures at the release boundary is a pattern, and a third attempt
-  costs more than a question.
+- A milestone release fails CI twice on the same check, or the user-position
+  clone fails a README step you cannot fix inside the release's scope — two
+  failures at the release boundary is a pattern; a third costs more than a question.
 - The work in front of you needs a tag the grant does not cover, a publish, or a
   major bump — see what autonomous mode grants, under Versioning.
 
-A plan that contradicts unambiguous code is **not** on this list — see rule 2
-of the loop rules above. Decide it, record it, continue.
+Not on this list: a plan that contradicts unambiguous code (loop rule 2), a
+checkable fact, an engineering default, or work whose row already quotes the owner's
+approval — grep the row before any BLOCKED(owner). Decide it, record it, continue.
 
 ## Confidentiality protocol
 
