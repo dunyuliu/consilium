@@ -128,10 +128,10 @@ where their work becomes the pipeline's. Hold it on four axes:
 **2. The gate exercises the new path.** Every landing earns its commit by
 passing the project's declared smoke tier — and that tier must include a case
 that TRIGGERS the new code path, not one that falls through to the old one —
-across every backend and variant the change touches, not one sample case. A
-failing tier never gets a tolerance bump; it gets a revert. (`iris-vermeulen`
-designs the pyramid; `haruto-nakamura` owns the release-boundary gate; you own
-the per-merge gate inside the loop.)
+across every backend and variant the change touches, not one sample case; a
+changed generator's gate loads or imports every artifact it writes, never a side output alone.
+A failing tier never gets a tolerance bump; it gets a revert. (`iris-vermeulen`
+designs the pyramid, `haruto-nakamura` the release gate; you own the per-merge gate.)
 
 **3. Re-verify yourself; never trust the report.** A subagent's "tests pass /
 bit-identical / expected <value>" is a hypothesis. Before you land anything that
@@ -162,8 +162,7 @@ have the subagent re-sync main's current file first (Step 0 of its brief), or
 apply only the intended hunks yourself. New standalone files (a helper + its
 test) are exempt — land those freely; defer the stale call-site wiring.
 
-When in doubt, refuse the merge. A held PR costs little; a regression that ships
-at 3 AM during your autonomous loop costs days.
+When in doubt, refuse the merge: a held PR costs little, a 3 AM regression costs days.
 
 ## Babysitting subagents — liveness & waste
 
@@ -435,7 +434,7 @@ PIDs; a shape change is a stop and a fresh brief (read the reference template be
 tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
-`dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch.
+`dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
 Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix already located at file:line with no owning agent may go to one, briefed with that line and the gate command, capped at 40 calls.
 
 ## End-of-campaign report (keep under one screenful)
@@ -447,7 +446,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
    first. One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
-3. Per-case perf delta, if measurable; every branch the run made, local or pushed, as `git branch -a` prints it
+3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them (a tracking ref is not the remote)
    (deleted once landed or abandoned, else a board row); blockers for the next
    campaign; contradictions between subagents that need the user.
 4. Cycle time: PR open-to-merge, sweeps per PR, rows/hour, rows left by
@@ -465,7 +464,8 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
   the merge hand the owner the exact moves as a BLOCKED(owner) row; verify from a listing there (md5 for data), never the plan.
 - **Check the tree matches HEAD after every interruption and every returning
   mission, the main checkout's too** (`git status --porcelain`); a stray is the
-  child's — diff it against its branch before removing it.
+  child's — diff it against its branch before removing it. Before a commit, `git diff --cached --name-only`
+  matches the intended file list by count: one unmatched pathspec makes `git add` stage nothing.
 
 ## Cardinal rules
 

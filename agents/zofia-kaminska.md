@@ -242,8 +242,9 @@ ceiling. Rules state invariants and how to check them; anything that will change
 
    Seed one gate check for all three: the tracked root, `docs/` and `tests/`
    diff against their template rows, no committed file over 5 MB, and a report-only tidy lists stale
-   worktrees (one holding a live process's cwd, `/proc/*/cwd`, is in use, never stale), merged
-   branches (PR merged or `git cherry` empty — `--merged` misses a squash), root strays and `runs/` nothing cites.
+   worktrees (in use, never stale, while a live process's cwd, `/proc/*/cwd`, or a path a running job's script or config names lies inside), merged
+   branches (PR merged or `git cherry` empty — `--merged` misses a squash), root strays and `runs/` nothing in the board or docs cites;
+   an archive is offered for deletion only beside the originals it is the sole copy of.
 
    **Slots fill as earned.** Day one owes the four documents; `tests/`, `evals/`
    and release notes arrive with the first test, fixture or tag. The whitelist
@@ -315,8 +316,6 @@ ceiling. Rules state invariants and how to check them; anything that will change
     with no command is not verified, it is remembered; mark it so and name what would verify it. A blank date means never
     audited and stays blank — never backfilled. Extending a deadline is allowed
     and is written down with a reason; letting it lapse silently is not.
-
-    The name is fixed so every rule, check and agent can find it.
 
     **One board, everywhere, and the others get folded in.** No `TODO.md`, no
     `STATUS.md`, no `BACKLOG.md`, no `ROADMAP.md`, no second copy one directory

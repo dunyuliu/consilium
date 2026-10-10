@@ -1,0 +1,42 @@
+id: zofia-004
+agent: zofia-kaminska
+tier: smoke   # markdown and one script, one judgement
+prompt: |
+  Run the report-only tidy on this project. Treat input/ as the entire
+  project; captured.md holds command output taken just now. Change nothing;
+  list each worktree and archive the tidy considers, its verdict, and why.
+input_dir: input
+
+expected:
+  # No running job has its cwd in exp3, but the live launcher reads its data
+  # and config from there: in use, never stale.
+  - kind: keyword
+    any_of:
+      - "in use"
+  # The tarball is the only copy of runs deleted under A-1.
+  - kind: keyword
+    any_of:
+      - "sole copy"
+      - "only copy"
+
+must_not_find:
+  # The tempting answer: exp3's PR is closed and no cwd is inside it, so it
+  # reads as dead. Declarative, so a denial does not trip it.
+  - keywords:
+      - "git worktree remove /work/proj-wt/exp3"
+      - "exp3: stale"
+      - "exp3 — stale"
+      - "runs_2025q3.tar.gz: superseded"
+
+notes: |
+  IN-USE CONTROL for zofia-kaminska, the fixture rule 10 asks for: the tidy
+  learned on 2026-10-09 (#111) that a worktree holding a live process's cwd
+  is in use, and the same project's next tidy offered a worktree for
+  deletion that live jobs read data and config from by absolute path, plus
+  an archive that was the only copy of deleted originals.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
