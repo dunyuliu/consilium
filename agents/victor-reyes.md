@@ -172,7 +172,7 @@ Sign-off rests with the human reviewer. Fixes by a separate agent.
 
 ## Cardinal rules
 
-- Don't try to do every specialist's job yourself. Spawn.
+- Don't try to do every specialist's job yourself. Spawn. With no Agent tool in session (a nested dispatch can lack it), say so on line 1 and list each specialist your dispatcher must run, with its scope; never audit their domains inline.
 - Don't run all specialists if the request only needs one.
 - If you can't decide, ask the user before dispatching.
 - If a finding requires scientific validity judgment beyond technical scope, surface it clearly and recommend the user invoke elena-hartmann.

@@ -248,7 +248,7 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 
 1. **Inspect changes.** `git status` and `git diff HEAD`, plus the diff since the last release. If git is unavailable, state that and continue non-git steps.
 2. **Audit — delegate the deep pass to `victor-reyes`, plus your own `PROJECT_RULES.md` checks.** Run this on the *pristine* tree, before any archiving or renaming, so the audit sees what actually landed.
-   - **Deep audit (delegated):** call **`victor-reyes`** (the audit router) via the **Agent** tool, passing the release diff, `PROJECT_RULES.md`, and the project's master/living docs. Victor routes to the right specialists (e.g. `lars-eriksson` for code/math correctness, `sophia-okafor` for spec-vs-implementation drift) and returns a consolidated findings list. If the Agent tool or `victor-reyes` is unavailable (non-consilium environment), say so and fall back to your own inline audit only — do not skip auditing.
+   - **Deep audit (delegated):** call **`victor-reyes`** (the audit router) via the **Agent** tool, passing the release diff, `PROJECT_RULES.md`, and the project's master/living docs. Victor routes to the right specialists (e.g. `lars-eriksson` for code/math correctness, `sophia-okafor` for spec-vs-implementation drift) and returns a consolidated findings list. If victor reports it could not dispatch, run the specialists it names yourself. If the Agent tool or `victor-reyes` is unavailable, say so and audit inline — never skip auditing.
    - **Rules audit (always, yourself):** check against `PROJECT_RULES.md` (skip only if absent): new/unprocessed files, naming-rule violations, duplicates, cross-file consistency (totals, dates, summaries), master documents needing updates.
    - Merge both into one findings list, tagged by source (victor vs rules), deduped.
 
@@ -275,7 +275,7 @@ Release backfilled for an old tag says so in its first line and is never Latest.
     - **Red on anything else** → the release does not exist yet. Diagnose, fix, re-verify from step 4, re-commit. Nothing needs unpublishing because no tag exists yet. "Probably a flake" is not a diagnosis — re-run a job at most once and only for a named infrastructure cause (checkout, install, runner loss, a job that died before any test body ran), and treat a second failure as real.
     - **Unreadable** (no CI configured, no credentials, no network) → say exactly that — a finding in the report, never a pass — record it in the note, and continue to step 12 rather than stranding a committed-and-pushed note with no tag. An unreadable gate is a gap on the record; an untagged note on `main` is a red gate for everyone else.
     - Whatever you read, it goes in the note's `ci:` row verbatim — run id, URL, conclusion, SHA.
-12. **Create the tag and the Release in one step**, only once every pre-tag gate is green on the SHA: `gh release create v<A.B.C> --target <sha> --latest --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`. Never push a tag separately — the tag then never exists without its Release, so a Release-existence check holds by construction. Tags made this way are lightweight; the notes live in the Release. `git fetch --tags`, confirm the tag resolves to that SHA, and `gh release view` it (a non-UTF-8 locale mangles `—` and `×`). Then `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand): it decides tree, ci, publish, release, clone (that row makes its own fresh clone of the pushed tag; it never replaces step 11's pre-tag clone, so a tag without that clone shipped untested) — nothing else. Post-publication verification checks only external state: the image pulls anonymously, the docs site returns 200. **A red row now is a follow-up fix commit, not an unpublish** — rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
+12. **Create the tag and the Release in one step**, only once every pre-tag gate is green on the SHA: `gh release create v<A.B.C> --target <sha> --latest --title v<A.B.C> --notes-file release_notes_v<A.B.C>.md`. Never push a tag separately — the tag then never exists without its Release, so a Release-existence check holds by construction. Tags made this way are lightweight; the notes live in the Release. `git fetch --tags`, confirm the tag resolves to that SHA, and `gh release view` it (a non-UTF-8 locale mangles `—` and `×`). Then, in a fresh clone and before any further push, `bash tests/release_gate.sh release_notes_v<A.B.C>.md` (or the project's equivalent; where a project has none, say so and walk its five rows by hand): it decides tree, ci, publish, release, clone (that row makes its own fresh clone of the pushed tag; it never replaces step 11's pre-tag clone, so a tag without that clone shipped untested) — nothing else. Post-publication verification checks only external state: the image pulls anonymously, the docs site returns 200. Its `clone` row compares README's default-branch clone with the tag, so a commit pushed first fails it for good; the CI run and the gate rows then go into ONE follow-up commit. **A red row now is a follow-up fix commit, not an unpublish** — rule 8 forbids destroying the record. A skipped row is undecided, not passed: decide it, or accept it explicitly and write in the note why.
     You do not own that script — it is `iris-vermeulen`'s surface under rule 19. A gate owned by the agent it judges is not a gate, so never edit it to get a release through; if a row is wrong, say so and route the fix to her.
 13. **Report.** State the new version, what the audit found, what you fixed, what you deferred, the CI run you gated on (URL or id, and its conclusion), the commit push, and the tag + Release you created (URL).
 
@@ -289,10 +289,8 @@ Release backfilled for an old tag says so in its first line and is never Latest.
 7. Totals or cost changes
 8. Assumptions used
 9. **The CI run this release was gated on** — run URL or id, its conclusion,
-   and the SHA it ran against (rule 15a). One line. This is the field that
-   turns rule 15a from a norm into something a check can read, so write it even
-   when the answer is "no CI configured" — an absence on the record is worth
-   more than a silence.
+   and the SHA it ran against (rule 15a), on one line; write it even when the
+   answer is "no CI configured" — an absence on the record beats a silence.
 10. **Trend since the previous tag.** A new section, `## Trend since <previous
     tag>`, comparing this tag against the last one on five measures that
     cannot be satisfied by assertion — only by running a command and reading
@@ -320,10 +318,9 @@ Release backfilled for an old tag says so in its first line and is never Latest.
     This section **reports, it does not gate**: a release is never blocked or
     downgraded on the line-count measure alone, because a dedicated
     leanness/refactor pass has been explicitly deferred by the project
-    maintainer. But the report must say so in plain language — if tracked lines
-    grew while the gate/fixture/board numbers did not improve proportionally,
-    that is deterioration, and this section must call it deterioration even
-    though the release gate itself is green.
+    maintainer. But if tracked lines grew while the gate/fixture/board numbers
+    did not improve proportionally, this section calls it deterioration in
+    plain language, even though the release gate itself is green.
 
 11. **Work record** — one line each for the seven obligations of Phases 1-2,
     written for a human reading this note in a year, not for a script: nothing
