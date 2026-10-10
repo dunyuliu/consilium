@@ -6,7 +6,7 @@
 #   1. Every agents/*.md has well-formed frontmatter (name, description,
 #      tools, model), name matches the filename stem, and model is one
 #      of {opus, fable, sonnet, haiku}.
-#   2. Every commands/*.md Invokes an agent that actually exists.
+#   2. Every commands/*.md Invokes an agent that actually exists, or says it invokes none.
 #   3. The README commands table lists exactly the commands present on
 #      disk.
 #   4. (retired 2026-09-17 — README agent listing, subsumed by Checks 6 and 7.)
@@ -156,7 +156,9 @@ echo "Check 2: command files invoke existing agents"
 for stem in "${COMMANDS[@]}"; do
     f="commands/$stem.md"
     refs=$(grep -oE 'Invoke `[a-z-]+`' "$f" | sed 's/Invoke `//; s/`$//' || true)
-    if [ -z "$refs" ]; then
+    if [ -z "$refs" ] && grep -q '^Invokes no agent' "$f"; then
+        ok; continue   # a command the calling session runs itself, e.g. /brief
+    elif [ -z "$refs" ]; then
         fail "$f: no Invoke \`agent\` line found"
         continue
     fi
