@@ -44,7 +44,7 @@ missed finding, because it destroys work that was already correct.
   during verification; it only blocks every other writer for as long as you
   hold it, and verification is the slow part. A force-release is an explicit,
   recorded act naming the holder, never a quiet cleanup — an unrecorded one is
-  indistinguishable from a lock that never worked.
+  indistinguishable from a lock that never worked. A lock held by your own host session, where in-process agents run, is live, never stale.
 
 ## Keeping the loop alive — four rules that cost a campaign each
 
@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate, and a session-log or docs-only commit is gated work too: unaudited or unmerged gated work goes to that successor on a pushed branch, never lands ungated or by direct push.
+a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate, and a session-log or docs-only commit is gated work too: unaudited or unmerged gated work goes to that successor on a pushed branch, never lands ungated or by direct push. A turn that opens on a context summary is past the cap, whatever the summary says (it drops the count): it records and asks for a fresh conductor.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
@@ -184,7 +184,7 @@ When in doubt, refuse the merge: a held PR costs little, a 3 AM regression costs
   or external kill is terminal: read the board and log for who stopped it, report it, never relaunch or evade.
 - **A process claim quotes command output** — "launched" or "running" needs a
   live `ps -o pid,lstart,args` line and a log that grew; never infer whose it
-  is, and never signal or renice a process that is not on your roster.
+  is, and never signal or renice a process that is not on your roster. A match or reproduction claim quotes both numbers in full, printed by one command this turn, never one typed or recalled.
 
 ## Workflow — the load-bearing order
 
@@ -233,8 +233,8 @@ them. Standing duties:
 - **Enforce** — every landing is checked against these rules, not just the test
   exit code.
 - **Compound** — the moment a campaign pays for a new lesson (a regression that
-  slipped a gate, a stale-base near-miss, a "fix" that didn't), write it back as
-  a numbered rule the SAME session. A lesson that generalises beyond this
+  slipped a gate, a stale-base near-miss, a "fix" that didn't), draft it for
+  `zofia-kaminska` to land as a numbered rule the SAME session; never merge it yourself. A lesson that generalises beyond this
   project also goes to consilium's inbox (Confidentiality, below). A campaign that learns the same lesson twice has a broken rules
   set — local or in you.
   A rule fitted to one incident can bind wrongly on the next. When one you
@@ -303,7 +303,7 @@ that merged anything ends with a tag or a stated blocker. Use the user's cadence
 they named one; otherwise use this and say so.
 
 Four steps, in order, each delegated to the agent that owns it. None is
-skippable and none reorders:
+skippable and none reorders; an owner-named tag gate stands in for CI only, never for a step:
 
 1. **Audit** — on the pristine tree, before anything is renamed or archived.
    `zofia-kaminska` against the rule book (her Mode B: tier split, violations
@@ -435,7 +435,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix already located at file:line with no owning agent may go to one, briefed with that line and the gate command, capped at 40 calls.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final, with no owning agent may go to one, briefed with that line or design, the gate command and its 40-call cap; a larger build is split into missions that fit.
 
 ## End-of-campaign report (keep under one screenful)
 
