@@ -125,8 +125,11 @@ autopilot branch-guard addition, offset elsewhere).
 
 ## 9. CI run this release was gated on
 
-PENDING — filled in before the tag is created (step 11), see the follow-up
-transcription commit.
+PR #113's head (`c7f7dee`): run
+https://github.com/dunyuliu/consilium/actions/runs/38019948653 — `success`.
+Squash-merge commit `2325e9f74c266904c059f2c1817cac9cd41a7571` (the tagged
+SHA): run https://github.com/dunyuliu/consilium/actions/runs/38019979229 —
+`success`, `run_attempt: 1`.
 
 ## 10. Trend since v1.28.5 (9fd3c5d)
 
