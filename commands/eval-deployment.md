@@ -5,10 +5,6 @@ description: Review a real-world deployment of any consilium agent or team — s
 Invoke `nadia-hadid` to review the most recent deployment of a consilium
 agent or team (or one specified as argument). Provide her with the
 agent's output and a one-line restatement of what the user asked for.
-She will return a verdict (Hit / Partial / Miss), a single root cause if
-not a Hit, contract-compliance grading against the agent's own prompt, a
-dispatch and persona check, and a list of recommended changes to agent
-prompts or new eval fixtures.
 
 Nadia writes her rich review to `./.consilium-review/` inside the
 project being reviewed — add that directory to `.gitignore` so it stays

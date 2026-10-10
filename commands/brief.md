@@ -1,9 +1,11 @@
 ---
-description: The owner's one-screen report on this session's work — answer, changes, numbers, decisions, next. On demand, or `/loop 2h /brief`. Triggers — `brief`, `brief since <time>`.
+description: The owner's one-screen report on this session's work — answer, changes, numbers, decisions, next. Triggers — `brief`, `brief since <time>`, `brief -loop [interval]`.
 ---
 
 Invokes no agent: the calling session writes it. At most 10 lines, read on a phone; never
 narration, restating the question, recap, agent names, unglossed jargon or a closing summary.
+`-loop [interval]`, default 3h: unless CronList already has it, CronCreate a recurring `/brief`
+at that interval (3h = `0 */3 * * *`), say its job id, then brief now.
 
 1. **Answer**: verdict plus one number, ≤15 words. Nothing new since the last brief → `No change since <time>.` and stop.
 2. **Changed**: ≤3 bullets, ≤20 words each, in plain words, each with one proof (PR, SHA, test count, plot); name what was not run or verified.
