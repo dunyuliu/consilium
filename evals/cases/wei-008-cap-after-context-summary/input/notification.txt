@@ -1,0 +1,16 @@
+This session is being continued from a previous conversation that ran out of
+context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary request: act as the conductor of the owner's 24 h autopilot run on
+   this repo; work the board in prio order, gated merges only.
+2. Work so far: merged PR #21 (board), PR #23 (dataset loader fix, audited) and
+   PR #24 (session log). lars-eriksson audited PR #23 and was stopped once read.
+   iris-vermeulen is live on Q-6 in her worktree (branch iris/split-tests).
+3. Owner decisions relayed: "Go on both open questions: the new split and the
+   timing run." Recorded verbatim at board commit 4be91d0.
+4. Pending: Q-7 and Q-8 are READY; Q-6 waits for iris.
+
+[from: invoking session, 14:52]
+iris-vermeulen reports done: branch iris/split-tests, CI run 8820 green,
+PR #26 open and mergeable. Her worktree is clean. Owner: "Keep going."
