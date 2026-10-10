@@ -54,7 +54,7 @@ its output or branch with a deadline (2-3x expected) that reports when it passes
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
-cancel it, or log "still owns <step>" so nobody re-briefs that step; a wait names the PID or agent that wakes you, or the work is yours now.
+cancel it, or log "still owns <step>" so nobody re-briefs that step; a wait names the PID or agent that wakes you, or the work is yours now. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate: unaudited or unmerged gated work goes to that successor, never lands ungated or by direct push.
+a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate, and a session-log or docs-only commit is gated work too: unaudited or unmerged gated work goes to that successor on a pushed branch, never lands ungated or by direct push.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
@@ -179,7 +179,7 @@ When in doubt, refuse the merge: a held PR costs little, a 3 AM regression costs
   the log at ~30 min, never waited out. Kill a hung build by PID and note it.
 - **Require frequent checkpoints** (`NOTES_<topic>.md` in the notes dir, never
   committed — findings go in commit messages and PR bodies).
-- **Keep a live roster** of children — agent ids, worktrees, PIDs — in the
+- **Keep a live roster** of children — agent ids, worktrees, PIDs, copied verbatim from each dispatch result as it returns, never rebuilt from memory or call order — in the
   session log and every interim report, so they can be stopped with you. A stop
   or external kill is terminal: read the board and log for who stopped it, report it, never relaunch or evade.
 - **A process claim quotes command output** — "launched" or "running" needs a
@@ -256,7 +256,7 @@ verify, then act, a stop first; disagree in your report, never by acting; it nev
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
-link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree.
+link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree; a detached long job runs from a cwd outside its worktree, which may be reaped.
 On a shared node, cap BLAS/OpenMP threads for every process, yours too (total ≤
 half the cores; an owner's resource order outranks a project rule), verified in its environment.
 Independent gate cases over ~2 h run as a process pool sized from `nproc`, load and
@@ -343,7 +343,7 @@ append-only through the remote: unpushed commits become unreachable the moment
 a maintainer merges the pushed snapshot on green CI. Two things are
 yours beyond the tree row: deciding which leftovers are evidence and which are
 scratch (evidence stays and gets named, rule 8), and reaping the worktrees with their branches,
-because you are the only one who knows which mission held which — reap one only after its agent's completion notice or a liveness check shows it gone (a merged PR is neither); check each
+because you are the only one who knows which mission held which — reap one only after a completion notice carrying the agent id its dispatch result recorded for that worktree, or a liveness check, shows it gone (a merged PR or a log label is neither); check each
 for uncommitted, unpushed and ignored work (`git status --ignored`), and copy
 out any file a board row cites, before reaping — `git worktree remove` deletes
 ignored output silently; squash landing breaks `--merged`: a branch is merged when its PR is (`gh pr list --state merged --head <b>`) or `git cherry` is empty. A dirty close blocks the next
@@ -463,7 +463,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
 - **Ignored files never travel through a worktree or a merge**: rule 20 item 1 bars you the main checkout, so after
   the merge hand the owner the exact moves as a BLOCKED(owner) row; verify from a listing there (md5 for data), never the plan.
 - **Check the tree matches HEAD after every interruption and every returning
-  mission, the main checkout's too** (`git status --porcelain`); a stray is the
+  mission, the main checkout's too** (`git status --porcelain`), read only: never `reset --hard`, `checkout -- .`, `clean` or `stash` there, a diverged local default being the invoker's `git pull --ff-only`; a stray is the
   child's — diff it against its branch before removing it. Before a commit, `git diff --cached --name-only`
   matches the intended file list by count: one unmatched pathspec makes `git add` stage nothing.
 
