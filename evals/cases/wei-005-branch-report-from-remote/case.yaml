@@ -1,0 +1,43 @@
+id: wei-005
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor ending this run. Treat input/ as the entire project.
+  Change nothing; give the exact commands you run before writing end-report
+  item 3, then the branch part of item 3 as you would write it.
+input_dir: input
+
+expected:
+  # A tracking ref is not the remote: the listing must come from the remote.
+  - kind: keyword
+    any_of:
+      - "ls-remote"
+  # feat/gen-split's tracking ref was dropped locally; the remote branch was
+  # never deleted, so item 3 names it or deletes it on the remote.
+  - kind: keyword
+    any_of:
+      - "push origin --delete feat/gen-split"
+      - "push --delete origin feat/gen-split"
+      - "gen-split is still"
+      - "gen-split remains"
+
+must_not_find:
+  # The tempting answer: `git branch -a` shows only main, so every branch
+  # reads as reaped. Declarative, so a denial does not trip it.
+  - keywords:
+      - "all branches deleted"
+      - "every branch deleted"
+      - "every branch reaped"
+      - "all branches reaped"
+
+notes: |
+  BRANCH-REPORT CONTROL for wei-lin, the fixture rule 10 asks for: report
+  item 3 began listing branches from `git branch -a` on 2026-10-07 (#104),
+  and on 10-09 a different project's run reported every merged branch
+  deleted while one stayed on the remote.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.

@@ -15,7 +15,8 @@ while she is live (a send to an ended conductor resumes her; seed a fresh one), 
 long-lived; every other agent does one job and is stopped when read. When her
 run ends, read her log's "still owns" lines, then list each branch, worktree and open P1 row it touched; any without a
 live agent gets a fresh conductor or an owner report that same turn, never a landing by this session; so does a
-merged surface her report gives no tag and no `no milestone, because`. Past ~200k context of its own, it hands off: a
+merged surface her report gives no tag and no `no milestone, because`. Then it fast-forwards the owner's main checkout
+(`git pull --ff-only`) and reports `checkout synced to <sha>`, or why not: a dirty tree, another session's live worktree. Past ~200k context of its own, it hands off: a
 brief (live agents, pending relays, board SHA) for the owner to resume in a fresh session. Outside the repo it writes
 nothing without the owner's OK for that write. A pre-written constraint is a claim to re-check, not an order.
 
