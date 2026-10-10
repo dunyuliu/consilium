@@ -77,7 +77,10 @@ row_skip() { skipped=$((skipped+1)); row SKIP "$1" "$2"; }
 tree_problems=()
 [ -n "$(git status --porcelain 2>/dev/null)" ] && tree_problems+=("uncommitted or untracked files")
 wt=$(git worktree list 2>/dev/null | wc -l | tr -d ' ')
-# a release is cut in its own worktree (haruto Phase 1): run from one, that worktree is the one allowed extra
+# a release is cut in its own worktree (haruto's Isolation section): run from
+# one, that worktree is the one allowed extra. Relaxed from a flat 1 on
+# 2026-10-08 (#108) after the stricter check false-positived on a legitimate
+# release-worktree cut (rule 28).
 allowed=1; [ "$(git rev-parse --git-dir)" != "$(git rev-parse --git-common-dir)" ] && allowed=2
 [ "$wt" -gt "$allowed" ] && tree_problems+=("$wt worktrees — a worktree outlives the agent that held it")
 [ -f "$(git rev-parse --git-common-dir)/consilium.lock" ] && tree_problems+=("repo lock still held (tests/lock.sh status)")
@@ -87,7 +90,7 @@ else
     tree_problems+=("no upstream — local and remote cannot be compared")
 fi
 if [ "${#tree_problems[@]}" -eq 0 ]; then
-    row_pass tree "clean, one worktree, no lock, level with upstream"
+    row_pass tree "clean, one worktree (two when cut from a release worktree), no lock, level with upstream"
 else
     row_fail tree "$(IFS='; '; echo "${tree_problems[*]}")"
 fi
