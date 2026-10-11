@@ -112,7 +112,8 @@ table.
 | `/eval-deployment` | `nadia-hadid` | Grade a real agent run against its contract, diagnose misses. |
 | `/implement` | `dunyu-liu` | Research-heavy new implementation with no reference. |
 | `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book — audit, `seed`, or `codify`. |
-| `/brief` | — | One-screen report to the owner: answer, changes, decisions, next. `/brief -loop` repeats it every 3 h. |
+| `/brief` | — | One-screen report to the owner: answer, changes, decisions, next. Loop: `/brief-loop`. |
+| `/brief-loop` | — | `/brief` every 3 h (or the interval given); quiet between briefs. |
 
 Full descriptions, and a deep dive on `/autopilot` and `/propose`, in
 `docs/user/commands.md`.

@@ -28,7 +28,8 @@ understanding before you run them: `/autopilot` and `/propose`.
 | `/eval-deployment` | `nadia-hadid` | Review a real-world deployment of any consilium agent or team — scores the run against the agent's contract and the task, diagnoses the root cause of any miss, recommends prompt or fixture edits. |
 | `/implement` | `dunyu-liu` | Research-heavy new implementation with no reference. `implement <feature>` builds; `implement spike <question>` is feasibility only. |
 | `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book. No argument audits; `seed` aligns the project to the book — creating what is absent, patching what exists; `codify <incident>` turns an incident into a rule. |
-| `/brief` | — | The owner's one-screen report on the calling session's work, run in that session: answer, what changed with proof, a comparison table, numbered decisions with a recommendation, what runs next. Silent past one line when nothing changed; `/brief -loop [interval]` arms a recurring session cron (default 3 h). |
+| `/brief` | — | The owner's one-screen report on the calling session's work, run in that session: answer, what changed with proof, a comparison table, numbered decisions with a recommendation, what runs next. Silent past one line when nothing changed; `/brief-loop [interval]` arms it on a recurring session cron (default 3 h). |
+| `/brief-loop` | — | Arms `/brief` on a recurring session cron, default every 3 h; between briefs every other reply is one line and decisions wait for the next brief. |
 
 ## `/autopilot` — what it may do unattended
 
