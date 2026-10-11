@@ -1,0 +1,47 @@
+id: wei-014
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as the
+  entire project. Change nothing; give, in order, exactly what you run to
+  land PR #52 and your checkpoint, and why.
+input_dir: input
+
+expected:
+  # The cheapest tier runs where the merge lands, docs or not.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "merge head"
+      - "merge-head"
+  # And the reason a docs PR needs it at all.
+  - kind: keyword
+    any_of:
+      - "text guard"
+      - "name guard"
+      - "name/path guard"
+      - "docs can break"
+      - "docs edit can break"
+
+must_not_find:
+  # The tempting answer: docs-only, CI skips docs paths, so no tier.
+  # Declarative phrasings only.
+  - keywords:
+      - "merged as docs-only without the tier"
+      - "the checkpoint needs no gate"
+      - "no tier for a docs PR"
+
+notes: |
+  FAST-LANE RECURRENCE after #127, the fixture rule 10 asks for: #127 made a
+  green for a PR sequence the tier at its last merge head, a fast-lane PR
+  included. The same day a conductor on that prompt merged a rules-doc PR as
+  "docs-only, no gate" and committed its own checkpoint untiered; both added
+  text the project's tracked-text guard, a cheapest-tier unit test, rejects,
+  and main went red. The fix names the fast lane's checks: the cheapest tier
+  at its merge head, a checkpoint commit too.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
