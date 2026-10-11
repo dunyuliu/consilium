@@ -128,10 +128,29 @@ net — disclosed above, not blocking).
 
 ## 9. CI run this release was gated on
 
-Run id 38106318299 (workflow `structural-invariants`), conclusion `success`,
-SHA `fd73ab6` — the pre-fix tip. This release's own commit (adding this note
-and the two owner-surface fixes) is a new SHA; its CI run and the release-gate
-rows are transcribed in one follow-up commit after the tag, per step 12.
+**Process note, disclosed.** `main` now enforces a required status check
+("check") that must already be green on a commit's own SHA before that SHA
+can land — a direct `git push origin main` of the release commit (SHA
+`d7d7b3f`) was rejected by branch protection (not by this project's own
+gate). Landed instead via a pull request (release branch, squash-merged),
+matching this agent's documented PR fallback: the pre-merge SHA `d7d7b3f`
+ran CI green (both the `push` and `pull_request` triggers), then the
+squash-merge produced the actual tagged SHA `a5fe24e`, which also ran CI
+green before the tag was created. Both runs: workflow `structural-invariants`,
+conclusion `success`. The tagged SHA is `a5fe24e`.
+
+Pre-tag fresh-clone check (step 11): a clone of `a5fe24e` into an empty scratch directory, normal shell
+environment (this project ships no pinned manifest or image — "pure bash, no
+dependencies" per `tests/check.sh`'s own header — so there is no narrower
+environment to build from): `bash tests/check.sh` → 1129 passed, 0 failed,
+matching the pre-push count exactly. One anomaly found and not chased further
+(not this release's surface): running the same clone's `check.sh` under an
+artificially stripped `PATH` (`env -i PATH=/usr/bin:/bin`) silently completed
+with only 1056 passed, 0 failed — fewer assertions ran, none reported as
+failed or skipped. Flagged for `iris-vermeulen` (gate owner) as a possible
+silent-environment-dependency gap in `tests/check.sh`; not reproducible via
+anything README documents or any environment a real user runs, so not treated
+as a release blocker.
 
 ## 10. Trend since v1.28.6 (2325e9f)
 
@@ -180,6 +199,20 @@ release, not itself evidence of a stronger suite until hand-graded.
   change.
 - rules: `zofia-kaminska` — one rule-19 wording drift found and fixed (§5);
   no tier changes; the rule-1b ceiling question left open for her (§6).
+
+## 12. Release gate
+
+- tree: PASS — clean, one worktree, no lock, level with upstream (checked in
+  a fresh clone of `v1.29.0`'s default branch, after the tag).
+- ci: PASS — green on `a5fe24e` (squash-merge of PR #125; pre-merge SHA
+  `d7d7b3f` was also green on both its `push` and `pull_request` runs before
+  merge). `main`'s required-status-check branch protection rejected a direct
+  push of the release commit; landed via PR instead (§9).
+- publish: PASS — `v1.29.0` pushed and pointing at `a5fe24e`.
+- release: PASS — GitHub Release exists for `v1.29.0`.
+- clone: PASS `a5fe24e` — fresh clone of `v1.29.0`, README's install block and
+  its first following command both exited 0 (`bash tests/release_gate.sh
+  release_notes_v1.29.0.md`: 5 passed, 0 failed, 0 skipped).
 
 ## 12. Release gate
 
