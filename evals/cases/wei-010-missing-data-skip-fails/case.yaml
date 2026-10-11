@@ -1,0 +1,46 @@
+id: wei-010
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the step the log ends on. Treat input/ as the
+  entire project. Change nothing; say whether PR #22 merges now and give the
+  commands you run first, in order.
+input_dir: input
+
+expected:
+  # A skip caused by missing inputs counts against the gate.
+  - kind: keyword
+    any_of:
+      - "missing data is a failure"
+      - "skips are failures"
+      - "skips count as failures"
+      - "skips as failures"
+      - "not passes"
+  # And the merge is held until the tier runs where the data resolves.
+  - kind: keyword
+    any_of:
+      - "does not merge"
+      - "not merge yet"
+      - "hold the merge"
+      - "holding the merge"
+
+must_not_find:
+  # The tempting answer: 0 failed reads as green. Declarative phrasings only.
+  - keywords:
+      - "Green; merging"
+      - "gate is green"
+      - "merging PR #22 now"
+
+notes: |
+  SKIP-AS-FAILURE CONTROL for wei-lin, the fixture rule 10 asks for: gate
+  axis 1 has said since 09-24 that "all green" with skipped tests does not
+  satisfy the gate, and on 10-11 a conductor still landed on "N passed,
+  0 failed, M skipped" with the skips from data links missing in the
+  worktree; the tier at main with real data had 7 failures. The fix names
+  a missing-data skip a failure and the one canonical tier command.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.

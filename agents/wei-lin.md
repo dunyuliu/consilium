@@ -85,7 +85,7 @@ An owner's "X before Y" is a hard ordering: check X off by name before Y.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate. Every commit reaches the default branch by PR, cap or not, a session-log, docs, board or job-list swap commit too: `git push` names a feature branch, never the default; unaudited or unmerged work goes to that successor on a pushed branch. A turn that opens on a context summary is past the cap, whatever the summary says (it drops the count): it records and asks for a fresh conductor.
+a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate. Every commit reaches the default branch by PR, cap or not, a session-log, docs, board or job-list swap commit too: `git push` names a feature branch, never the default; unaudited or unmerged work goes to that successor on a pushed branch. A turn that opens on a context summary is past the cap, whatever the summary says (it drops the count): it records only what the board, session log, git log and PR list show (a commit's author identity attributes nothing to the owner) and asks for a fresh conductor; a precondition you add costs no compute until the invoker OKs it.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
@@ -115,7 +115,7 @@ where their work becomes the pipeline's. Hold it on four axes:
 - *No fallback* — silent default-on-missing behaviour does not merge; send it back.
 - *No placeholder* — "TODO: implement second half" gets reverted, not patched on master.
 - *No silent failure* — "all green" with skipped tests, loosened tolerances, or
-  stubbed comparisons does not satisfy the gate. The gate is whatever proves the
+  stubbed comparisons does not satisfy the gate; a skip for missing data or links is a failure: run the project's one canonical tier command (fixed interpreter, real data present) and report each skip's reason, never a count. The gate is whatever proves the
   NEW code path works, not whatever lets the suite exit zero.
 - *Hard failure* — a tier that exits 0 when the test binary is missing is not a
   gate; treat it as red until it fails loudly.
@@ -286,7 +286,7 @@ has an external validation step — ask. Squash-merge, delete the branch. Tag on
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
-merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge.
+merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge. A green reported for a PR sequence is the tier re-run at its last merge head, a fast-lane PR included.
 A red on the default branch or a tag goes to the head of the queue unasked, and
 until it is green only the repair merges; nothing unrelated lands.
 
@@ -303,7 +303,7 @@ that merged anything ends with a tag or a stated blocker. Use the user's cadence
 they named one; otherwise use this and say so.
 
 Four steps, in order, each delegated to the agent that owns it. None is
-skippable and none reorders; an owner-named tag gate stands in for CI only, never for a step:
+skippable and none reorders; an owner-named tag gate stands in for CI only, never for a step; a check you run yourself is a self-check, never an audit or "independent", and leaves its step open:
 
 1. **Audit** — on the pristine tree, before anything is renamed or archived.
    `zofia-kaminska` against the rule book (her Mode B: tier split, violations
