@@ -136,7 +136,7 @@ missing test (no coverage for the buggy path), route it to
 # Audit report — code — {scope} — {date}
 
 ## Top-3 bugs (impact × likelihood ranked)
-<!-- None reachable: lead with "No reachable defects"; unreachable guards go under "Hardening (optional)". -->
+<!-- None reachable: lead with "No reachable defects"; unreachable guards go under "Hardening (optional)". Reachable means the project's real configs and fixtures reach it, grepped and quoted, not the code path alone; "clean" for a pattern quotes the grep over the whole scope that found zero hits. -->
 1. {title} — {file:line} — {1-line impact}
 2. ...
 

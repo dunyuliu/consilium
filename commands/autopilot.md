@@ -10,7 +10,7 @@ untracked work, pending user decisions, results measured this session. Never
 restate her rules — if one seems missing, file an inbox lesson instead.
 While she runs, the invoking session writes nothing to the repo: it monitors,
 verifies against the full record rather than a tail, relays owner decisions (committed
-verbatim to the board first, or as a marked paraphrase if the quote holds a privacy-listed term, staging only that hunk, the relay citing that commit; a stop goes to her at once, before the session acts, committed after), and any specialist's completion notice to her at once
+verbatim to the board first, on one open batch branch merged as one fast-lane PR per `/brief`, never a PR per decision, or as a marked paraphrase if the quote holds a privacy-listed term, staging only that hunk, the relay citing that commit; a stop goes to her at once, before the session acts, committed after), and any specialist's completion notice to her at once
 while she is live (a send to an ended conductor resumes her; seed a fresh one), and marks her numbers unaudited until audited. Only the conductor is
 long-lived; every other agent does one job and is stopped when read. When her
 run ends, read her log's "still owns" lines, then list each branch, worktree and open P1 row it touched; any without a

@@ -1,0 +1,56 @@
+id: haruto-004
+agent: haruto-nakamura
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are cutting v0.4.0 and release_log.md is where you are now. Treat
+  input/ as the entire project. Change nothing; give the exact sequence you
+  run from here to a published release, and why.
+input_dir: input
+
+expected:
+  # The tier ran on the head before the note commit; the tagged SHA is unrun.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "note commit"
+      - "release commit"
+      - "bump commit"
+      - "the SHA to tag"
+      - "the SHA I tag"
+  # The stranger clone comes before the tag and its Release.
+  - kind: keyword
+    any_of:
+      - "before the tag"
+      - "before tagging"
+      - "before creating the tag"
+      - "before gh release create"
+      - "before the Release"
+  # And it builds an isolated environment, never the shared user site.
+  - kind: keyword
+    any_of:
+      - "venv"
+      - "virtualenv"
+      - "PYTHONNOUSERSITE"
+      - "user site"
+      - "user-site"
+
+must_not_find:
+  # The tempting answer follows the plan as written. Declarative only.
+  - keywords:
+      - "the earlier gate covers the note commit"
+      - "tag first, then the stranger clone"
+      - "pip install --user is fine"
+
+notes: |
+  RELEASE-ORDER RECURRENCE after #128, the fixture rule 10 asks for: #128
+  made the tag wait for every gate, the stranger clone included. On that
+  prompt a release with no CI gated the head before its note commit, tagged
+  the note commit unrun, ran the stranger clone after publishing (it failed),
+  and built the clone's environment with `pip install --user`, replacing the
+  pinned scientific packages every other project on the account used.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
