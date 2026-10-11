@@ -272,7 +272,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
-a docs/board/log-only PR is the fast lane — light checks, the project's privacy grep on the PR head included (every PR, your session log too), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
+a docs/board/log-only PR is the fast lane — light checks, the project's privacy grep before every push included (every branch, your session log too; a hit blocks like red CI), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
 strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
@@ -282,7 +282,7 @@ they change), run from its own detached worktree so edits cannot race it. A fix 
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
-has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`: audits ran, a session log exists,
+has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit) or says "audit waived by owner", a session log exists,
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
@@ -294,7 +294,7 @@ until it is green only the repair merges; nothing unrelated lands.
 HEAD: its command + SHA on the board, output in `runs/`, never a doc or comment.
 
 **Phase 3a — Milestone release (the strict one).** Patch tags per landing are
-cheap and unaudited by design; this is the expensive one, and it is where the
+cheap, never unaudited (victor's report or the owner's waiver, above); this is the expensive one, and it is where the
 rule book actually binds. A **milestone** is a surface reaching its target
 state — every board row for it green, or its queue emptied — not every landing,
 and per surface: one at target gets its cycle while others stay open. From ~80% of
