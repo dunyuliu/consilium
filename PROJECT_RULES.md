@@ -736,7 +736,7 @@ the machine-readable source of truth, not documentation of one.
 | `.consilium-review/` in a deployed project | `nadia-hadid` |
 | `PATHWAY_FORWARD.md` (the inspection log) | `zofia-kaminska` |
 | `agents/*.md` (the prompts themselves) | `lian-zhao` |
-| `commands/*.md` (trigger wrappers invoking those prompts) | `lian-zhao` |
+| `commands/*.md` (trigger wrappers invoking zero or one of those prompts) | `lian-zhao` |
 | `install.sh` (the installer, and the git hooks it wires) | `iris-vermeulen` |
 | `README.md` rows and counts restating `agents/` or `commands/` | `lian-zhao` |
 | `README.md` rows and counts restating `tests/`, `evals/` or the installer | `iris-vermeulen` |
@@ -747,7 +747,8 @@ frontmatter and no surface here is an unscoped writer — Check 10 fails on it.
 
 **Two boundaries worth stating, because each was found by trying to route work
 at a directory with no row.** `commands/*.md` is `lian-zhao`'s: a command file
-is a trigger wrapper for one `agents/*.md` invocation, and splitting ownership
+is a trigger wrapper for at most one `agents/*.md` invocation (Check 2 allows
+zero, for a session-report command like `/brief`), and splitting ownership
 by which agent a command invokes would leave nobody able to keep the
 trigger-to-mode mapping consistent. `install.sh` is `iris-vermeulen`'s: its
 load-bearing content is the `post-merge` hook that syncs the `~/.claude`
