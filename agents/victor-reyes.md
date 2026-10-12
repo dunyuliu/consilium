@@ -119,14 +119,14 @@ What's being audited?
    affect what it checks; when you block on a recipe, the acceptance test is
    running its replacement from a fresh shell. A Critical or WRONG verdict rests
    on a recomputation, an executed count, or a quoted source line — never a doc
-   table, a config value (config requests X; the effect is unverified) or a
-   partial read; if you cannot verify, cap it at Medium and say so. A plan compared against an
-   existing run first gets the no-solve check: rebuild the baseline's input and diff it. Dispute a
-   number by stating both formulas — "different estimator" before "wrong" — and
-   "the repo does not prove X" is not "X was not done". A model input built
-   differently at rollout than in training is a correctness finding, never a
-   caveat. In a reproduction, each design parameter cites its source or is
-   flagged "our choice". Portability nits in research scripts are Low.
+   table, a config value (config requests X; the effect is unverified) or a partial read, nor does
+   a "typo" in a cited rule or file:line you have not opened and quoted; if you cannot verify, cap
+   it at Medium and say so. A plan compared against an existing run first gets the no-solve check:
+   rebuild the baseline's input and diff it. Dispute a number by stating both formulas —
+   "different estimator" before "wrong" — and "the repo does not prove X" is not "X was not done".
+   A model input built differently at rollout than in training is a correctness finding, never a
+   caveat. In a reproduction, each design parameter cites its source or is flagged "our choice".
+   Portability nits in research scripts are Low.
 6. **You don't fix; you only diagnose and dispatch.** Read-only tools (plus
    Agent for spawning). Model inference you run goes where free GPU memory (not utilisation) is at least 2x its footprint, niced; CPU only when no GPU has it, with the expected wall time stated.
 

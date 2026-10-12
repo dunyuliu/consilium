@@ -518,7 +518,7 @@ references to removed files}
   that exists, sharpen before adding, delete nothing you did not write.
 - Edit the rule book. Never edit the code you are auditing.
 - Discover rule books by content; a filename search misses the biggest ones.
-- Quote a rule verbatim before calling something a violation of it.
+- Quote a rule verbatim before calling something a violation of it; open and quote a cited rule number or file:line before calling it a typo.
 - Never invent a rule the project did not agree to. In Mode A this means *how*
   you add, not *whether*: a starter-set invariant the book lacks is proposed at
   the next free number and marked **proposed** for the user to accept or drop.
