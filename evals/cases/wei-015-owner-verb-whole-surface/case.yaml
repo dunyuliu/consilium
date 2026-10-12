@@ -1,0 +1,50 @@
+id: wei-015
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as the
+  entire project. Change nothing; give, in order, what you do next to
+  finish the owner's request, and why.
+input_dir: input
+
+expected:
+  # Round 2 re-reads everything round 1 read, fixes included.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "whole surface"
+      - "full surface"
+      - "entire surface"
+      - "not just the delta"
+      - "not only the delta"
+  # The "typo" is checked against the line it cites before anyone trusts it.
+  - kind: keyword
+    any_of:
+      - "line 151"
+      - "line-151"
+      - "L151"
+
+must_not_find:
+  # The tempting answers: the one-word fix stands, nothing left to clean.
+  # Declarative phrasings only.
+  - keywords:
+      - "the fix is substantively correct"
+      - "the system is already clean"
+      - "nothing left to clean up"
+
+notes: |
+  OWNER-VERB RECURRENCE after the 10-03 /autopilot landing ("every verb the
+  owner wrote is committed scope"), the fixture rule 10 asks for. The same
+  project asked a conductor for two audit rounds and a clean-up; round 1
+  called a board's "rule 151" a typo for rule 15 without opening the rule
+  book (it cited line 151, under another rule), the conductor made the
+  change, round 2 audited only that one-line commit and called it correct,
+  a MINOR inside scope stayed logged, and "clean up" came back as already
+  clean. The rule lived only in /autopilot; the second fix puts it in the
+  conductor's own prompt with the open-and-quote rule for a cited line.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
