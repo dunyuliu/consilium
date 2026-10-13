@@ -180,8 +180,28 @@ lines).
 
 ## 9. CI run this release was gated on
 
-__PENDING — transcribed in the single follow-up commit after the tag, per
-agents/haruto-nakamura.md step 12.__
+**Process note.** `main` enforces a required status check ("check") that must
+be green on a commit's own SHA before it can land — a direct `git push
+origin main` of the release commit (SHA `6869a79`) was rejected by branch
+protection (not by this project's own gate). Landed instead via PR #132
+(release branch, squash-merged), matching this agent's documented PR
+fallback: the pre-merge SHA `6869a79` ran CI green (both the `push`-trigger
+run on `release/v1.29.1` and the `pull_request` run against `main`), then the
+squash-merge produced the actual tagged SHA `cf87275`, which also ran CI
+green (run id `38340094699`, workflow `structural-invariants`, conclusion
+`success`) before the tag was created. The tagged SHA is `cf87275`.
+
+Pre-tag fresh-clone check (step 11): a clone of `cf87275` into an empty
+scratch directory, `bash tests/check.sh` → 1279 passed, 0 failed, matching
+the pre-push count exactly (this project ships no pinned manifest or image —
+"pure bash, no dependencies" per `tests/check.sh`'s own header — so there is
+no narrower environment to build from). The same known anomaly v1.29.0
+flagged recurred and was not re-chased: running the same clone's
+`check.sh` under an artificially stripped `PATH` (`env -i PATH=/usr/bin:/bin`)
+silently completed with only 1204 passed, 0 failed — fewer assertions ran,
+none reported as failed or skipped. Already flagged to `iris-vermeulen`
+(gate owner) in v1.29.0; not reproducible via anything README documents, so
+not treated as a release blocker here either.
 
 ## 10. Trend since v1.29.0 (a5fe24e)
 
