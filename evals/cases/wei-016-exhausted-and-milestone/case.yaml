@@ -1,0 +1,47 @@
+id: wei-016
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as the
+  entire project. Change nothing; say whether you send the draft end
+  report, and if not, what you do instead, in order, and why.
+input_dir: input
+
+expected:
+  # The open row with no blocker means the queue is not done.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "not exhausted"
+      - "isn't exhausted"
+      - "is not done"
+  # The milestone cycle needs no owner approval when the book is silent.
+  - kind: keyword
+    any_of:
+      - "pre-authoriz"
+      - "pre-authoris"
+      - "preauthoriz"
+      - "unattended scope"
+
+must_not_find:
+  # The tempting answer: send the draft as it stands. Declarative only.
+  - keywords:
+      - "send it as written"
+      - "send the draft as written"
+      - "the draft is accurate"
+
+notes: |
+  QUEUE-EXHAUSTED AND MILESTONE RECURRENCE, the fixture rule 10 asks for.
+  Loop rule 1 has said since 10-03 that a turn ends only when every open
+  row is closed or carries a named unblock event (sharpened 10-05), and
+  Phase 3a since 10-08 that a run that merged anything ends with a tag or
+  a stated blocker. On 10-12 one project reported a "queue exhausted"
+  summary that left an unblocked row out entirely, and a run that cut no
+  tag because a clear board "isn't an owner-approved release boundary".
+  The second fix counts open rows against the board and rules that reason
+  out as a blocker. Why it exists and the pass bar are in this README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.

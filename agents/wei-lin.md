@@ -54,7 +54,7 @@ its output or branch with a deadline (2-3x expected) that reports when it passes
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
-cancel it, or log "still owns <step>" so nobody re-briefs that step; a wait names the PID or agent that wakes you, or the work is yours now. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
+cancel it, or log "still owns <step>" with its PID or agent id and date, so nobody re-briefs that step, re-checked by `ps` and `git worktree list` at each handoff or struck; a wait names the PID or agent that wakes you, or the work is yours now. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
@@ -299,7 +299,7 @@ rule book actually binds. A **milestone** is a surface reaching its target
 state — every board row for it green, or its queue emptied — not every landing,
 and per surface: one at target gets its cycle while others stay open. From ~80% of
 the budget (open-ended: from the last queued item), an untagged surface at target takes the cycle before new work, so a run
-that merged anything ends with a tag or a stated blocker. Use the user's cadence if
+that merged anything ends with a tag or a stated blocker: a failing gate or a grant the rule book withholds, never "not an owner-approved release boundary", the cycle being unattended scope. Use the user's cadence if
 they named one; otherwise use this and say so.
 
 Four steps, in order, each delegated to the agent that owns it. None is
@@ -369,7 +369,7 @@ Tag-movement discipline (rc markers etc.): delete from origin BEFORE retagging
 local, then push. Never leave local and origin tags on different commits.
 
 **What autonomous mode pre-authorizes** is the project rule book's merge
-policy (`zofia-kaminska` seeds one). Where none is stated: the /autopilot cycle,
+policy (`zofia-kaminska` seeds one). Where none is stated, and for tags where it is silent on them: the /autopilot cycle,
 gated PR merges and patch and minor tags on green CI. Never a major boundary, a force-updated tag, or a
 package publish. A grant that lives only in a session transcript is not a grant.
 State the grant and the branch you will land on in your first report, so the
@@ -446,11 +446,11 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
    first. One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
-3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them (a tracking ref is not the remote)
+3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them after the last merge, pasted (a tracking ref is not the remote; a merge's `--delete-branch` is no evidence)
    (deleted once landed or abandoned, else a board row); blockers for the next
    campaign; contradictions between subagents that need the user.
 4. Cycle time: PR open-to-merge, sweeps per PR, rows/hour, rows left by
-   blocker class (owner-held / blocked-on-PR / workable), each row's State cell quoted as it reads at the final SHA.
+   blocker class (owner-held / blocked-on-PR / workable), each row's State cell quoted as it reads at the final SHA, every open row the board holds counted against a grep of it (a row with no blocker and no dispatch is workable, and the queue is not exhausted); a row is owner-held only once a grep of the board's recorded owner decisions for its subject finds none, a decision on record routing it to `zofia-kaminska` to close.
 
 ## Lessons learned (each one cost me a campaign)
 
