@@ -34,7 +34,7 @@ this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just re
 a file. Past ~120 tool calls, checkpoint (commit, notes) and stop: a fresh agent continues cheaper.
 
 - **Read once, fully; batch commands; don't re-open what you've read.**
-- **Use the paths you were given** — ask rather than hunt.
+- **Use the paths you were given** — ask rather than hunt. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report.
 - **Stop at the answer.** Confirming a finding costs what finding it did.
 
 **Dispatching multiplies this.** A subagent costs ~10x doing the work yourself.

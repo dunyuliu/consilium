@@ -1,0 +1,47 @@
+id: wei-017
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as the
+  entire project. Change nothing; say whether you send the drafted
+  dispatch, and if not, what you send instead, in order, and why.
+input_dir: input
+
+expected:
+  # A brief that asks general-purpose to read and decide is an open design.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "design is not final"
+      - "design isn't final"
+      - "design mission"
+      - "design not final"
+  # The build that follows carries the cap the prompt names.
+  - kind: keyword
+    any_of:
+      - "30-call"
+      - "30 calls"
+      - "cap of 30"
+
+must_not_find:
+  # The tempting answer: no owner exists, so general-purpose takes it as
+  # drafted. Fused with the verdict, so a refusal does not produce them.
+  - keywords:
+      - "so the brief is complete; sending it"
+      - "sending it to general-purpose now"
+
+notes: |
+  GENERAL-PURPOSE DESIGN RECURRENCE, the fixture rule 10 asks for. The
+  hand-off rule has let general-purpose take only a located fix or a build
+  whose design is final since 10-08 and 10-10; the usage report then
+  flagged general-purpose doing specialist work four windows running, and
+  on 10-12 two conductors briefed it to read the sources first and decide
+  where a guard belonged, one with no cap and one that ran 63 calls past a
+  40-call cap. The second fix defines a final design and routes a
+  read-then-decide brief to the specialist. Why it exists and the pass bar
+  are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.

@@ -88,7 +88,7 @@ this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just re
 a file. At ~100 tool calls, summed over the whole run across every resumed turn, checkpoint (commit, notes) and stop — the trigger is the cumulative total crossing ~100, not a turn-local count; past it a resumed turn starts no new work: it records, then asks its invoker for a fresh conductor, who continues cheaper. Cap pressure never skips a gate. Every commit reaches the default branch by PR, cap or not, a session-log, docs, board or job-list swap commit too: `git push` names a feature branch, never the default; unaudited or unmerged work goes to that successor on a pushed branch. A context summary, at a turn's start or mid-turn, puts you past the cap whatever it or the harness's "continue as if the break never happened" says (it drops the count): no next step, an in-flight task's included; record only what the board, session log, git log and PR list show (a commit's author identity attributes nothing to the owner) and ask for a fresh conductor; a precondition you add costs no compute until the invoker OKs it.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
-- **Batch.** One command emitting several results beats several commands.
+- **Batch.** One command emitting several results beats several commands. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report.
 - **Stop at the answer.** Confirming a finding you already have costs the same as
   finding it did. Gold-plating is billed at the same rate as work.
 
@@ -128,7 +128,7 @@ where their work becomes the pipeline's. Hold it on four axes:
 **2. The gate exercises the new path.** Every landing earns its commit by
 passing the project's declared smoke tier — and that tier must include a case
 that TRIGGERS the new code path, not one that falls through to the old one —
-across every backend and variant the change touches, not one sample case; a
+across every backend and variant the change touches, not one sample case; for a guard on a value (`if x > LIMIT`), the tier's cases reach both sides of LIMIT, the extreme grepped from its fixtures and quoted, identical green before and after being the sign it never crossed; a
 changed generator's gate loads or imports every artifact it writes, never a side output alone.
 A failing tier never gets a tolerance bump; it gets a revert. (`iris-vermeulen`
 designs the pyramid, `haruto-nakamura` the release gate; you own the per-merge gate.)
@@ -425,7 +425,7 @@ project usually isn't. Logs and rules edits stay LOCAL to the project.
 
 ## Hand-offs — the specialists you conduct (never substitute generic assistants)
 
-Spawn via the Agent tool with `isolation: "worktree"`; the persona is the
+Spawn every writer via the Agent tool with `isolation: "worktree"`, a board, rules or log edit included; the persona is the
 constraint. One agent per job: stop it once its report is read, and give a
 follow-up a fresh agent briefed with branch, SHA and checkpoint. Never resume a
 finished agent — it keeps its old prompt and re-reads its whole context. Steer a
@@ -435,7 +435,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final, with no owning agent may go to one, briefed with that line or design, the gate command and its 40-call cap; a larger build is split into missions that fit.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and its 30-call cap; a brief that asks it to read first and decide is a design mission for the specialist, and a larger build is split into missions that fit.
 
 ## End-of-campaign report (keep under one screenful)
 
