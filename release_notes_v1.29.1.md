@@ -187,11 +187,15 @@ protection (not by this project's own gate). Landed instead via PR #132
 (release branch, squash-merged), matching this agent's documented PR
 fallback: the pre-merge SHA `6869a79` ran CI green (both the `push`-trigger
 run on `release/v1.29.1` and the `pull_request` run against `main`), then the
-squash-merge produced the actual tagged SHA `cf87275`, which also ran CI
-green (run id `38340094699`, workflow `structural-invariants`, conclusion
-`success`) before the tag was created. The tagged SHA is `cf87275`.
+squash-merge produced SHA `cf87275`, which also ran CI green (run id
+`38340094699`, workflow `structural-invariants`, conclusion `success`)
+before this section was first drafted. A second small follow-up PR (#133)
+then landed on top of it to fill in this section while both were still
+knowable pre-tag, producing SHA `9d630d9`, which ran CI green in turn (run
+id `38340420822`, same workflow, conclusion `success`). **The tagged SHA is
+`9d630d9`.**
 
-Pre-tag fresh-clone check (step 11): a clone of `cf87275` into an empty
+Pre-tag fresh-clone check (step 11): a clone of `9d630d9` into an empty
 scratch directory, `bash tests/check.sh` → 1279 passed, 0 failed, matching
 the pre-push count exactly (this project ships no pinned manifest or image —
 "pure bash, no dependencies" per `tests/check.sh`'s own header — so there is
@@ -272,5 +276,14 @@ carrying a latent grading defect this release's audit found but did not fix
 
 ## 12. Release gate
 
-__PENDING — transcribed in the single follow-up commit after the tag, per
-agents/haruto-nakamura.md step 12.__
+`bash tests/release_gate.sh release_notes_v1.29.1.md` in a fresh clone of the
+tag, after the Release was created: 5 passed, 0 failed, 0 skipped.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream (checked on
+  `main` in the fresh clone, after the tag).
+- ci: PASS — green on `9d630d95` (two runs: the push to `main` at merge, and
+  the tag push itself; both `success`).
+- publish: PASS — `v1.29.1` pushed and pointing at `9d630d95`.
+- release: PASS — GitHub Release exists for `v1.29.1`.
+- clone: PASS `9d630d9` — fresh clone of `v1.29.1`, README's install block and
+  its first following command both exited 0.
