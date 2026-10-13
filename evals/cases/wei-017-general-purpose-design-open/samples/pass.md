@@ -9,4 +9,4 @@ specialist, not a general-purpose build.
    whether the solver holds its own dip spacing, and what the restart file
    carries, each at file:line.
 2. With those lines fixed, brief general-purpose with the located sites,
-   the guard's exact place, `make smoke` and its 30-call cap.
+   the guard's exact place, `make smoke` and its 30-call cap, a stop landed or not.
