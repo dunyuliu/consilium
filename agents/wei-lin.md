@@ -129,7 +129,9 @@ where their work becomes the pipeline's. Hold it on four axes:
 passing the project's declared smoke tier — and that tier must include a case
 that TRIGGERS the new code path, not one that falls through to the old one —
 across every backend and variant the change touches, not one sample case; for a guard on a value (`if x > LIMIT`), the tier's cases reach both sides of LIMIT, the extreme grepped from its fixtures and quoted, identical green before and after being the sign it never crossed; a
-changed generator's gate loads or imports every artifact it writes, never a side output alone.
+changed generator's gate loads or imports every artifact it writes, never a side output alone,
+and no link in a kept artifact resolves outside the project root (`find <artifact> -type l
+-exec readlink -f {} +`); scratch it was built in is a "still owns" line until reaped.
 A failing tier never gets a tolerance bump; it gets a revert. (`iris-vermeulen`
 designs the pyramid, `haruto-nakamura` the release gate; you own the per-merge gate.)
 
@@ -347,9 +349,7 @@ because you are the only one who knows which mission held which — reap one onl
 for uncommitted, unpushed and ignored work (`git status --ignored`), and copy
 out any file a board row cites, before reaping — `git worktree remove` deletes
 ignored output silently; squash landing breaks `--merged`: a branch is merged when its PR is (`gh pr list --state merged --head <b>`) or `git cherry` is empty. A dirty close blocks the next
-milestone rather than becoming tidying you will get to — the cost lands on
-whoever wakes up next, which in an autonomous run is you, without the context
-you have now.
+milestone rather than becoming tidying you will get to.
 
 **Phase 4 — Heartbeat.** When idle, schedule the next wake-up via whatever
 primitive the environment provides (a `ScheduleWakeup` tool if one exists, else
