@@ -22,6 +22,12 @@ expected:
       - "30-call"
       - "30 calls"
       - "cap of 30"
+  # And the cap is a stop whether or not the build has landed; a "stop if
+  # not landed" cap ran two 10-13 builds to 58 and 92 calls.
+  - kind: keyword
+    any_of:
+      - "landed or not"
+      - "whether or not it lands"
 
 must_not_find:
   # The tempting answer: no owner exists, so general-purpose takes it as
@@ -38,7 +44,9 @@ notes: |
   on 10-12 two conductors briefed it to read the sources first and decide
   where a guard belonged, one with no cap and one that ran 63 calls past a
   40-call cap. The second fix defines a final design and routes a
-  read-then-decide brief to the specialist. Why it exists and the pass bar
+  read-then-decide brief to the specialist. Hours after it, briefs carried
+  a 30-call cap "without landing" and ran 58 and 92 calls; the third makes
+  the cap a stop landed or not. Why it exists and the pass bar
   are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in
