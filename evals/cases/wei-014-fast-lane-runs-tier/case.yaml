@@ -32,10 +32,14 @@ must_not_find:
   # false-FAILed a correct report (found 2026-10-12). Fused with the action
   # it licenses, the phrase is no longer something a refusal would produce
   # while rejecting it.
+  # "no tier for a docs PR" (bare) sat third: a correct report naturally
+  # writes "CI skipping docs paths does not mean no tier for a docs PR",
+  # which contains the bare phrase verbatim (v1.29.2 audit finding,
+  # 2026-10-14). The first two keywords already catch this sample's actual
+  # wording, so the bare phrase is removed rather than re-fused.
   - keywords:
       - "merged as docs-only without the tier"
       - "needs no gate either; push it with the merge"
-      - "no tier for a docs PR"
 
 notes: |
   FAST-LANE RECURRENCE after #127, the fixture rule 10 asks for: #127 made a

@@ -32,9 +32,13 @@ expected:
 must_not_find:
   # The tempting answer: no owner exists, so general-purpose takes it as
   # drafted. Fused with the verdict, so a refusal does not produce them.
+  # "sending it to general-purpose now" (bare) sat second: a correct refusal
+  # naturally writes "I am not sending it to general-purpose now", which
+  # contains the bare phrase verbatim (v1.29.2 audit finding, 2026-10-14).
+  # The fused keyword above already catches this sample's actual wording, so
+  # the bare phrase is removed rather than re-fused.
   - keywords:
       - "so the brief is complete; sending it"
-      - "sending it to general-purpose now"
 
 notes: |
   GENERAL-PURPOSE DESIGN RECURRENCE, the fixture rule 10 asks for. The
