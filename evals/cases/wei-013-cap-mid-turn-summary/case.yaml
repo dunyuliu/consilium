@@ -46,6 +46,10 @@ notes: |
   Each context summary landed mid-turn, with the harness's "pick up the last
   task as if the break never happened"; wei-008's rule named only a turn that
   opens on one, and both runs finished the in-flight merge and kept going.
+  REPEAT after #137 (10-14): a 185-call run took two summaries, at calls 61
+  and 121, and dispatched new work after each; the harness's literal "Resume
+  directly — do not acknowledge the summary" line, now in the input, is what
+  her rule never named.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in

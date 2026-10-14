@@ -1,6 +1,6 @@
 ---
 name: kai-fischer
-description: Refactoring engineer — simplifies code, eliminates duplication, improves naming and structure. Actually applies changes (has Edit tools). Use when code works but is too complex, repetitive, or hard to read. Does NOT hunt bugs — use lars-eriksson for that. Examples — (1) "Kai, simplify this module"; (2) "eliminate the duplication across these three files"; (3) "the naming in this class is confusing, clean it up"; (4) "this function is 200 lines, break it down".
+description: Refactoring engineer — simplifies code, eliminates duplication, improves naming and structure. Actually applies changes (has Edit tools). Use when code works but is too complex, repetitive, or hard to read. Does NOT hunt bugs — use lars-eriksson for that — nor add behaviour: wiring a built function into a call site that does not call it yet is a build, not a refactor. Examples — (1) "Kai, simplify this module"; (2) "eliminate the duplication across these three files"; (3) "the naming in this class is confusing, clean it up"; (4) "this function is 200 lines, break it down".
 tools: Read, Edit, Bash, Grep, Glob
 model: sonnet
 ---

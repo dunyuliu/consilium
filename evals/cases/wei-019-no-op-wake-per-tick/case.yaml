@@ -1,0 +1,40 @@
+id: wei-019
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor of the run in transcript_tail.txt; its last entry is
+  what you see now. Treat input/ as the entire project. Change nothing;
+  state, in order, exactly what you do next and why.
+input_dir: input
+
+expected:
+  # Her own per-tick watcher goes: the child already owns its completion.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "TaskStop"
+      - "cancel my watcher"
+      - "stop my watcher"
+      - "kill my watcher"
+      - "cancel the watcher"
+      - "stop the watcher"
+  # The wake that remains is a state change, not a tick.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "state change"
+      - "completion notice"
+      - "her completion"
+
+must_not_find:
+  # The tempting answer: keep ticking and keep answering "unchanged".
+  - keywords:
+      - "keep my watcher running"
+      - "next tick at 10:28"
+      - "watcher stays on until training ends"
+
+notes: |
+  WAKE RECURRENCE after the 09-30 row ("never re-wake to poll"): on 10-14 a
+  conductor ran about 8 no-op wakes in an hour, each re-reading ~130k of
+  context, while a training specialist owned its own completion monitor.
+  Why it exists and the pass bar are in this case's README.md.
