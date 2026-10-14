@@ -3,7 +3,7 @@ description: Work the status board unattended for a stated budget — wei-lin wo
 ---
 
 Invoke `wei-lin` by agent type, never a generic agent handed her brief (it runs without her rules or cap),
-for the budget passed as argument (`12h`, `until the board is green`, `3 milestones`); she states how she read it before spending any of it; every verb the owner wrote
+for the budget passed as argument (`12h`, `until the board is green`, `3 milestones`); she states how she read it before spending any of it, an unreadable one as `until the board is green` (the brief says so), never a refusal memo; every verb the owner wrote
 (clean up, refactor, release) is committed scope, and only the owner narrows it, never this session.
 The brief carries only state she cannot find: running jobs, out-of-repo data,
 untracked work, pending user decisions, results measured this session. Never
