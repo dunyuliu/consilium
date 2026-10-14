@@ -234,7 +234,14 @@ at 5752 (ceiling 5754, 2 lines headroom).
 
 ## 9. CI run this release was gated on
 
-PENDING_CI_SECTION
+Pending at commit time: this section describes the PR's own commit
+(`27c3435`) and, once known, the post-squash-merge SHA and the tag SHA — none
+of which exist yet while this note is being drafted and pushed for PR review.
+Per v1.29.1 precedent (that release's own §9, and its follow-up commit
+`9c65c85`), this section is filled in a follow-up commit once the merge SHA's
+CI run has concluded and the tag is about to be cut — never left blank
+permanently, and never used to justify tagging before CI is actually read
+green on the tag's own SHA (rule 15a).
 
 ## 10. Trend since v1.29.1 (9d630d9)
 
@@ -249,7 +256,12 @@ PENDING_CI_SECTION
   worse by this measure alone — new coverage added, none of it graded yet.
 - **Tracked text lines** (`git diff --shortstat 9d630d9..HEAD -- '*.md'
   '*.yaml'`, counted across the whole repo, not only `agents/`+`commands/`):
-  PENDING_DIFFSTAT
+  50 files changed, 741 insertions(+), 56 deletions(-) — inflated by the
+  `release_notes_v1.29.1.md` archive move, which git counts as a full
+  delete-and-recreate rather than a rename (its content changed between the
+  tag and the archive move, via #134's own follow-up commit, so similarity
+  detection does not fire). Net of that one file, the real content growth is
+  the three new fixtures plus this release's four guard-fix comments.
 - **Board currency** (`PATHWAY_FORWARD.md`): 28 VERIFIED, 1 BROKEN, 0 blank
   `last-checked` rows — identical at both commits; the board was not touched
   by this diff.
@@ -307,4 +319,11 @@ disclosed fixed (§5) and one new fixture-design question added (§6).
 
 ## 12. Release gate
 
-PENDING_GATE_SECTION
+Pending at commit time: `bash tests/release_gate.sh release_notes_v1.29.2.md`
+cannot resolve its `publish`/`release`/`clone` rows until the tag and GitHub
+Release exist (it SKIPs them by design until then — see the script's own
+`publish_result` gating). Per v1.29.1 precedent, this section is filled in a
+follow-up commit once the tag is cut and the gate has been re-run against it;
+the tag itself is never created until the gate that precedes it (CI on the
+merge SHA, plus a manual pre-tag clone check) is independently green, so
+nothing here stands in for that decision.
