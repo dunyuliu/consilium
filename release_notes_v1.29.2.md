@@ -234,14 +234,34 @@ at 5752 (ceiling 5754, 2 lines headroom).
 
 ## 9. CI run this release was gated on
 
-Pending at commit time: this section describes the PR's own commit
-(`27c3435`) and, once known, the post-squash-merge SHA and the tag SHA — none
-of which exist yet while this note is being drafted and pushed for PR review.
-Per v1.29.1 precedent (that release's own §9, and its follow-up commit
-`9c65c85`), this section is filled in a follow-up commit once the merge SHA's
-CI run has concluded and the tag is about to be cut — never left blank
-permanently, and never used to justify tagging before CI is actually read
-green on the tag's own SHA (rule 15a).
+**Process note.** `main` enforces a required status check, same as v1.29.1 —
+direct `git push origin main` was not attempted for the release commit; it
+landed via PR #141 (branch `release/v1.29.2`, squash-merged), producing SHA
+`cb219c8`. That squash captured the branch's first commit only — its second
+commit (fixing three literal `PENDING_*` placeholder tokens left in this
+note, found by re-reading the committed blob before tagging) had not yet been
+pushed when #141 merged. The fix was cherry-picked (`b023d90` →
+`6c63577`) onto a new branch and landed via a second PR, #142
+(squash-merged), producing SHA `5fcb044`. **The tagged SHA is `5fcb044`.**
+
+CI: the pre-merge commit `6c63577` ran green on both triggers (`push` on
+`release/v1.29.2-fixup`, run id `38540926051`, and `pull_request` against
+`main`, run id `38540933485`, both `success`) before PR #142 was merged. The
+squash-merge itself (`5fcb044`) then ran CI green in turn (`push` on `main`,
+run id `38540996425`, workflow `structural-invariants`, conclusion
+`success`) — read and confirmed green before the tag was created, per rule
+15a.
+
+Pre-tag fresh-clone check (step 11, run manually, distinct from
+`tests/release_gate.sh`'s own post-tag `clone` row): a clone of `5fcb044`
+into an empty scratch `$HOME`, running exactly what `README.md` documents —
+its `## Install` block (`git clone` + `bash install.sh`) then the next
+`bash`-tagged block (`bash tests/check.sh`). Cloned SHA matched `5fcb044`
+exactly; `install.sh` exited 0; `tests/check.sh` exited 0 with **1249
+passed, 0 failed** — fewer assertions than the 1326 seen locally, consistent
+with this project's documented shallow-clone caveat (Checks 27 and 28
+disappear with no tags/history in a fresh single-branch clone; neither
+failed nor was silently skipped, both say so).
 
 ## 10. Trend since v1.29.1 (9d630d9)
 
@@ -319,11 +339,14 @@ disclosed fixed (§5) and one new fixture-design question added (§6).
 
 ## 12. Release gate
 
-Pending at commit time: `bash tests/release_gate.sh release_notes_v1.29.2.md`
-cannot resolve its `publish`/`release`/`clone` rows until the tag and GitHub
-Release exist (it SKIPs them by design until then — see the script's own
-`publish_result` gating). Per v1.29.1 precedent, this section is filled in a
-follow-up commit once the tag is cut and the gate has been re-run against it;
-the tag itself is never created until the gate that precedes it (CI on the
-merge SHA, plus a manual pre-tag clone check) is independently green, so
-nothing here stands in for that decision.
+`bash tests/release_gate.sh release_notes_v1.29.2.md`, run on `main` after
+the Release was created: 5 passed, 0 failed, 0 skipped.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream. (First run
+  FAILed on a still-held `haruto-release` repo lock from this release's own
+  work; released, then this row passed.)
+- ci: PASS — green on `5fcb0448`.
+- publish: PASS — `v1.29.2` pushed and pointing at `5fcb0448`.
+- release: PASS — GitHub Release exists for `v1.29.2`.
+- clone: PASS `5fcb0448` — fresh clone of `v1.29.2`, README's install block
+  and its first following command both exited 0.
