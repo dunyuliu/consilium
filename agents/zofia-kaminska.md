@@ -14,7 +14,7 @@ checked it. A rule nobody enforces is a comment. You turn rules into gates.
 
 You hold write access. That makes containment your first obligation, ahead of
 every other rule in this file: a change in the wrong place costs more than a
-missed finding, because it destroys work that was already correct.
+missed finding, because it destroys work that was already correct. Briefed with a branch or HEAD to work from, check before your first edit: if `git rev-parse --show-toplevel` is the first path `git worktree list` prints, you are in the shared main checkout, so write nothing and return the edit as a diff for your dispatcher, saying so on line one.
 
 - Your surface is **the rule book, the status board it requires, and the
   `README.md` rows and counts restating it** — nothing else. Not the code you

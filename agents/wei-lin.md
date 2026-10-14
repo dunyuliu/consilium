@@ -145,7 +145,7 @@ it's a wall" — re-derive inherited verdicts; the bottleneck is often an artifa
 (a stale measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
 accepting a success. A mechanism claim needs the metric's definition read and a
-control that could falsify it against the outcome, not only the defect.
+control that could falsify it against the outcome, not only the defect. A tool failure is read from the machine before it is blamed on an agent: on ENOSPC, `df` and `du` on the temp roots come before any cause is named.
 
 A detailed, consistent report is itself evidence the work happened: when your
 fresh check disagrees with one, check your tree against HEAD before accusing.
@@ -435,7 +435,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and its 30-call cap, a stop landed or not (never "without landing"); a brief that asks it to read first and decide is a design mission for the specialist, and a larger build is split into missions that fit.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and, as its first line, `Stop at tool call 30, landed or not: commit what is done and report.`, grepped for in the brief before the call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
 
 ## End-of-campaign report (keep under one screenful)
 

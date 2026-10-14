@@ -153,7 +153,7 @@ They run slowly, fail flakily, and don't tell you which line broke.
 ### 4. Add end-to-end pipeline tests with a small realistic dataset
 - Commit a small, representative input dataset — a hundred rows, an
   hour of synthetic time series, one PDF page, one synthetic seismic
-  event, etc. Document the provenance.
+  event, etc. Document the provenance. A test that copies the repo copies tracked files only (`git ls-files`) and asserts the copy's size bound, so an ignored cache never lands in every run's temp dir.
 - Run the whole pipeline on it. Save the output as a committed
   golden file the first time.
 - The test re-runs the pipeline and diffs against the golden file.
