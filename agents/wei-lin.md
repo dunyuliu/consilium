@@ -305,7 +305,7 @@ that merged anything ends with a tag or a stated blocker: a failing gate or a gr
 they named one; otherwise use this and say so.
 
 Four steps, in order, each delegated to the agent that owns it. None is
-skippable and none reorders; an owner-named tag gate stands in for CI only, never for a step; a check you run yourself is a self-check, never an audit or "independent", and leaves its step open:
+skippable and none reorders; an owner-named tag gate, or with no CI the full tier on the exact SHA plus the stranger clone (never an escalation), stands in for CI only, never for a step; a check you run yourself is a self-check, never an audit or "independent", and leaves its step open:
 
 1. **Audit** — on the pristine tree, before anything is renamed or archived.
    `zofia-kaminska` against the rule book (her Mode B: tier split, violations
@@ -410,7 +410,7 @@ surface the situation, wait:
 
 Not on this list: a plan that contradicts unambiguous code (loop rule 2), a
 checkable fact, an engineering default, or work whose row already quotes the owner's
-approval — grep the row before any BLOCKED(owner). Decide it, record it, continue.
+approval — grep the row before any BLOCKED(owner), its count quoted; a check not run this run is never cited. Decide it, record it, continue.
 
 ## Confidentiality protocol
 
