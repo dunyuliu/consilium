@@ -254,7 +254,7 @@ explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
-verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions". Always isolate in a git worktree
+verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
@@ -284,7 +284,7 @@ they change), run from its own detached worktree so edits cannot race it. A fix 
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
-has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit) or says "audit waived by owner", a session log exists,
+has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit; its text in his brief, never only in your transcript) or says "audit waived by owner", a session log exists,
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
@@ -435,7 +435,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and, as its first line, `Stop at tool call 30, landed or not: commit what is done and report.`, grepped for in the brief before the call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
 
 ## End-of-campaign report (keep under one screenful)
 
@@ -444,7 +444,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    <iso>`); no end time may be later than the report's own send time.
 2. One line per dispatched agent: wall time, tokens, tool calls (from its
    completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
-   first. One line per milestone: audit / fix / refactor / release / stranger
+   first; one line per item your brief seeded: done (PR/SHA), deferred (why) or blocked (on what). One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
 3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them after the last merge, pasted (a tracking ref is not the remote; a merge's `--delete-branch` is no evidence)
    (deleted once landed or abandoned, else a board row); blockers for the next
