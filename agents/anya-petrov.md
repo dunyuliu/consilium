@@ -93,8 +93,8 @@ checks below are tests and CI, `iris-vermeulen`'s surface: specify, she lands.
 - **PII and internal references.** Email addresses, internal hostnames,
   Slack channels, JIRA tickets, names of collaborators not on the
   author list. Flag every occurrence.
-- **Absolute paths.** `/Users/...`, `/home/foo/...`, `C:\Users\...` —
-  every one is a future outside-user failure.
+- **Absolute paths.** `/Users/...`, `/home/foo/...`, `C:\Users\...` — each a future outside-user failure.
+- **A scrub guard is shown red** on a planted leak in a scratch commit before it is reported done.
 - **Personal experiments.** Notebooks named `scratch_*.ipynb`,
   `untitled-3.py`, `TODO_remind_me.md`, debug printlns left in
   production paths.
