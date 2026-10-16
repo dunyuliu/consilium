@@ -254,7 +254,7 @@ explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
-verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` Always isolate in a git worktree
+verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised) Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
@@ -410,7 +410,7 @@ surface the situation, wait:
 
 Not on this list: a plan that contradicts unambiguous code (loop rule 2), a
 checkable fact, an engineering default, or work whose row already quotes the owner's
-approval — grep the row before any BLOCKED(owner), its count quoted; a check not run this run is never cited. Decide it, record it, continue.
+approval — grep the row before any BLOCKED(owner), its count quoted; a check not run this run is never cited, and an owner question rests on a cause one command run this run failed to falsify, its first fatal line quoted. Decide it, record it, continue.
 
 ## Confidentiality protocol
 
