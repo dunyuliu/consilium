@@ -170,17 +170,28 @@ failed (this release). `agents/`+`commands/` line count: unchanged at 5752
 
 **Process note.** `main` lands every release commit through a PR, same as
 v1.29.1 and v1.29.2 (#147 codified this); direct `git push origin main` was
-not attempted. This release's commit lands via a release PR from branch
-`release/v1.29.3`, cut in an isolated worktree.
+not attempted for either the release commit or this follow-up. The release
+commit landed via PR #149 (branch `release/v1.29.3`, squash-merged),
+producing SHA `832e62e6`.
 
-Pending at commit time — filled by a follow-up docs-only commit once the PR
-has merged, the squash-merge commit's own CI run (`push` trigger on `main`)
-has been read and confirmed green for that exact SHA (rule 15a), and the
-pre-tag fresh-clone check (step 11, distinct from `tests/release_gate.sh`'s
-own post-tag `clone` row) has been run against it: the merge SHA, its CI run
-id/conclusion, and the pre-tag clone result. The tag is created only after
-all of that is green; per rule 8 this note is never rewritten to hide that
-sequence, only extended.
+Pre-merge: commit `43ec9655` (the PR branch tip) ran green on both triggers
+(`push` on `release/v1.29.3`, run id `38877416595`, and `pull_request`
+against `main`, run id `38877433783`, both `success`) before PR #149 was
+merged. The squash-merge itself (`832e62e6`) then ran CI green in turn
+(`push` on `main`, run id `38877513470`, workflow `structural-invariants`,
+conclusion `success`) — read and confirmed green before the tag was
+created, per rule 15a. **The tagged SHA is `832e62e6`.**
+
+Pre-tag fresh-clone check (step 11, run manually, distinct from
+`tests/release_gate.sh`'s own post-tag `clone` row): a clone of `832e62e6`
+into an empty scratch `$HOME`, running exactly what `README.md` documents —
+its `## Install` block (`git clone` + `bash install.sh`) then the next
+`bash`-tagged block (`bash tests/check.sh`). Cloned SHA matched `832e62e6`
+exactly; `install.sh` exited 0 (`consilium installed: 23 agents, 22
+commands, 1/1 hooks wired`); `tests/check.sh` exited 0 with **1348 passed, 0
+failed** — the same count seen on the release branch (no shallow-clone
+check disappearance this time, since the clone carried full history and
+tags).
 
 ## 10. Trend since v1.29.2 (5fcb044)
 
@@ -246,7 +257,13 @@ release's own hand (none were made — §5).
 
 ## 12. Release gate
 
-Pending at commit time — `bash tests/release_gate.sh release_notes_v1.29.3.md`
-cannot pass the `publish`, `release`, or `clone` rows until the tag and its
-Release exist, which happens only after every pre-tag gate is green (rule
-15a/15b). Filled by the same follow-up commit as §9, after the tag is cut.
+`bash tests/release_gate.sh release_notes_v1.29.3.md`, run in a fresh clone
+of the pushed tag (checked out to `main`, tracking `origin/main`): 5 passed,
+0 failed, 0 skipped.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream.
+- ci: PASS — green on `832e62e6`.
+- publish: PASS — `v1.29.3` pushed and pointing at `832e62e6`.
+- release: PASS — GitHub Release exists for `v1.29.3`.
+- clone: PASS `832e62e6` — fresh clone of `v1.29.3`, README's install block
+  and its first following command both exited 0.
