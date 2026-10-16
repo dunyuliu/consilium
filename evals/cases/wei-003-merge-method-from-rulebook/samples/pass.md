@@ -1,7 +1,8 @@
 # Conductor — landing PR #14
 
 The notes fix the merge method: a merge commit, since the supplement and the
-board cite SHAs. The fast lane changes the checks, not the method.
+board cite SHAs. A script changed, so this is not the fast lane; either
+way the method is the notes', never the default.
 
 1. `gh pr checks 14` — run 812 success on head 7f03b2d.
 2. `gh pr merge 14 --merge --delete-branch`

@@ -37,6 +37,9 @@ notes: |
   milestone report line landed 2026-10-08, and the same project then
   reported two docs-only runs that squash-merged under a merge-commit-only
   rule book and called each landing a milestone without the agreed line.
+  The fast-lane fix (#111) then recurred on docs-plus-script PRs, whose
+  landing step still read "Squash-merge"; the input now touches a script
+  so the case reaches that step, not only the fast lane.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in
