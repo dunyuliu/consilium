@@ -284,7 +284,7 @@ they change), run from its own detached worktree so edits cannot race it. A fix 
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
-has an external validation step — ask. Squash-merge, delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit; its text in his brief, never only in your transcript) or says "audit waived by owner", a session log exists,
+has an external validation step — ask. Merge with the rule book's method flag (read before the run's first merge, never the default), delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit; its text in his brief, never only in your transcript) or says "audit waived by owner", a session log exists,
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
