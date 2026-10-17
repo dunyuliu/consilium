@@ -160,7 +160,7 @@ declared_defects:
       - "instant-payment"
 
 notes: |
-  Origin: PF-017 follow-up. lian-zhao landed rule 26's portable half in
+  Origin: board row 17 follow-up. lian-zhao landed rule 26's portable half in
   agents/iris-vermeulen.md ("### 6. Audit the existing tests") and in
   agents/wei-lin.md's merge gate, and named the gap: no iris-*/wei-lin-* case
   exercised "measure before removing a signal", so landing the prompt text

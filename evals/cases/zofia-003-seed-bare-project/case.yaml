@@ -58,7 +58,7 @@ must_not_find:
   # anything and may well say so, so the guard fired on exactly the behaviour
   # the harness demands. The case prompt now asks for the seed as a report.
   #
-  # This is the class of defect PF-003 exists to find: the fixture was wrong
+  # This is the class of defect board row 3 exists to find: the fixture was wrong
   # and only attempting to run it showed that. Restore those guards only
   # alongside a writable staging mode, which is not built.
   # Wrong classification at Step 0. Declarative, and subject-first so a denial

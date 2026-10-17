@@ -105,7 +105,7 @@ notes: |
   checksum-verifies.
 
   Run (2026-08-27, dispatched, scoped to a staged copy): FAIL - 6 criteria, 1 failed (must_not_find matched "| Critical |").
-  Scored the fixture, not the agent (the PF-011 class): the input then carried
+  Scored the fixture, not the agent (the board row 11 class): the input then carried
   three real undeclared defects. Input cleaned the same day.
 
   Re-run (2026-08-27, after the input was cleaned): PASS - 6 criteria, 0 failed.

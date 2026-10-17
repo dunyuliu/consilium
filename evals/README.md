@@ -180,7 +180,7 @@ matter, so read which is which.**
 
 **Built (2026-08-05).** `declared_defects:` in `case.yaml` lists every real
 defect in `input/`, whether or not it is required for a pass — including the
-ones nobody planted, found while auditing the corpus (PF-011) and declared
+ones nobody planted, found while auditing the corpus (board row 11) and declared
 rather than deleted. `run.sh grade` reports how many were mentioned:
 
 ```
