@@ -20,12 +20,16 @@ function emit_item() {
     cur = ""; cur_state = ""; has_cmd = 0; has_result = 0; infence = 0
 }
 
-# --- board table: | PF-001 | `area` | claim | STATE | date | interval | prio |
+# --- board table: | 1 | `area` | claim | STATE | date | interval | prio |
 #
 # `prio` is appended rather than inserted on purpose: every field here is read
 # by position, so a column in the middle would silently shift state, date and
 # interval one place left and Check 12 would validate the wrong cells.
-section == "board" && /^\| *PF-[0-9]+ *\|/ {
+# Every data row under '## Board' is emitted whatever its id looks like: a
+# filter on the id shape would drop a malformed row unchecked, so Check 12
+# judges the id instead (1, 2, 3; splits 1a, 1b; `PF-NNN` is the old spelling).
+/^## / { inboard = ($0 ~ /^## Board/) }
+section == "board" && inboard && /^\|/ && !/^\| *id *\|/ && !/^\|[-| ]+$/ {
     n = split($0, f, "|")
     id = f[2]; area = f[3]; state = f[5]; last = f[6]; iv = f[7]; prio = f[8]
     gsub(/^ +| +$/, "", id);    gsub(/^ +| +$/, "", area)
@@ -36,11 +40,11 @@ section == "board" && /^\| *PF-[0-9]+ *\|/ {
     next
 }
 
-# --- item blocks: ### PF-001 — `area` — STATE
-section == "items" && /^### PF-[0-9]+/ {
+# --- item blocks: ### 1 — `area` — STATE
+section == "items" && /^### [0-9]+[a-z]? —/ {
     emit_item()
     line = $0
-    match(line, /PF-[0-9]+/); cur = substr(line, RSTART, RLENGTH)
+    match(line, /[0-9]+[a-z]?/); cur = substr(line, RSTART, RLENGTH)
     # state is the last em-dash-separated field, minus any trailing qualifier
     n = split(line, parts, / — /)
     cur_state = parts[n]
@@ -64,8 +68,8 @@ section == "items" && infence {
 # shell cannot be reconstructed by a line-oriented parser, and the first attempt
 # at rule 21a broke by joining `for ...; do` fragments with `;`. Check 17 fails
 # such a fence instead of guessing.
-section == "evidence" && /^### PF-[0-9]+/ {
-    match($0, /PF-[0-9]+/); ev_id = substr($0, RSTART, RLENGTH); next
+section == "evidence" && /^### [0-9]+[a-z]? —/ {
+    match($0, /[0-9]+[a-z]?/); ev_id = substr($0, RSTART, RLENGTH); next
 }
 section == "evidence" && /^```bash/ { ev = 1; ec = ""; en = 0; er = ""; next }
 section == "evidence" && /^```/ {
@@ -78,7 +82,7 @@ section == "evidence" && ev {
     next
 }
 
-# --- deferral log: | 2026-08-04 | PF-003 | 2026-09-03 | reason |
+# --- deferral log: | 2026-08-04 | 3 | 2026-09-03 | reason |
 section == "defer" && /^\| *20[0-9][0-9]-/ {
     n = split($0, f, "|")
     id = f[3]; until_d = f[4]

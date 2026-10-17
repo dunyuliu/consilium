@@ -43,7 +43,7 @@ die() { echo "error: $1" >&2; exit 2; }
 # A record written under rule 25d reads:
 #   Run (<date>, <agent>, prompt <short-SHA>). <VERDICT> — <k> criteria, <m> failed.
 # Records written before 25d landed name no SHA and are NEVER backfilled — an
-# invented SHA is a guess wearing a receipt (PF-027). A SHA-bearing record is
+# invented SHA is a guess wearing a receipt (board row 27). A SHA-bearing record is
 # always compared by SHA: match -> CURRENT, mismatch -> STALE.
 #
 # A SHA-less (legacy) record falls back to the date comparison this repo ran
@@ -51,7 +51,7 @@ die() { echo "error: $1" >&2; exit 2; }
 # events. Measured 2026-09-16 (session log, finding 26): of the legacy records
 # with a run history, every one whose date differs from its agent prompt's
 # last-commit date is EARLIER (14 cases) or LATER (10 cases) — never same-day
-# in this corpus, i.e. PF-024's blind spot (same-day edit, no way to order by
+# in this corpus, i.e. board row 24's blind spot (same-day edit, no way to order by
 # date) has zero known members here, and reserving UNKNOWN PROVENANCE for
 # every legacy record regardless of date converted those 14 true STALE
 # positives into shrugs. So:
@@ -387,7 +387,7 @@ cmd_grade() {
     # Rule 5 admits exactly one eval pass criterion, so this cannot move it.
     # What it CAN do is make an uncredited-but-correct finding visible. Several
     # cases carry real defects that are not in `expected` — found while auditing
-    # the inputs (PF-011) and declared rather than deleted, because an
+    # the inputs (board row 11) and declared rather than deleted, because an
     # undeclared true defect makes a thorough audit score no better than a
     # shallow one. Before this block those defects were recorded in prose that
     # nothing read.
@@ -481,14 +481,14 @@ cmd_smoke() {
 # A verdict is only about the prompt that produced it. A SHA-bearing "Run
 # (...)" line names the prompt file's SHA at dispatch time and `list`
 # compares it against `agents/<agent>.md`'s SHA now, so a same-day
-# edit-then-dispatch (invisible to a date compare, PF-024) is caught.
+# edit-then-dispatch (invisible to a date compare, board row 24) is caught.
 #
 # Records that existed before rule 25d landed name no SHA, and rule 25d
 # forbids backfilling one — annotating a verdict with a SHA nobody recorded
 # is inventing data. Such a record falls back to the date comparison this
 # repo ran before 25d, but only where a date can actually order the two
 # events — see the header above `classify_case` for the measurement that
-# settled this (session log, finding 26 / PF-027 follow-up):
+# settled this (session log, finding 26 / board row 27 follow-up):
 #   - legacy date EARLIER than the prompt's last commit -> STALE.
 #   - legacy date LATER -> CURRENT (nothing known contradicts it).
 #   - legacy date EQUAL -> UNKNOWN PROVENANCE, the one case a date genuinely

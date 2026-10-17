@@ -86,7 +86,7 @@ Read this list first; jump to a rule only when it is load-bearing.
 | 23a | The dispatch-cost warning tracks the Agent tool exactly | mechanical — Check 20 |
 | 26 | Before removing, weakening, or replacing a signal, measure what it currently catches | mechanical in part — a check could require a before/after count in the commit message; whether the count was measured against the real corpus is judgment |
 | 27 | A restriction does not survive a dispatch hop — restate it in every sub-brief | norm — no mechanism logs dispatch briefs today |
-| 28 | A gate that blocks a correct action is a P1 defect in the machinery, not a reason to wait | norm, since whether a blocked action was *correct* is a judgment call — the override for two of three incidents already exists and is named; the third is open as PF-033 |
+| 28 | A gate that blocks a correct action is a P1 defect in the machinery, not a reason to wait | norm, since whether a blocked action was *correct* is a judgment call — the override for two of three incidents already exists and is named; the third is open as board row 33 |
 
 ---
 
@@ -264,7 +264,7 @@ carve-out does not apply, whatever the note's quality.
 **Tier**: norm — condition (1) needs the platform's release history, which
 `tests/check.sh` cannot reach (rule 21b). A check could require the deletion
 commit to cite the tag and both conditions, so Check 28 verifies the paperwork
-exists without verifying the facts inside it. Not built; PF-031.
+exists without verifying the facts inside it. Not built; board row 31.
 
 ## 9. Run the cheap check locally before you push
 
@@ -514,7 +514,7 @@ case.** Corollaries, each paid for:
   answer's denial contains it — guarding `"Williams"` in a case declaring a
   Williams defect admits no correct report at all. **Not mechanizable**: three
   candidate checks were measured across all 23 cases and each either missed
-  known instances or failed correct content (PF-011). The test is one command,
+  known instances or failed correct content (board row 11). The test is one command,
   so run it.
 
 **Mechanically linted (Check 16)**: an `expected` term may not also be a
@@ -551,9 +551,9 @@ retroactive obligation on the cases already in the suite.
 
 **Rationale**: `evals/run.sh`'s STALE check compares calendar dates, so a
 same-day prompt edit and dispatch are unordered and a verdict can silently
-outlive the prompt it was produced against (PF-024); separately, a fixture
+outlive the prompt it was produced against (board row 24); separately, a fixture
 whose pass bar is itself a judgement call was being graded from one dispatch,
-indistinguishable from a settled measurement (PF-025). One field closes both.
+indistinguishable from a settled measurement (board row 25). One field closes both.
 
 **How to apply**: name the prompt file's SHA at dispatch time
 (`git log -1 --format=%h -- agents/<agent>.md`); set `contested: true` with a
@@ -976,7 +976,7 @@ same thing to the next writer.
 red-gate dispatch → 18b step 5; `tests/release_gate.sh`'s `row_skip` paths →
 `--accept-skips`; `tests/lock.sh acquire` refusing a second holder → a
 recorded force-release (18a). `evals/run.sh` and CI gate nothing terminally.
-Check 35's newest-tag grace has no override today — board row PF-033.
+Check 35's newest-tag grace has no override today — board row 33.
 
 ---
 

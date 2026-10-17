@@ -541,7 +541,7 @@ required.
   wrong. Precision is read, not computed.
 - `install.sh` has since been exercised by hand under a sandboxed `HOME` —
   clean clone, dirty target, foreign symlink, real file, `--force`, second
-  install — and PF-010 is closed. It still has no automated test; the structural
+  install — and board row 10 is closed. It still has no automated test; the structural
   invariants are covered by `tests/check.sh`, the script itself is not.
 - Statistics specialist for p-hacking, multiple comparisons, study
   design.
@@ -570,7 +570,7 @@ for users, `PATHWAY_FORWARD.md` as a living prioritized board, and
 - **Not yet**: nothing holds a seeded README to being *credible* —
   concise is asked for, evidence-backed is not. The board's missing
   priority column was the other half of this and is now closed
-  (PF-018): `prio` is required on every row, seeded by invariant 12,
+  (board row 18): `prio` is required on every row, seeded by invariant 12,
   and read by `/autopilot`.
 
 ### 2. Release: does it cover what a release owes?

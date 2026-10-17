@@ -23,7 +23,8 @@
 #   9. Every eval fixture's line_range still brackets its declared anchor.
 #  10. The rule-19 write-surface ownership table is complete and exclusive.
 #  11. Every write-surface owner declares isolation as its first section.
-#  12. PATHWAY_FORWARD.md is current and every VERIFIED claim cites a command.
+#  12. PATHWAY_FORWARD.md is current, its row ids well-formed and unique, and
+#      every VERIFIED claim cites a command.
 #  13. Every agent declares a communication-discipline section.
 #  14. Every agent declares tool economy (section presence only).
 #  15. Every fixture ships pass/fail sample reports that grade as labelled.
@@ -454,6 +455,7 @@ else
     today_d=$(days "$(date -u +%Y-%m-%d)")
 
     board_rows=0
+    declare -A seen_id=()
     declare -A item_state=() item_cmd=()
     while IFS='|' read -r id st hc hr; do
         [ -z "$id" ] && continue
@@ -471,6 +473,13 @@ else
         [ -z "$id" ] && continue
         board_rows=$((board_rows + 1))
         err=""
+        # Row ids: 1, 2, 3; a split 1a, 1b; never reused (PF-NNN is retired).
+        if ! printf '%s' "$id" | grep -qE '^[1-9][0-9]*[a-z]?$'; then
+            err="bad row id '$id' — ids are 1, 2, 3 and splits 1a, 1b"
+        elif [ -n "${seen_id[$id]:-}" ]; then
+            err="row id $id appears twice — an id is never reused"
+        fi
+        seen_id[$id]=1
         case "$st" in VERIFIED|OPEN|BROKEN|DEFERRED|RETIRED) ;; *) err="bad state '$st'" ;; esac
         # Rule 21's priority. A row with no priority cannot be queued, and a
         # board that cannot be queued is an archive: state says how bad a row
@@ -689,7 +698,7 @@ echo "Check 19: must_not_find guards are declarative, not imperative"
 # WHAT THIS CHECKS, EXACTLY: that no guard begins with one of the verbs below.
 # The list is finite, so a guard opening with a verb not on it passes — this is
 # named narrowly for that reason and is not the general claim that every guard
-# survives its negation, which is not mechanizable (see PF-011).
+# survives its negation, which is not mechanizable (see board row 11).
 #
 # `cutting` is deliberately absent: "cutting rina-solberg.md is safe" is
 # declarative and negates cleanly. An -ing form is a gerund, not an imperative.
@@ -984,7 +993,7 @@ echo "Check 30: no expected keyword appears in ordinary finding-free prose"
 # TERM-LEVEL, NOT WHOLE-CASE: grading each case against one hollow report
 # catches only the most egregious, because a generic report cannot carry the
 # domain words a finding-free report in that domain would use. Testing each
-# term's NEGATION is the dead end PF-011 records. What is decidable is whether
+# term's NEGATION is the dead end board row 11 records. What is decidable is whether
 # the term is a word ordinary review prose already contains.
 #
 # WHAT THIS CHECKS, EXACTLY: that no `expected` or `location` keyword appears in
