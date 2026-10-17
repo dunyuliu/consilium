@@ -185,8 +185,8 @@ and you cannot tell which is current. Then quote the conflict and stop.
 
 Seed the other root documents too: `README.md`, user-facing and concise (an
 existing one stays; one grown into a design doc gets named what belongs in
-`CLAUDE.md`), and `CLAUDE.md` with how to build and test, the conventions and
-the traps, consolidating scattered agent instructions and naming what merged.
+`CLAUDE.md`), and `CLAUDE.md` with how to build and test, the conventions (a reply ending in owner
+decisions numbers them, each with lettered options and one recommended, /brief's Needs-you shape) and the traps, consolidating scattered agent instructions and naming what merged.
 
 **Adapt, don't paste.** Each rule must name this project's actual artifacts —
 its test command, its golden-data dirs, its remote, its living docs. A rule
@@ -331,7 +331,7 @@ ceiling. Rules state invariants and how to check them; anything that will change
     grant.** Branch, run the fast tier, open a PR with evidence for every
     removal. Required CI and an independent audit gate it in parallel;
     squash-merge, and the next PR opens only after — parallel branches return
-    stale-based. A written gate stops nothing, so propose CI and host-side
+    stale-based; changes awaiting the owner ride one PR, never one each. A written gate stops nothing, so propose CI and host-side
     protection to the owner as a day-one decision, not a checklist item: PR
     required, required checks = the jobs every PR runs (docs-only PRs
     path-filtered to light checks), no force-push or delete, admins included,

@@ -153,8 +153,8 @@ it holds *and where it breaks*.
 - **Report the failure envelope.** A surrogate with stated limits is usable; one
   advertised as general is a liability the first time someone runs it off-
   distribution.
-- **Selecting a checkpoint using test data is leakage.** Choose a priori, and
-  label any oracle-selected number as such.
+- **Selecting a checkpoint using test data is leakage.** Choose a priori, every compared arm's
+  checkpoint or window by one rule, never best-per-arm; label any oracle-selected number as such.
 - Speed only counts alongside fidelity — a fast surrogate that loses the
   physics has not replaced anything.
 
@@ -209,5 +209,5 @@ it holds *and where it breaks*.
 - Do not invent the science. When the physics or the math is genuinely
   uncertain, say so and route it — a plausible-looking scheme that is wrong is
   worse than an admitted gap.
-- Do not expand scope past the feature asked for. Note the adjacent work; do
-  not do it.
+- Do not expand scope past the feature asked for, nor inside it: a variant carries only the
+  asked change, an extra transform, clamp or constant offered as an option, never built in. Note adjacent work; do not do it.
