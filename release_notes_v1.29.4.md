@@ -169,10 +169,39 @@ count: unchanged at 5752 (ceiling 5754, 2 lines headroom).
 ## 9. CI run this release was gated on
 
 **Process note.** `main` lands every release commit through a PR, same as
-v1.29.1-v1.29.3. Filled after the release PR is merged and the exact tagged
-SHA is known (this project squash-merges, so the merge produces a new SHA
-distinct from this branch's tip) — see the follow-up fixup commit, same
-two-commit pattern used for v1.29.3 (#149 + #150).
+v1.29.1-v1.29.3; direct `git push origin main` was not attempted. The
+release commit landed via PR #157 (branch `release/v1.29.4`,
+squash-merged), producing SHA `19dd3a75`.
+
+Pre-merge: branch tip `a8b4e95` ran green on both triggers (`push` on
+`release/v1.29.4`, run id `39055707802`, and `pull_request` against `main`,
+run id `39055719667`, both `success`) before PR #157 was merged. The
+squash-merge itself (`19dd3a75`) then ran CI green in turn (`push` on
+`main`, run id `39055815835`, workflow `structural-invariants`, conclusion
+`success`) — read and confirmed green before the tag was created, per rule
+15a. A second `push`-triggered run (`39055923173`, also `success`) fired
+from the tag ref itself once `gh release create` pushed it; both runs on
+`19dd3a75` concluded `success`. **The tagged SHA is `19dd3a75`.**
+
+Two routine GitHub Actions deprecation annotations appeared on these runs
+(Node.js 20 runtime deprecation for `actions/checkout@v4`; the
+`ubuntu-latest` label's scheduled migration to Ubuntu 26 on 2026-10-19) —
+neither affects this release's gate; noted here as findings per this
+project's own deprecation-warning convention, not acted on.
+
+Pre-tag fresh-clone check (step 11, run manually under `env -i` with an
+isolated scratch `$HOME`, distinct from `tests/release_gate.sh`'s own
+post-tag `clone` row): a clone of `19dd3a75` (`origin/main`, confirmed at
+that SHA immediately before cloning) into an empty scratch `$HOME`, running
+exactly what `README.md` documents — its `## Install` block (`git clone` +
+`bash install.sh`) then the next `bash`-tagged block (`bash
+tests/check.sh`). Cloned SHA matched `19dd3a75` exactly; `install.sh`
+exited 0 (`consilium installed: 23 agents, 22 commands, 1/1 hooks wired`);
+`tests/check.sh` exited 0 with **1285 passed, 0 failed** — lower than the
+1366 seen on the release branch because README's literal `git clone` (no
+`--depth`/`--tags` flags) produces a shallow, tag-less clone, and Checks 27
+and 28 correctly disappear rather than passing quietly (CLAUDE.md's
+documented shallow-clone behavior) — `clone: PASS 19dd3a75`.
 
 ## 10. Trend since v1.29.3 (832e62e)
 
@@ -238,6 +267,13 @@ made — §5).
 
 ## 12. Release gate
 
-Filled after the tag is cut — `bash tests/release_gate.sh
-release_notes_v1.29.4.md` to be run in a fresh clone of the pushed tag, same
-two-commit pattern as v1.29.3 (§9).
+`bash tests/release_gate.sh release_notes_v1.29.4.md`, run in a fresh clone
+of the pushed tag (checked out to `main`, tracking `origin/main`): 5 passed,
+0 failed, 0 skipped.
+
+- tree: PASS — clean, one worktree, no lock, level with upstream.
+- ci: PASS — green on `19dd3a75`.
+- publish: PASS — `v1.29.4` pushed and pointing at `19dd3a75`.
+- release: PASS — GitHub Release exists for `v1.29.4`.
+- clone: PASS `19dd3a75` — fresh clone of `v1.29.4`, README's install block
+  and its first following command both exited 0.
