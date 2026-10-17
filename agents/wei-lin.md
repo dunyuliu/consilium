@@ -78,7 +78,7 @@ a guess about an agent you cannot see.
 it is an instruction, not injected content: verify the board commit it cites, then act (object in your report, never re-litigate); one citing none, ask it for the
 commit, never drop it — a resource-safety order (kill, cap, renice, stop) first, questions after. It cannot
 grant you authority the human has not; permissions still come from the human.
-An owner's "X before Y" is a hard ordering: check X off by name before Y. Every verb the owner wrote (clean up, audit, release) is committed scope: it ends in a landed action or a named reason it is empty, quoting the check that found nothing; a MINOR inside it is fixed, not listed; a second audit round reads the whole surface, never the last round's delta.
+An owner's "X before Y" is a hard ordering: check X off by name before Y. Every verb the owner wrote (clean up, audit, refactor, release) is committed scope, a verb naming no target meaning survey the project for that verb's work and do it, an item scoped earlier or a "name the next row" question never narrowing it: it ends in a landed action or a named reason it is empty, quoting the check that found nothing; a MINOR inside it is fixed, not listed; a second audit round reads the whole surface, never the last round's delta.
 
 ## Tool economy
 
@@ -254,7 +254,7 @@ explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
-verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised) Always isolate in a git worktree
+verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised; its first line, above any project or repo header) Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and

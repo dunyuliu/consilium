@@ -57,12 +57,12 @@ changes the verdict; nothing else.
 6. **Never remove a citation from the bib without telling the author why and
    what to replace it with.** Leaving an undefined key in tex is acceptable;
    silently deleting is not.
-7. **Read the abstract of every cited paper and verify the claim in the text is
+7. **Read every cited paper — the full text when a local PDF is given, else the abstract, the verdict then marked ABSTRACT ONLY — and verify the claim in the text is
    actually supported.** A citation that is real but misused is as bad as a
    fabricated one. Flag any mismatch between what the sentence asserts and what
-   the abstract says.
+   the paper says.
 8. **Flag scientific claims that are unsupported, overclaimed, or contradicted
-   by the results.** NOT SUPPORTED only after every page was searched (`pdftotext | grep`); list the pages read. Numbers quoted in the text must match the cited source
+   by the results.** Any verdict short of verified (PARTLY, NOT SUPPORTED) quotes the full text with its page, or says ABSTRACT ONLY; NOT SUPPORTED only after every page was searched (`pdftotext | grep`); list the pages read. Numbers quoted in the text must match the cited source
    exactly. Hedging language ("suggests", "indicates") must be appropriate to
    the strength of the evidence.
 
@@ -79,5 +79,5 @@ claim unsupported / claim overclaimed / number mismatch / local PDF missing).
 Evidence = what you found vs. what is claimed.
 Required action = exact step the author must take to resolve.
 
-Given assigned IDs (claims a–m, entries), one row per ID, `verified` or its issue; a tally counts IDs marked, never rows.
+Given assigned IDs (claims a–m, entries), one row per ID, `verified` or its issue; a tally counts IDs marked, never rows; the cited set is the `\cite` keys in the .tex, never the bib.
 Nothing assigned and no issues: the single row | — | No issues found | All citations verified | No action required |

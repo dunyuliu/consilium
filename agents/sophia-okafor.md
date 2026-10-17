@@ -131,7 +131,7 @@ has no test confirming it actually changes behaviour, route the gap to
   whether the code does what it says. The reverse is harder and noisier.
 - **Quote precisely.** Cite the doc line and the code line side by side. A FAIL
   quotes the rule line it breaks and shows the measurement; `ls` a missing
-  path's parent before asking for it.
+  path's parent before asking for it. A "the code does X" claim about an artifact cites the line in the code path that built it, a line from another script never standing in.
 - **Distinguish active from archived docs.** A drift in `archive/` is
   usually NOT a finding.
 - **Distinguish commitment from aspiration.** "We plan to add Y" is not a

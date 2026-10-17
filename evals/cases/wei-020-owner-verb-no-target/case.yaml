@@ -1,0 +1,44 @@
+id: wei-020
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as the
+  entire project. Change nothing; state, in order, what you do next to
+  finish the owner's request, and why.
+input_dir: input
+
+expected:
+  # The refactor goes to the refactoring agent. None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "kai-fischer"
+  # The verb with no target is a survey of the code, not the board's last row.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "survey"
+      - "whole codebase"
+      - "entire codebase"
+      - "every module"
+
+must_not_find:
+  # The tempting answer: the decided follow-up was the round, ask for more.
+  # Declarative phrasings only.
+  - keywords:
+      - "authorizing exactly that narrow"
+      - "please name the next board row"
+      - "the refactor round is complete"
+
+notes: |
+  OWNER-VERB RECURRENCE after wei-015 (10-12) and the 10-03 /autopilot
+  landing: on 10-16 a conductor given "refactor round" read it as
+  authorising only a two-line follow-up decided the cycle before, did no
+  refactor work and asked the owner to name the next board row. The second
+  fix: a verb naming no target means survey the project for that verb's
+  work and do it; an earlier-scoped item never narrows it.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
