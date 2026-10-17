@@ -15,8 +15,8 @@ anything by hand.
 @software{liu2026consilium,
   author  = {Liu, Dunyu},
   title   = {Consilium},
-  version = {1.27.0},
-  date    = {2026-09-18},
+  version = {1.29.3},
+  date    = {2026-10-16},
   url     = {https://github.com/dunyuliu/consilium},
   license = {MIT}
 }
@@ -28,8 +28,8 @@ anything by hand.
 |---|---|
 | Author | Dunyu Liu, Institute for Geophysics, The University of Texas at Austin |
 | Title | Consilium |
-| Version | 1.27.0 |
-| Date released | 2026-09-18 |
+| Version | 1.29.3 |
+| Date released | 2026-10-16 |
 | License | MIT |
 | Repository | https://github.com/dunyuliu/consilium |
 

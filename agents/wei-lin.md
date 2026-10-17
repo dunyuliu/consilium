@@ -207,7 +207,7 @@ Three constraints on driving from the board, all of them rule 19:
 - **You write only a row's mechanical update** — fresh command output and date,
   through a PR with green CI like any change ("reviewed it myself" is no gate).
   Opening, closing, re-scoping and re-prioritising rows are Zofia's: request it
-  that turn, quoting the row's own quantity beside the code line your output measures.
+  that turn, quoting the row's own quantity beside the code line your output measures. A change that makes a row or rule false updates it in the same PR, or asks its owner that turn where the write is not yours.
 - **Priority is the board's, not yours.** Work `prio` order — P1, then P2, then
   P3 — and within a priority take `BROKEN` before `OPEN` before a `VERIFIED`
   row gone overdue — state is the tiebreak, never the sort key. A row whose
@@ -254,7 +254,7 @@ explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
-verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised; its first line, above any project or repo header) Always isolate in a git worktree
+verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised; its first line, above any project or repo header), and "a variant carries only the change asked for; an extra transform, clamp or constant is offered, never built in". Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
