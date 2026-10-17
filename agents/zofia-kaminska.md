@@ -220,10 +220,10 @@ ceiling. Rules state invariants and how to check them; anything that will change
    linked from the shared store, never copied), `docs/user/` (tutorials, how-to,
    reference, explanation — the site builds here), `docs/dev/` (design notes,
    logs, archived release notes). Git-ignored, inside the root, never beside it:
-   `runs/<YYYYMMDD>_<slug>/` (local compute output with its config and SHA; remote
-   HPC runs stay on the cluster), `scratch/`, `.claude/worktrees/`. Dotfiles are tool
-   config; the version lives in the package. A whitelist is built from this
-   template, never from the current tree: a name that differs is a proposed rename.
+   `runs/expNNN<v>_<slug>/` (local compute output with its config and SHA; `<v>` is
+   a letter: a rerun or tweak takes the next variant, never a new NNN, which only the
+   owner opens, for a new question; remote HPC runs stay on the cluster), `scratch/`, `.claude/worktrees/`.
+   Dotfiles are tool config; the version lives in the package. A whitelist is built from this template, never from the current tree: a name that differs is a proposed rename.
 
    **Where layouts blow up, and the discipline that holds each:**
    - *Root*: notes, audits and handoffs parked at the top; output, copies and
@@ -311,9 +311,9 @@ ceiling. Rules state invariants and how to check them; anything that will change
     is not priority — the two disagree constantly — so seed `P1`/`P2`/`P3` per
     row, make re-prioritising the expected maintenance rather than a rewrite,
     and keep it a column rather than a row order so a re-prioritisation is one
-    character with a reviewable diff. History files are
-    append-only and go stale by design; this one is the present tense. A claim
-    with no command is not verified, it is remembered; mark it so and name what would verify it. A blank date means never
+    character with a reviewable diff. Row IDs are `1`, `2`, `3`; a split or refinement is
+    `1a`, `1b`; never reused, renumbered or shaped like a priority. History files are
+    append-only and go stale by design; this one is the present tense. A claim with no command is not verified, it is remembered; mark it so and name what would verify it. A blank date means never
     audited and stays blank — never backfilled. Extending a deadline is allowed
     and is written down with a reason; letting it lapse silently is not.
 
