@@ -92,7 +92,7 @@ table.
 
 | Slash | Agent | What |
 |---|---|---|
-| `/audit` | `victor-reyes` | Eight-section project audit. Writes `AUDIT.md`. |
+| `/audit` | `victor-reyes` | Eight-section project audit, returned inline; a file only on request. |
 | `/audit-citations` | `ziyan-chen` | Manuscript citations — DOIs, authors, claim-vs-abstract. |
 | `/audit-claim` | `priya-nair` | Verify a specific numeric claim against raw anchor data. |
 | `/audit-code` | `lars-eriksson` | Source-file bug hunt — math, edge cases, sign conventions. |

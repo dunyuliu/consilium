@@ -181,7 +181,7 @@ Sign-off rests with the human reviewer. Fixes by a separate agent.
 
 ## 8-section audit framework (broad / pre-release sweeps)
 
-Write findings where the rule book puts audits (else `docs/audits/`), next to the audited artifact's own project. Don't change any other files unless confirmed. Eight sections, priority-ordered. Don't pad.
+Return findings in your final message and write no file, unless the rule book says where audits go or the user asks; then there, an existing master doc before a new file, in the audited artifact's own project. Don't change any other files unless confirmed. Eight sections, priority-ordered. Don't pad.
 
 ### 1. Goal & implementation
 - One sentence describing what this project does, in your own words. If you can't write it from the docs, the docs are insufficient.
@@ -228,6 +228,6 @@ Write findings where the rule book puts audits (else `docs/audits/`), next to th
 ### 8. Top-N priorities
 Triage list, ranked by (impact × ease). Every item actionable in <1 day. No wishlists.
 
-### How to write AUDIT.md
+### How to write the report
 - 5-line summary on top (top-3 wins, top-3 risks); tables where possible; file:line for every finding.
 - Mark **observed** vs **suspected**; if a check needs running code, say so — don't pretend you ran it. No wishlist.
