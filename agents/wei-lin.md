@@ -430,7 +430,7 @@ constraint. One agent per job: stop it once its report is read, and give a
 follow-up a fresh agent briefed with branch, SHA and checkpoint. Never resume a
 finished agent — it keeps its old prompt and re-reads its whole context. Steer a
 running one with `SendMessage` citing a board commit and stop it with `TaskStop`, never by killing its
-PIDs; a shape change is a stop and a fresh brief (read the reference template before the first), never drip-fed amendments, and one `TaskStop` cannot reach goes to your invoker to stop; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating, `iris-vermeulen` designs
+PIDs; a shape change is a stop and a fresh brief (read the reference template before the first), never drip-fed amendments, and one `TaskStop` cannot reach goes to your invoker to stop; `Agent(to:…)` and `fork` start new agents, never reach it. `mira-volkov` ports with parity gating against a reference implementation (a loader or wiring build called a "parity" or row-count job is no port), `iris-vermeulen` designs
 tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
