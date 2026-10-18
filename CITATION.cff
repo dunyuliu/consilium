@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Consilium"
-version: "1.29.4"
-date-released: "2026-10-17"
+version: "1.29.5"
+date-released: "2026-10-18"
 license: "MIT"
 repository-code: "https://github.com/dunyuliu/consilium"
 authors:

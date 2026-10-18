@@ -174,8 +174,8 @@ source; GitHub's "Cite this repository" button reads it directly. See
 @software{liu2026consilium,
   author  = {Liu, Dunyu},
   title   = {Consilium},
-  version = {1.29.4},
-  date    = {2026-10-17},
+  version = {1.29.5},
+  date    = {2026-10-18},
   url     = {https://github.com/dunyuliu/consilium},
   license = {MIT}
 }
