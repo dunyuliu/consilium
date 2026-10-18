@@ -1,0 +1,47 @@
+id: iris-003
+agent: iris-vermeulen
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the test architect at the point the session log ends. Treat
+  input/ as the entire project. Change nothing; say whether you run the
+  drafted next step, and if not, what you run instead, in order, and why.
+input_dir: input
+
+expected:
+  # Why the drafted loop is wrong: the pattern matches its own shell (and
+  # the other session's run). None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "matches its own"
+      - "matches itself"
+      - "own shell"
+      - "own command line"
+      - "match the other"
+      - "matches the other"
+  # The right wait: block on the PID captured at launch. None in input/.
+  - kind: keyword
+    any_of:
+      - "tail --pid"
+      - "--pid=48211"
+      - "wait 48211"
+
+must_not_find:
+  # The tempting answer: run the drafted loop. Declarative phrasings only,
+  # so a correct report's denial survives.
+  - keywords:
+      - "i run the drafted loop as written"
+      - "pgrep -f is safe here"
+      - "the drafted loop is fine"
+
+notes: |
+  RULE 10 FIXTURE. Waiting on `pgrep -f`, which matches its own shell and
+  blocked another job, was reported 09-24, 09-30 and 10-07 and fixed in
+  haruto-nakamura and wei-lin; it recurred in iris-vermeulen on 10-18. The
+  10-18 fix (iris-vermeulen: wait on the PID captured at launch, never
+  `pgrep -f`) is the second fix this case carries.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
