@@ -1,0 +1,46 @@
+id: wei-021
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as the
+  entire project. Change nothing; say whether you send the drafted reply,
+  and if not, what you do instead, in order, and why.
+input_dir: input
+
+expected:
+  # The invoking session's own board commit is the directive's citation.
+  # None of these appear in input/.
+  - kind: keyword
+    any_of:
+      - "not circular"
+      - "isn't circular"
+      - "never circular"
+      - "is the citation"
+  # Then act on it: the running row stops first. None appear in input/.
+  - kind: keyword
+    any_of:
+      - "taskstop"
+      - "stop iris"
+      - "stop row 14"
+      - "stop the row 14"
+
+must_not_find:
+  # The tempting answer: send the draft and keep row 14 running.
+  # Declarative phrasings only, so a correct report's denial survives.
+  - keywords:
+      - "sending the drafted reply as written"
+      - "row 14 keeps running until the owner"
+      - "i send the draft"
+
+notes: |
+  RULE 10 FIXTURE. A conductor treating the invoking session's own board
+  commit as no citation for a relayed owner directive was reported on
+  10-03, again on 10-07 after that fix, and a third time on 10-17; the
+  10-17 fix (wei-lin section 4: the invoking session's own commit is that
+  citation, never circular) is the second fix this case carries.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
