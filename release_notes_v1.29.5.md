@@ -117,7 +117,7 @@ below.
 | 4 | Minor | `agents/wei-lin.md` cost paragraph (~line 81) | The new stale-completion-notice check names `git branch -r --contains <SHA>` first; a squash-merged commit (this project's own merge policy, rule 20) will not be found by that command, so the check can false-negative "not landed" on exactly the merge shape this repo uses. "or its PR" partially saves it. | Deferred, same owner. |
 | 5 | Minor | `agents/zofia-kaminska.md:3` | Frontmatter `description` now says she "writes the rule book, the board **and the gate check it seeds**," in the same sentence that says "writing scripts go to another agent" — a gate check is a script. | Deferred, same owner. |
 | 6 | Minor | process, not content | Rule 10 ("fixture first or in the same commit") was not followed for either new fixture: `wei-021`'s fix landed in `87dce8e` with its fixture one commit later in `bce9b5a`; `iris-003`'s fix landed in `44ddc01` with its fixture one commit later in `de076cb`. No shipped-content impact — both fixtures exist and are structurally sound (findings 1-2 aside). | No action this release; the rule-book owner (`zofia-kaminska`) may want to record this as a recurring soft-miss. |
-| 7 | Low | `docs/release_notes_v1.29.4.md` ("Pre-tag fresh-clone check" paragraph, landed pre-archive by `d98fa1b`) | States README's literal `git clone` "produces a shallow, tag-less clone" — a plain `git clone <url>` is a full clone including tags, so the stated reason for 1285-vs-1366 passes in that note is likely wrong; the real cause is unverified. | **Cannot be fixed**: `v1.29.4` is already tagged and released; rule 8 forbids rewriting a prior release note once superseded, and this note is being archived to `docs/` in this same release (§3). Carried forward as an open, uncorrectable-in-place defect — see §6. |
+| 7 | Low | `docs/release_notes_v1.29.4.md` ("Pre-tag fresh-clone check" paragraph, landed pre-archive by `d98fa1b`) | States README's literal `git clone` "produces a shallow, tag-less clone" causing its 1285-vs-1366 pass-count gap. **Confirmed wrong by direct test** (§9): this release's own fresh clone of `e171b35` has all 42 tags and full history; re-running `tests/check.sh` in one checkout, once in a normal shell and once under `env -i`'s minimal `PATH`, reproduces the same kind of gap (1406 vs 1323) with no clone involved — the real cause is `gh` being absent from a minimal `PATH`, which degrades Check 35, not clone depth or tags. | **Cannot be fixed in place**: `v1.29.4` is already tagged and released; rule 8 forbids rewriting a prior release note once superseded, and this note is being archived to `docs/` in this same release (§3). Carried forward as an open, uncorrectable-in-place defect, now with its real cause identified — see §6. |
 | 8 | Minor | `agents/iris-vermeulen.md:51` | "and the ~120-call stop holds mid-diagnosis" restates line 43's existing "Past ~120 tool calls, checkpoint (commit, notes) and stop" three lines above — the mid-diagnosis exception reads better as a clause on the existing sentence than a second statement of the same number appended to an unrelated bullet. | Deferred — `agents/*.md` is `lian-zhao`'s surface. |
 
 No finding fell on a surface this release owns (release notes, version
@@ -143,9 +143,10 @@ files, tags) except finding 7, which rule 8 forecloses fixing in place.
   own `fail.md` sample; `wei-020`'s third guard is still untested by
   either sample — **confirmed untouched by this range**; carried forward,
   still open.
-- `docs/release_notes_v1.29.4.md`'s shallow-clone explanation is likely
-  wrong and now uncorrectable in place (§5, finding 7) — recorded here
-  rather than silently left for a future reader to trust.
+- `docs/release_notes_v1.29.4.md`'s shallow-clone explanation is confirmed
+  wrong (the real cause is `gh` missing from a minimal `PATH`, not clone
+  depth or tags — §5, finding 7, §9) and now uncorrectable in place —
+  recorded here rather than silently left for a future reader to trust.
 - Carried from v1.29.3/v1.29.4, unresolved and untouched by this range:
   `docs/lessons_ledger.md` call-count disagreements for rows 10-13/10-14;
   `wei-017`'s criteria not yet forcing lars-eriksson-first ordering;
@@ -176,11 +177,11 @@ pre-release-commit HEAD). `agents/`+`commands/` line count: unchanged at
   reviewed at merge time (each green on CI individually — confirmed in
   §10); this release re-audits their cumulative effect since v1.29.4, not
   each PR's own review.
-- Finding 7 (v1.29.4 note's shallow-clone claim) was not independently
-  re-derived from scratch — this release confirmed the claim is
-  *inconsistent with README.md's actual clone command* (no `--depth`/
-  `--single-branch` flag), not what the true cause of the pass-count
-  difference was.
+- Finding 7 (v1.29.4 note's shallow-clone claim) was independently
+  re-derived: this release's own pre-tag clone showed 42 tags and full
+  history present, and a same-commit, no-clone `env -i`-vs-normal-shell
+  comparison reproduced the same shape of pass-count gap, isolating the
+  true cause to `gh`'s absence from a minimal `PATH` degrading Check 35.
 - Per this project's leak-free instruction, CI and release references
   below are recorded by run id / tag / SHA, not by full host URL, and this
   note was grepped for absolute paths and personal names before every
@@ -189,15 +190,44 @@ pre-release-commit HEAD). `agents/`+`commands/` line count: unchanged at
 ## 9. CI run this release was gated on
 
 **Process note.** `main` lands every release commit through a PR, same as
-v1.29.1-v1.29.4; direct `git push origin main` was not attempted.
+v1.29.1-v1.29.4; direct `git push origin main` was not attempted. The
+release commit landed via PR #164 (branch `release/v1.29.5`,
+squash-merged), producing SHA `e171b35`.
 
-PENDING AT TIME OF WRITING — completed and transcribed into this same file
-in a follow-up commit before the tag is created, per the v1.29.3/v1.29.4
-precedent (`b1dcc86`, `d98fa1b`): the release branch's PR number, its
-pre-merge CI run, the squash-merge SHA, the CI run on that merged SHA
-(read and confirmed green before the tag, per rule 15a), and the pre-tag
-fresh-clone check (`clone: PASS <sha>`) against README's documented
-install + first command.
+Pre-merge: branch tip `8f71ef9` ran green on both triggers (`push` on
+`release/v1.29.5`, run id `39165746321`, and `pull_request` against `main`,
+run id `39165748708`, both `success`) before PR #164 was merged. The
+squash-merge itself (`e171b35`) then ran CI green in turn (`push` on
+`main`, run id `39165784144`, workflow `structural-invariants`, conclusion
+`success`) — read and confirmed green before the tag was created, per rule
+15a. **The tagged SHA is `e171b35`.**
+
+Pre-tag fresh-clone check (step 11, run manually under `env -i` with an
+isolated scratch `$HOME`, distinct from `tests/release_gate.sh`'s own
+post-tag `clone` row): a clone of `e171b35` (`https://github.com/dunyuliu/consilium.git`
+default branch, confirmed at that SHA immediately after cloning) into an
+empty scratch `$HOME`, running exactly what `README.md` documents — its
+`## Install` block (`git clone` + `bash install.sh`) then the next
+`bash`-tagged block (`bash tests/check.sh`). Cloned SHA matched `e171b35`
+exactly; `install.sh` exited 0 (`consilium installed: 23 agents, 22
+commands, 1/1 hooks wired`); `tests/check.sh` exited 0 with **1323 passed,
+0 failed** — lower than the 1406 seen in a normal shell, same commit.
+**Verified cause, not the shallow-clone explanation v1.29.4's note gave
+(§5 finding 7, confirmed wrong by direct test below)**: README's literal
+`git clone` is a full clone with all 42 tags present (`git tag | wc -l`
+inside the cloned checkout), not shallow or tag-less. The actual cause is
+`env -i`'s minimal `PATH` (`/usr/bin:/bin:/usr/local/bin`) excluding `gh`:
+re-running `tests/check.sh` in this same checkout, once under a normal
+shell and once under `env -i` with that same minimal `PATH`, reproduces
+1406 vs 1323 on the identical commit with no clone involved at all; the
+diff is exactly Check 35 degrading to "no gh CLI installed — cannot check
+for GitHub Releases, rule 15's Release half not checkable here" when `gh`
+is unreachable — `clone: PASS e171b35`.
+
+No new GitHub Actions deprecation annotations beyond the two already noted
+in v1.29.4's record (Node.js 20 runtime deprecation for
+`actions/checkout@v4`; the `ubuntu-latest` label's scheduled migration);
+neither affects this release's gate.
 
 ## 10. Trend since v1.29.4 (19dd3a7)
 
@@ -275,14 +305,17 @@ wrong.
 
 ## 12. Release gate
 
-PENDING AT TIME OF WRITING — `bash tests/release_gate.sh
-release_notes_v1.29.5.md` to be run in a fresh clone of the pushed tag and
-transcribed here in the same follow-up commit as §9, before the tag is
-created (rule 15b; the gate decides all five rows, this release engineer
-transcribes what it printed).
+`bash tests/release_gate.sh release_notes_v1.29.5.md`, run in a fresh clone
+of the pushed tag (checked out to `main`, tracking `origin/main`): 5
+passed, 0 failed, 0 skipped. (First run showed `ci` as SKIP — "no run
+found for e171b35d" — a few seconds of GitHub API propagation delay after
+`gh release create`; re-run moments later resolved it, confirmed directly
+via `gh api repos/dunyuliu/consilium/commits/e171b35.../check-runs`
+returning `conclusion: success` before the re-run.)
 
-- tree: pending
-- ci: pending
-- publish: pending
-- release: pending
-- clone: pending
+- tree: PASS — clean, one worktree, no lock, level with upstream.
+- ci: PASS — green on `e171b35`.
+- publish: PASS — `v1.29.5` pushed and pointing at `e171b35`.
+- release: PASS — GitHub Release exists for `v1.29.5`.
+- clone: PASS — fresh clone of `v1.29.5`, README's install block and its
+  first following command both exited 0.
