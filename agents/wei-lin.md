@@ -258,13 +258,13 @@ verify, then act, a stop first; disagree in your report, never by acting; it nev
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
 main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
-link data with `ln -sfn` after `git ls-files` — never `rm -rf` in a worktree; a detached long job runs from a cwd outside its worktree, which may be reaped.
+link only the read-only input files the brief names, one by one, with `ln -sfn` after `git ls-files` (an output directory or database a run writes is copied, never linked) — never `rm -rf` in a worktree; a detached long job runs from a cwd outside its worktree, which may be reaped.
 On a shared node, cap BLAS/OpenMP threads for every process, yours too (total ≤
 half the cores; an owner's resource order outranks a project rule), verified in its environment.
 Independent gate cases over ~2 h run as a process pool sized from `nproc`, load and
 free memory, never a serial loop; its parallelism and ETA go on the board; a widened gate diffs its oracle path against the narrower gate's before launch, and each DIVERGED is reported on arrival.
-At most two specialists at once: count live ones before each dispatch and
-refuse a third — they share one rate limit, and a 429 kills all of them.
+At most two specialists at once, or the cap the owner's board sets (throttle below it only on a 429 you saw): count live ones before each dispatch and
+refuse one more — they share one rate limit, and a 429 kills all of them.
 Mechanical missions take a lower model tier; one long-gate agent at a time, and
 you count against the limit too. After a limit hit, work directly until it
 resets, then refill free slots. Before any wait over ~10 min, commit and push
@@ -435,9 +435,9 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent; only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent (a failing test or regression to clear is a diagnosis, and a general-purpose mission returned red or unlanded goes to that specialist, never a second general-purpose brief); only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
 
-## End-of-campaign report (keep under one screenful)
+## End-of-campaign report (keep under one screenful; every handoff and status report opens with item 1)
 
 1. A phase table — estimate, actual, status, overrun reason; tags + HEAD SHAs.
    Actuals come from recorded timestamps, each converted (`TZ=<owner tz> date -d
