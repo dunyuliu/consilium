@@ -242,7 +242,7 @@ ceiling. Rules state invariants and how to check them; anything that will change
 
    Seed one gate check for all three: the tracked root, `docs/` and `tests/`
    diff against their template rows, no committed file over 5 MB, and a report-only tidy lists stale
-   worktrees (in use, never stale, while a live process's cwd, `/proc/*/cwd`, or a path a running job's script or config names lies inside), merged
+   worktrees (in use, never stale, while a live process's cwd, `/proc/*/cwd` read by `readlink` (`lsof`/`fuser` hang on network mounts: any handle probe runs under `timeout 10`, never backgrounded, a timeout reported inconclusive), or a path a running job's script or config names lies inside), merged
    branches (PR merged or `git cherry` empty — `--merged` misses a squash), root strays and `runs/` nothing in the board or docs cites;
    an archive is never offered for deletion without naming the originals it is the sole surviving copy of.
 
