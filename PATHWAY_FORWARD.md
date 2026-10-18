@@ -42,7 +42,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 3 | `evals/cases/` | ~~every fixture has been dispatched and graded at least once~~ — retired 2026-10-04, ground (c): rule 10 relaxed to fixtures for repeat failures only; hand-dispatched coverage is no longer a goal | RETIRED | 2026-10-04 | — | — |
 | 4 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
 | 5 | `docs/release_notes_*` | ~~no divergence between a release note and its tag goes unrecorded~~ — retired 2026-09-18, ground (b): the command read a tag's immutable content and printed the same 6 forever; v1.10.0's divergence stays recorded in the block below | RETIRED | 2026-09-18 | — | — |
-| 6 | `tests/check.sh` | the suite is green | VERIFIED | 2026-10-04 | 14 | P2 |
+| 6 | `tests/check.sh` | the suite is green | VERIFIED | 2026-10-18 | 14 | P2 |
 | 7 | `tests/check.sh` | the header's live `Verifies:` entries are exactly the checks the body runs, by number | VERIFIED | 2026-09-19 | 30 | P3 |
 | 8 | `tests/check.sh` | ~~checks 1–5 have been negative-tested~~ — retired 2026-09-18, ground (b): a historical fact about one day's work, watched by a green-suite command that cannot go red for it | RETIRED | 2026-09-18 | — | — |
 | 9 | `agents/` | ~~no agent prompt's body contradicts its own frontmatter or another agent's prompt~~ — retired 2026-09-18, ground (b): one string in one of 22 files standing in for a fleet-wide semantic claim | RETIRED | 2026-09-18 | — | — |
@@ -57,10 +57,10 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 18 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-19 | 30 | P3 |
 | 19 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-09-19 | 30 | P3 |
 | 20 | `tests/check.sh` Check 27 | the untagged-release-note check exists independent of any one tag's current state | VERIFIED | 2026-09-19 | 30 | P3 |
-| 21 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-10-04 | 14 | P3 |
+| 21 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-10-18 | 14 | P3 |
 | 22 | `agents/` | `lian-zhao`'s frontmatter no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-19 | 30 | P3 |
-| 23 | `tests/lock.sh` | the lock resolves to the same shared file from a main checkout and any linked worktree | VERIFIED | 2026-10-04 | 14 | P3 |
-| 24 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-10-04 | 14 | P3 |
+| 23 | `tests/lock.sh` | the lock resolves to the same shared file from a main checkout and any linked worktree | VERIFIED | 2026-10-18 | 14 | P3 |
+| 24 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-10-18 | 14 | P3 |
 | 25 | `evals/cases/zofia-004-seed-patch-established` | causes 1–2 fixed (`iris-vermeulen`); rests on criterion 3 alone — a named substring-grading limit, not a gap, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | 26 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-19 | 30 | P3 |
 | 27 | `evals/cases/*/case.yaml`, `evals/run.sh` | ~~a verdict names the prompt SHA it was graded against; a contested case cites its sample count (rule 25d)~~ — retired 2026-09-18, ground (a): the SHA half is row 24's mechanism and no contested case survives the 36→10 cut | RETIRED | 2026-09-18 | — | — |
