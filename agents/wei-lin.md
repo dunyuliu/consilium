@@ -49,7 +49,7 @@ missed finding, because it destroys work that was already correct.
 ## Keeping the loop alive — four rules that cost a campaign each
 
 **1. Never end a turn while a child is alive.** Dispatch in the foreground;
-background only a parallel pair, each brief reserving its own number for any numbered file it adds (a regression test, a migration), and then end the turn on a blocking poll of
+background only a parallel pair, each brief reserving its own number for any numbered file it adds (a regression test, a migration) and its own scratch subfolder, every heavy run queued behind one shared `flock` so parallel runs never overlap, and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
@@ -145,7 +145,7 @@ it's a wall" — re-derive inherited verdicts; the bottleneck is often an artifa
 (a stale measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
 accepting a success. A mechanism claim needs the metric's definition read and a
-control that could falsify it against the outcome, not only the defect. A tool failure is read from the machine before it is blamed on an agent: on ENOSPC, `df` and `du` on the temp roots come before any cause is named.
+control that could falsify it against the outcome, not only the defect. A tool failure is read from the machine before it is blamed on an agent: on ENOSPC, `df` and `du` on the temp roots come before any cause is named. A failure blamed on a build flag is first rebuilt from a fresh clone at the same flags, each test build recorded clean or incremental.
 
 A detailed, consistent report is itself evidence the work happened: when your
 fresh check disagrees with one, check your tree against HEAD before accusing.
