@@ -43,7 +43,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 4 | `evals/` | ~~grading measures precision (false positives/negatives), not just declared-defect mentions~~ — retired 2026-09-18, ground (b): asks a prose grader to be graded for precision by another soft instrument | RETIRED | 2026-09-18 | — | — |
 | 5 | `docs/release_notes_*` | ~~no divergence between a release note and its tag goes unrecorded~~ — retired 2026-09-18, ground (b): the command read a tag's immutable content and printed the same 6 forever; v1.10.0's divergence stays recorded in the block below | RETIRED | 2026-09-18 | — | — |
 | 6 | `tests/check.sh` | the suite is green | VERIFIED | 2026-10-18 | 14 | P2 |
-| 7 | `tests/check.sh` | the header's live `Verifies:` entries are exactly the checks the body runs, by number | VERIFIED | 2026-09-19 | 30 | P3 |
+| 7 | `tests/check.sh` | the header's live `Verifies:` entries are exactly the checks the body runs, by number | VERIFIED | 2026-10-19 | 30 | P3 |
 | 8 | `tests/check.sh` | ~~checks 1–5 have been negative-tested~~ — retired 2026-09-18, ground (b): a historical fact about one day's work, watched by a green-suite command that cannot go red for it | RETIRED | 2026-09-18 | — | — |
 | 9 | `agents/` | ~~no agent prompt's body contradicts its own frontmatter or another agent's prompt~~ — retired 2026-09-18, ground (b): one string in one of 22 files standing in for a fleet-wide semantic claim | RETIRED | 2026-09-18 | — | — |
 | 10 | `install.sh` | a clean-clone install works on a machine that has never run it, and the gate is green in that clone | VERIFIED | 2026-09-18 | 60 | P2 |
@@ -51,18 +51,18 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 12 | `agents/` | ~~no fleet-wide fixture-verdict staleness against the prompt it grades~~ — retired with row 17 2026-09-18, ground (a): covered by production evidence, ceiling recorded | RETIRED | 2026-09-18 | — | — |
 | 13 | `agents/` | ~~every agent runs on the cheapest model tier that passes its fixture~~ — retired 2026-09-18, ground (b): unsatisfiable for the only three agents it has left, and the measurable part is done | RETIRED | 2026-09-18 | — | — |
 | 14 | `agents/` | ~~no agent is missing the fixture its name implies~~ — rule 13 retired 2026-09-17, same reason as row 2 | RETIRED | 2026-09-17 | — | — |
-| 15 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12) and no residue of the retired byte-diff mechanism (Check 17) remains | VERIFIED | 2026-09-19 | 30 | P3 |
+| 15 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12) and no residue of the retired byte-diff mechanism (Check 17) remains | VERIFIED | 2026-10-19 | 30 | P3 |
 | 16 | `.github/workflows/` | ~~CI runs the same gate a developer runs, with the same result~~ — retired 2026-09-18, ground (b): the command reached a checkout depth and never "the same result"; the divergence it meant to catch is inspected by row 10's clone-and-run walk | RETIRED | 2026-09-18 | — | — |
 | 17 | `agents/` | ~~fixtures exist for the autopilot cycle, the release gate and zofia's patch path, and have been dispatched~~ — retired with row 12 2026-09-18, ground (a): v1.23.0's stranger-clone, CI-green release is the behavioural evidence a fixture would only approximate | RETIRED | 2026-09-18 | — | — |
-| 18 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-09-19 | 30 | P3 |
-| 19 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-09-19 | 30 | P3 |
-| 20 | `tests/check.sh` Check 27 | the untagged-release-note check exists independent of any one tag's current state | VERIFIED | 2026-09-19 | 30 | P3 |
+| 18 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-10-19 | 30 | P3 |
+| 19 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-10-19 | 30 | P3 |
+| 20 | `tests/check.sh` Check 27 | the untagged-release-note check exists independent of any one tag's current state | VERIFIED | 2026-10-19 | 30 | P3 |
 | 21 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-10-18 | 14 | P3 |
-| 22 | `agents/` | `lian-zhao`'s frontmatter no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-09-19 | 30 | P3 |
+| 22 | `agents/` | `lian-zhao`'s frontmatter no longer contradicts her own body on the fixture write surface | VERIFIED | 2026-10-19 | 30 | P3 |
 | 23 | `tests/lock.sh` | the lock resolves to the same shared file from a main checkout and any linked worktree | VERIFIED | 2026-10-18 | 14 | P3 |
 | 24 | `evals/run.sh` | STALE compares the prompt SHA a verdict was graded against, not the date | VERIFIED | 2026-10-18 | 14 | P3 |
 | 25 | `evals/cases/zofia-004-seed-patch-established` | causes 1–2 fixed (`iris-vermeulen`); rests on criterion 3 alone — a named substring-grading limit, not a gap, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
-| 26 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-09-19 | 30 | P3 |
+| 26 | `tests/lock.sh` / working pattern | codified as `PROJECT_RULES.md` rule 18a — acquire only for the write step | VERIFIED | 2026-10-19 | 30 | P3 |
 | 27 | `evals/cases/*/case.yaml`, `evals/run.sh` | ~~a verdict names the prompt SHA it was graded against; a contested case cites its sample count (rule 25d)~~ — retired 2026-09-18, ground (a): the SHA half is row 24's mechanism and no contested case survives the 36→10 cut | RETIRED | 2026-09-18 | — | — |
 | 28 | `install.sh` | ~~install a working hook set from inside a linked worktree, not only a main checkout~~ — retired 2026-09-18, ground (c): the maintainer decided to remove local hooks entirely (090ce70), not fix their reach | RETIRED | 2026-09-18 | — | — |
 | 29 | `PROJECT_RULES.md` | ~~every live index row has body prose in the file, not only a one-line index claim~~ — retired 2026-09-18, ground (b): the rule book auditing its own formatting; nothing downstream depends on it | RETIRED | 2026-09-18 | — | — |
@@ -71,7 +71,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 32 | `README.md` question 1 | ~~the seeded-README credibility gap has no check today and stays open~~ — retired 2026-09-18, ground (b): the row's own text concedes no rule, check or criterion mentions credibility; it is an obligation on `agents/zofia-kaminska.md`'s prompt, not a board row | RETIRED | 2026-09-18 | — | — |
 | 33 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 verifies the mechanism and its newest-tag grace is gone (`f109ef8`); the false README prose is now fixed, human-owned, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | 34 | `README.md` question 2 | the gate decides five rows and haruto owes seven; the stale "all ten things a release owes" heading is fixed, human-owned prose, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
-| 35 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — mechanized in Check 31 (`632c439`) | VERIFIED | 2026-09-19 | 30 | P3 |
+| 35 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — mechanized in Check 31 (`632c439`) | VERIFIED | 2026-10-19 | 30 | P3 |
 
 **Retirement pass, 2026-09-18 (fifth pass).** 0 P1 / 2 P2 / 17 P3 across 19
 live rows, plus 16 RETIRED (all marked with the state's own `RETIRED`; the
