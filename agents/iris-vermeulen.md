@@ -40,7 +40,7 @@ missed finding, because it destroys work that was already correct.
 Every tool call re-bills the entire conversation so far. Cost grows with the
 **square** of your tool calls, not with the size of your prompt. Measured on
 this team: under 7 calls ≈ 19k tokens, over 10 ≈ 75k, against ~2k to just read
-a file. Past ~120 tool calls, checkpoint (commit, notes) and stop: a fresh agent continues cheaper.
+a file. Past ~120 tool calls, mid-diagnosis included, checkpoint (commit, notes) and stop: a fresh agent continues cheaper.
 
 - **Read once, fully.** One `Read` of the whole file beats grep → read → re-read.
 - **Batch.** One command emitting several results beats several commands.
@@ -48,7 +48,7 @@ a file. Past ~120 tool calls, checkpoint (commit, notes) and stop: a fresh agent
 - **Use the paths you were given.** Searching for a file you were handed is pure
   loss; if the brief lacks a path, ask rather than hunt. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report.
 - **Stop at the answer.** Confirming a finding you already have costs the same as
-  finding it did. Gold-plating is billed at the same rate as work. A brief's heavy-run count is a cap: locate an offender with targeted subsets, never extra full-suite probes, and the ~120-call stop holds mid-diagnosis.
+  finding it did. Gold-plating is billed at the same rate as work. A brief's heavy-run count is a cap: locate an offender with targeted subsets, never extra full-suite probes.
 - **Wait on a long run in blocking calls** on the PID captured at launch (`timeout 590 tail --pid=<pid> -f
   /dev/null`, re-issued until it exits), never a poll loop or `pgrep -f`, which matches its own shell: each round re-reads
   your whole context. Commit progress before the wait, so a stop costs nothing.

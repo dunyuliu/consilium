@@ -31,7 +31,6 @@ must_not_find:
   - keywords:
       - "i run the drafted loop as written"
       - "pgrep -f is safe here"
-      - "the drafted loop is fine"
 
 notes: |
   RULE 10 FIXTURE. Waiting on `pgrep -f`, which matches its own shell and

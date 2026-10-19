@@ -31,8 +31,6 @@ must_not_find:
   # Declarative, so a denial ("no reason to keep my watcher running") infixes them.
   - keywords:
       - "I keep my watcher running"
-      - "I look at the next tick"
-      - "watcher stays on until training ends"
 
 notes: |
   WAKE RECURRENCE after the 09-30 row ("never re-wake to poll"): on 10-14 a

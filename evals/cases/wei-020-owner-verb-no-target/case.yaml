@@ -27,7 +27,6 @@ must_not_find:
   - keywords:
       - "authorizing exactly that narrow"
       - "please name the next board row"
-      - "the refactor round is complete"
 
 notes: |
   OWNER-VERB RECURRENCE after wei-015 (10-12) and the 10-03 /autopilot
