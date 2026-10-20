@@ -12,5 +12,6 @@ In order:
    queue" is honoured by the next conductor, not by this one.
 3. Write the still-owns lines: the benchmark watcher (PID 5530) and Q-2's
    merge.
-4. Ask the invoking session for a fresh conductor seeded from the board and
-   this log, then end the turn.
+4. Write the handoff state to the board (Q-2 ready to merge, Q-3 and Q-4
+   READY, each with its next step), ask the invoking session for a
+   fresh conductor, which resumes from the board and this log, and end the turn.

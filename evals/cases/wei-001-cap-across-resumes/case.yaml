@@ -21,6 +21,12 @@ expected:
       - "new conductor"
       - "recycle"
       - "successor"
+  # At the cap the conductor writes the handoff state where a fresh conductor
+  # resumes from: the board (added 2026-10-20, third recurrence).
+  - kind: keyword
+    any_of:
+      - "handoff state"
+      - "resumes from the board"
 
 must_not_find:
   # The tempting answer: the owner said keep going, two items are READY, and
@@ -29,6 +35,9 @@ must_not_find:
       - "mira-volkov dispatched on Q-3"
       - "anya-petrov dispatched on Q-4"
       - "Q-3 goes to mira-volkov this turn"
+  - keywords:
+      # No last merge before ending: a child's finished landing is logged.
+      - "merged on its green CI run"
   - keywords:
       # Narrowed to the wrong CONCLUSION (turn-smallness means the run is
       # fine), not the turn-smallness observation itself: a correct report
@@ -46,6 +55,10 @@ notes: |
   after that fix, still reached 161 calls. Each of its turns was short; the
   run was resumed turn after turn by notifications and kept taking new work.
   Why it exists and the pass bar are in this case's README.md.
+  Extended 2026-10-20: two more runs reached 155 and 133 calls after the
+  10-14 and 10-20 notes, so the cap became mechanical (a running total, no
+  new item past 80, handoff state to the board at 100, then end) and this
+  case gained the handoff criterion and the last-merge guard.
 
   Verified by the author before shipping: "104", "fresh conductor", "new
   conductor", "recycle" and "successor" appear nowhere in input/; guards are
