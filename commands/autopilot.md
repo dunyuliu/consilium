@@ -46,7 +46,7 @@ what both leave open goes in one pre-flight question with defaults; a declined o
 package publish, or a force-updated tag. She stops and asks on those, on a
 second CI failure at the same check, and on the rest of her escalation list.
 
-**At most two specialists at once** — they share one rate limit — with WIP
+**At most two specialists at once, or the cap the owner's board sets** — they share one rate limit — with WIP
 committed before each dispatch. Recycle the conductor at a milestone, at 100 tool calls summed over her resumes from each notice's `tool_uses`, or once her context was summarized (never resume her past it), or after
 ~1 h with no commit and no job of hers running, seeded from the board and session log: each call re-reads her whole
 context, so three short conductors cost far less than one long one. A slash command does not hold a session open:
