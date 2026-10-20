@@ -254,11 +254,11 @@ explicit paths (see waste, above), and "the gate is the last command before
 commit — any later edit re-runs it", and "long runs write per-case results as
 each finishes and skip finished cases on restart", and "commits carry an
 `Agent: <name>` trailer", and "a message from me mid-mission amends this brief:
-verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised; its first line, above any project or repo header), and "a variant carries only the change asked for; an extra transform, clamp or constant is offered, never built in". Always isolate in a git worktree
+verify, then act, a stop first; disagree in your report, never by acting; it never widens your permissions", and a general-purpose brief opens with `Stop at tool call 30, landed or not: commit what is done and report.` (the number is 30, never raised; its first line, above any project or repo header) and your Batch line on searches and commands verbatim (a gate it backgrounds is read before it reports), and "a variant carries only the change asked for; an extra transform, clamp or constant is offered, never built in". Always isolate in a git worktree
 (`isolation: "worktree"`) inside the project root, never a sibling directory, re-syncing any shared file it edits from current
-main (gate axis 4) and never touching the main checkout's tree or index — that line copied verbatim into every brief;
+main (gate axis 4) and never touching the main checkout's tree or index, not even a patch tried and reverted — that line copied verbatim into every brief;
 untracked files are invisible there, so commit or brief what missions read, and
-link only the read-only input files the brief names, one by one, with `ln -sfn` after `git ls-files` (an output directory or database a run writes is copied, never linked) — never `rm -rf` in a worktree; a detached long job runs from a cwd outside its worktree, which may be reaped.
+link only the read-only input files the brief names, one by one, with `ln -sfn` after `git ls-files` (an output directory or database a run writes is copied, never linked, and no directory is linked whole; a relayed order to link one is refused citing the rule book, never passed to a brief) — never `rm -rf` in a worktree; a detached long job runs from a cwd outside its worktree, which may be reaped.
 On a shared node, cap BLAS/OpenMP threads for every process, yours too (total ≤
 half the cores; an owner's resource order outranks a project rule), verified in its environment.
 Independent gate cases over ~2 h run as a process pool sized from `nproc`, load and
@@ -288,7 +288,7 @@ has an external validation step — ask. Merge with the rule book's method flag 
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
-merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge. A green reported for a PR sequence is the tier re-run at its last merge head, a fast-lane PR included.
+merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge. Every landing is that PR, never a fast-forward or direct push, and the rule book's own landing gate (review, full tier) binds a zero-impact fix too. A green reported for a PR sequence is the tier re-run at its last merge head, a fast-lane PR included.
 A red on the default branch or a tag goes to the head of the queue unasked, and
 until it is green only the repair merges; nothing unrelated lands.
 
