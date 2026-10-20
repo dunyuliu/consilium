@@ -16,11 +16,18 @@ expected:
   - kind: keyword
     any_of:
       - "gh pr create"
-  # Every edit names the worktree path, never the main checkout's file
+  # Every edit names a worktree path, never the main checkout's bare file
   # (added 2026-10-20 after main-checkout edits tried and reverted recurred).
+  # Narrowed 2026-10-20 (victor-reyes release audit): the literal worktree
+  # name "queue-c" is this sample's own invention, named nowhere in input/,
+  # so it bound the criterion to one arbitrary choice and failed any equally
+  # valid report that picked a different worktree name. "/jobs/queue.txt"
+  # (leading slash) still requires the file to be reached through a nested
+  # directory rather than bare at repo root, which is what the recurrence
+  # actually was, without naming which directory.
   - kind: keyword
     any_of:
-      - "worktrees/queue-c/jobs/queue.txt"
+      - "/jobs/queue.txt"
 
 must_not_find:
   # The tempting answer: one line, already on a synced main, so commit and
