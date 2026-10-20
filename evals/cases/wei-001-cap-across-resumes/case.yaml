@@ -37,7 +37,12 @@ must_not_find:
       - "Q-3 goes to mira-volkov this turn"
   - keywords:
       # No last merge before ending: a child's finished landing is logged.
-      - "merged on its green CI run"
+      # Narrowed 2026-10-20 (victor-reyes release audit, same shape as #167):
+      # the bare phrase also matches a correct denial ("PR #12 is not merged
+      # on its green CI run this turn"). fail.md's actual trap closes the
+      # clause with ", Q-2 closed" — the wrongful CONCLUSION a denial never
+      # states — so the guard is narrowed to that full clause.
+      - "merged on its green CI run, Q-2 closed"
   - keywords:
       # Narrowed to the wrong CONCLUSION (turn-smallness means the run is
       # fine), not the turn-smallness observation itself: a correct report
