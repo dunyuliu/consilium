@@ -54,7 +54,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 15 | `tests/check.sh` | the board's evidence commands are checked for shape (Check 12) and no residue of the retired byte-diff mechanism (Check 17) remains | VERIFIED | 2026-10-19 | 30 | P3 |
 | 16 | `.github/workflows/` | ~~CI runs the same gate a developer runs, with the same result~~ — retired 2026-09-18, ground (b): the command reached a checkout depth and never "the same result"; the divergence it meant to catch is inspected by row 10's clone-and-run walk | RETIRED | 2026-09-18 | — | — |
 | 17 | `agents/` | ~~fixtures exist for the autopilot cycle, the release gate and zofia's patch path, and have been dispatched~~ — retired with row 12 2026-09-18, ground (a): v1.23.0's stranger-clone, CI-green release is the behavioural evidence a fixture would only approximate | RETIRED | 2026-09-18 | — | — |
-| 18 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-10-19 | 30 | P3 |
+| 18 | `PATHWAY_FORWARD.md` | the board can express the priority it is worked in | VERIFIED | 2026-10-20 | 30 | P3 |
 | 19 | `tests/release_gate.sh` | the published-release row lands in the gate, skipping without credentials or a pushed tag; the gate is run-once by construction (see block) | VERIFIED | 2026-10-19 | 30 | P3 |
 | 20 | `tests/check.sh` Check 27 | the untagged-release-note check exists independent of any one tag's current state | VERIFIED | 2026-10-19 | 30 | P3 |
 | 21 | `tests/check.sh` | Check 29's script selector uses `git ls-files`, not `find .` — no false red for a worktree-isolated dispatch | VERIFIED | 2026-10-18 | 14 | P3 |
@@ -370,8 +370,19 @@ Retired together with row 12, ground (a) — see that block for the shared
 reasoning. Kept per rule 21, carries no command or interval.
 
 ### 18 — `PATHWAY_FORWARD.md` — VERIFIED
+
+**Fixed 2026-10-20.** The prior command (`... | head -1 | awk -F'|' '{print NF}'`)
+only counted the fields `parse_board.awk` always emits (6, by construction) —
+it printed `6` whatever the table held and could not go red for a missing or
+garbled priority, which is how row 18 got re-verified across #168 without
+checking anything. The replacement reads every non-retired row's actual `prio`
+cell and the table header, and fails if either breaks: a row without `P1`,
+`P2` or `P3`, or a header whose last column is no longer literally `prio`.
 ```bash
-awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | head -1 | awk -F'|' '{print NF}'
+awk -f tests/parse_board.awk -v section=board PATHWAY_FORWARD.md | awk -F'|' '
+  $3 != "RETIRED" && $6 !~ /^P[123]$/ { print "no priority on row " $1 ": " $6; bad=1 }
+  END { if (bad) exit 1 }
+' && grep -qE '^\| *id *\|.*\| *prio *\|$' PATHWAY_FORWARD.md
 ```
 
 ### 19 — `tests/release_gate.sh` — VERIFIED
