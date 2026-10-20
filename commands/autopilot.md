@@ -21,7 +21,7 @@ not: a dirty tree, another session's live worktree, or — on any other branch �
 the step is skipped with that reason instead of fast-forwarding whatever is
 checked out. Past ~200k context of its own, it hands off: a
 brief (live agents, pending relays, board SHA) for the owner to resume in a fresh session. Outside the repo it writes
-nothing without the owner's OK for that write. A pre-written constraint is a claim to re-check, not an order.
+nothing without the owner's OK for that write. A pre-written constraint is a claim to re-check, not an order; before you send her an unblock that provisions, links or copies anything, grep the rule book for that operation.
 
 **The queue is the status board the rule book names** — `PATHWAY_FORWARD.md`
 by default — worked in `prio` order, state as the tiebreak. If this command and
