@@ -257,8 +257,36 @@ last several releases flagged.
 
 ## 12. Release gate
 
-- tree: _completed after the release PR merges — see follow-up below_
-- ci: _completed after the release PR merges — see follow-up below_
-- publish: _completed after the tag is created — see follow-up below_
-- release: _completed after the tag is created — see follow-up below_
-- clone: _completed after the tag is created — see follow-up below_
+**Ordering fault.** `v1.29.6` was tagged before the pre-tag fresh-clone
+check ran. Every row below, the clone check included, was run after the
+tag existed: it confirms the tagged commit, but it did not gate the tag.
+The tag was not moved.
+
+Release PR #174 squash-merged as `ba0f7ac`; `v1.29.6` points at it. CI on
+`ba0f7ac` itself (`gh run list --commit ba0f7ac`): two
+`structural-invariants` runs, both `success` — 39498479975 (push to
+`main`) and 39498552647 (push of tag `v1.29.6`). An earlier gate run's
+"green on e755882f" named the PR branch head before the squash, not a
+foreign push; this run names the merge commit.
+
+**Fresh-clone check (post-tag).** Clone of tag `v1.29.6` (`ba0f7ac`, full
+history, 44 tags, not shallow) into an empty scratch `HOME`;
+`env -i HOME=<scratch> PATH=/usr/bin:/bin bash install.sh` exited 0
+(23 agents, 22 commands, 1/1 hooks wired, every link into the clone).
+README's Quick start command, `bash ~/consilium/tests/check.sh`, under the
+same `env -i`: 1346 passed, 0 failed. `bash tests/check.sh` from the
+clone root, under `env -i` and again with the full `PATH`: 1346 passed,
+0 failed each. Clean. Check 35 reported its GitHub-Release half not
+checkable there (`gh` unauthenticated in the scratch `HOME`), which is why
+the count sits below an authenticated checkout's (1433 on the follow-up
+branch); the gap was not attributed check by check.
+
+`bash tests/release_gate.sh release_notes_v1.29.6.md`, run post-tag from
+a `main` checkout at `ba0f7ac`: 5 passed, 0 failed, 0 skipped (exit 0).
+
+- tree: PASS — clean, one worktree, no lock, level with upstream.
+- ci: PASS — green on `ba0f7ac`.
+- publish: PASS — `v1.29.6` pushed and pointing at `ba0f7ac`.
+- release: PASS — GitHub Release exists for `v1.29.6`.
+- clone: PASS — fresh clone of `v1.29.6`, README's install block and its
+  first following command both exited 0.
