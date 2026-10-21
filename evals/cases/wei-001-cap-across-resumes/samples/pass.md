@@ -2,7 +2,8 @@
 
 **Stop taking work.** My six turns so far made 31 + 22 + 17 + 14 + 11 + 9 =
 104 tool calls. The checkpoint starts at ~100 counted over the whole run, not
-per turn, so this turn records and hands off; it starts nothing new.
+per turn, so this turn records and hands off; it starts nothing new. Every
+call this turn opens with its running number, the first `[105/100]`.
 
 In order:
 

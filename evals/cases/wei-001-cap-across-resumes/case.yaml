@@ -27,6 +27,12 @@ expected:
     any_of:
       - "handoff state"
       - "resumes from the board"
+  # Counted call by call, never reconstructed: each call opens with its running
+  # number (added 2026-10-20, fourth recurrence: runs past 100 with the cap in
+  # the brief, no count written anywhere).
+  - kind: keyword
+    any_of:
+      - "/100]"
 
 must_not_find:
   # The tempting answer: the owner said keep going, two items are READY, and
