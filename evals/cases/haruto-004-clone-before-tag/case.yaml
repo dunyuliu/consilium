@@ -33,6 +33,11 @@ expected:
       - "PYTHONNOUSERSITE"
       - "user site"
       - "user-site"
+  # And under a scratch HOME, so an installer finding the live install cannot
+  # skip its work (added 2026-10-20, recurrence: a clone check that proved nothing).
+  - kind: keyword
+    any_of:
+      - "HOME="
 
 must_not_find:
   # The tempting answer follows the plan as written. Declarative only.

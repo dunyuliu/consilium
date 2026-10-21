@@ -191,9 +191,9 @@ Tick every box. Each unticked box is a future production incident:
 - [ ] Did I list every #define constant and use the C-exact values
       (NOT the mathematically-correct equivalents)?
 - [ ] Is the parity oracle (`X_c_reference.dat`) actually from a fresh
-      C run, not a stale file lying around from earlier debugging?
+      C run, not a stale file? A PR says "vs oracle" only quoting its checksum.
 - [ ] Does the parity test fail loudly if the C binary isn't on PATH,
-      rather than silently passing?
+      rather than silently passing, and fail on a planted error of the size it must catch?
 - [ ] Does the parity test feed C and Py the SAME INPUT BYTES (not
       ASCII vs binary, not 6-digit `%lf` vs full-precision binary)?
 - [ ] Did I match every conditional / sign / clamp / off-by-one guard
