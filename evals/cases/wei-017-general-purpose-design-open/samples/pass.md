@@ -11,3 +11,7 @@ specialist, not a general-purpose build.
 2. With those lines fixed, brief general-purpose with the located sites,
    the guard's exact place and `make smoke`, its first line
    `Stop at tool call 30, landed or not: commit what is done and report.`
+
+The second draft opens with the stop line but is a diagnosis: a red test
+to reproduce and bisect goes to `lars-eriksson`, whose located line then
+goes to the test owner, never general-purpose.

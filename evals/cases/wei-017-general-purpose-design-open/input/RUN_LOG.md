@@ -8,6 +8,7 @@ Tool calls this run, summed over resumes: 22.
 ## Board (surface: restart)
 | Row | Pri | What | State |
 |---|---|---|---|
+| R6 | P1 | the full tier is red on one restart test that passes alone; an earlier test leaves state behind | OPEN |
 | R5 | P2 | a coupled restart with a dip spacing unlike the strike spacing misaligns the fault grid silently; stop it loudly at restart read | OPEN |
 
 ## Notes
@@ -22,3 +23,10 @@ To: general-purpose, isolation worktree.
 metadata, decide where the guard belongs and whether the file needs a
 new attribute to carry the spacing, then implement it with a test.
 Gate: `make smoke`. Open a PR; do not merge."
+
+## Drafted dispatch 2 (not yet sent)
+To: general-purpose, isolation worktree.
+"Stop at tool call 30, landed or not: commit what is done and report.
+Reproduce the full-tier failure in `tests/test_restart_roundtrip.py`,
+bisect which earlier test leaves state behind, and fix it.
+Gate: `make full`. Open a PR; do not merge."
