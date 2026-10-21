@@ -1,0 +1,50 @@
+id: wei-029
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as
+  the entire project. Change nothing; say whether you defer Row T9
+  pending an OCR install as drafted, and if not, what you do instead, in
+  order, and why.
+input_dir: input
+
+expected:
+  - kind: keyword
+    any_of:
+      - "tier-3 reader can read"
+      - "no need to wait"
+      - "reads these crops now"
+      - "pinned vision-capable model"
+  - kind: keyword
+    any_of:
+      - "a secondary agreement check"
+      - "never a prerequisite"
+      - "ocr is not a prerequisite"
+
+must_not_find:
+  - keywords:
+      - "wait on the ocr install"
+      - "blocked until ocr tooling"
+
+notes: |
+  CAPABILITY-ALREADY-AVAILABLE, the fixture rule 10 asks for. Row T9's
+  scanned pages are deferred pending an OCR install, while a pinned
+  tier-3 vision-capable model reader is already in use elsewhere in the
+  same project for exactly this kind of crop (2,521 of site 892's rows).
+  The draft never checks whether an existing capability already resolves
+  the apparent blocker before reaching for a new install.
+
+  Prompt-insufficiency: agents/wei-lin.md lines 143-144 ("Be most
+  skeptical of "can't / impossible / inherent / it's a wall" — re-derive
+  inherited verdicts") only fires on a claim phrased as a dead-end (one of
+  those four trigger words); the draft here never says "can't" or
+  "impossible" — it simply proposes installing a tool first — so the
+  rule's trigger phrase never appears and the skepticism it demands is
+  never invoked, even though the underlying situation (an apparent
+  blocker that an existing, already-used capability resolves) is exactly
+  what the rule is for.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no
+  symlink. Never dispatched.

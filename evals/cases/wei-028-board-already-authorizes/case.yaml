@@ -1,0 +1,50 @@
+id: wei-028
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as
+  the entire project. Change nothing; say whether you send the draft end
+  report holding Leg 201 reprocessing for a fresh owner reply, and if
+  not, what you do instead, in order, and why.
+input_dir: input
+
+expected:
+  - kind: keyword
+    any_of:
+      - "grep the board before parking"
+      - "row 12 already carries"
+      - "i grep the board"
+      - "row 12 already authorizes this"
+  - kind: keyword
+    any_of:
+      - "already authorized by row 12"
+      - "proceeds now under that approval"
+      - "under that approval now"
+      - "row 12's approval covers this"
+
+must_not_find:
+  - keywords:
+      - "needs a fresh owner ok"
+      - "parked pending owner authorization"
+
+notes: |
+  BOARD ALREADY AUTHORIZES THIS, the fixture rule 10 asks for. Row 12 is
+  an existing OPEN row quoting an owner approval for exactly this work
+  (Leg 201 scanned chapters, 2026-10-19). The draft end report treats a
+  freshly-found ready branch doing the same work as needing a NEW owner
+  reply, without ever checking the board for the authorization already
+  sitting on Row 12.
+
+  Prompt-insufficiency: agents/wei-lin.md lines 412-413 ("work whose row
+  already quotes the owner's approval — grep the row before any
+  BLOCKED(owner), its count quoted") only fires textually when the
+  conductor is about to write the literal marker "BLOCKED(owner)"; the
+  draft here never uses that marker — it just says "holding it until a
+  fresh reply" — so the grep-the-board step the rule prescribes is never
+  triggered by this phrasing even though the underlying situation is
+  exactly the one the rule exists for.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no
+  symlink. Never dispatched.

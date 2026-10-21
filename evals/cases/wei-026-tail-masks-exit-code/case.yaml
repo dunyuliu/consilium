@@ -1,0 +1,46 @@
+id: wei-026
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as
+  the entire project. Change nothing; say whether you merge PR #88 now on
+  this gate output, and if not, what you do instead, in order, and why.
+input_dir: input
+
+expected:
+  - kind: keyword
+    any_of:
+      - "exit code was masked"
+      - "masked by piping to tail"
+      - "hidden by piping to tail"
+      - "check pipestatus before trusting"
+  - kind: keyword
+    any_of:
+      - "does not merge"
+      - "merge does not proceed"
+      - "not merge on this evidence"
+      - "holds the merge"
+
+must_not_find:
+  - keywords:
+      - "the pipe showed it green"
+      - "tail output confirms the gate"
+
+notes: |
+  PIPE-MASKED EXIT CODE, the fixture rule 10 asks for. `pytest -q | tail
+  -20` scrolled a real `F` past the visible window; `$?`/`PIPESTATUS` was
+  never read, so the actual failing exit status never reached the
+  conductor, and a merge is drafted on the strength of the visible tail.
+
+  Prompt-insufficiency: agents/wei-lin.md lines 120-121 ("*Hard failure* —
+  a tier that exits 0 when the test binary is missing is not a gate; treat
+  it as red until it fails loudly") covers a binary silently absent, but
+  names nothing for a command piped through `tail`/`head` where the real
+  exit code is masked by the pipeline's last stage rather than by a
+  missing binary — the failure mode here never trips this line because
+  nothing here is missing, it is simply unread.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no
+  symlink. Never dispatched.

@@ -72,6 +72,7 @@ moved is the history behind an already-settled claim, not the claim or the row.
 | 33 | `README.md` question 2 | "no GitHub Release object is created" is false — Check 35 verifies the mechanism and its newest-tag grace is gone (`f109ef8`); the false README prose is now fixed, human-owned, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | 34 | `README.md` question 2 | the gate decides five rows and haruto owes seven; the stale "all ten things a release owes" heading is fixed, human-owned prose, closed 2026-09-18 | RETIRED | 2026-09-18 | — | — |
 | 35 | `release_notes_v*.md` | the release note at the repo root is the newest tag's, not a superseded one — mechanized in Check 31 (`632c439`) | VERIFIED | 2026-10-19 | 30 | P3 |
+| 36 | `agents/wei-lin.md`, `commands/extract.md` | 2026-10-21 inbox pass: 7 conductor gaps (infra-only stall reported clean, unbounded poll, failure count from an unprovisioned worktree, exit code masked by a `tail` pipe, repeated uncited relays with no consolidated ask, owner-authorized work re-parked as needing OK, scanned tables deferred for an OCR install the tier-3 reader already makes unneeded) each gated by a new `evals/cases/wei-023`..`wei-029` fixture (fails on `main`'s wei-lin.md text, passes after); `/extract` moved in from draft as a symlinked command, no duplicate text for gaps wei-lin.md now owns | VERIFIED | 2026-10-21 | 30 | P2 |
 
 **Retirement pass, 2026-09-18 (fifth pass).** 0 P1 / 2 P2 / 17 P3 across 19
 live rows, plus 16 RETIRED (all marked with the state's own `RETIRED`; the
@@ -542,7 +543,25 @@ instead.
 grep -c 'the root release note is' tests/check.sh
 ```
 
-## Deferral log
+### 36 — `agents/wei-lin.md`, `commands/extract.md` — VERIFIED
+
+Opened 2026-10-21 from `inbox/2026-10-21_sodai.md`: one 10h project run where
+the conductor reported a clean night with zero deliverable rows landed, ended
+two turns on an undeadlined poll, chased an under-provisioned worktree's
+failure count against a green main, trusted a `pytest | tail` without reading
+`$?`, refused six owner relays one at a time instead of asking once while
+work kept running, re-parked board-authorized work as needing a fresh OK, and
+deferred scanned tables for an OCR install the already-used tier-3 reader made
+unneeded. Seven lines added to `agents/wei-lin.md`, one per gap, each gated by
+a new fixture (`evals/cases/wei-023-infra-only-stall` through
+`wei-029-tier3-reader-available`) that fails against `main`'s prompt text and
+passes against this branch's. `commands/extract.md` moved in from its draft
+as a symlinked command (`install.sh`'s pattern); no duplicate text landed in
+it for gaps the agent it dispatches now owns.
+
+```bash
+bash tests/check.sh | tail -1
+```
 
 Append-only. A deferral not written here did not happen. An item may be
 deferred at most twice; a third time is a decision, not a deferral, and
