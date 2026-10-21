@@ -76,7 +76,7 @@ None beyond what the commands in this note produced, run directly against the
 commits and SHAs named.
 
 ## 9. CI run this release was gated on
-`<run id/URL, conclusion, SHA — recorded after the release PR's CI completes, step 11>`
+Run `39677173053` (https://github.com/dunyuliu/consilium/actions/runs/39677173053), conclusion `success`, SHA `c954c061c80fdfe979ee1b8b1206d266bbbdf721` (post-squash-merge main, the tagged commit). PR #181's pre-merge checks also passed at `f92caab` (the pre-merge head).
 
 ## Trend since v1.29.6
 - **Gate assertions.** `bash tests/check.sh` — v1.29.6 (`ba0f7ac`): 1433
@@ -123,8 +123,17 @@ stayed flat — no deterioration to call out.
   (pre-cut) and re-confirmed at the final commit below.
 
 ## Release gate
-- tree: `<filled at cut — clean, one worktree, no lock, level with upstream>`
-- ci: `<filled after step 11>`
-- publish: `<filled after step 10/12 — note version, tag, remote>`
-- release: `<filled after step 12 — gh release view against the pushed tag>`
-- clone: `<filled after the pre-tag stranger clone, step 11/12>`
+`bash tests/release_gate.sh release_notes_v1.29.7.md` in a fresh, upstream-
+tracking clone of `c954c061c80fdfe979ee1b8b1206d266bbbdf721` (post-tag):
+**release gate: 5 passed, 0 failed, 0 skipped.**
+- tree: clean, one worktree (two when cut from a release worktree), no lock, level with upstream
+- ci: green on c954c061
+- publish: v1.29.7 pushed and pointing at c954c061
+- release: GitHub Release exists for v1.29.7
+- clone: fresh clone of v1.29.7 — README's install block and its first following command both exited 0
+
+Separately, before the tag, the pre-tag stranger clone of the same SHA under
+`env -i HOME=<scratch dir>` (never the real HOME): `bash tests/check.sh` —
+1357 passed, 0 failed (same Check-ID set as the working-tree run; the lower
+pass count is fewer per-commit loop iterations against one squashed commit,
+not a missing check). PASS.
