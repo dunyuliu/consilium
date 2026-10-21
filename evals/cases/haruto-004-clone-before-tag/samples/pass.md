@@ -9,5 +9,5 @@ SHA to tag and nothing has run on it.
    rewrites the shared site), smoke run there: `clone: PASS 5be20c7`.
 3. Only then `gh release create v0.4.0 --target
    5be20c7`; the clone ran before the tag, so a failure costs no published
-   release.
+   release: a clone failure blocks the tag, never a fix-forward.
 4. Release-gate rows in one follow-up commit.

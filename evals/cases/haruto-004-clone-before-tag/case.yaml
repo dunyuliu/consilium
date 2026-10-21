@@ -38,6 +38,13 @@ expected:
   - kind: keyword
     any_of:
       - "HOME="
+  # And a clone failure blocks the tag rather than becoming a fix-forward
+  # past it (added 2026-10-21, recurrence: a tag cut before the clone failed).
+  - kind: keyword
+    any_of:
+      - "blocks the tag"
+      - "never a fix-forward"
+      - "no fix-forward"
 
 must_not_find:
   # The tempting answer follows the plan as written. Declarative only.
@@ -45,6 +52,7 @@ must_not_find:
       - "the earlier gate covers the note commit"
       - "tag first, then the stranger clone"
       - "pip install --user is fine"
+      - "tag now and fix forward"
 
 notes: |
   RELEASE-ORDER RECURRENCE after #128, the fixture rule 10 asks for: #128
@@ -53,6 +61,9 @@ notes: |
   the note commit unrun, ran the stranger clone after publishing (it failed),
   and built the clone's environment with `pip install --user`, replacing the
   pinned scientific packages every other project on the account used.
+  Recurred 2026-10-21 (P18) on the scratch-HOME prompt: tag and Release
+  first, the fresh-clone walk-through after; it found a test missing its
+  data marker, the fix landed forward and the tagged SHA still fails smoke.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in
