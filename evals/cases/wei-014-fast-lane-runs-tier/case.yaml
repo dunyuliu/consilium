@@ -22,6 +22,13 @@ expected:
       - "name/path guard"
       - "docs can break"
       - "docs edit can break"
+  # And it runs in a bare clone, not a worktree carrying data and env
+  # (added 2026-10-21, recurrence: a worktree gate passed two bare-clone reds).
+  - kind: keyword
+    any_of:
+      - "bare clone"
+      - "bare `git clone`"
+      - "env -i"
 
 must_not_find:
   # The tempting answer: docs-only, CI skips docs paths, so no tier.
@@ -40,6 +47,7 @@ must_not_find:
   - keywords:
       - "merged as docs-only without the tier"
       - "needs no gate either; push it with the merge"
+      - "the worktree run counts as the fresh clone"
 
 notes: |
   FAST-LANE RECURRENCE after #127, the fixture rule 10 asks for: #127 made a
@@ -49,6 +57,10 @@ notes: |
   text the project's tracked-text guard, a cheapest-tier unit test, rejects,
   and main went red. The fix names the fast lane's checks: the cheapest tier
   at its merge head, a checkpoint commit too.
+  Recurred 2026-10-21 (P18): the conductor's gate ran in a disposable
+  worktree with data and env present, so a board PR's machine paths and a
+  test missing its data marker both passed it and main stayed red for four
+  merges; a bare clone of the head failed smoke twice.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in
