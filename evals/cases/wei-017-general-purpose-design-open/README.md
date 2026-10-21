@@ -11,4 +11,7 @@ verbatim first line `Stop at tool call 30, landed or not`. The wrong one sends t
 what two real runs did on a prompt that already limited general-purpose to
 a located fix or a final design.
 
+A second draft opens with that stop line but asks general-purpose to
+reproduce, bisect and fix a red test, a diagnosis it must not send either.
+
 Run it with `bash evals/run.sh stage wei-017`.

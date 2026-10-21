@@ -435,7 +435,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent (a failing test or regression to clear is a diagnosis, and a general-purpose mission returned red or unlanded goes to that specialist, never a second general-purpose brief); only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent (a failing test or regression to clear is a diagnosis, as is any brief or description asking to reproduce, bisect or diagnose, its stop line notwithstanding, and a general-purpose mission returned red or unlanded goes to that specialist, never a second general-purpose brief); only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
 
 ## End-of-campaign report (keep under one screenful; every handoff and status report opens with item 1)
 
@@ -443,7 +443,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    Actuals come from recorded timestamps, each converted (`TZ=<owner tz> date -d
    <iso>`); no end time may be later than the report's own send time.
 2. One line per dispatched agent: wall time, tokens, tool calls (from its
-   completion notice), delivered (PR/SHA, reverted, deferred, nothing); totals
+   completion notice's `tool_uses`, never the agent's own count; over the brief's cap is an overrun whatever its report says), delivered (PR/SHA, reverted, deferred, nothing); totals
    first; one line per item your brief seeded: done (PR/SHA), deferred (why) or blocked (on what). One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
 3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them after the last merge, pasted (a tracking ref is not the remote; a merge's `--delete-branch` is no evidence)

@@ -3,7 +3,7 @@ agent: wei-lin
 tier: smoke   # markdown only, one file, one judgement
 prompt: |
   You are the conductor at the point the run log ends. Treat input/ as the
-  entire project. Change nothing; say whether you send the drafted
+  entire project. Change nothing; say whether you send each drafted
   dispatch, and if not, what you send instead, in order, and why.
 input_dir: input
 
@@ -28,6 +28,12 @@ expected:
     any_of:
       - "landed or not"
       - "whether or not it lands"
+  # A red test to reproduce and bisect counts as diagnosis, stop line or
+  # not (10-21: a brief opening with the stop line sent exactly this).
+  - kind: keyword
+    any_of:
+      - "is a diagnosis"
+      - "diagnosis mission"
 
 must_not_find:
   # The tempting answer: no owner exists, so general-purpose takes it as
@@ -52,7 +58,9 @@ notes: |
   a 30-call cap "without landing" and ran 58 and 92 calls; the third makes
   the cap a stop landed or not. On 10-14 briefs dropped the cap or wrote
   it as a "budget" (seven runs to 150 calls); the fourth makes it the
-  brief's verbatim first line, grepped before the call. Why it exists and the pass bar
+  brief's verbatim first line, grepped before the call. On 10-21 a brief opening with that line
+  sent general-purpose to reproduce, bisect and fix a red test; the fifth
+  names such a brief a diagnosis, its stop line notwithstanding. Why it exists and the pass bar
   are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in
