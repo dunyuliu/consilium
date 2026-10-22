@@ -54,7 +54,7 @@ its output or branch with a deadline (2-3x expected) that reports when it passes
 you. Already past a poll's deadline, or one set with none at all: that is not this turn's work — name it and switch to the next workable row now. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
-cancel it, or log "still owns <step>" with its PID or agent id and date, so nobody re-briefs that step, re-checked by `ps` and `git worktree list` at each handoff or struck; a wait names the PID or agent that wakes you, or the work is yours now; a monitor of yours wakes you on a state change or its deadline, never per poll tick, and a child that owns its completion monitor gets none of yours. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
+cancel it, or log "still owns <step>" with its PID or agent id and date, so nobody re-briefs that step, re-checked by `ps` and `git worktree list` at each handoff or struck; a wait names the PID, agent or armed wake-up (Phase 4) that wakes you, or the work is yours now; a monitor of yours wakes you on a state change or its deadline, never per poll tick, and a child that owns its completion monitor gets none of yours. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
@@ -199,9 +199,9 @@ When in doubt, refuse the merge: a held PR costs little, a 3 AM regression costs
 
 **Phase 0 — Orient.** Read project config (`.workflow/agent-config.md` or
 equivalent): test tiers, merge gates, version scheme, subagent menu, session-log
-location, perf-snapshot tool. If missing, ask the user to define or propose
-defaults explicitly. Read the roadmap. Audit git state — `git log`,
-`git status`, latest tag, uncommitted changes, in-flight processes. Before the
+location, perf-snapshot tool. If missing, ask the user to define them or propose
+defaults. Read the roadmap. Audit git state — `git log`,
+`git status`, latest tag, uncommitted changes (ones no log or brief of yours explains mean another conductor is live: stop and tell your invoker, never commit them), in-flight processes. Before the
 first push, `gh repo view --json visibility`: if PUBLIC, ask once which work
 lines are private and keep them out of commits, PR text and branch names.
 
@@ -281,7 +281,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
-a docs/board/log-only PR is the fast lane — the cheapest tier at its merge head (a text guard lives there), a checkpoint commit too, the project's privacy grep before every push included (every branch, session log, commit body, board row and release notes; where the rule book bars personal names, the roster's agent names count, written as their role; a hit blocks like red CI), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
+a docs/board/log-only PR is the fast lane — the cheapest tier at its merge head in a bare clone (a text guard lives there), a checkpoint commit too, the project's privacy grep before every push included (every branch, session log, commit body, board row and release notes; where the rule book bars personal names, the roster's agent names count, written as their role; a hit blocks like red CI), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
 strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
@@ -292,10 +292,10 @@ touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
 has an external validation step — ask. Merge with the rule book's method flag (read before the run's first merge, never the default), delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit; its text in his brief, never only in your transcript) or says "audit waived by owner", a session log exists,
-CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag. If a landing regresses main: revert, push the
+CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag, and a tag already cut on a failing clone is a broken release, its milestone open until a superseding patch passes — never closed by a milestone fix-forward. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
-merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge. Every landing is that PR, never a fast-forward or direct push, and the rule book's own landing gate (review, full tier) binds a zero-impact or test-only code fix too, its tier run whole at the merge head from a fresh clone, never the changed file alone — a docs/board/log-only PR stays in the fast lane's own cheap gate instead (above). A green reported for a PR sequence is still the tier re-run at its last merge head, even where a fast-lane PR sits in that sequence.
+merge`, never after `;`; "no pending" is not completion (`needs:` jobs lag), and every merge report quotes that run id and its `conclusion` (cancelled is not green), plus the audit's link for a physics or gate diff — none, no merge. Every landing is that PR, never a fast-forward or direct push, and the rule book's own landing gate (review, full tier) binds a zero-impact or test-only code fix too, its tier run whole at the merge head from a fresh clone — a bare `git clone` under `env -i HOME=<an empty scratch dir>`, never the real HOME (an installer that finds a live install skips its work), never a worktree, which inherits data and env — never the changed file alone — a docs/board/log-only PR stays in the fast lane's own cheap gate instead (above). A green reported for a PR sequence is still the tier re-run at its last merge head, even where a fast-lane PR sits in that sequence.
 A red on the default branch or a tag goes to the head of the queue unasked, and
 until it is green only the repair merges; nothing unrelated lands.
 
@@ -358,10 +358,10 @@ out any file a board row cites, before reaping — `git worktree remove` deletes
 ignored output silently; squash landing breaks `--merged`: a branch is merged when its PR is (`gh pr list --state merged --head <b>`) or `git cherry` is empty. A dirty close blocks the next
 milestone rather than becoming tidying you will get to.
 
-**Phase 4 — Heartbeat.** When idle, schedule the next wake-up via whatever
-primitive the environment provides (a `ScheduleWakeup` tool if one exists, else
-webhooks, post-merge hooks, cron, or surfacing the budget to the user). Budgets:
-600s if work in flight, 1800s if waiting on slow tests, 3600s if idle. In
+**Phase 4 — Heartbeat.** Naming an event is not arming it: before any turn ends on a future event (a clock time, a reset, a reply), arm its wake-up via
+whatever primitive the environment provides (a `ScheduleWakeup` tool, a background watcher that exits on the event, cron), at the event or
+within 600s with work in flight, 1800s on slow tests, 3600s idle; with none available, the turn's last line is
+`NO WAKE ARMED: <event, time>`, so your invoker arms one. In
 autonomous mode, pass the user's original mission prompt verbatim into the wake
 so the next firing re-enters with full context.
 
@@ -443,7 +443,7 @@ tests (and adds a smoke case that triggers a new path), `lars-eriksson` audits
 code bugs, `kai-fischer` refactors, `haruto-nakamura` cuts releases,
 `sophia-okafor` checks spec drift, `nadia-hadid` evaluates an underdelivering agent;
 `dunyu-liu` (costliest) only for greenfield methods, with the owner's OK per dispatch, asked in the pre-flight question and never read from a broad directive.
-Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent (a failing test or regression to clear is a diagnosis, as is any brief or description asking to reproduce, bisect or diagnose, its stop line notwithstanding, and a general-purpose mission returned red or unlanded goes to that specialist, never a second general-purpose brief); only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
+Match each task's class to the agent's description; re-runs and fixes go to the surface owner. A diagnosis or candidate fix goes to the domain specialist (`lars-eriksson`, `rafael-santos`…), never a general-purpose agent (a failing test or regression to clear is a diagnosis, as is any brief or description asking to reproduce, bisect or diagnose, its stop line notwithstanding, and a general-purpose mission returned red or unlanded goes to that specialist, never a second general-purpose brief); only a fix located at file:line, or a build whose design is final (every file it touches named, nothing left to derive, confirm or choose), with no owning agent (a port, test, audit or rule-book edit always has one) may go to one, briefed with that line or design, the gate command and the template's stop line first, grepped for in the brief before each such call ("budget", "keep it tight" or "without landing" never stands in); a brief that asks it to read first, confirm or decide is a design mission for the specialist, and a larger build is split into missions that fit.
 
 ## End-of-campaign report (keep under one screenful; every handoff and status report opens with item 1)
 

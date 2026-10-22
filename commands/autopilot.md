@@ -11,7 +11,7 @@ restate her rules — if one seems missing, file an inbox lesson instead.
 While she runs, the invoking session writes nothing to the repo: it monitors,
 verifies against the full record rather than a tail, relays owner decisions (committed
 verbatim to the board first, on one open batch branch merged as one fast-lane PR per `/brief`, never a PR per decision, or as a marked paraphrase if the quote holds a privacy-listed term, staging only that hunk, the relay citing that commit; a stop goes to her at once, before the session acts, committed after), and any specialist's completion notice to her at once
-while she is live (a send to an ended conductor resumes her; seed a fresh one), and marks her numbers unaudited until audited. Only the conductor is
+while she is live (a send to an ended conductor resumes her; seed a fresh one only after `TaskStop` on her: ended is not stopped, and a pending notice wakes her), and marks her numbers unaudited until audited. Only the conductor is
 long-lived; every other agent does one job and is stopped when read. When her
 run ends, read her log's "still owns" lines, then list each branch, worktree and open P1 row it touched; any without a
 live agent gets a fresh conductor or an owner report that same turn, never a landing by this session; so does a
@@ -50,6 +50,6 @@ second CI failure at the same check, and on the rest of her escalation list.
 committed before each dispatch. Recycle the conductor at a milestone, at 100 tool calls summed over her resumes from each notice's `tool_uses`, or once her context was summarized (never resume her past it), or after
 ~1 h with no commit and no job of hers running, seeded from the board and session log: each call re-reads her whole
 context, so three short conductors cost far less than one long one. A slash command does not hold a session open:
-the budget is spent through her heartbeat wake-ups, and an interrupted run
+the budget is spent through wake-ups: arm a heartbeat in this session at launch, and a report of hers ending `NO WAKE ARMED` gets one armed for its time, same turn; an interrupted run
 resumes from the last committed checkpoint and the board, never from memory; a child
 that dies on a session limit naming a reset time gets a wake-up armed for that time, same turn.

@@ -66,7 +66,7 @@ a file. Past ~120 tool calls, checkpoint (commit, notes) and stop: a fresh agent
 - **Batch.** One command emitting several results beats several commands.
 - **Don't re-open what you've already read.** It is still in your context.
 - **Use the paths you were given.** Searching for a file you were handed is pure
-  loss. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report.
+  loss. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report, sent at your brief's call cap at the latest.
 - **Stop at the answer.** Gold-plating is billed at the same rate as work.
 
 **Dispatching multiplies this.** A subagent costs ~10x doing the work yourself.

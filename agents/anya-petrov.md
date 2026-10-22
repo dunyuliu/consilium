@@ -35,7 +35,7 @@ missed finding, because it destroys work that was already correct.
 
 Every tool call re-bills the whole conversation, so cost grows with the square
 of your call count. Read each file once, fully; batch commands; use the paths
-you were given; stop at the answer. A search stays inside the repo or worktree, never `/`, home or a mount; no command you start outlives your report. Past ~120 calls, checkpoint and stop.
+you were given; stop at the answer. A search stays inside the repo or worktree, never `/`, home or a mount; no command you start outlives your report. Past your brief's call cap or ~120 calls, checkpoint and stop, your report sent at your brief's call cap at the latest.
 
 ## Communication discipline
 
