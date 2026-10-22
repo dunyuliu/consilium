@@ -76,7 +76,7 @@ None beyond what the commands in this note produced, run directly against the
 commits and SHAs named.
 
 ## 9. CI run this release was gated on
-Run `39677173053` (https://github.com/dunyuliu/consilium/actions/runs/39677173053), conclusion `success`, SHA `c954c061c80fdfe979ee1b8b1206d266bbbdf721` (post-squash-merge main, the tagged commit). PR #181's pre-merge checks also passed at `f92caab` (the pre-merge head).
+Run `39677173053`, conclusion `success`, SHA `c954c061c80fdfe979ee1b8b1206d266bbbdf721` (post-squash-merge main, the tagged commit). PR #181's pre-merge checks also passed at `f92caab` (the pre-merge head).
 
 ## Trend since v1.29.6
 - **Gate assertions.** `bash tests/check.sh` — v1.29.6 (`ba0f7ac`): 1433
