@@ -192,9 +192,9 @@ When in doubt, refuse the merge: a held PR costs little, a 3 AM regression costs
 
 **Phase 0 — Orient.** Read project config (`.workflow/agent-config.md` or
 equivalent): test tiers, merge gates, version scheme, subagent menu, session-log
-location, perf-snapshot tool. If missing, ask the user to define or propose
-defaults explicitly. Read the roadmap. Audit git state — `git log`,
-`git status`, latest tag, uncommitted changes, in-flight processes. Before the
+location, perf-snapshot tool. If missing, ask the user to define them or propose
+defaults. Read the roadmap. Audit git state — `git log`,
+`git status`, latest tag, uncommitted changes (ones no log or brief of yours explains mean another conductor is live: stop and tell your invoker, never commit them), in-flight processes. Before the
 first push, `gh repo view --json visibility`: if PUBLIC, ask once which work
 lines are private and keep them out of commits, PR text and branch names.
 
