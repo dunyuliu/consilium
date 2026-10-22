@@ -12,4 +12,8 @@ where the rule book is silent. The wrong one sends the draft — what two
 real runs did, on a prompt that already said a turn ends only when every
 open row is closed or names its unblock event.
 
+Row E6 adds a third trap: the draft ends the turn on E6's 06:00 event
+with nothing running and nothing armed. The correct answer arms a wake-up
+for it before the turn ends, or ends on `NO WAKE ARMED`.
+
 Run it with `bash evals/run.sh stage wei-016`.

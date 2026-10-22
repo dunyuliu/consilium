@@ -54,7 +54,7 @@ its output or branch with a deadline (2-3x expected) that reports when it passes
 you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
-cancel it, or log "still owns <step>" with its PID or agent id and date, so nobody re-briefs that step, re-checked by `ps` and `git worktree list` at each handoff or struck; a wait names the PID or agent that wakes you, or the work is yours now; a monitor of yours wakes you on a state change or its deadline, never per poll tick, and a child that owns its completion monitor gets none of yours. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
+cancel it, or log "still owns <step>" with its PID or agent id and date, so nobody re-briefs that step, re-checked by `ps` and `git worktree list` at each handoff or struck; a wait names the PID, agent or armed wake-up (Phase 4) that wakes you, or the work is yours now; a monitor of yours wakes you on a state change or its deadline, never per poll tick, and a child that owns its completion monitor gets none of yours. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
 
 **2. Plan versus code: code wins when it is unambiguous.** Record the deviation
 loudly — session log plus a plan amendment naming the row you overrode — and
@@ -351,10 +351,10 @@ out any file a board row cites, before reaping — `git worktree remove` deletes
 ignored output silently; squash landing breaks `--merged`: a branch is merged when its PR is (`gh pr list --state merged --head <b>`) or `git cherry` is empty. A dirty close blocks the next
 milestone rather than becoming tidying you will get to.
 
-**Phase 4 — Heartbeat.** When idle, schedule the next wake-up via whatever
-primitive the environment provides (a `ScheduleWakeup` tool if one exists, else
-webhooks, post-merge hooks, cron, or surfacing the budget to the user). Budgets:
-600s if work in flight, 1800s if waiting on slow tests, 3600s if idle. In
+**Phase 4 — Heartbeat.** Naming an event is not arming it: before any turn ends on a future event (a clock time, a reset, a reply), arm its wake-up via
+whatever primitive the environment provides (a `ScheduleWakeup` tool, a background watcher that exits on the event, cron), at the event or
+within 600s with work in flight, 1800s on slow tests, 3600s idle; with none available, the turn's last line is
+`NO WAKE ARMED: <event, time>`, so your invoker arms one. In
 autonomous mode, pass the user's original mission prompt verbatim into the wake
 so the next firing re-enters with full context.
 
