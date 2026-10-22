@@ -119,10 +119,11 @@ None beyond what the commands in this note produced, run directly against
 the commits and SHAs named.
 
 ## 9. CI run this release was gated on
-Run `39803339887`, conclusion `success`, SHA `e147f659c424b7f5e3731df6edc95e9a3c265619`
-(pre-merge-PR validation on this release's branch; the post-squash-merge
-run on `main` is transcribed in a follow-up commit per rule 8/step 12, same
-as v1.29.7's own `4aac688`).
+Pre-merge, PR #185's branch head `e147f659c424b7f5e3731df6edc95e9a3c265619`:
+run `39803339887`, conclusion `success`. Post-squash-merge on `main`, SHA
+`59449173f4dc4fe3b6fc6b533d62e13ebd9711ef` (the tagged commit): run
+`39805836865`, conclusion `success` (tag-ref push of `v1.30.0` onto the same
+SHA triggered a second run, `39806136239`, also `success`).
 
 ## Trend since v1.29.7
 - **Gate assertions.** `bash tests/check.sh` — v1.29.7 (`c954c06`): 1446
@@ -178,12 +179,17 @@ earmarks as reportable here rather than gating.
   below.
 
 ## Release gate
-- tree: clean, one worktree, lock held by `haruto-nakamura-release` for
-  this release only, level with upstream at cut time
-- ci: PASS — run `39803339887` on branch head `e147f65`, conclusion
-  `success`; post-merge run on `main` transcribed in a follow-up commit
-  (rule 8/step 12)
-- publish: v1.30.0 note committed and pushed via PR, merged to `main`
-- release: `gh release view v1.30.0` to be confirmed at the tag step
-- clone: pre-tag stranger clone under `env -i HOME=<scratch>` to be run
-  against the merged SHA before the tag is cut
+Pre-tag stranger clone, under `env -i HOME=/tmp/consilium-clone-scratch/home`
+(scratch, never the real `HOME`), `git clone` of `59449173f4dc4fe3b6fc6b533d62e13ebd9711ef`:
+exit 0; `bash tests/check.sh` in that same env: 1493 passed, 0 failed
+(`clone: PASS 59449173`).
+
+`bash tests/release_gate.sh release_notes_v1.30.0.md` in a fresh clone,
+checked out on `main` (tracking `origin/main`) at `59449173`: **release
+gate: 5 passed, 0 failed, 0 skipped.**
+- tree: clean, one worktree, level with upstream
+- ci: green on `59449173`
+- publish: v1.30.0 pushed and pointing at `59449173`
+- release: GitHub Release exists for v1.30.0
+- clone: fresh clone of v1.30.0 — README's install block and its first
+  following command both exited 0
