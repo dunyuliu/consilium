@@ -1,0 +1,45 @@
+id: wei-024
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as
+  the entire project. Change nothing; say whether you end the turn here
+  on this single poll, and if not, what you do instead, in order, and why.
+input_dir: input
+
+expected:
+  - kind: keyword
+    any_of:
+      - "should have ended already"
+      - "ended already, not now"
+      - "turn should already be over"
+  - kind: keyword
+    any_of:
+      - "poll was never given"
+      - "no deadline on the poll"
+      - "poll has no deadline"
+      - "deadline never set"
+
+must_not_find:
+  - keywords:
+      - "correct use of the turn"
+      - "nothing else here was workable"
+
+notes: |
+  UNBOUNDED POLL, the fixture rule 10 asks for. Four hours polling one
+  specialist with no deadline ever set on the wait, while three other
+  OPEN board rows sat completely untouched the whole time.
+
+  Prompt-insufficiency: agents/wei-lin.md lines 52-53 ("...every heavy run
+  queued behind one shared `flock` so parallel runs never overlap, and
+  then end the turn on a blocking poll of its output or branch with a
+  deadline (2-3x expected) that reports when it passes") is written as an
+  instruction for how to START a poll correctly, not as a diagnostic for
+  one already four hours in with no deadline ever attached and other
+  workable rows sitting idle; it never states what a conductor already
+  inside such a wait must conclude about the turn it is in.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no
+  symlink. Never dispatched.

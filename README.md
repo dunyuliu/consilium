@@ -105,6 +105,7 @@ table.
 | `/port` | `mira-volkov` | Port a C/Fortran numerical binary to vectorized Python with bit-faithful parity, then optimize. |
 | `/campaign` | `wei-lin` | Conduct a long-running multi-mission engineering campaign. |
 | `/autopilot` | `wei-lin` | Work the status board unattended for a budget (`autopilot 12h`). |
+| `/extract` | `wei-lin` | Extraction-first autopilot — a running extraction job is queue item 1, kept alive for the budget (`extract 10h`). |
 | `/release` | `haruto-nakamura` | Versioned-release workflow. `release` / `release minor` / `release major`. |
 | `/propose` | `shu-han` | Funding proposal end to end. |
 | `/review` | `elena-hartmann` | Full editorial decision — verdict, core weakness, Reviewer-2 attack. |

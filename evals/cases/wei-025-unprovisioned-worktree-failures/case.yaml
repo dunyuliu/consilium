@@ -1,0 +1,47 @@
+id: wei-025
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as
+  the entire project. Change nothing; say whether you dispatch
+  lars-eriksson to fix the 89 failing tests in wt-ingest as drafted, and
+  if not, what you do instead, in order, and why.
+input_dir: input
+
+expected:
+  - kind: keyword
+    any_of:
+      - "artifact of an under-provisioned worktree"
+      - "not a real regression"
+      - "unprovisioned worktree, not a bug"
+      - "worktree never linked to cache"
+  - kind: keyword
+    any_of:
+      - "re-provision the worktree"
+      - "sync the data/cache links"
+      - "link data/cache into"
+      - "relink reference and data/cache"
+
+must_not_find:
+  - keywords:
+      - "failures are a real regression"
+      - "the 9 failing tests first"
+
+notes: |
+  UNPROVISIONED-WORKTREE FAILURE COUNT, the fixture rule 10 asks for. A
+  worktree built before the symlink step reports 89 failed/103 errors; the
+  same commit on the main checkout, fully provisioned, is green. The draft
+  next step dispatches a fix for the "89 failures" as real code bugs.
+
+  Prompt-insufficiency: agents/wei-lin.md lines 138-139 ("A subagent's
+  "tests pass / bit-identical / expected <value>" is a hypothesis. Before
+  you land anything that matters, run your OWN fresh check...") only
+  covers the case of a subagent claiming SUCCESS; it names nothing
+  symmetric for a subagent reporting FAILURE, so a failure count from an
+  unprovisioned worktree is never flagged as the hypothesis it is before
+  code gets dispatched against it.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no
+  symlink. Never dispatched.

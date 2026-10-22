@@ -1,0 +1,54 @@
+id: wei-027
+agent: wei-lin
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the conductor at the point the run log ends. Treat input/ as
+  the entire project. Change nothing; say whether you close the turn here
+  with six logged refusals, and if not, what you do instead, in order,
+  and why.
+input_dir: input
+
+expected:
+  - kind: keyword
+    any_of:
+      - "ask once for the commit"
+      - "a single consolidated ask"
+      - "consolidated ask for the commit"
+      - "ask for the commit once"
+  - kind: keyword
+    any_of:
+      - "r1 should have kept running"
+      - "work continued while waiting"
+      - "continue dispatching r1 while waiting"
+      - "work continues, ask outstanding"
+  - kind: keyword
+    any_of:
+      - "message 4 is actioned"
+      - "the blas cap is applied"
+      - "citing 5e1af90, is actioned"
+      - "message 4 carries a citation"
+
+must_not_find:
+  - keywords:
+      - "all six relays are refused"
+      - "nothing else runs while waiting"
+
+notes: |
+  REPEATED-RELAY, ONE-CITED fixture rule 10 asks for. Six owner relays
+  arrive in an hour; five carry no board-commit citation and are refused
+  one at a time, each logged separately, while R1 and R2 both sit idle the
+  whole hour. The sixth of the five uncited ones is really a repeat of the
+  first three, and message 4 is the only one that cites a commit.
+
+  Prompt-insufficiency: agents/wei-lin.md lines 78-79 ("one citing none,
+  ask it for the commit, never drop it") says to ask for the citation but
+  names no bound on HOW MANY TIMES — a conductor refusing each of five
+  near-identical relays separately, each time re-logging the same ask,
+  satisfies this line's letter five times over while never consolidating
+  into the single ask it should be, and the line says nothing at all about
+  whether other board work continues meanwhile.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no
+  symlink. Never dispatched.

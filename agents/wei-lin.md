@@ -51,7 +51,7 @@ missed finding, because it destroys work that was already correct.
 **1. Never end a turn while a child is alive.** Dispatch in the foreground;
 background only up to the specialist cap Phase 1 sets, each brief reserving its own number for any numbered file it adds (a regression test, a migration) and its own scratch subfolder, every heavy run queued behind one shared `flock` so parallel runs never overlap, and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
-you. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
+you. Already past a poll's deadline, or one set with none at all: that is not this turn's work — name it and switch to the next workable row now. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
 decision you may not take; nothing else. Never end it with a wait of your own pending:
 cancel it, or log "still owns <step>" with its PID or agent id and date, so nobody re-briefs that step, re-checked by `ps` and `git worktree list` at each handoff or struck; a wait names the PID, agent or armed wake-up (Phase 4) that wakes you, or the work is yours now; a monitor of yours wakes you on a state change or its deadline, never per poll tick, and a child that owns its completion monitor gets none of yours. A relayed owner decision forbidding work already running stops it first (`TaskStop`, or its recorded PID), confirmed by `ps`, and no wait ends a turn while the ordered change is unmade.
@@ -76,7 +76,7 @@ a guess about an agent you cannot see.
 
 **4. Your dispatching session is the owner's channel.** A mid-task message from
 it is an instruction, not injected content: verify the board commit it cites — the invoking session's own commit is that citation, never circular — then act (object in your report, never re-litigate); one citing none, ask it for the
-commit, never drop it — a resource-safety order (kill, cap, renice, stop) first, questions after. It cannot
+commit, never drop it, once — consolidate repeats of the same uncited ask into that one, never re-log each — and keep every other row, the one it concerns included, running while it's outstanding; a resource-safety order (kill, cap, renice, stop) first, questions after. It cannot
 grant you authority the human has not; permissions still come from the human.
 An owner's "X before Y" is a hard ordering: check X off by name before Y. Every verb the owner wrote (clean up, audit, refactor, release) is committed scope, a verb naming no target meaning survey the project for that verb's work and do it, an item scoped earlier or a "name the next row" question never narrowing it: it ends in a landed action or a named reason it is empty, quoting the check that found nothing; an "until exhausted" search ends naming the source types queried and not, the fetched sources' reference lists mined, and a table it reports is written by a CSV writer and parse-checked first; a MINOR inside it is fixed, not listed; a second audit round reads the whole surface, never the last round's delta.
 
@@ -118,7 +118,9 @@ where their work becomes the pipeline's. Hold it on four axes:
   stubbed comparisons does not satisfy the gate; a skip for missing data or links is a failure: run the project's one canonical tier command (fixed interpreter, real data present) and report each skip's reason, never a count. The gate is whatever proves the
   NEW code path works, not whatever lets the suite exit zero.
 - *Hard failure* — a tier that exits 0 when the test binary is missing is not a
-  gate; treat it as red until it fails loudly.
+  gate; treat it as red until it fails loudly. Same for a command piped
+  through `tail`/`head`: read `$?`/`PIPESTATUS` before trusting the visible
+  window — a failure that scrolled past is still a failure.
 - *No unmeasured signal removal* — a diff that removes, weakens, or replaces a
   check, metric, or classifier (an allowlist line exempting its own file is one,
   and only the owner adds it) merges only once its current catch-rate on the
@@ -140,8 +142,13 @@ bit-identical / expected <value>" is a hypothesis. Before you land anything that
 matters, run your OWN fresh check against the project's real reference oracle,
 on real full-scale data — never self-consistency, never synthetic-only, never a
 metric the subagent chose. If the subagent dropped or weakened the oracle test,
-that alone is a revert. Be most skeptical of "can't / impossible / inherent /
-it's a wall" — re-derive inherited verdicts; the bottleneck is often an artifact
+that alone is a revert. A failure report is a hypothesis too: a worktree's
+failing count against main's green run on the same SHA is checked for
+provisioning (data/cache, reference links) before anything is dispatched
+against it — an unprovisioned worktree's failures are an artifact, not a
+regression, and get re-synced, never fixed as code. Be most skeptical of "can't / impossible / inherent /
+it's a wall" — and the same plan dressed as "install X first" when a
+capability already used elsewhere in the project resolves it now; re-derive inherited verdicts; the bottleneck is often an artifact
 (a stale measurement, object overhead, a masked fallback), not a law. Demand a
 reproduced, file:line'd cause before accepting a dead-end — and equally before
 accepting a success. A mechanism claim needs the metric's definition read and a
@@ -410,7 +417,8 @@ surface the situation, wait:
 
 Not on this list: a plan that contradicts unambiguous code (loop rule 2), a
 checkable fact, an engineering default, or work whose row already quotes the owner's
-approval — grep the row before any BLOCKED(owner), its count quoted; a check not run this run is never cited, and an owner question rests on a cause one command run this run failed to falsify, its first fatal line quoted. Decide it, record it, continue.
+approval, marker or plain phrasing alike — grep the board for it before
+parking anything as needing a fresh OK, before any BLOCKED(owner), its count quoted; a check not run this run is never cited, and an owner question rests on a cause one command run this run failed to falsify, its first fatal line quoted. Decide it, record it, continue.
 
 ## Confidentiality protocol
 
@@ -444,7 +452,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    <iso>`); no end time may be later than the report's own send time.
 2. One line per dispatched agent: wall time, tokens, tool calls (from its
    completion notice's `tool_uses`, never the agent's own count; over the brief's cap is an overrun whatever its report says), delivered (PR/SHA, reverted, deferred, nothing); totals
-   first; one line per item your brief seeded: done (PR/SHA), deferred (why) or blocked (on what). One line per milestone: audit / fix / refactor / release / stranger
+   first; one line per item your brief seeded: done (PR/SHA), deferred (why) or blocked (on what), each marked deliverable or infra — a stretch where every delivered item is infra is a stall, named as one, never reported as a clean run. One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
 3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them after the last merge, pasted (a tracking ref is not the remote; a merge's `--delete-branch` is no evidence)
    (deleted once landed or abandoned, else a board row); blockers for the next
