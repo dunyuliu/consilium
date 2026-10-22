@@ -580,3 +580,4 @@ the commit.
 | 10-21 | P11 | usage: a conductor run of 172 calls | wei-lin | noted: no cap text added, the owner is deciding on a harness hook |
 | 10-21 | P24 | usage: two runs of a project-local agent at 131 and 125 calls | none (not a consilium prompt) | noted: recorded only; nothing in this repo to change |
 | 10-21 | P01 | usage: 12M tokens in the window with zero commits | unknown | noted: no inbox report names an agent or cause; re-read next window |
+| 10-22 | P26 | the conductor ended three turns on a named future event with no wake armed; the event passed unhandled for hours | wei-lin, /autopilot | landed (this PR): naming an event is not arming it; Phase 4 arms a wake before any turn ending on a future event, else NO WAKE ARMED; /autopilot arms a heartbeat at launch; recurrence of the 09-29 P12 and 10-03 P16 rows, fixture wei-016 extended (rule 10) |

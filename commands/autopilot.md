@@ -50,6 +50,6 @@ second CI failure at the same check, and on the rest of her escalation list.
 committed before each dispatch. Recycle the conductor at a milestone, at 100 tool calls summed over her resumes from each notice's `tool_uses`, or once her context was summarized (never resume her past it), or after
 ~1 h with no commit and no job of hers running, seeded from the board and session log: each call re-reads her whole
 context, so three short conductors cost far less than one long one. A slash command does not hold a session open:
-the budget is spent through her heartbeat wake-ups, and an interrupted run
+the budget is spent through wake-ups: arm a heartbeat in this session at launch, and a report of hers ending `NO WAKE ARMED` gets one armed for its time, same turn; an interrupted run
 resumes from the last committed checkpoint and the board, never from memory; a child
 that dies on a session limit naming a reset time gets a wake-up armed for that time, same turn.
