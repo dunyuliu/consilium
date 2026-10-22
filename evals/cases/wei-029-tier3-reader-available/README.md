@@ -3,7 +3,7 @@
 Row T9's scanned pages are queued for extraction. The draft plan defers
 them until an OCR tool is installed, while a pinned tier-3 vision-capable
 model reader is already in use elsewhere in the project for exactly this
-kind of crop — 2,521 of site 892's rows already come through it.
+kind of crop — most of site A's rows already come through it.
 
 The correct answer says the tier-3 reader can read these crops now,
 without waiting on any install, and that OCR (if used at all) is a

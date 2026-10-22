@@ -12,7 +12,7 @@ Tool calls this run, summed over resumes: 76.
 | X2 | P1 | repair flaky CI runner image | Done (PR 42) |
 | X3 | P2 | patch stale test fixture for schema v3 | Done (PR 43) |
 | X4 | P2 | rebase conflict in branch-cleanup script | Done (PR 44) |
-| X5 | P3 | extract Table 7 values from site 892 | OPEN |
+| X5 | P3 | extract Table 7 values from site A | OPEN |
 
 No row touching extraction landed a single observation row this run; X5
 sat exactly as it started the whole ten hours. CI green on main throughout.

@@ -30,7 +30,7 @@ notes: |
   CAPABILITY-ALREADY-AVAILABLE, the fixture rule 10 asks for. Row T9's
   scanned pages are deferred pending an OCR install, while a pinned
   tier-3 vision-capable model reader is already in use elsewhere in the
-  same project for exactly this kind of crop (2,521 of site 892's rows).
+  same project for exactly this kind of crop (most of site A's rows).
   The draft never checks whether an existing capability already resolves
   the apparent blocker before reaching for a new install.
 

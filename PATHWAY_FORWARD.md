@@ -545,7 +545,7 @@ grep -c 'the root release note is' tests/check.sh
 
 ### 36 — `agents/wei-lin.md`, `commands/extract.md` — VERIFIED
 
-Opened 2026-10-21 from `inbox/2026-10-21_sodai.md`: one 10h project run where
+Opened 2026-10-21 from a P24 inbox file: one 10h project run where
 the conductor reported a clean night with zero deliverable rows landed, ended
 two turns on an undeadlined poll, chased an under-provisioned worktree's
 failure count against a green main, trusted a `pytest | tail` without reading
