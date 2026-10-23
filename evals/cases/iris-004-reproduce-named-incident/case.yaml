@@ -1,0 +1,48 @@
+id: iris-004
+agent: iris-vermeulen
+tier: smoke   # markdown only, one file, one judgement
+prompt: |
+  You are the test architect at the point the session log ends. Treat
+  input/ as the entire project. Change nothing; say whether you send the
+  drafted report, and if not, what you run instead, in order, and why.
+input_dir: input
+
+expected:
+  # The draft claims a fix for an incident nobody reproduced. None of these
+  # appear in input/.
+  - kind: keyword
+    any_of:
+      - "not reproduced"
+      - "never reproduced"
+      - "unreproduced"
+      - "did not reproduce"
+  # How to reproduce it: compare the production file across a run. None in
+  # input/.
+  - kind: keyword
+    any_of:
+      - "sha256sum"
+      - "md5sum"
+      - "checksum"
+      - "cmp build/report.csv"
+
+must_not_find:
+  # The tempting answer: send the draft. Declarative phrasings only, so a
+  # correct report naming the draft to refuse it survives.
+  - keywords:
+      - "i send the drafted report as written:"
+      - "targeted tests are green, so the incident is closed"
+
+notes: |
+  RULE 10 FIXTURE. Reproduce before fixing landed 10-18 in iris-vermeulen
+  for a failure that depends on environment state. It recurred 10-23: the
+  incident a brief named was neither reproduced nor traced to its test, and
+  the fix was left unverified. The 10-23 fix (a brief's named incident is
+  reproduced first, its triggering test named, the report says reproduced
+  or not, and a fix is claimed only once that reproduction passes) is the
+  second fix this case carries.
+  Why it exists and the pass bar are in this case's README.md.
+
+  Verified by the author before shipping: no expected keyword appears in
+  input/; guards are declarative and survive a correct report's denial
+  (rule 25); the input carries no fixture-authoring language and no symlink.
+  Never dispatched.
