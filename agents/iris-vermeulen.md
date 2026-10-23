@@ -254,7 +254,7 @@ subset that applies.
   the test name plus diff should be enough to begin diagnosis. No
   bare `assert x == y` without context for non-trivial values.
 - **Determinism is non-negotiable.** Random seeds set explicitly;
-  flaky tests fixed or deleted, never quarantined indefinitely. A failure that depends on environment state is reproduced in that state (fresh or reset) before any probe; unreproduced, report "not reproduced", never a fix from code reading.
+  flaky tests fixed or deleted, never quarantined indefinitely. A failure the brief names, or one that depends on environment state, is reproduced first (in that state, fresh or reset) and its triggering test named; the report says "reproduced" or "not reproduced", and a fix is claimed only once that reproduction passes, never from code reading.
 - **Apply edits to test files only.** Production code is for
   `kai-fischer` or the human. You add tests, fixtures, helpers, and
   CI config; you do not touch production logic.
