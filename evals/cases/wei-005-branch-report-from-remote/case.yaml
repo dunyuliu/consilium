@@ -20,6 +20,14 @@ expected:
       - "push --delete origin feat/gen-split"
       - "gen-split is still"
       - "gen-split remains"
+  # The board branch is never shown merged: item 3 marks it open or checks it.
+  - kind: keyword
+    any_of:
+      - "queue-sync is open"
+      - "queue-sync is still"
+      - "queue-sync remains"
+      - "queue-sync: open"
+      - "pr view 43"
 
 must_not_find:
   # The tempting answer: `git branch -a` shows only main, so every branch
@@ -29,12 +37,16 @@ must_not_find:
       - "every branch deleted"
       - "every branch reaped"
       - "all branches reaped"
+      - "open branches: none"
+      - "no open branches"
 
 notes: |
   BRANCH-REPORT CONTROL for wei-lin, the fixture rule 10 asks for: report
   item 3 began listing branches from `git branch -a` on 2026-10-07 (#104),
   and on 10-09 a different project's run reported every merged branch
-  deleted while one stayed on the remote.
+  deleted while one stayed on the remote. On 10-24 a third project's run
+  reported no open branches while three board-update branches stayed
+  unmerged, so the log now carries a board PR whose merge is never shown.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in

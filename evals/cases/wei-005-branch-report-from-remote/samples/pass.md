@@ -6,3 +6,5 @@ Commands: `git fetch --prune`, `git branch`, `git ls-remote --heads origin`.
 it: feat/gen-split is still on the remote. Deleting it now with
 `git push origin --delete feat/gen-split`, then re-listing with ls-remote;
 feat/mesh-reader was deleted on the remote.
+board/queue-sync is open: #43 was only armed for auto-merge, so I check it
+with `gh pr view 43` before claiming anything clean.
