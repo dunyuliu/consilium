@@ -122,8 +122,13 @@ None beyond what the commands in this note produced, run directly against
 the commits and SHAs named.
 
 ## 9. CI run this release was gated on
-Pending — filled in after the commit is pushed and CI runs on its exact SHA
-(step 11); see §12 for the final value.
+`structural-invariants` run
+https://github.com/dunyuliu/consilium/actions/runs/40132233827 — conclusion
+`success`, SHA `f5d49f805d98212e1ab9dc292ac8d8d06c934f87` (the tagged commit,
+pushed via the release PR's merge to `main`). An earlier run on the same SHA
+triggered by the merge itself,
+https://github.com/dunyuliu/consilium/actions/runs/40132163969, also
+concluded `success`.
 
 ## Trend since v1.30.0
 - **Gate assertions.** `bash tests/check.sh`: v1.30.0 (`59449173`): 1584
@@ -172,10 +177,13 @@ call out.
   / 0 failed, on the final pre-tag commit.
 
 ## Release gate
-Pending — filled in after the tag and Release are created (step 12), from a
-fresh clone and `bash tests/release_gate.sh release_notes_v1.30.1.md`.
-- tree: pending
-- ci: pending
-- publish: pending
-- release: pending
-- clone: pending
+`bash tests/release_gate.sh release_notes_v1.30.1.md`, run in a fresh clone
+against tag `v1.30.1` (SHA `f5d49f805d98212e1ab9dc292ac8d8d06c934f87`):
+`release gate: 5 passed, 0 failed, 0 skipped`.
+- tree: clean, one worktree, no lock, level with upstream
+- ci: green on `f5d49f80`
+- publish: v1.30.1 pushed and pointing at `f5d49f80`
+- release: GitHub Release exists for v1.30.1
+- clone: PASS `f5d49f805d98212e1ab9dc292ac8d8d06c934f87` — fresh clone of
+  v1.30.1, README's install block and its first following command both
+  exited 0
