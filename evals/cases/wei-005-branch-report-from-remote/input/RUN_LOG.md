@@ -1,6 +1,7 @@
 # Run log — last entries before the end report
 
 PRs this run: #41 (feat/mesh-reader), #42 (feat/gen-split). Both merged.
+Board rows pushed on board/queue-sync as #43, `gh pr merge --auto` armed.
 
 ```
 $ git push origin --delete feat/mesh-reader

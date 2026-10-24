@@ -454,7 +454,7 @@ Match each task's class to the agent's description; re-runs and fixes go to the 
    completion notice's `tool_uses`, never the agent's own count; over the brief's cap is an overrun whatever its report says), delivered (PR/SHA, reverted, deferred, nothing); totals
    first; one line per item your brief seeded: done (PR/SHA), deferred (why) or blocked (on what), each marked deliverable or infra — a stretch where every delivered item is infra is a stall, named as one, never reported as a clean run. One line per milestone: audit / fix / refactor / release / stranger
    gate / board — each with evidence or NOT RUN; with none, `no milestone, because <reason>`.
-3. Per-case perf delta, if measurable; every branch the run made, as `git branch` and `git ls-remote --heads origin` print them after the last merge, pasted (a tracking ref is not the remote; a merge's `--delete-branch` is no evidence)
+3. Per-case perf delta, if measurable; every branch the run made, board and log branches included, as `git branch` and `git ls-remote --heads origin` print them after the last merge, pasted, each marked merged (its PR merged or `git cherry` empty), open PR or abandoned, and "none open" only once every one is marked (a tracking ref is not the remote; a merge's `--delete-branch` is no evidence)
    (deleted once landed or abandoned, else a board row); blockers for the next
    campaign; contradictions between subagents that need the user.
 4. Cycle time: PR open-to-merge, sweeps per PR, rows/hour, rows left by

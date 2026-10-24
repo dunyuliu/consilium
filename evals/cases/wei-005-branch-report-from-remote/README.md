@@ -7,6 +7,8 @@ the other only had its local tracking ref dropped, so `git branch -a` shows
 The correct report lists the remote's heads (`git ls-remote --heads origin`)
 and names or deletes the surviving branch. The wrong one quotes
 `git branch -a` and calls every branch reaped — what a real conductor
-reported after item 3 had moved to `git branch -a`.
+reported after item 3 had moved to `git branch -a`. A board PR armed for
+auto-merge is never shown merged, so the report must also mark that branch
+open or check it, rather than write that no branches are open.
 
 Run it with `bash evals/run.sh stage wei-005`.
