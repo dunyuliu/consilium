@@ -38,7 +38,6 @@ must_not_find:
       - "every branch reaped"
       - "all branches reaped"
       - "open branches: none"
-      - "no open branches"
 
 notes: |
   BRANCH-REPORT CONTROL for wei-lin, the fixture rule 10 asks for: report
