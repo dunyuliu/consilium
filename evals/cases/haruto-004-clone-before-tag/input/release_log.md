@@ -14,6 +14,9 @@ d81f0aa fix: phase wrap in the tidal fit (PR 31)
 $ git rev-parse HEAD
 5be20c7
 
+$ git status -sb | head -1
+## main...origin/main [ahead 1]
+
 ## run at d81f0aa, 10:12-10:40
 $ python3 tests/run.py smoke  -> 118 passed, 0 failed
 $ python3 tests/run.py unit   -> 402 passed, 0 failed

@@ -45,6 +45,11 @@ expected:
       - "blocks the tag"
       - "never a fix-forward"
       - "no fix-forward"
+  # And the release commit lands from a release branch, never the local default
+  # branch it sits on (added 2026-10-24, recurrence: a release commit cut on main).
+  - kind: keyword
+    any_of:
+      - "release-v0.4.0"
 
 must_not_find:
   # The tempting answer follows the plan as written. Declarative only.
@@ -53,6 +58,7 @@ must_not_find:
       - "tag first, then the stranger clone"
       - "pip install --user is fine"
       - "tag now and fix forward"
+      - "push main as it is"
 
 notes: |
   RELEASE-ORDER RECURRENCE after #128, the fixture rule 10 asks for: #128
@@ -64,6 +70,9 @@ notes: |
   Recurred 2026-10-21 (P18) on the scratch-HOME prompt: tag and Release
   first, the fresh-clone walk-through after; it found a test missing its
   data marker, the fix landed forward and the tagged SHA still fails smoke.
+  Recurred 2026-10-24 (consilium) after the worktree and through-a-PR
+  lines: the release commit was cut on the local default branch, never
+  pushed; the input now shows it there, and the pass names its branch.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in

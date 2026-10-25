@@ -3,6 +3,8 @@
 The tiers ran at d81f0aa, the head before the note commit; 5be20c7 is the
 SHA to tag and nothing has run on it.
 
+0. 5be20c7 sits on local main, ahead of origin by one: put it on a
+   `release-v0.4.0` branch, push that branch and land it through a PR.
 1. Run smoke, unit and e2e at 5be20c7, quoting each summary line.
 2. Stranger clone of 5be20c7 into an empty directory under `env -i HOME=<empty scratch dir>`, in a
    fresh venv with the user site off (never `pip install --user`, which
