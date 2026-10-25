@@ -22,14 +22,18 @@ expected:
       - "past the cap"
       - "over the brief's cap"
       - "past the brief's cap"
+      - "stop line"
+      - "past call 12"
 
 must_not_find:
   # The tempting answer: the resumed turn's own count, reported as the run's.
-  # Declarative, so a denial infixes them (rule 25).
+  # Declarative verdict lines only, so a correct denial that quotes the bare
+  # fact (e.g. "6 calls in the resumed turn, but the run's total is 17")
+  # cannot infix them (rule 25).
   - keywords:
       - "Calls: 6, within"
-      - "total of 6 calls"
-      - "is within the cap"
+      - "6 calls, within the cap"
+      - "verdict: within the cap"
       - "stayed within the cap"
       - "stayed under the cap"
 
@@ -42,6 +46,7 @@ notes: |
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: "17", "overrun", "over the cap",
-  "past the cap" and the brief's-cap phrasings appear nowhere in input/;
-  guards are declarative and survive a correct report's denial (rule 25); the
-  input carries no fixture-authoring language and no symlink. Never dispatched.
+  "past the cap", the brief's-cap phrasings, "stop line" and "past call 12"
+  appear nowhere in input/; guards are declarative verdict lines and survive
+  a correct report's denial (rule 25); the input carries no fixture-authoring
+  language and no symlink. Never dispatched.

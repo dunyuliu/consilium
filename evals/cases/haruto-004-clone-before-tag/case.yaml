@@ -58,7 +58,7 @@ must_not_find:
       - "tag first, then the stranger clone"
       - "pip install --user is fine"
       - "tag now and fix forward"
-      - "push main as it is"
+      - "verdict: push main"
 
 notes: |
   RELEASE-ORDER RECURRENCE after #128, the fixture rule 10 asks for: #128
