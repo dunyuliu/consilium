@@ -135,6 +135,14 @@ a fix for — see §6):
   respectively (next pass).
 - The two Advisory findings above: recorded, no action required while Check
   37 stays green.
+- **Low (CI pipeline health, found post-merge)** — `gh run watch` on the
+  merge-to-main run (`40233538537`) surfaced two GitHub Actions deprecation
+  annotations unrelated to this diff: `actions/checkout@v4` is being forced
+  onto Node.js 24 (Node 20 deprecated), and `ubuntu-latest` migrates to
+  Ubuntu 26 starting 2026-10-19. Both are runner-infrastructure deprecations
+  in `.github/workflows/check.yml`, not a defect this release introduced;
+  routed to `iris-vermeulen` (CI config owner, rule 19) as a future pin-bump,
+  not actioned here.
 
 ## 7. Totals or cost changes
 `agents/` + `commands/`: 5786 lines, unchanged from v1.30.1 (both pre-tag
@@ -146,9 +154,14 @@ None beyond what the commands in this note produced, run directly against
 the commits and SHAs named.
 
 ## 9. CI run this release was gated on
-Pending — filled in after step 11 reads CI for the pushed release commit's
-SHA (rule 15a); this note is re-read and this line replaced before the tag
-is created, per step 8/12.
+`structural-invariants` run
+https://github.com/dunyuliu/consilium/actions/runs/40233538537 — conclusion
+`success`, SHA `d8ddbed285c316ba93f920627ab0c0e95f8c751c` (the tagged commit,
+pushed via release PR #197's squash merge to `main`). Two earlier runs on the
+release branch's pre-merge SHA (`915fd85`), triggered by the branch push and
+the PR itself, also concluded `success`:
+https://github.com/dunyuliu/consilium/actions/runs/40233468284 and
+https://github.com/dunyuliu/consilium/actions/runs/40233478840.
 
 ## Trend since v1.30.1
 - **Gate assertions.** `bash tests/check.sh`: v1.30.1 (`f5d49f80`, fresh
@@ -194,7 +207,9 @@ call out.
   complexity was flagged needing simplification.
 - fixes: 4 applied, all by the owning surface (`iris-vermeulen` on three
   fixture guards/criteria, `lian-zhao` on one prompt step), none by the
-  release engineer. 2 deferred (Low, §6). 2 advisory, no action forced (§6).
+  release engineer. 3 deferred (Low, §6: the step-9 ordering question, the
+  Check 19 verb-list gap, and the post-merge CI deprecation annotations). 2
+  advisory, no action forced (§6).
 - docs: `PATHWAY_FORWARD.md` checked against the filesystem — already
   current, no drift found needing this release to update it (§4).
 - refactor: not run — see conciseness above; both pre-tag fixes were each a
@@ -206,6 +221,13 @@ call out.
   re-triggered Check 31's transient, resolved by writing this file).
 
 ## Release gate
-Pending — `bash tests/release_gate.sh release_notes_v1.30.2.md` runs in a
-fresh clone against the pushed tag, before the tag is created (step 12), and
-this section is replaced with its five rows at that point.
+`bash tests/release_gate.sh release_notes_v1.30.2.md`, run in a fresh clone
+against tag `v1.30.2` (SHA `d8ddbed285c316ba93f920627ab0c0e95f8c751c`):
+`release gate: 5 passed, 0 failed, 0 skipped`.
+- tree: clean, one worktree, no lock, level with upstream
+- ci: green on `d8ddbed2`
+- publish: v1.30.2 pushed and pointing at `d8ddbed2`
+- release: GitHub Release exists for v1.30.2
+- clone: PASS `d8ddbed285c316ba93f920627ab0c0e95f8c751c` — fresh clone of
+  v1.30.2, README's install block and its first following command both
+  exited 0
