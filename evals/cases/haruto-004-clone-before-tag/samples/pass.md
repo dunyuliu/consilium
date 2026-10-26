@@ -13,3 +13,6 @@ SHA to tag and nothing has run on it.
    5be20c7`; the clone ran before the tag, so a failure costs no published
    release: a clone failure blocks the tag, never a fix-forward.
 4. Release-gate rows in one follow-up commit.
+
+This is call 55 of a 60-call brief and the steps above take more than five:
+the run ends untagged at call 60 and reports steps 0-4 as what remains.
