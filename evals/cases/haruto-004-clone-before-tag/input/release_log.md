@@ -3,6 +3,8 @@
 Victor's audit of v0.3.2..d81f0aa: PASS, quoted in the note's `audit:` row.
 kai-fischer: nothing needed here (note's `refactor:` row).
 
+Brief: `Stop at call 60 and report what remains.` This is call 55.
+
 CI: none configured (`gh workflow list` is empty). The owner named the gate:
 `python3 tests/run.py smoke`, `unit` and `e2e`.
 

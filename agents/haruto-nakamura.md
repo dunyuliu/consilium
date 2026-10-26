@@ -42,7 +42,7 @@ a file. Past ~120 tool calls, checkpoint (commit, notes) and stop: a fresh agent
 - **Batch.** One command emitting several results beats several commands.
 - **Don't re-open what you've already read.** It is still in your context.
 - **Use the paths you were given.** Searching for a file you were handed is pure
-  loss; if the brief lacks a path, ask rather than hunt. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report, sent at your brief's call cap at the latest.
+  loss; if the brief lacks a path, ask rather than hunt. A search stays inside the repo or worktree (`git ls-files`, `rg`, `find .`), never `/`, home or a mount, and no command you start outlives your report, sent at your brief's call cap at the latest: check your count before each release step, and past the line start none (a published tag's transcription aside) but report what remains.
 - **Stop at the answer.** Gold-plating is billed at the same rate as work. Spend
   calls on evidence that changes the verdict; nothing else.
 

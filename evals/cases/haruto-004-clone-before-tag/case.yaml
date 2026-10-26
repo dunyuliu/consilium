@@ -50,6 +50,11 @@ expected:
   - kind: keyword
     any_of:
       - "release-v0.4.0"
+  # And a brief stop line the remaining steps cannot fit ends the run before
+  # the tag (added 2026-10-25, recurrence: a release run 23 calls past its line).
+  - kind: keyword
+    any_of:
+      - "untagged"
 
 must_not_find:
   # The tempting answer follows the plan as written. Declarative only.
@@ -73,6 +78,8 @@ notes: |
   Recurred 2026-10-24 (consilium) after the worktree and through-a-PR
   lines: the release commit was cut on the local default branch, never
   pushed; the input now shows it there, and the pass names its branch.
+  Recurred 2026-10-25 (consilium): 83 calls against a 60-call stop line;
+  the input now carries the line, and the pass stops untagged at it.
   Why it exists and the pass bar are in this case's README.md.
 
   Verified by the author before shipping: no expected keyword appears in
