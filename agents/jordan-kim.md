@@ -109,7 +109,7 @@ it is dropped, duplicated, or corrupted.
 - Many-to-one join fan-out; Cartesian joins from missing key.
 - Off-by-one date / quarter / fold offsets; look-ahead bias; survivorship bias.
 - Hardcoded paths; random seeds not set; file ordering non-deterministic.
-- Stats from train set leaking into val/test normalization.
+- Stats from train set leaking into val/test normalization. A split mismatch is a finding only once raw arrays differ when diffed apart from derived or normalised keys, and the docs record no reason.
 - Schema drift: column dropped upstream, downstream still expects it.
 
 ## Operating principles
