@@ -182,8 +182,7 @@ rule 21, carries no command or interval.
 
 ### 6 — `tests/check.sh` — VERIFIED
 Green means the checks pass, not that the repo is correct (row 8).
-`Summary: 796 passed, 0 failed`, run 2026-09-18 on base `b1b1ad8` after the
-rule-book slim in this worktree.
+`Summary: 1633 passed, 0 failed`, run 2026-11-05 on `654b900`.
 ```bash
 bash tests/check.sh | tail -1
 ```
@@ -415,6 +414,7 @@ grep -c "no matching tag" tests/check.sh
 ```
 
 ### 21 — `tests/check.sh` — VERIFIED
+Re-run 2026-11-05 on `654b900`: 1.
 ```bash
 grep -c "git ls-files '\*\.sh'" tests/check.sh
 ```
@@ -425,11 +425,13 @@ grep -c "refuses to touch a prompt that has none" agents/lian-zhao.md
 ```
 
 ### 23 — `tests/lock.sh` — VERIFIED
+Re-run 2026-11-05 on `654b900`: exit 0.
 ```bash
 grep -q 'git rev-parse --git-common-dir' tests/lock.sh && test -d "$(git rev-parse --git-common-dir)"
 ```
 
 ### 24 — `evals/run.sh` — VERIFIED
+Re-run 2026-11-05 on `654b900`: 1.
 ```bash
 grep -c 'provenance indeterminate' evals/run.sh
 ```
