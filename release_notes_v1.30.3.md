@@ -83,8 +83,12 @@ predates this release.
 None beyond what the commands in this note produced.
 
 ## 9. CI run this release was gated on
-Pending — transcribed in the follow-up commit after step 11 reads CI for the
-pushed release commit's SHA (rule 15a), as for v1.30.2.
+`structural-invariants` run
+https://github.com/dunyuliu/consilium/actions/runs/42138917334 — conclusion
+`success`, SHA `79bccef67cf1a665f2fa1f77eaf89fe353bc597c` (the tagged commit,
+release PR #203's squash merge). Pre-merge runs on the branch SHA, also
+`success`: https://github.com/dunyuliu/consilium/actions/runs/42138713033 and
+https://github.com/dunyuliu/consilium/actions/runs/42138835503.
 
 ## Trend since v1.30.2
 - **Gate assertions.** `bash tests/check.sh`: v1.30.2 tag checked out today:
@@ -121,6 +125,12 @@ held; no deterioration.
   mechanical gate is green except the expected Check 31 transient (§Trend).
 
 ## Release gate
-Pending — `bash tests/release_gate.sh release_notes_v1.30.3.md` runs in a
-fresh clone against the pushed tag; its five rows are transcribed in the
-follow-up commit after the tag.
+`bash tests/release_gate.sh release_notes_v1.30.3.md`, in a fresh clone of
+tag `v1.30.3` (SHA `79bccef67cf1a665f2fa1f77eaf89fe353bc597c`):
+`release gate: 5 passed, 0 failed, 0 skipped`.
+- tree: clean, one worktree, no lock, level with upstream
+- ci: green on `79bccef6`
+- publish: v1.30.3 pushed and pointing at `79bccef6`
+- release: GitHub Release exists for v1.30.3
+- clone: PASS `79bccef67cf1a665f2fa1f77eaf89fe353bc597c` — fresh clone, empty
+  `HOME`, README's install block and `bash tests/check.sh` both exited 0
