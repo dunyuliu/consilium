@@ -30,6 +30,7 @@ understanding before you run them: `/autopilot` and `/propose`.
 | `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book. No argument audits; `seed` aligns the project to the book — creating what is absent, patching what exists; `codify <incident>` turns an incident into a rule. |
 | `/brief` | — | The owner's one-screen report on the calling session's work, run in that session: answer, what changed with proof, a comparison table, numbered decisions with a recommendation, what runs next. Silent past one line when nothing changed; `/brief-loop [interval]` arms it on a recurring session cron (default 3 h). |
 | `/brief-loop` | — | Arms `/brief` on a recurring session cron, default every 3 h; between briefs every other reply is one line and decisions wait for the next brief. |
+| `/cleanup` | `zofia-kaminska` | Zofia's report-only tidy (stale worktrees, merged branches, root strays, uncited `runs/`, scratch); the calling session deletes what is dead where the rules allow, stops its idle tasks and agents, and lists the rest as one owner Go. Replies only with what needs the owner. |
 
 ## `/autopilot` — what it may do unattended
 

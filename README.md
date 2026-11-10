@@ -115,6 +115,7 @@ table.
 | `/enforce-rules` | `zofia-kaminska` | Enforce the project rule book — audit, `seed`, or `codify`. |
 | `/brief` | — | One-screen report to the owner: answer, changes, numbers, decisions, next. Loop: `/brief-loop`. |
 | `/brief-loop` | — | `/brief` every 3 h (or the interval given); quiet between briefs. |
+| `/cleanup` | `zofia-kaminska` | Report-only tidy, delete what is dead where rules allow, rest as one owner Go. |
 
 Full descriptions, and a deep dive on `/autopilot` and `/propose`, in
 `docs/user/commands.md`.
