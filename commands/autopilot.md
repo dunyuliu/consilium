@@ -23,22 +23,9 @@ checked out. Past ~200k context of its own, it hands off: a
 brief (live agents, pending relays, board SHA) for the owner to resume in a fresh session. Outside the repo it writes
 nothing without the owner's OK for that write. A pre-written constraint is a claim to re-check, not an order; before you send her an unblock that provisions, links or copies anything, grep the rule book for that operation.
 
-**The queue is the status board the rule book names** — `PATHWAY_FORWARD.md`
-by default — worked in `prio` order, state as the tiebreak. If this command and
-the rule book disagree on which file, ask once rather than pick. She writes a
-row's mechanical update (fresh command output, date); opening, closing and
-re-scoping rows stay Zofia's (rule 19). A row closes on a command that ran.
+**The queue is the status board the rule book names** — `PATHWAY_FORWARD.md` by default — worked in `prio` order, state as the tiebreak. If this command and the rule book disagree on which file, ask once rather than pick. She writes a row's mechanical update (fresh command output, date); opening, closing and re-scoping rows stay Zofia's (rule 19). A row closes on a command that ran.
 
-**Per landing: a gated merge only.** Per **milestone** — a surface reaching its
-target state — once each: session log, board pass, and the strict cycle in her
-Phase 3a: audit (`zofia-kaminska` rules, `victor-reyes` code), fix by each
-surface's owner, `kai-fischer` refactor scoped to the findings,
-`haruto-nakamura` release, the tag gated on green CI for that exact SHA (rule
-15a). Before the tag, clone that SHA into an empty directory and follow the
-README as a stranger, under `env -i` so no shared venv is inherited; an error, or
-an env-build script that doesn't create its own interpreter, blocks the release. With no remote, no CI,
-or pushing forbidden, the gate is the full test tier on the exact SHA plus a
-stranger clone of the local repo at the tag — say so in the first report.
+**Per landing: a gated merge only.** Per **milestone** — a surface reaching its target state — once each: session log, board pass, and the strict cycle in her Phase 3a: audit (`zofia-kaminska` rules, `victor-reyes` code), fix by each surface's owner, `kai-fischer` refactor scoped to the findings, `haruto-nakamura` release, the tag gated on green CI for that exact SHA (rule 15a). Before the tag, clone that SHA into an empty directory and follow the README as a stranger, under `env -i` so no shared venv is inherited; an error, or an env-build script that doesn't create its own interpreter, blocks the release. With no remote, no CI, or pushing forbidden, the gate is the full test tier on the exact SHA plus a stranger clone of the local repo at the tag — say so in the first report.
 
 **Unattended scope is the project's stated merge policy**, read from its rule
 book (a direct-push policy is flagged to the owner once as a deviation from PR-only); where none is stated, this command's cycle is the policy, named in the brief and never asked; missing CI is her first row. Only
