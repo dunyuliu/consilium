@@ -49,7 +49,7 @@ missed finding, because it destroys work that was already correct.
 ## Keeping the loop alive — four rules that cost a campaign each
 
 **1. Never end a turn while a child is alive.** Dispatch in the foreground;
-background only up to the specialist cap Phase 1 sets, each brief reserving its own number for any numbered file it adds (a regression test, a migration) and its own scratch subfolder, every heavy run queued behind one shared `flock` so parallel runs never overlap, and then end the turn on a blocking poll of
+background only up to the specialist cap Phase 1 sets, each brief reserving its own number for any numbered file it adds (a regression test, a migration) and its own scratch subfolder, every heavy run queued behind one shared `flock` so parallel runs never overlap (a long single-core job last or outside it), and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Already past a poll's deadline, or one set with none at all: that is not this turn's work — name it and switch to the next workable row now. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
@@ -176,7 +176,7 @@ When in doubt, refuse the merge: a held PR costs little, a 3 AM regression costs
 ## Babysitting subagents — liveness & waste
 
 - **Liveness = the agent's transcript mtime advancing, OR fresh files/procs it
-  owns** — NOT CPU%, not transcript size. A reasoning-heavy agent can sit at low
+  owns** (its notes file, run directory, roster PIDs; a task-output file's mtime stands still mid-run) — NOT CPU%, not transcript size. A reasoning-heavy agent can sit at low
   CPU for many minutes doing real work; killing it on "looks idle" loses hours.
   Conversely, a fresh transcript with ZERO file/NOTES/proc progress for ~40+ min
   is a reasoning-spin — stop it, salvage its notes, re-pinpoint, re-dispatch
@@ -227,7 +227,7 @@ Three constraints on driving from the board, all of them rule 19:
   re-run is MEASURED; VERIFIED needs an independent oracle at matched resolution,
   an archived one first — until then "gated, not validated", naming what is missing.
   A board number or relayed success names its result file, mtime and code SHA, never
-  "no exception" (an "after-X" run started after X); `ls` a report's paths before "gone".
+  "no exception" or a worker's DONE line (a batch is done when its finished outputs, counted, equal the queue's length; an "after-X" run started after X); `ls` a report's paths before "gone".
 
 `PROJECT_RULES.md` is the project's LOCAL, auditable companion — it holds only
 the project-SPECIFICS your universal rules can't know (what "parity" means here,
@@ -281,7 +281,7 @@ finished work to its branch (draft PR) — a 429 mid-wait strands it otherwise.
 small, ready non-physics row into the next PR — one CI run, capped at what one
 audit reads in one pass; physics gets its own PR, and a red fix or ready P1
 never waits for a batch. PRs are serial, one owner each: a correction goes to that owner (or stops it) first;
-a docs/board/log-only PR is the fast lane — the cheapest tier at its merge head in a bare clone (a text guard lives there; the project's page or PDF build too, exit 0), a checkpoint commit too, the project's privacy grep before every push included (every branch, session log, commit body, board row and release notes; where the rule book bars personal names, the roster's agent names count, written as their role; a hit blocks like red CI), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
+a docs/board/log-only PR is the fast lane — the cheapest tier at its merge head in a bare clone in your own environment, `env -i` being the code gate's (a text guard lives there; the project's page or PDF build too, exit 0), a checkpoint commit too, the project's privacy grep before every push included (every branch, session log, commit body, board row and release notes; where the rule book bars personal names, the roster's agent names count, written as their role; a hit blocks like red CI), `gh pr merge --auto` with the rule book's merge method (`--merge`/`--rebase`, else `--squash`; every merge), no audit, never queued behind code. Per returning subagent: rebase if gate axis 4 calls for it,
 strip machine-local paths from the diff, syntax-check, then push and open the PR at once — what changed, why,
 evidence for every removal. Three gates run alongside, never in series: the
 required CI check, a `victor-reyes` audit if the diff changes gate or physics logic, and your own gate
@@ -291,7 +291,7 @@ they change), run from its own detached worktree so edits cannot race it. A fix 
 touching source or numerics. A version bump rides in the feature PR, never its
 own. Never merge past a hold marker in the PR's own commits or body ("NOT
 merged", "pending owner"), and never freeze a first reference whose benchmark
-has an external validation step — ask. Merge with the rule book's method flag (read before the run's first merge, never the default), delete the branch. Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit; its text in his brief, never only in your transcript) or says "audit waived by owner", a session log exists,
+has an external validation step — ask. Merge with the rule book's method flag (read before the run's first merge, never the default), delete the branch (from a worktree by `git push origin --delete`: `gh pr merge --delete-branch` there checks out and moves the local default branch). Tag only through `haruto-nakamura`, a per-landing tag too: his note quotes victor's report on last-tag..tag (one run per tag, not per commit; its text in his brief, never only in your transcript) or says "audit waived by owner", a session log exists,
 CI and the gate ran on the tag's own SHA, the stranger clone passed; a miss blocks the tag, and a tag already cut on a failing clone is a broken release, its milestone open until a superseding patch passes — never closed by a milestone fix-forward. If a landing regresses main: revert, push the
 revert, log the diagnosis. Never debug in master. Poll CI's run LIST, not only
 the SHA you are gating; gate a merge as `gh run watch <id> --exit-status && gh pr
@@ -389,7 +389,7 @@ is per MILESTONE, not per landing: one log section, one board handoff, evidence
 batched — in one campaign 31 of 51 commits in ten hours were ceremony. Per
 milestone: time + commit SHAs, which subagent, what they shipped (files, line
 counts, parity target), test tier + result, per-case perf delta if known,
-anything contradictory vs prior assumptions. On a regression + revert, log the
+anything contradictory vs prior assumptions; a child's result is one log line once read, before the next dispatch, never saved for the handoff. On a regression + revert, log the
 full chain: the bad commit, how it got past the gate (which gate was
 insufficient and what should change), the revert commit, the retry precondition.
 
