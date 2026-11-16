@@ -77,12 +77,13 @@ None beyond what the commands in this note produced. Victor's audit ran in
 one session without specialist dispatch (§5).
 
 ## 9. CI run this release was gated on
-Pre-merge runs on the release branch SHA are read at step 11 and
-transcribed, with the tagged merge commit's run, into this note by one
-post-tag follow-up commit, as for v1.30.3. For the range's last commit,
 `structural-invariants` run
-https://github.com/dunyuliu/consilium/actions/runs/43967499681 — `success`,
-SHA `9730780a1f2afbe45009940e5874a3430c0925dd`.
+https://github.com/dunyuliu/consilium/actions/runs/43968595114 — conclusion
+`success`, SHA `c53e4ea4acd2d51b97c7a6f3a08c8bd077c84538` (the tagged commit,
+release PR #207's squash merge). Pre-merge runs on the branch SHA, also
+`success`: https://github.com/dunyuliu/consilium/actions/runs/43968466112 and
+https://github.com/dunyuliu/consilium/actions/runs/43968476731. Earlier
+range-tip run on `9730780`: run 43967499681, `success`.
 
 ## Trend since v1.30.3
 - **Gate assertions.** `bash tests/check.sh`: v1.30.3 tag 1636 passed, 0
@@ -114,10 +115,15 @@ shrank 4; gate +2, other measures flat. No deterioration.
   tests/check.sh` green on `9730780`. No rule change in range.
 
 ## Release gate
-Transcribed by the post-tag follow-up commit from `bash
-tests/release_gate.sh release_notes_v1.31.0.md` in a fresh clone of the tag.
-- tree: pending post-tag run
-- ci: pending post-tag run
-- publish: pending post-tag run
-- release: pending post-tag run
-- clone: pending post-tag run
+`bash tests/release_gate.sh release_notes_v1.31.0.md`, in a fresh clone of
+`main` at the tag (SHA `c53e4ea4acd2d51b97c7a6f3a08c8bd077c84538`):
+`release gate: 5 passed, 0 failed, 0 skipped`. A first run with a scratch
+`HOME` and a detached checkout failed tree, ci and release for lack of `gh`
+credentials and an upstream, not for state; the rerun above is the verdict.
+- tree: clean, one worktree, no lock, level with upstream
+- ci: green on `c53e4ea4`
+- publish: v1.31.0 pushed and pointing at `c53e4ea4`
+- release: GitHub Release exists for v1.31.0
+- clone: PASS `c53e4ea4acd2d51b97c7a6f3a08c8bd077c84538` — pre-tag clone
+  under an empty `HOME`: README's install block exited 0 and `bash
+  tests/check.sh` gave 1542 passed, 0 failed
