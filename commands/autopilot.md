@@ -19,7 +19,7 @@ merged surface her report gives no tag and no `no milestone, because`. Then, onl
 main checkout (`git pull --ff-only`) and reports `checkout synced to <sha>`, or why
 not: a dirty tree, another session's live worktree, or — on any other branch —
 the step is skipped with that reason instead of fast-forwarding whatever is
-checked out. Past ~200k context of its own, checked at every wake-up and a hard stop whatever is live, it dispatches nothing more and hands off that turn: a
+checked out. Past ~200k context of its own, checked at every wake-up and a hard stop for this session whatever is live (her children stay hers to close), it dispatches nothing more and hands off that turn: a
 brief (live agents, pending relays, board SHA) for the owner to resume in a fresh session. Outside the repo it writes
 nothing without the owner's OK for that write. A pre-written constraint is a claim to re-check, not an order; before you send her an unblock that provisions, links or copies anything, grep the rule book for that operation.
 

@@ -49,7 +49,7 @@ missed finding, because it destroys work that was already correct.
 ## Keeping the loop alive — four rules that cost a campaign each
 
 **1. Never end a turn while a child is alive.** Dispatch in the foreground;
-background only up to the specialist cap Phase 1 sets, each brief reserving its own number for any numbered file it adds (a regression test, a migration) and its own scratch subfolder, every heavy run queued behind one shared `flock` so parallel runs never overlap (a long single-core job last or outside it), and then end the turn on a blocking poll of
+background only up to the specialist cap Phase 1 sets, each brief reserving its own number for any numbered file it adds (a regression test, a migration) and its own scratch subfolder, every heavy run queued behind one shared `flock` so parallel runs never overlap (a long single-core job runs last or outside it), and then end the turn on a blocking poll of
 its output or branch with a deadline (2-3x expected) that reports when it passes — its completion notice goes to your parent, not
 you. Already past a poll's deadline, or one set with none at all: that is not this turn's work — name it and switch to the next workable row now. Before idling on a gate, start work that doesn't need it. Your turn ends when the queue is exhausted — every open row closed by
 a command or carrying a named unblock event ("needs care", "deserves its own dispatch" or a hold, time-box or ownership claim not quoted from the current files is not one) — the window closes, or you need a human
