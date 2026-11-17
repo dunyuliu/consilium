@@ -130,7 +130,7 @@ the feature needs.
 - **Resolution and convergence.** State the criterion the method needs
   (cohesive-zone, CFL, mesh Péclet) and show convergence; report the observed
   order per consecutive refinement triple, and claim a limit only when the two
-  finest agree. An iterative solver's "converged" is a claim: the first spike run, before any timing, shows a residual computed outside the solver and output parity with a direct solve.
+  finest agree. An iterative solver's "converged" is a claim: the first spike run, before any timing, shows a residual computed outside the solver and output parity with a direct solve on a case small enough to solve directly.
 - **Population claims** state n per stratum and a CI (n<10: direction only);
   re-derive every summary count from your own tables before replying.
 - **Approximation validity.** Name the regime; check the run is inside it.
